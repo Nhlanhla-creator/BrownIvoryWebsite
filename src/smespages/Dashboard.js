@@ -29,6 +29,7 @@ const businessModels = [
   'SaaS', 'PaaS', 'IaaS', 'E-commerce', 'Direct Sales', 'Franchise', 'Other'
 ];
 
+
 const steps = [
   'Profile Form',
   'Company Overview',
@@ -121,6 +122,7 @@ const stepContent = {
 };
 
 export default function Dashboard() {
+  // State hooks
   const [currentStep, setCurrentStep] = useState('Profile Form');
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
@@ -128,8 +130,50 @@ export default function Dashboard() {
   const [saveStatus, setSaveStatus] = useState('');
   const [showStepInfo, setShowStepInfo] = useState(false);
   const [openDropdowns, setOpenDropdowns] = useState({});
+  const [complianceData, setComplianceData] = useState({
+    percentage: 0,
+    trend: 'neutral',
+    change: '0%'
+  });
+
   const navigate = useNavigate();
 
+  // Fetch compliance data
+  useEffect(() => {
+    const fetchCompliance = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/compliance', {
+          signal: AbortSignal.timeout(5000) // Timeout after 5 seconds
+        });
+        
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        const percentage = data.compliancePercentage || 0;
+        
+        setComplianceData({
+          percentage,
+          trend: percentage >= 80 ? 'up' : 
+                percentage >= 50 ? 'neutral' : 'down',
+          change: percentage >= 80 ? '+5%' : 
+                 percentage >= 50 ? '0%' : '-5%'
+        });
+      } catch (error) {
+        console.warn('Error fetching compliance, using fallback:', error);
+        // Fallback values
+        setComplianceData({
+          percentage: 0,
+          trend: 'neutral',
+          change: '0%'
+        });
+      }
+    };
+    
+    fetchCompliance();
+  }, []);
+
+
+  // Updated statBlocks with dynamic compliance data
   const statBlocks = [
     { label: 'Total Matched Funders', route: '/TotalMatchedFunders', value: 18, trend: 'up', change: '+3' },
     { label: 'Applications Sent', route: '/ApplicationsSent', value: 12, trend: 'neutral', change: '0' },
@@ -137,31 +181,65 @@ export default function Dashboard() {
     { label: 'Funder Interest Received', route: '/FunderInterestReceived', value: 5, trend: 'up', change: '+2' },
     { label: 'Meetings Scheduled', route: '/MeetingsScheduled', value: 2, trend: 'up', change: '+1' },
     { label: 'Feedback Received', route: '/FeedbackReceived', value: 4, trend: 'neutral', change: '0' },
-    { label: 'Compliance Status', route: '/ComplianceStatus', value: '80%', trend: 'up', change: '+5%' },
+    { 
+      label: 'Compliance Status', 
+      route: '/ComplianceStatus', 
+      value: `${complianceData.percentage}%`, 
+      trend: complianceData.trend, 
+      change: complianceData.change 
+    },
     { label: 'BIG Score Summary', route: '/BIGScoreSummary', value: '75%', trend: 'up', change: '+3%' }
   ];
+
+  // File upload handler with compliance update
+  const handleInputChange = async (e) => {
+    const { name, value, type, checked } = e.target;
+    const val = type === 'checkbox' ? checked : 
+                type === 'file' ? e.target.files[0] : 
+                value;
+
+    // Handle file uploads for compliance documents
+    if (type === 'file' && ['taxClearance', 'registrationDoc', 'directorIds', 'shareholderCerts'].includes(name)) {
+      try {
+        const response = await fetch('http://localhost:3001/api/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            documentType: name,
+            isUploaded: !!e.target.files[0]
+          })
+        });
+
+        if (!response.ok) throw new Error('Upload failed');
+
+        const data = await response.json();
+        const percentage = data.compliance || 0;
+
+        setComplianceData({
+          percentage,
+          trend: percentage >= 80 ? 'up' : 
+                percentage >= 50 ? 'neutral' : 'down',
+          change: percentage >= 80 ? '+5%' : 
+                 percentage >= 50 ? '0%' : '-5%'
+        });
+      } catch (error) {
+        console.error('Error uploading document:', error);
+      }
+    }
+
+    setFormData(prev => ({ ...prev, [name]: val }));
+    
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: undefined }));
+    }
+  };
+
 
   const toggleDropdown = (fieldName) => {
     setOpenDropdowns(prev => ({
       ...prev,
       [fieldName]: !prev[fieldName]
     }));
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const val = type === 'checkbox' ? checked : 
-                type === 'file' ? e.target.files[0] : 
-                value;
-    setFormData(prev => ({ ...prev, [name]: val }));
-    
-    if (errors[name]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
   };
 
   const handleSelectOption = (fieldName, value) => {
