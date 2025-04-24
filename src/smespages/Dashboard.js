@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
-import { CheckCircle, AlertCircle, Loader2, ChevronRight, ChevronLeft, HelpCircle, LifeBuoy, ArrowUp, ArrowDown, Minus, ChevronDown, ChevronUp } from 'lucide-react';
+import { 
+  CheckCircle, AlertCircle, Loader2, ChevronRight, ChevronLeft, 
+  HelpCircle, LifeBuoy, ArrowUp, ArrowDown, Minus, 
+  ChevronDown, ChevronUp, Menu, X, Settings, User, 
+  FileText, BarChart2, DollarSign, Shield, Mail, LogOut 
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const africanCountries = [
@@ -13,13 +18,6 @@ const africanCountries = [
   'South Africa', 'South Sudan', 'Sudan', 'Tanzania', 'Togo', 'Tunisia', 'Uganda', 'Zambia', 'Zimbabwe'
 ];
 
-const africanLanguages = [
-  'Afrikaans', 'Amharic', 'Arabic', 'Bambara', 'Berber', 'Chewa', 'Chichewa', 'Comorian', 
-  'English', 'French', 'Fula', 'Hausa', 'Igbo', 'Kinyarwanda', 'Kirundi', 'Khoekhoe', 
-  'Lingala', 'Malagasy', 'Mauritian Creole', 'Ndebele', 'Oromo', 'Portuguese', 'Sango', 
-  'Sepedi', 'Sesotho', 'Setswana', 'Shona', 'Somali', 'Swahili', 'Swati', 'Tigrinya', 
-  'Tsonga', 'Tswana', 'Venda', 'Xhosa', 'Yoruba', 'Zulu', 'Other'
-];
 
 const businessStages = ['Pre-seed', 'Seed', 'Series A', 'Series B', 'Series C', 'Growth', 'Mature'];
 const profitabilityStatuses = ['Profitable', 'Break-even', 'Pre-revenue', 'Loss-making'];
@@ -51,7 +49,7 @@ const stepContent = {
         'Manufacturing', 'Retail', 'Energy', 'Transportation', 'Construction', 'Other'
       ], required: true },
       { name: 'website', label: 'Website / Social Media Links', type: 'url' },
-      { name: 'languages', label: 'Languages for Communication', type: 'multiselect', options: africanLanguages, required: true }
+      { name: 'languages', label: 'Languages for Communication',type: 'text', required: true },
     ],
     description: 'Basic information about your company'
   },
@@ -403,7 +401,7 @@ export default function Dashboard() {
           </button>
           <button className="btn-support">
             <LifeBuoy size={18} />
-            <span>Support</span>
+            <span>Settings</span>
           </button>
         </div>
       </header>
