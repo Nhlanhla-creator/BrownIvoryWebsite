@@ -1,0 +1,143 @@
+/* Auth.css - Enhanced */
+
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Raleway', 'Segoe UI', sans-serif;
+  background-color: #F2F0E6;
+  animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-container {
+  max-width: 400px;
+  margin: 60px auto;
+  background-color: #fff;
+  border: 2px solid #754A2D;
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.8s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.auth-container h2 {
+  color: #372C27;
+  text-align: center;
+  margin-bottom: 24px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.form-box {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-step {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: transform 0.3s ease;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  background-color: #F2F0E6;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-group:focus-within {
+  border-color: #754A2D;
+  box-shadow: 0 0 0 3px rgba(117, 74, 45, 0.2);
+}
+
+.input-group input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 16px;
+  color: #372C27;
+  padding-left: 10px;
+}
+
+.input-group svg {
+  color: #754A2D;
+  font-size: 18px;
+}
+
+.input-error {
+  border-color: red !important;
+  box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.2);
+}
+
+.error-text {
+  color: red;
+  font-size: 0.85em;
+  margin-top: -6px;
+  margin-bottom: 8px;
+}
+
+button {
+  background-color: #754A2D;
+  color: #fff;
+  border: none;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+button:hover {
+  background-color: #5e3b23;
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.switch-link, .forgot-password {
+  text-align: center;
+  font-size: 14px;
+  color: #372C27;
+  transition: color 0.2s;
+}
+
+.switch-link span {
+  color: #754A2D;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.switch-link span:hover,
+.forgot-password:hover {
+  color: #5e3b23;
+}
+
+.forgot-password {
+  margin-top: -8px;
+  text-decoration: underline;
+  cursor: pointer;
+}
