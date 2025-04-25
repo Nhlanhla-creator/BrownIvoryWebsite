@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
-import { CheckCircle, AlertCircle, Loader2, ChevronRight, ChevronLeft, HelpCircle, LifeBuoy, ArrowUp, ArrowDown, Minus, ChevronDown, ChevronUp } from 'lucide-react';
+import { 
+  CheckCircle, AlertCircle, Loader2, ChevronRight, ChevronLeft, 
+  HelpCircle, LifeBuoy, ArrowUp, ArrowDown, Minus, 
+  ChevronDown, ChevronUp, Menu, X, Settings, User, 
+  FileText, BarChart2, DollarSign, Shield, Mail, LogOut 
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const africanCountries = [
@@ -13,20 +18,50 @@ const africanCountries = [
   'South Africa', 'South Sudan', 'Sudan', 'Tanzania', 'Togo', 'Tunisia', 'Uganda', 'Zambia', 'Zimbabwe'
 ];
 
-const africanLanguages = [
-  'Afrikaans', 'Amharic', 'Arabic', 'Bambara', 'Berber', 'Chewa', 'Chichewa', 'Comorian', 
-  'English', 'French', 'Fula', 'Hausa', 'Igbo', 'Kinyarwanda', 'Kirundi', 'Khoekhoe', 
-  'Lingala', 'Malagasy', 'Mauritian Creole', 'Ndebele', 'Oromo', 'Portuguese', 'Sango', 
-  'Sepedi', 'Sesotho', 'Setswana', 'Shona', 'Somali', 'Swahili', 'Swati', 'Tigrinya', 
-  'Tsonga', 'Tswana', 'Venda', 'Xhosa', 'Yoruba', 'Zulu', 'Other'
-];
 
-const businessStages = ['Pre-seed', 'Seed', 'Series A', 'Series B', 'Series C', 'Growth', 'Mature'];
-const profitabilityStatuses = ['Profitable', 'Break-even', 'Pre-revenue', 'Loss-making'];
-const bbbeeLevels = ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Non-compliant'];
+const businessStages = [ 'Idea Stage',
+  'Concept Validation',
+  'Prototype Ready',
+  'MVP Launched',
+  'Early Traction',
+  'Revenue-Generating',
+  'Product-Market Fit',
+  'Scaling / Growth',
+  'Expansion / Internationalization',
+  'Established / Mature',
+  'Pivoting',
+  'Exit Stage (e.g. Acquisition / IPO)',
+  'Other'];
+const profitabilityStatuses = ['Pre-revenue',
+    'Loss-making',
+    'Break-even',
+    'Profitable',
+    'Consistently Profitable',
+    'Recently Turned Profitable',
+    'High Growth with Losses',
+    'Seasonally Profitable',
+    'Not Disclosed',
+    'Other'];
+const bbbeeLevels = ['Level 1 Contributor',
+    'Level 2 Contributor',
+    'Level 3 Contributor',
+    'Level 4 Contributor',
+    'Level 5 Contributor',
+    'Level 6 Contributor',
+    'Level 7 Contributor',
+    'Level 8 Contributor',
+    'Non-Compliant',
+    'Not Applicable'];
 const businessModels = [
-  'B2B', 'B2C', 'B2B2C', 'Marketplace', 'Subscription', 'Freemium', 
-  'SaaS', 'PaaS', 'IaaS', 'E-commerce', 'Direct Sales', 'Franchise', 'Other'
+  'Manufacturer', 'Retailer', 'E-commerce', 'Private Label / White Label',
+    'Consulting / Agency', 'Freemium', 'Subscription', 'Pay-Per-Use', 'Time-Based Billing',
+    'Marketplace', 'Two-Sided Platform', 'Peer-to-Peer (P2P)', 'Aggregator',
+    'Licensing', 'Franchise', 'Patent Licensing',
+    'SaaS (Software as a Service)', 'PaaS / IaaS', 'Open-Source + Support', 'Data Monetization',
+    'Brokerage', 'Lending / Credit', 'Leasing', 'Crowdfunding',
+    'D2C (Direct-to-Consumer)', 'B2B (Business-to-Business)', 'B2C (Business-to-Consumer)', 'B2G (Business-to-Government)',
+    'Razor and Blade', 'Freemium-to-Paid Upgrade', 'Pay-What-You-Want', 'Usage-Based Pricing', 'Circular Economy',
+    'Other'
 ];
 
 
@@ -48,11 +83,24 @@ const stepContent = {
       { name: 'registrationNumber', label: 'Registration Number', type: 'text', required: true },
       { name: 'country', label: 'Country of Operation', type: 'select', options: africanCountries, required: true },
       { name: 'industry', label: 'Industry Sector', type: 'select', options: [
-        'Agriculture', 'Technology', 'Finance', 'Healthcare', 'Education', 
-        'Manufacturing', 'Retail', 'Energy', 'Transportation', 'Construction', 'Other'
+        'Agriculture', 'Forestry', 'Fishing', 'Mining', 'Oil & Gas',
+    'Automotive', 'Aerospace & Defense', 'Chemical Manufacturing', 'Food & Beverage', 'Electronics',
+    'Textiles', 'Machinery', 'Construction', 'Shipbuilding', 'Steel & Metal Works',
+    'Pharmaceuticals', 'Plastics & Rubber', 'Banking', 'Insurance', 'Investment Management',
+    'Accounting', 'Consulting', 'Legal Services', 'Real Estate', 'E-commerce',
+    'Retail', 'Fashion', 'Consumer Goods', 'Hospitality', 'Tourism',
+    'Restaurants', 'Airlines', 'Railroads', 'Trucking', 'Shipping & Freight',
+    'Warehousing', 'Software', 'IT Services', 'Telecommunications', 'Internet & Media',
+    'Data Analytics', 'Cybersecurity', 'Cloud Computing', 'Hospitals', 'Biotech',
+    'Medical Devices', 'Health Insurance', 'Film & TV', 'Music', 'Publishing',
+    'Gaming', 'Sports & Recreation', 'Streaming', 'Primary Education', 'Higher Education',
+    'EdTech', 'Vocational Training', 'Utilities', 'Waste Management', 'Public Services',
+    'Government', 'Defense & Military', 'NGOs', 'Religious Organizations',
+    'Scientific R&D', 'Market Research', 'Think Tanks', 'Executive Leadership',
+    'Policy & Decision Making', 'Other'
       ], required: true },
       { name: 'website', label: 'Website / Social Media Links', type: 'url' },
-      { name: 'languages', label: 'Languages for Communication', type: 'multiselect', options: africanLanguages, required: true }
+      { name: 'languages', label: 'Languages for Communication',type: 'text', required: true },
     ],
     description: 'Basic information about your company'
   },
@@ -481,7 +529,7 @@ export default function Dashboard() {
           </button>
           <button className="btn-support">
             <LifeBuoy size={18} />
-            <span>Support</span>
+            <span>Settings</span>
           </button>
         </div>
       </header>
