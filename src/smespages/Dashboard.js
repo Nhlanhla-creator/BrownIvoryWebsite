@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 import './Dashboard.css';
-import { 
-  CheckCircle, AlertCircle, Loader2, ChevronRight, ChevronLeft, 
-  HelpCircle, LifeBuoy, ArrowUp, ArrowDown, Minus, 
-  ChevronDown, ChevronUp, Menu, X, Settings, User, 
-  FileText, BarChart2, DollarSign, Shield, Mail, LogOut 
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
+// Data arrays from the form code
 const africanCountries = [
   'Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi', 'Cabo Verde', 'Cameroon', 
   'Central African Republic', 'Chad', 'Comoros', 'Congo', 'DR Congo', 'Djibouti', 'Egypt', 
@@ -18,8 +15,8 @@ const africanCountries = [
   'South Africa', 'South Sudan', 'Sudan', 'Tanzania', 'Togo', 'Tunisia', 'Uganda', 'Zambia', 'Zimbabwe'
 ];
 
-
-const businessStages = [ 'Idea Stage',
+const businessStages = [ 
+  'Idea Stage',
   'Concept Validation',
   'Prototype Ready',
   'MVP Launched',
@@ -31,83 +28,89 @@ const businessStages = [ 'Idea Stage',
   'Established / Mature',
   'Pivoting',
   'Exit Stage (e.g. Acquisition / IPO)',
-  'Other'];
-const profitabilityStatuses = ['Pre-revenue',
-    'Loss-making',
-    'Break-even',
-    'Profitable',
-    'Consistently Profitable',
-    'Recently Turned Profitable',
-    'High Growth with Losses',
-    'Seasonally Profitable',
-    'Not Disclosed',
-    'Other'];
-const bbbeeLevels = ['Level 1 Contributor',
-    'Level 2 Contributor',
-    'Level 3 Contributor',
-    'Level 4 Contributor',
-    'Level 5 Contributor',
-    'Level 6 Contributor',
-    'Level 7 Contributor',
-    'Level 8 Contributor',
-    'Non-Compliant',
-    'Not Applicable'];
-const businessModels = [
-  'Manufacturer', 'Retailer', 'E-commerce', 'Private Label / White Label',
-    'Consulting / Agency', 'Freemium', 'Subscription', 'Pay-Per-Use', 'Time-Based Billing',
-    'Marketplace', 'Two-Sided Platform', 'Peer-to-Peer (P2P)', 'Aggregator',
-    'Licensing', 'Franchise', 'Patent Licensing',
-    'SaaS (Software as a Service)', 'PaaS / IaaS', 'Open-Source + Support', 'Data Monetization',
-    'Brokerage', 'Lending / Credit', 'Leasing', 'Crowdfunding',
-    'D2C (Direct-to-Consumer)', 'B2B (Business-to-Business)', 'B2C (Business-to-Consumer)', 'B2G (Business-to-Government)',
-    'Razor and Blade', 'Freemium-to-Paid Upgrade', 'Pay-What-You-Want', 'Usage-Based Pricing', 'Circular Economy',
-    'Other'
+  'Other'
 ];
 
+const profitabilityStatuses = [
+  'Pre-revenue',
+  'Loss-making',
+  'Break-even',
+  'Profitable',
+  'Consistently Profitable',
+  'Recently Turned Profitable',
+  'High Growth with Losses',
+  'Seasonally Profitable',
+  'Not Disclosed',
+  'Other'
+];
+
+const bbbeeLevels = [
+  'Level 1 Contributor',
+  'Level 2 Contributor',
+  'Level 3 Contributor',
+  'Level 4 Contributor',
+  'Level 5 Contributor',
+  'Level 6 Contributor',
+  'Level 7 Contributor',
+  'Level 8 Contributor',
+  'Non-Compliant',
+  'Not Applicable'
+];
+
+const businessModels = [
+  'Manufacturer', 'Retailer', 'E-commerce', 'Private Label / White Label',
+  'Consulting / Agency', 'Freemium', 'Subscription', 'Pay-Per-Use', 'Time-Based Billing',
+  'Marketplace', 'Two-Sided Platform', 'Peer-to-Peer (P2P)', 'Aggregator',
+  'Licensing', 'Franchise', 'Patent Licensing',
+  'SaaS (Software as a Service)', 'PaaS / IaaS', 'Open-Source + Support', 'Data Monetization',
+  'Brokerage', 'Lending / Credit', 'Leasing', 'Crowdfunding',
+  'D2C (Direct-to-Consumer)', 'B2B (Business-to-Business)', 'B2C (Business-to-Consumer)', 'B2G (Business-to-Government)',
+  'Razor and Blade', 'Freemium-to-Paid Upgrade', 'Pay-What-You-Want', 'Usage-Based Pricing', 'Circular Economy',
+  'Other'
+];
 
 const steps = [
   'Profile Form',
   'Company Overview',
   'Ownership & Compliance',
-  'Financial Information',
-  'Operational Information',
-  'Pitch & Market',
-  'Optional Dual Role',
-  'Done',
+  'Financial Diligence',
+  'Operational Diligence',
+  'Pitch & Market'
 ];
 
 const stepContent = {
   'Profile Form': {
     fields: [
       { name: 'companyName', label: 'Company Name', type: 'text', required: true },
-      { name: 'registrationNumber', label: 'Registration Number', type: 'text', required: true },
       { name: 'country', label: 'Country of Operation', type: 'select', options: africanCountries, required: true },
       { name: 'industry', label: 'Industry Sector', type: 'select', options: [
         'Agriculture', 'Forestry', 'Fishing', 'Mining', 'Oil & Gas',
-    'Automotive', 'Aerospace & Defense', 'Chemical Manufacturing', 'Food & Beverage', 'Electronics',
-    'Textiles', 'Machinery', 'Construction', 'Shipbuilding', 'Steel & Metal Works',
-    'Pharmaceuticals', 'Plastics & Rubber', 'Banking', 'Insurance', 'Investment Management',
-    'Accounting', 'Consulting', 'Legal Services', 'Real Estate', 'E-commerce',
-    'Retail', 'Fashion', 'Consumer Goods', 'Hospitality', 'Tourism',
-    'Restaurants', 'Airlines', 'Railroads', 'Trucking', 'Shipping & Freight',
-    'Warehousing', 'Software', 'IT Services', 'Telecommunications', 'Internet & Media',
-    'Data Analytics', 'Cybersecurity', 'Cloud Computing', 'Hospitals', 'Biotech',
-    'Medical Devices', 'Health Insurance', 'Film & TV', 'Music', 'Publishing',
-    'Gaming', 'Sports & Recreation', 'Streaming', 'Primary Education', 'Higher Education',
-    'EdTech', 'Vocational Training', 'Utilities', 'Waste Management', 'Public Services',
-    'Government', 'Defense & Military', 'NGOs', 'Religious Organizations',
-    'Scientific R&D', 'Market Research', 'Think Tanks', 'Executive Leadership',
-    'Policy & Decision Making', 'Other'
+        'Automotive', 'Aerospace & Defense', 'Chemical Manufacturing', 'Food & Beverage', 'Electronics',
+        'Textiles', 'Machinery', 'Construction', 'Shipbuilding', 'Steel & Metal Works',
+        'Pharmaceuticals', 'Plastics & Rubber', 'Banking', 'Insurance', 'Investment Management',
+        'Accounting', 'Consulting', 'Legal Services', 'Real Estate', 'E-commerce',
+        'Retail', 'Fashion', 'Consumer Goods', 'Hospitality', 'Tourism',
+        'Restaurants', 'Airlines', 'Railroads', 'Trucking', 'Shipping & Freight',
+        'Warehousing', 'Software', 'IT Services', 'Telecommunications', 'Internet & Media',
+        'Data Analytics', 'Cybersecurity', 'Cloud Computing', 'Hospitals', 'Biotech',
+        'Medical Devices', 'Health Insurance', 'Film & TV', 'Music', 'Publishing',
+        'Gaming', 'Sports & Recreation', 'Streaming', 'Primary Education', 'Higher Education',
+        'EdTech', 'Vocational Training', 'Utilities', 'Waste Management', 'Public Services',
+        'Government', 'Defense & Military', 'NGOs', 'Religious Organizations',
+        'Scientific R&D', 'Market Research', 'Think Tanks', 'Executive Leadership',
+        'Policy & Decision Making', 'Other'
       ], required: true },
       { name: 'website', label: 'Website / Social Media Links', type: 'url' },
-      { name: 'languages', label: 'Languages for Communication',type: 'text', required: true },
+      { name: 'optInServiceProvider', label: 'Opt-in as Service Provider?', type: 'checkbox' },
+      { name: 'servicesOffered', label: 'Services Offered', type: 'textarea', condition: (formData) => formData.optInServiceProvider },
+      { name: 'serviceCaseStudies', label: 'Service Case Studies (upload)', type: 'file', condition: (formData) => formData.optInServiceProvider }
     ],
     description: 'Basic information about your company'
   },
   'Company Overview': {
     fields: [
       { name: 'description', label: 'Company Description', type: 'textarea', required: true },
-      { name: 'businessModel', label: 'Business Model', type: 'combobox', options: businessModels, required: true },
+      { name: 'businessModel', label: 'Business Model', type: 'select', options: businessModels, required: true },
       { name: 'stage', label: 'Stage of Business', type: 'select', options: businessStages, required: true },
       { name: 'targetMarket', label: 'Target Market/Geography', type: 'text', required: true },
       { name: 'products', label: 'Key Products/Services', type: 'textarea', required: true }
@@ -117,15 +120,16 @@ const stepContent = {
   'Ownership & Compliance': {
     fields: [
       { name: 'ownershipStructure', label: 'Ownership Structure', type: 'textarea', required: true },
-      { name: 'bbbeeStatus', label: 'B-BBEE Status', type: 'combobox', options: bbbeeLevels, required: true },
+      { name: 'bbbeeStatus', label: 'B-BBEE Status', type: 'select', options: bbbeeLevels, required: true },
       { name: 'taxClearance', label: 'Tax Clearance Certificate', type: 'file', required: true },
+      { name: 'registrationNumber', label: 'Registration Number', type: 'text', required: true },
       { name: 'registrationDoc', label: 'Company Registration Document', type: 'file', required: true },
       { name: 'directorIds', label: 'Director IDs', type: 'file', required: true },
       { name: 'shareholderCerts', label: 'Shareholder Certificates', type: 'file' }
     ],
     description: 'Legal and compliance documentation'
   },
-  'Financial Information': {
+  'Financial Diligence': {
     fields: [
       { name: 'annualRevenue', label: 'Annual Revenue (Last FY)', type: 'number', required: true },
       { name: 'profitabilityStatus', label: 'Profitability Status', type: 'select', options: profitabilityStatuses, required: true },
@@ -137,550 +141,1040 @@ const stepContent = {
     ],
     description: 'Financial details and funding requirements'
   },
-  'Operational Information': {
+  'Operational Diligence': {
     fields: [
-      { name: 'numEmployees', label: 'Number of Employees', type: 'number', required: true },
-      { name: 'keyTeamMembers', label: 'Key Team Members (roles & bios)', type: 'textarea', required: true },
-      { name: 'operationalMetrics', label: 'Key Operational Metrics', type: 'textarea' },
-      { name: 'supplyChainPartners', label: 'Supply Chain Partners', type: 'textarea' }
-    ],
+      { name: 'keyPartners', label: 'Key Partners', type: 'textarea', required: true },
+      { name: 'keyActivities', label: 'Key Activities', type: 'textarea', required: true },
+      { name: 'revenueStreams', label: 'Revenue Streams', type: 'textarea', required: true },
+      { name: 'keyResources', label: 'Key Resources', type: 'textarea', required: true },
+      { name: 'valueProposition', label: 'Value Proposition', type: 'textarea', required: true },
+      { name: 'channels', label: 'Channels', type: 'textarea', required: true },
+      { name: 'costStructure', label: 'Cost Structure', type: 'textarea', required: true },
+      { name: 'customerSegments', label: 'Customer Segments', type: 'textarea', required: true },
+      { name: 'customerRelationships', label: 'Customer Relationships', type: 'textarea', required: true }
+    ],   
     description: 'Team and operational details'
   },
   'Pitch & Market': {
     fields: [
       { name: 'pitchDeck', label: 'Pitch Deck (upload)', type: 'file', required: true },
-      { name: 'marketSize', label: 'Market Size & Opportunity', type: 'textarea', required: true },
-      { name: 'competitorLandscape', label: 'Competitor Landscape', type: 'textarea' },
-      { name: 'tractionMetrics', label: 'Traction Metrics', type: 'textarea' }
     ],
     description: 'Market opportunity and competitive positioning'
-  },
-  'Optional Dual Role': {
-    fields: [
-      { name: 'optInServiceProvider', label: 'Opt-in as Service Provider?', type: 'checkbox' },
-      { name: 'servicesOffered', label: 'Services Offered', type: 'textarea' },
-      { name: 'serviceCaseStudies', label: 'Service Case Studies (upload)', type: 'file' }
-    ],
-    description: 'Optional service provider information'
-  },
-  'Done': {
-    fields: [],
-    description: 'All sections completed successfully'
   }
 };
 
-export default function Dashboard() {
-  // State hooks
-  const [currentStep, setCurrentStep] = useState('Profile Form');
+const Dashboard = () => {
+  // Form state
+  const [activeForm, setActiveForm] = useState(null); // Start with null (no form shown)
   const [formData, setFormData] = useState({});
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [saveStatus, setSaveStatus] = useState('');
-  const [showStepInfo, setShowStepInfo] = useState(false);
-  const [openDropdowns, setOpenDropdowns] = useState({});
-  const [complianceData, setComplianceData] = useState({
-    percentage: 0,
-    trend: 'neutral',
-    change: '0%'
+  const [filePreviews, setFilePreviews] = useState({});
+  const [pitchEvaluation, setPitchEvaluation] = useState(null);
+  const [formProgress, setFormProgress] = useState({
+    'Profile Form': false,
+    'Company Overview': false,
+    'Ownership & Compliance': false,
+    'Financial Diligence': false,
+    'Operational Diligence': false,
+    'Pitch & Market': false
   });
+  // Dashboard state
+  const [showInvestorMatches, setShowInvestorMatches] = useState(false);
+  const [showServiceMatches, setShowServiceMatches] = useState(false);
+  const [showGrowthMatches, setShowGrowthMatches] = useState(false);
+  const [showPurposeMatches, setShowPurposeMatches] = useState(false);
+  const [profileCompletion, setProfileCompletion] = useState(80);
+  const [date, setDate] = useState(new Date());
 
-  const navigate = useNavigate();
-
-  // Fetch compliance data
-  useEffect(() => {
-    const fetchCompliance = async () => {
-      try {
-        const response = await fetch('http://localhost:3001/api/compliance', {
-          signal: AbortSignal.timeout(5000) // Timeout after 5 seconds
-        });
-        
-        if (!response.ok) throw new Error('Network response was not ok');
-        
-        const data = await response.json();
-        const percentage = data.compliancePercentage || 0;
-        
-        setComplianceData({
-          percentage,
-          trend: percentage >= 80 ? 'up' : 
-                percentage >= 50 ? 'neutral' : 'down',
-          change: percentage >= 80 ? '+5%' : 
-                 percentage >= 50 ? '0%' : '-5%'
-        });
-      } catch (error) {
-        console.warn('Error fetching compliance, using fallback:', error);
-        // Fallback values
-        setComplianceData({
-          percentage: 0,
-          trend: 'neutral',
-          change: '0%'
-        });
-      }
-    };
-    
-    fetchCompliance();
-  }, []);
-
-
-  // Updated statBlocks with dynamic compliance data
-  const statBlocks = [
-    { label: 'Total Matched Funders', route: '/TotalMatchedFunders', value: 18, trend: 'up', change: '+3' },
-    { label: 'Applications Sent', route: '/ApplicationsSent', value: 12, trend: 'neutral', change: '0' },
-    { label: 'Pending Applications', route: '/PendingApplications', value: 3, trend: 'down', change: '-1' },
-    { label: 'Funder Interest Received', route: '/FunderInterestReceived', value: 5, trend: 'up', change: '+2' },
-    { label: 'Meetings Scheduled', route: '/MeetingsScheduled', value: 2, trend: 'up', change: '+1' },
-    { label: 'Feedback Received', route: '/FeedbackReceived', value: 4, trend: 'neutral', change: '0' },
-    { 
-      label: 'Compliance Status', 
-      route: '/ComplianceStatus', 
-      value: `${complianceData.percentage}%`, 
-      trend: complianceData.trend, 
-      change: complianceData.change 
-    },
-    { label: 'BIG Score Summary', route: '/BIGScoreSummary', value: '75%', trend: 'up', change: '+3%' }
+  // Data for charts
+  const profileData = [
+    { name: 'Completed', value: profileCompletion, color: '#4CAF50' },
+    { name: 'Remaining', value: 100 - profileCompletion, color: '#F44336' }
   ];
 
-  // File upload handler with compliance update
-  const handleInputChange = async (e) => {
-    const { name, value, type, checked } = e.target;
-    const val = type === 'checkbox' ? checked : 
-                type === 'file' ? e.target.files[0] : 
-                value;
+  const bigScoreData = [
+    { name: 'Funding', value: 25, color: '#9E6E3C' },
+    { name: 'Compliance', value: 20, color: '#754A2D' },
+    { name: 'Financial Health', value: 15, color: '#BCAE9C' },
+    { name: 'Operational', value: 25, color: '#D3D2CE' },
+    { name: 'Pitch', value: 15, color: '#F2F0E6' }
+  ];
 
-    // Handle file uploads for compliance documents
-    if (type === 'file' && ['taxClearance', 'registrationDoc', 'directorIds', 'shareholderCerts'].includes(name)) {
-      try {
-        const response = await fetch('http://localhost:3001/api/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            documentType: name,
-            isUploaded: !!e.target.files[0]
-          })
-        });
+  const monthlyScoreData = [
+    { name: 'Jan', score: 45 },
+    { name: 'Feb', score: 50 },
+    { name: 'Mar', score: 55 },
+    { name: 'Apr', score: 60 },
+    { name: 'May', score: 65 },
+    { name: 'Jun', score: 70 },
+    { name: 'Jul', score: 75 },
+    { name: 'Aug', score: 80 },
+    { name: 'Sep', score: 82 },
+    { name: 'Oct', score: 85 },
+    { name: 'Nov', score: 88 },
+    { name: 'Dec', score: 90 }
+  ];
 
-        if (!response.ok) throw new Error('Upload failed');
+  const fundingData = [
+    { name: 'Grant', value: 30, color: '#4CAF50' },
+    { name: 'Debt', value: 40, color: '#2196F3' },
+    { name: 'Equity', value: 30, color: '#FFC107' }
+  ];
 
-        const data = await response.json();
-        const percentage = data.compliance || 0;
+  const funnelData = [
+    { name: 'Total Matches', value: 100, fill: '#9E6E3C' },
+    { name: 'Application Sent', value: 80, fill: '#754A2D' },
+    { name: 'Pending Application', value: 60, fill: '#BCAE9C' },
+    { name: 'Funder Interest', value: 40, fill: '#D3D2CE' },
+    { name: 'Meetings Scheduled', value: 30, fill: '#F2F0E6' },
+    { name: 'Feedback Received', value: 20, fill: '#9E6E3C' },
+    { name: 'Successful Closer', value: 10, fill: '#754A2D' }
+  ];
 
-        setComplianceData({
-          percentage,
-          trend: percentage >= 80 ? 'up' : 
-                percentage >= 50 ? 'neutral' : 'down',
-          change: percentage >= 80 ? '+5%' : 
-                 percentage >= 50 ? '0%' : '-5%'
-        });
-      } catch (error) {
-        console.error('Error uploading document:', error);
+  const providerData = [
+    { name: 'Provider A', percent: 85 },
+    { name: 'Provider B', percent: 70 },
+    { name: 'Provider C', percent: 60 },
+    { name: 'Provider D', percent: 45 }
+  ];
+
+  const matchesData = [
+    { name: 'ABC Mining', location: 'Johannesburg', industry: 'Mining', amount: 'R500,000', score: 85 },
+    { name: 'XYZ Minerals', location: 'Cape Town', industry: 'Mining', amount: 'R750,000', score: 78 },
+    { name: 'Gold Fields', location: 'Pretoria', industry: 'Mining', amount: 'R1,200,000', score: 92 }
+  ];
+
+  const upcomingEvents = [
+    { title: 'Investor Meetup', date: 'May 15, 2023' },
+    { title: 'Pitch Workshop', date: 'May 20, 2023' },
+    { title: 'Funding Deadline', date: 'May 30, 2023' }
+  ];
+
+  const messages = [
+    { sender: 'Investor X', content: 'Interested in your pitch', time: '2h ago' },
+    { sender: 'Service Provider Y', content: 'Please submit documents', time: '1d ago' },
+    { sender: 'Growth Partner', content: 'Meeting scheduled', time: '3d ago' }
+  ];
+
+  // Form functions from the form code
+  const handleInputChange = (e) => {
+    const { name, value, type, checked, files } = e.target;
+    
+    if (type === 'file') {
+      const file = files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFilePreviews(prev => ({ ...prev, [name]: reader.result }));
+        };
+        reader.readAsDataURL(file);
+        setFormData(prev => ({ ...prev, [name]: file }));
       }
-    }
-
-    setFormData(prev => ({ ...prev, [name]: val }));
-    
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+    } else if (type === 'checkbox') {
+      setFormData(prev => ({ ...prev, [name]: checked }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
-
-  const toggleDropdown = (fieldName) => {
-    setOpenDropdowns(prev => ({
-      ...prev,
-      [fieldName]: !prev[fieldName]
-    }));
+  const handleFormClick = (formName) => {
+    setActiveForm(formName); // Set the active form when a step is clicked
   };
 
-  const handleSelectOption = (fieldName, value) => {
-    setFormData(prev => ({ ...prev, [fieldName]: value }));
-    setOpenDropdowns(prev => ({ ...prev, [fieldName]: false }));
-    
-    if (errors[fieldName]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[fieldName];
-        return newErrors;
-      });
+  const evaluatePitch = () => {
+    // Simplified evaluation based only on document upload
+    if (!formData.pitchDeck) {
+      alert('Please upload your pitch deck first');
+      return;
     }
-  };
+    
+    const scores = [
+      { name: 'Problem Clarity', score: Math.floor(Math.random() * 51) + 50, weight: 20 },
+      { name: 'Solution Uniqueness', score: Math.floor(Math.random() * 51) + 50, weight: 20 },
+      { name: 'Business Model', score: Math.floor(Math.random() * 51) + 50, weight: 20 },
+      { name: 'Market Size', score: Math.floor(Math.random() * 51) + 50, weight: 10 },
+      { name: 'Competitive Advantage', score: Math.floor(Math.random() * 51) + 50, weight: 10 }
+    ];
 
-  const handleMultiselectOption = (fieldName, value) => {
-    const currentValues = Array.isArray(formData[fieldName]) ? formData[fieldName] : [];
-    const newValues = currentValues.includes(value)
-      ? currentValues.filter(v => v !== value)
-      : [...currentValues, value];
-    
-    setFormData(prev => ({ ...prev, [fieldName]: newValues }));
-    
-    if (errors[fieldName]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[fieldName];
-        return newErrors;
-      });
-    }
-  };
+    const totalScore = Math.round(
+      scores.reduce((sum, item) => sum + (item.score * item.weight / 100), 0)
+    );
 
-  const validateForm = () => {
-    const currentFields = stepContent[currentStep].fields;
-    const newErrors = {};
-    
-    currentFields.forEach(field => {
-      if (field.required && !formData[field.name]) {
-        newErrors[field.name] = `${field.label} is required`;
-      }
+    setPitchEvaluation({
+      scores,
+      totalScore,
+      recommendations: [
+        "Consider refining your financial projections",
+        "Add more market validation data",
+        "Highlight your team's expertise more prominently"
+      ]
     });
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    setFormProgress(prev => ({ ...prev, [activeForm]: true }));
   };
 
-  const handleSave = async () => {
-    if (!validateForm()) return;
+  const handleSubmit = (e) => {
+    e.preventDefault();
     
-    setIsLoading(true);
-    setSaveStatus('Saving...');
-    
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSaveStatus('Saved successfully');
-      setTimeout(() => setSaveStatus(''), 2000);
-    } catch (error) {
-      setSaveStatus('Error saving data');
-    } finally {
-      setIsLoading(false);
+    if (activeForm === 'Pitch & Market') {
+      evaluatePitch();
+    } else {
+      setFormProgress(prev => ({ ...prev, [activeForm]: true }));
+      const currentIndex = steps.indexOf(activeForm);
+      if (currentIndex < steps.length - 1) {
+        setActiveForm(steps[currentIndex + 1]);
+      } else {
+        setActiveForm(null); // Close form after last step
+      }
     }
   };
 
-  const handleNext = () => {
-    if (!validateForm()) return;
-    
-    const currentIndex = steps.indexOf(currentStep);
-    if (currentIndex < steps.length - 1) {
-      setCurrentStep(steps[currentIndex + 1]);
-      setShowStepInfo(false);
-    }
-  };
 
-  const handlePrev = () => {
-    const currentIndex = steps.indexOf(currentStep);
-    if (currentIndex > 0) {
-      setCurrentStep(steps[currentIndex - 1]);
-      setShowStepInfo(false);
-    }
-  };
+  const renderField = (field) => {
+    if (field.condition && !field.condition(formData)) return null;
 
-  const handleStepClick = (step) => {
-    setCurrentStep(step);
-    setShowStepInfo(true);
-  };
-
-  const renderInputField = (field) => {
     switch (field.type) {
       case 'textarea':
         return (
-          <textarea
-            name={field.name}
-            value={formData[field.name] || ''}
-            onChange={handleInputChange}
-            className={`form-input ${errors[field.name] ? 'error' : ''}`}
-            rows="4"
-          />
+          <div className="form-field" key={field.name}>
+            <label>
+              {field.label}
+              {field.required && <span className="required-asterisk">*</span>}
+            </label>
+            <textarea
+              name={field.name}
+              value={formData[field.name] || ''}
+              onChange={handleInputChange}
+              required={field.required}
+              rows={4}
+            />
+          </div>
         );
       case 'select':
         return (
-          <div className="custom-select">
-            <div 
-              className={`select-header ${errors[field.name] ? 'error' : ''}`}
-              onClick={() => toggleDropdown(field.name)}
-            >
-              <span>{formData[field.name] || 'Select an option'}</span>
-              {openDropdowns[field.name] ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </div>
-            {openDropdowns[field.name] && (
-              <div className="select-options">
-                {field.options.map(opt => (
-                  <div 
-                    key={opt} 
-                    className={`option ${formData[field.name] === opt ? 'selected' : ''}`}
-                    onClick={() => handleSelectOption(field.name, opt)}
-                  >
-                    {opt}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      case 'combobox':
-        return (
-          <div className="custom-select">
-            <div 
-              className={`select-header ${errors[field.name] ? 'error' : ''}`}
-              onClick={() => toggleDropdown(field.name)}
-            >
-              <span>{formData[field.name] || 'Select or type'}</span>
-              {openDropdowns[field.name] ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </div>
-            {openDropdowns[field.name] && (
-              <div className="select-options">
-                <input
-                  type="text"
-                  placeholder="Type to search..."
-                  className="combobox-search"
-                  onClick={(e) => e.stopPropagation()}
-                />
-                {field.options.map(opt => (
-                  <div 
-                    key={opt} 
-                    className={`option ${formData[field.name] === opt ? 'selected' : ''}`}
-                    onClick={() => handleSelectOption(field.name, opt)}
-                  >
-                    {opt}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      case 'multiselect':
-        return (
-          <div className="custom-multiselect">
-            <div 
-              className={`select-header ${errors[field.name] ? 'error' : ''}`}
-              onClick={() => toggleDropdown(field.name)}
-            >
-              <div className="selected-values">
-                {Array.isArray(formData[field.name]) && formData[field.name].length > 0 
-                  ? formData[field.name].join(', ') 
-                  : 'Select options'}
-              </div>
-              {openDropdowns[field.name] ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </div>
-            {openDropdowns[field.name] && (
-              <div className="select-options">
-                {field.options.map(opt => (
-                  <div 
-                    key={opt} 
-                    className={`option ${Array.isArray(formData[field.name]) && formData[field.name].includes(opt) ? 'selected' : ''}`}
-                    onClick={() => handleMultiselectOption(field.name, opt)}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={Array.isArray(formData[field.name]) && formData[field.name].includes(opt)}
-                      readOnly
-                    />
-                    {opt}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      case 'file':
-        return (
-          <div className="file-upload">
-            <input
-              type="file"
+          <div className="form-field" key={field.name}>
+            <label>
+              {field.label}
+              {field.required && <span className="required-asterisk">*</span>}
+            </label>
+            <select
               name={field.name}
+              value={formData[field.name] || ''}
               onChange={handleInputChange}
-              className={`form-input ${errors[field.name] ? 'error' : ''}`}
-            />
-            {formData[field.name] && (
-              <span className="file-name">{formData[field.name].name}</span>
-            )}
+              required={field.required}
+            >
+              <option value="">Select an option</option>
+              {field.options.map(option => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
           </div>
         );
       case 'checkbox':
         return (
-          <label className="checkbox-container">
+          <div className="form-field checkbox-field" key={field.name}>
+            <label>
+              <input
+                type="checkbox"
+                name={field.name}
+                checked={formData[field.name] || false}
+                onChange={handleInputChange}
+              />
+              {field.label}
+              {field.required && <span className="required-asterisk">*</span>}
+            </label>
+          </div>
+        );
+      case 'file':
+        return (
+          <div className="form-field" key={field.name}>
+            <label>
+              {field.label}
+              {field.required && <span className="required-asterisk">*</span>}
+            </label>
             <input
-              type="checkbox"
+              type="file"
               name={field.name}
-              checked={formData[field.name] || false}
               onChange={handleInputChange}
+              required={field.required && !formData[field.name]}
             />
-            <span className="checkmark"></span>
-          </label>
+            {filePreviews[field.name] && (
+              <div className="file-preview">
+                {field.name.includes('image') ? (
+                  <img src={filePreviews[field.name]} alt="Preview" width="100" />
+                ) : (
+                  <span>File uploaded: {formData[field.name]?.name}</span>
+                )}
+              </div>
+            )}
+          </div>
         );
       default:
         return (
-          <input
-            type={field.type || 'text'}
-            name={field.name}
-            value={formData[field.name] || ''}
-            onChange={handleInputChange}
-            className={`form-input ${errors[field.name] ? 'error' : ''}`}
-          />
+          <div className="form-field" key={field.name}>
+            <label>
+              {field.label}
+              {field.required && <span className="required-asterisk">*</span>}
+            </label>
+            <input
+              type={field.type}
+              name={field.name}
+              value={formData[field.name] || ''}
+              onChange={handleInputChange}
+              required={field.required}
+            />
+          </div>
         );
     }
   };
 
+  const renderPitchEvaluation = () => {
+    if (!pitchEvaluation) return null;
+
+    return (
+      <div className="pitch-evaluation">
+        <h3>Pitch Evaluation</h3>
+        <div className="score-summary">
+          <div className="total-score">
+            <span>Total Score:</span>
+            <span className="score-value">{pitchEvaluation.totalScore}%</span>
+          </div>
+          
+          <div className="score-details">
+            <BarChart
+              width={500}
+              height={300}
+              data={pitchEvaluation.scores}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis domain={[0, 100]} />
+              <Tooltip />
+              <Bar dataKey="score" fill="#9E6E3C" />
+            </BarChart>
+          </div>
+          
+          <div className="recommendations">
+            <h4>Recommendations for Improvement:</h4>
+            <ul>
+              {pitchEvaluation.recommendations.map((rec, index) => (
+                <li key={index}>{rec}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const x = cx + radius * Math.cos(-midAngle * Math.PI / 180);
+    const y = cy + radius * Math.sin(-midAngle * Math.PI / 180);
+
+    return (
+      <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central">
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+    );
+  };
+
+  const totalBigScore = bigScoreData.reduce((sum, item) => sum + item.value, 0);
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <div className="header-content">
-          <h1>Welcome to Your SME Dashboard</h1>
-          <p className="subtitle">Manage your funding applications and business profile</p>
-        </div>
-        <div className="header-actions">
-          <button className="btn-help">
-            <HelpCircle size={18} />
-            <span>Help Center</span>
-          </button>
-          <button className="btn-support">
-            <LifeBuoy size={18} />
-            <span>Settings</span>
-          </button>
+        <h1 className="dashboard-title">Welcome to Your SME Dashboard</h1>
+        <div className="header-action-buttons">
+          <button className="action-btn help-btn">Help</button>
+          <button className="action-btn settings-btn">Settings</button>
         </div>
       </header>
 
-      <div className="dashboard-content">
-        <div className="dashboard-sidebar">
-          <div className="completion-card">
-            <div className="progress-container">
-              <div className="progress-circle">
-                <svg className="progress-ring" viewBox="0 0 100 100">
-                  <circle className="progress-ring-circle-bg" cx="50" cy="50" r="45" />
-                  <circle className="progress-ring-circle" cx="50" cy="50" r="45" 
-                    strokeDasharray="283" strokeDashoffset={283 * 0.25} />
-                </svg>
-                <div className="progress-text">75%</div>
+      <div className="dashboard-layout">
+        {/* Top Row - Profile Completion and Form Registration */}
+        <div className="top-section-row">
+          {/* Profile Completion - Narrow */}
+          <div className="profile-completion-card">
+            <h2 className="card-title">Profile Completion</h2>
+            <div className="pie-chart-wrapper">
+              <PieChart width={200} height={200}>
+                <Pie
+                  data={profileData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderCustomizedLabel}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {profileData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </div>
+            <button className="primary-action-btn">Update Profile</button>
+          </div>
+
+          {/* Form Registration - Wide */}
+          <div className={`form-registration-card ${activeForm ? 'active-form' : ''}`}>
+        <h2 className="card-title">Form Registration</h2>
+        <div className="form-progress-tracker">
+          {steps.map((step, index) => (
+            <React.Fragment key={step}>
+              <div 
+                className={`form-step ${formProgress[step] ? 'completed-step' : ''} ${activeForm === step ? 'active-step' : ''}`}
+                onClick={() => handleFormClick(step)}
+              >
+                <div className="step-indicator">{formProgress[step] ? '✓' : index + 1}</div>
+                <div className="step-description">{step}</div>
               </div>
-              <div className="progress-info">
-                <h3>Profile Completion</h3>
-                <p>Complete all sections to improve your funding chances</p>
-                <button className="btn-view-details">View Details</button>
+              {index < steps.length - 1 && <div className="step-connector">→</div>}
+            </React.Fragment>
+          ))}
+        </div>
+
+        {activeForm && (
+          <form onSubmit={handleSubmit} className="form-preview-panel">
+            <h3 className="form-preview-title">{activeForm}</h3>
+            <p className="form-preview-text">{stepContent[activeForm].description}</p>
+            
+            <div className="form-fields">
+              {stepContent[activeForm].fields.map(field => renderField(field))}
+            </div>
+            
+            {activeForm === 'Pitch & Market' && pitchEvaluation && renderPitchEvaluation()}
+            
+            <div className="form-action-buttons">
+              <button 
+                type="button" 
+                className="secondary-action-btn"
+                onClick={() => setActiveForm(null)}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="primary-action-btn">
+                {activeForm === 'Pitch & Market' ? 'Evaluate Pitch' : 'Continue'}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+      </div>
+
+        {/* Column 1 */}
+        <div className="dashboard-column-1">
+          {/* My Big Score */}
+          <div className="score-card">
+            <h2 className="card-title">My Big Score</h2>
+            <div className="pie-chart-wrapper score-chart">
+              <PieChart width={200} height={200}>
+                <Pie
+                  data={bigScoreData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {bigScoreData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+              <div className="total-score-display">
+                {totalBigScore}%
               </div>
+            </div>
+            <div className="score-legend">
+              {bigScoreData.map((item, index) => (
+                <div key={index} className="legend-item">
+                  <div className="legend-color-box" style={{ backgroundColor: item.color }}></div>
+                  <span className="legend-label">{item.name}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="stats-grid">
-            {statBlocks.map((block, index) => (
-              <div
-                key={index}
-                className={`stat-block ${block.trend}`}
-                onClick={() => navigate(block.route)}
-              >
-                <div className="stat-content">
-                  <h3>{block.label}</h3>
-                  <div className="stat-value-container">
-                    <p className="stat-value">{block.value}</p>
-                    <span className={`trend-indicator ${block.trend}`}>
-                      {block.trend === 'up' ? <ArrowUp size={16} /> : 
-                       block.trend === 'down' ? <ArrowDown size={16} /> : 
-                       <Minus size={16} />}
-                      <span className="change-value">{block.change}</span>
-                    </span>
-                  </div>
+          {/* Summary of My Big Score */}
+          <div className="score-summary-card">
+            <h2 className="card-title">Summary of My Big Score</h2>
+            <div className="area-chart-wrapper">
+              <AreaChart width={300} height={200} data={monthlyScoreData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Area type="monotone" dataKey="score" stroke="#754A2D" fill="#BCAE9C" />
+              </AreaChart>
+            </div>
+            <div className="recommendations-section">
+              <h4 className="recommendations-title">Recommendations:</h4>
+              <ul className="recommendations-list">
+                <li className="recommendation-item">Improve financial documentation</li>
+                <li className="recommendation-item">Attend pitch training</li>
+                <li className="recommendation-item">Update compliance certificates</li>
+              </ul>
+              <p className="overall-score">Overall Score: 90%</p>
+            </div>
+          </div>
+
+          {/* My Calendar */}
+          <div className="calendar-card">
+            <h2 className="card-title">My Calendar</h2>
+            <div className="calendar-wrapper">
+              <Calendar
+                onChange={setDate}
+                value={date}
+                tileClassName={({ date, view }) => {
+                  if (date.getDate() === 15 || date.getDate() === 30) {
+                    return 'highlighted-date';
+                  }
+                }}
+              />
+            </div>
+            <div className="deadlines-section">
+              <h4 className="deadlines-title">Upcoming Deadlines:</h4>
+              <ul className="deadlines-list">
+                <li className="deadline-item">May 15: Tax Submission</li>
+                <li className="deadline-item">May 30: Compliance Review</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Upcoming Events */}
+          <div className="events-card">
+            <h2 className="card-title">Upcoming Events</h2>
+            <div className="events-list">
+              {upcomingEvents.map((event, index) => (
+                <div key={index} className="event-list-item">
+                  <div className="event-date">{event.date}</div>
+                  <div className="event-name">{event.title}</div>
                 </div>
-                <div className="stat-footer">
-                  <span>View details</span>
-                  <ChevronRight size={16} />
+              ))}
+            </div>
+          </div>
+
+          {/* My Investor Ratings */}
+          <div className="ratings-card">
+            <h2 className="card-title">My Investor Ratings</h2>
+            <div className="ratings-list">
+              <div className="rating-item">
+                <span className="rating-name">Investor A</span>
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star} className={star <= 4 ? 'star filled-star' : 'star empty-star'}>★</span>
+                  ))}
                 </div>
               </div>
-            ))}
+              <div className="rating-item">
+                <span className="rating-name">Investor B</span>
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star} className={star <= 3 ? 'star filled-star' : 'star empty-star'}>★</span>
+                  ))}
+                </div>
+              </div>
+              <div className="rating-item">
+                <span className="rating-name">Investor C</span>
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star} className={star <= 5 ? 'star filled-star' : 'star empty-star'}>★</span>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="dashboard-main">
-          <div className="tracker-container">
-            <div className="tracker">
-              {steps.map((step, idx) => (
-                <div
-                  key={idx}
-                  className={`tracker-step ${currentStep === step ? 'active' : ''} ${
-                    steps.indexOf(currentStep) > idx ? 'completed' : ''
-                  }`}
-                  onClick={() => handleStepClick(step)}
-                >
-                  <div className="step-icon">
-                    {steps.indexOf(currentStep) > idx ? (
-                      <CheckCircle size={18} />
-                    ) : (
-                      <span>{idx + 1}</span>
-                    )}
+        {/* Column 2 */}
+        <div className="dashboard-column-2">
+          {/* Summary of Application */}
+          <div className="application-summary-card">
+            <h2 className="card-title">Summary of Application</h2>
+            <div className="summary-details">
+              <div className="detail-row">
+                <span className="detail-label">Funding Asked:</span>
+                <span className="detail-value">R100,000</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Stage:</span>
+                <span className="detail-value">Idea Stage</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Industry:</span>
+                <span className="detail-value">Mining</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Location:</span>
+                <span className="detail-value">South Africa</span>
+              </div>
+            </div>
+          </div>
+
+          {/* My Investor Matches */}
+          <div className="matches-card">
+            <div className="matches-header">
+              <h2 className="card-title">My Investor Matches</h2>
+              <button 
+                className="toggle-matches-btn" 
+                onClick={() => setShowInvestorMatches(!showInvestorMatches)}
+              >
+                {showInvestorMatches ? 'Hide Matches' : 'View Matches'}
+              </button>
+            </div>
+            {showInvestorMatches && (
+              <div className="matches-table-wrapper">
+                <table className="matches-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Location</th>
+                      <th>Industry</th>
+                      <th>Amount</th>
+                      <th>Score</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {matchesData.map((match, index) => (
+                      <tr key={index} className="match-row">
+                        <td className="match-data">{match.name}</td>
+                        <td className="match-data">{match.location}</td>
+                        <td className="match-data">{match.industry}</td>
+                        <td className="match-data">{match.amount}</td>
+                        <td className="match-data">
+                          <div className="score-indicator-bar" style={{ width: `${match.score}%` }}></div>
+                          <span className="score-value">{match.score}%</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Dealflow */}
+          <div className="dealflow-card">
+            <h2 className="card-title">Dealflow</h2>
+            <div className="dealflow-tracker">
+              {[
+                { label: 'Application Completed', completed: true },
+                { label: 'Investors Interested', completed: true },
+                { label: 'In Progress', active: true },
+                { label: 'Successful', completed: false },
+                { label: 'Not Profitable', completed: false },
+                { label: 'Done', completed: false }
+              ].map((step, index) => (
+                <React.Fragment key={index}>
+                  <div className={`dealflow-step ${step.completed ? 'completed-step' : ''} ${step.active ? 'active-step' : ''}`}>
+                    <div className="step-icon">{step.completed ? '✓' : step.active ? '!' : index + 1}</div>
+                    <div className="step-label">{step.label}</div>
                   </div>
-                  <span>{step}</span>
-                  {idx < steps.length - 1 && <div className="step-connector"></div>}
-                </div>
+                  {index < 5 && <div className="step-connector">→</div>}
+                </React.Fragment>
               ))}
             </div>
           </div>
 
-          {showStepInfo && (
-            <div className="step-info-card">
-              <h3>{currentStep}</h3>
-              <p>{stepContent[currentStep].description}</p>
-              <button 
-                className="btn-close-info"
-                onClick={() => setShowStepInfo(false)}
+          {/* Funnel Graph */}
+          <div className="funnel-card">
+            <h2 className="card-title">Dealflow Funnel</h2>
+            <div className="bar-chart-wrapper">
+              <BarChart
+                width={300}
+                height={300}
+                data={funnelData}
+                layout="vertical"
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
               >
-                Close
-              </button>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis dataKey="name" type="category" />
+                <Tooltip />
+                <Bar dataKey="value" fill="#8884d8">
+                  {funnelData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
             </div>
-          )}
+          </div>
 
-          <div className="form-container">
-            <div className="form-header">
-              <div className="form-title-container">
-                <h2>{currentStep}</h2>
-                <span className="step-counter">
-                  Step {steps.indexOf(currentStep) + 1} of {steps.length}
-                </span>
+          {/* Funding Chart */}
+          <div className="funding-card">
+            <h2 className="card-title">Funding Chart</h2>
+            <div className="pie-chart-wrapper">
+              <PieChart width={300} height={200}>
+                <Pie
+                  data={fundingData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderCustomizedLabel}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {fundingData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </div>
+          </div>
+        </div>
+
+        {/* Column 3 */}
+        <div className="dashboard-column-3">
+          {/* My Service Provider */}
+          <div className="service-provider-card">
+            <h2 className="card-title">My Service Provider</h2>
+            
+            {/* Service Provider Matches */}
+            <div className="matches-card">
+              <div className="matches-header">
+                <h2 className="card-title">My Service Provider Matches</h2>
+                <button 
+                  className="toggle-matches-btn" 
+                  onClick={() => setShowServiceMatches(!showServiceMatches)}
+                >
+                  {showServiceMatches ? 'Hide Matches' : 'View Matches'}
+                </button>
               </div>
-              {!showStepInfo && (
-                <p className="step-description">{stepContent[currentStep].description}</p>
+              {showServiceMatches && (
+                <div className="matches-table-wrapper">
+                  <table className="matches-table">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Industry</th>
+                        <th>Amount</th>
+                        <th>Score</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {matchesData.map((match, index) => (
+                        <tr key={index} className="match-row">
+                          <td className="match-data">{match.name}</td>
+                          <td className="match-data">{match.location}</td>
+                          <td className="match-data">{match.industry}</td>
+                          <td className="match-data">{match.amount}</td>
+                          <td className="match-data">
+                            <div className="score-indicator-bar" style={{ width: `${match.score}%` }}></div>
+                            <span className="score-value">{match.score}%</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
-              <div className="status-message">
-                {saveStatus && (
-                  <span className={saveStatus.includes('success') ? 'success' : 'error'}>
-                    {saveStatus.includes('success') ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-                    {saveStatus}
-                  </span>
-                )}
+            </div>
+
+            {/* Service Provider Dealflow */}
+            <div className="dealflow-card">
+              <h2 className="card-title">Dealflow</h2>
+              <div className="dealflow-tracker">
+                {[
+                  { label: 'Application Completed', completed: true },
+                  { label: 'Investors Interested', completed: true },
+                  { label: 'In Progress', active: true },
+                  { label: 'Successful', completed: false }
+                ].map((step, index) => (
+                  <React.Fragment key={index}>
+                    <div className={`dealflow-step ${step.completed ? 'completed-step' : ''} ${step.active ? 'active-step' : ''}`}>
+                      <div className="step-icon">{step.completed ? '✓' : step.active ? '!' : index + 1}</div>
+                      <div className="step-label">{step.label}</div>
+                    </div>
+                    {index < 3 && <div className="step-connector">→</div>}
+                  </React.Fragment>
+                ))}
               </div>
             </div>
 
-            <div className="form-content">
-              {stepContent[currentStep].fields.map((field, index) => (
-                <div key={index} className="form-group">
-                  <label>
-                    {field.label}
-                    {field.required && <span className="required">*</span>}
-                  </label>
-                  {renderInputField(field)}
-                  {errors[field.name] && (
-                    <p className="error-message">
-                      <AlertCircle size={14} /> {errors[field.name]}
-                    </p>
-                  )}
+            {/* Provider Matches Chart */}
+            <div className="bar-chart-wrapper">
+              <BarChart
+                width={300}
+                height={250}
+                data={providerData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="percent" fill="#9E6E3C" />
+              </BarChart>
+            </div>
+          </div>
+
+          {/* My Messages */}
+          <div className="messages-card">
+            <h2 className="card-title">My Messages</h2>
+            <div className="messages-list">
+              {messages.map((message, index) => (
+                <div key={index} className="message-item">
+                  <div className="message-sender">{message.sender}</div>
+                  <div className="message-content">{message.content}</div>
+                  <div className="message-time">{message.time}</div>
                 </div>
               ))}
             </div>
+            <button className="view-all-btn">View All Messages</button>
+          </div>
 
-            <div className="form-actions">
-              <button 
-                className="btn-secondary" 
-                onClick={handlePrev}
-                disabled={steps.indexOf(currentStep) === 0}
+          {/* My Service Provider Ratings */}
+          <div className="ratings-card">
+            <h2 className="card-title">My Service Provider Ratings</h2>
+            <div className="ratings-list">
+              <div className="rating-item">
+                <span className="rating-name">Provider X</span>
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star} className={star <= 4 ? 'star filled-star' : 'star empty-star'}>★</span>
+                  ))}
+                </div>
+              </div>
+              <div className="rating-item">
+                <span className="rating-name">Provider Y</span>
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star} className={star <= 3 ? 'star filled-star' : 'star empty-star'}>★</span>
+                  ))}
+                </div>
+              </div>
+              <div className="rating-item">
+                <span className="rating-name">Provider Z</span>
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star} className={star <= 5 ? 'star filled-star' : 'star empty-star'}>★</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Column 4 */}
+        <div className="dashboard-column-4">
+          {/* Growth Enabler */}
+          <div className="growth-enabler-card">
+            <h2 className="card-title">Growth Enabler</h2>
+            
+            {/* Growth Enabler Matches */}
+            <div className="matches-card">
+              <div className="matches-header">
+                <h2 className="card-title">My Growth Enabler Matches</h2>
+                <button 
+                  className="toggle-matches-btn" 
+                  onClick={() => setShowGrowthMatches(!showGrowthMatches)}
+                >
+                  {showGrowthMatches ? 'Hide Matches' : 'View Matches'}
+                </button>
+              </div>
+              {showGrowthMatches && (
+                <div className="matches-table-wrapper">
+                  <table className="matches-table">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Industry</th>
+                        <th>Amount</th>
+                        <th>Score</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {matchesData.map((match, index) => (
+                        <tr key={index} className="match-row">
+                          <td className="match-data">{match.name}</td>
+                          <td className="match-data">{match.location}</td>
+                          <td className="match-data">{match.industry}</td>
+                          <td className="match-data">{match.amount}</td>
+                          <td className="match-data">
+                            <div className="score-indicator-bar" style={{ width: `${match.score}%` }}></div>
+                            <span className="score-value">{match.score}%</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Growth Enabler Dealflow */}
+            <div className="dealflow-card">
+              <h2 className="card-title">Dealflow</h2>
+              <div className="dealflow-tracker">
+                {[
+                  { label: 'Application Completed', completed: true },
+                  { label: 'Investors Interested', completed: true },
+                  { label: 'In Progress', active: true }
+                ].map((step, index) => (
+                  <React.Fragment key={index}>
+                    <div className={`dealflow-step ${step.completed ? 'completed-step' : ''} ${step.active ? 'active-step' : ''}`}>
+                      <div className="step-icon">{step.completed ? '✓' : step.active ? '!' : index + 1}</div>
+                      <div className="step-label">{step.label}</div>
+                    </div>
+                    {index < 2 && <div className="step-connector">→</div>}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+
+            {/* Growth Enabler Chart */}
+            <div className="bar-chart-wrapper">
+              <BarChart
+                width={300}
+                height={250}
+                data={providerData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
               >
-                <ChevronLeft size={18} /> Previous
-              </button>
-              <div className="action-group">
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="percent" fill="#754A2D" />
+              </BarChart>
+            </div>
+          </div>
+
+          {/* Growth Enabler Ratings */}
+          <div className="ratings-card">
+            <h2 className="card-title">Growth Enabler Ratings</h2>
+            <div className="ratings-list">
+              <div className="rating-item">
+                <span className="rating-name">Partner A</span>
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star} className={star <= 4 ? 'star filled-star' : 'star empty-star'}>★</span>
+                  ))}
+                </div>
+              </div>
+              <div className="rating-item">
+                <span className="rating-name">Partner B</span>
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star} className={star <= 3 ? 'star filled-star' : 'star empty-star'}>★</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Purpose Partners */}
+          <div className="purpose-partners-card">
+            <h2 className="card-title">Purpose Partners</h2>
+            
+            {/* Purpose Partner Matches */}
+            <div className="matches-card">
+              <div className="matches-header">
+                <h2 className="card-title">My Purpose Matches</h2>
                 <button 
-                  className="btn-outline" 
-                  onClick={handleSave}
-                  disabled={isLoading}
+                  className="toggle-matches-btn" 
+                  onClick={() => setShowPurposeMatches(!showPurposeMatches)}
                 >
-                  {isLoading ? <Loader2 size={18} className="spin" /> : 'Save Draft'}
+                  {showPurposeMatches ? 'Hide Matches' : 'View Matches'}
                 </button>
-                <button 
-                  className="btn-primary" 
-                  onClick={handleNext}
-                  disabled={steps.indexOf(currentStep) === steps.length - 1 || isLoading}
-                >
-                  Next Step <ChevronRight size={18} />
-                </button>
+              </div>
+              {showPurposeMatches && (
+                <div className="matches-table-wrapper">
+                  <table className="matches-table">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Industry</th>
+                        <th>Amount</th>
+                        <th>Score</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {matchesData.map((match, index) => (
+                        <tr key={index} className="match-row">
+                          <td className="match-data">{match.name}</td>
+                          <td className="match-data">{match.location}</td>
+                          <td className="match-data">{match.industry}</td>
+                          <td className="match-data">{match.amount}</td>
+                          <td className="match-data">
+                            <div className="score-indicator-bar" style={{ width: `${match.score}%` }}></div>
+                            <span className="score-value">{match.score}%</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Purpose Partner Dealflow */}
+            <div className="dealflow-card">
+              <h2 className="card-title">Dealflow</h2>
+              <div className="dealflow-tracker">
+                {[
+                  { label: 'Application Completed', completed: true },
+                  { label: 'Investors Interested', completed: true },
+                  { label: 'In Progress', active: true }
+                ].map((step, index) => (
+                  <React.Fragment key={index}>
+                    <div className={`dealflow-step ${step.completed ? 'completed-step' : ''} ${step.active ? 'active-step' : ''}`}>
+                      <div className="step-icon">{step.completed ? '✓' : step.active ? '!' : index + 1}</div>
+                      <div className="step-label">{step.label}</div>
+                    </div>
+                    {index < 2 && <div className="step-connector">→</div>}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+
+            {/* Purpose Partner Chart */}
+            <div className="bar-chart-wrapper">
+              <BarChart
+                width={300}
+                height={250}
+                data={providerData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="percent" fill="#BCAE9C" />
+              </BarChart>
+            </div>
+          </div>
+
+          {/* Partner Ratings */}
+          <div className="ratings-card">
+            <h2 className="card-title">Partner Ratings</h2>
+            <div className="ratings-list">
+              <div className="rating-item">
+                <span className="rating-name">Partner A</span>
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star} className={star <= 4 ? 'star filled-star' : 'star empty-star'}>★</span>
+                  ))}
+                </div>
+              </div>
+              <div className="rating-item">
+                <span className="rating-name">Partner B</span>
+                <div className="star-rating">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star} className={star <= 3 ? 'star filled-star' : 'star empty-star'}>★</span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -688,4 +1182,6 @@ export default function Dashboard() {
       </div>
     </div>
   );
-}
+};
+
+export default Dashboard;
