@@ -4,7 +4,7 @@ import { Mail, Lock, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function LoginRegister() {
-  const navigate = useNavigate(); // ✅ Correctly placed inside the component
+  const navigate = useNavigate();
 
   const [isRegistering, setIsRegistering] = useState(true);
   const [email, setEmail] = useState('');
@@ -13,6 +13,7 @@ export default function LoginRegister() {
   const [codeSent, setCodeSent] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const [errors, setErrors] = useState({});
+  const [role, setRole] = useState(''); // <-- new state for role
 
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
@@ -21,6 +22,7 @@ export default function LoginRegister() {
     if (!validateEmail(email)) newErrors.email = 'Invalid email address';
     if (password.length < 6) newErrors.password = 'Password must be at least 6 characters';
     if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+    if (!role) newErrors.role = 'Please select a role';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -36,7 +38,7 @@ export default function LoginRegister() {
       return;
     }
     setErrors({});
-    navigate('/dashboard'); // ✅ Navigates without page reload
+    navigate('/dashboard');
   };
 
   const handleLogin = () => {
@@ -48,13 +50,13 @@ export default function LoginRegister() {
       setErrors(newErrors);
     } else {
       setErrors({});
-      navigate('/dashboard'); // ✅ Navigates without page reload
+      navigate('/dashboard');
     }
   };
 
   return (
     <div className="auth-container">
-      <h2>{isRegistering ? 'Register as SME/BUSINESS' : 'Login as SME/BUSINESS'}</h2>
+      <h2>{isRegistering ? 'Register ' : 'Login '}</h2>
       <div className="form-box">
         {isRegistering ? (
           codeSent ? (
@@ -81,6 +83,7 @@ export default function LoginRegister() {
                 />
               </div>
               {errors.email && <p className="error-text">{errors.email}</p>}
+
               <div className={`input-group ${errors.password ? 'input-error' : ''}`}>
                 <Lock size={16} />
                 <input
@@ -91,6 +94,7 @@ export default function LoginRegister() {
                 />
               </div>
               {errors.password && <p className="error-text">{errors.password}</p>}
+
               <div className={`input-group ${errors.confirmPassword ? 'input-error' : ''}`}>
                 <Lock size={16} />
                 <input
@@ -101,8 +105,24 @@ export default function LoginRegister() {
                 />
               </div>
               {errors.confirmPassword && <p className="error-text">{errors.confirmPassword}</p>}
+
+              {/* Role dropdown */}
+              <div className={`input-group ${errors.role ? 'input-error' : ''}`}>
+                <select value={role} onChange={(e) => setRole(e.target.value)}>
+                  <option value="">Select Role</option>
+                  <option value="SME/BUSINESS">SME/BUSINESS</option>
+                  <option value="Investor">Investor</option>
+                  <option value="Service Provider">Service Provider</option>
+                  <option value="Growth Enabler">Growth Enabler</option>
+                  <option value="Purpose Partners">Purpose Partners</option>
+                </select>
+              </div>
+              {errors.role && <p className="error-text">{errors.role}</p>}
+
               <button onClick={handleRegister}>Register</button>
-              <p className="switch-link">Already have an account? <span onClick={() => setIsRegistering(false)}>Login</span></p>
+              <p className="switch-link">
+                Already have an account? <span onClick={() => setIsRegistering(false)}>Login</span>
+              </p>
             </div>
           )
         ) : (
@@ -117,6 +137,7 @@ export default function LoginRegister() {
               />
             </div>
             {errors.email && <p className="error-text">{errors.email}</p>}
+
             <div className={`input-group ${errors.password ? 'input-error' : ''}`}>
               <Lock size={16} />
               <input
@@ -127,6 +148,7 @@ export default function LoginRegister() {
               />
             </div>
             {errors.password && <p className="error-text">{errors.password}</p>}
+
             <button onClick={handleLogin}>Login</button>
             <p className="switch-link">
               Don't have an account? <span onClick={() => setIsRegistering(true)}>Register</span>
