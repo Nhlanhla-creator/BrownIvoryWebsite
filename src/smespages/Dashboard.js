@@ -73,8 +73,8 @@ const steps = [
   'Profile Form',
   'Company Overview',
   'Ownership & Compliance',
-  'Financial Diligence',
-  'Operational Diligence',
+  'Financial Due Diligence',
+  'Operational Due Diligence',
   'Pitch & Market'
 ];
 
