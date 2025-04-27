@@ -129,7 +129,7 @@ const stepContent = {
     ],
     description: 'Legal and compliance documentation'
   },
-  'Financial Diligence': {
+  'Financial Information': {
     fields: [
       { name: 'annualRevenue', label: 'Annual Revenue (Last FY)', type: 'number', required: true },
       { name: 'profitabilityStatus', label: 'Profitability Status', type: 'select', options: profitabilityStatuses, required: true },
@@ -141,7 +141,7 @@ const stepContent = {
     ],
     description: 'Financial details and funding requirements'
   },
-  'Operational Diligence': {
+  'Operational Information': {
     fields: [
       { name: 'keyPartners', label: 'Key Partners', type: 'textarea', required: true },
       { name: 'keyActivities', label: 'Key Activities', type: 'textarea', required: true },
@@ -173,8 +173,8 @@ const Dashboard = () => {
     'Profile Form': false,
     'Company Overview': false,
     'Ownership & Compliance': false,
-    'Financial Diligence': false,
-    'Operational Diligence': false,
+    'Financial Information': false,
+    'Operational Information': false,
     'Pitch & Market': false
   });
   // Dashboard state
