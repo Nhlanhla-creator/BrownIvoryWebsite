@@ -101,6 +101,9 @@ const stepContent = {
         'Policy & Decision Making', 'Other'
       ], required: true },
       { name: 'website', label: 'Website / Social Media Links', type: 'url' },
+      { name: 'services', label: 'What are you looking for?', type: 'select', options: [
+        'Funding', 'Service Provider', 'Growth Enablers', 'Purpose Partners','All'
+      ], required: true },
       { name: 'optInServiceProvider', label: 'Opt-in as Service Provider?', type: 'checkbox' },
       { name: 'servicesOffered', label: 'Services Offered', type: 'textarea', condition: (formData) => formData.optInServiceProvider },
       { name: 'serviceCaseStudies', label: 'Service Case Studies (upload)', type: 'file', condition: (formData) => formData.optInServiceProvider }
@@ -761,26 +764,39 @@ const Dashboard = () => {
 
           {/* Dealflow */}
           <div className="dealflow-card">
-            <h2 className="card-title">Dealflow</h2>
-            <div className="dealflow-tracker">
-              {[
-                { label: 'Application Completed', completed: true },
-                { label: 'Investors Interested', completed: true },
-                { label: 'In Progress', active: true },
-                { label: 'Successful', completed: false },
-                { label: 'Not Profitable', completed: false },
-                { label: 'Done', completed: false }
-              ].map((step, index) => (
-                <React.Fragment key={index}>
-                  <div className={`dealflow-step ${step.completed ? 'completed-step' : ''} ${step.active ? 'active-step' : ''}`}>
-                    <div className="step-icon">{step.completed ? '✓' : step.active ? '!' : index + 1}</div>
-                    <div className="step-label">{step.label}</div>
-                  </div>
-                  {index < 5 && <div className="step-connector">→</div>}
-                </React.Fragment>
-              ))}
-            </div>
+  <h2 className="card-title">Dealflow</h2>
+  <div className="dealflow-tracker">
+    {[
+       { label: <>Funders<br />Interested</>, completed: true },
+      { label: <>Applications<br />Submitted</>, completed: true },
+      { label: <>Under<br />Review</>, completed: true },
+      { label: <>Due<br />Diligence</>, active: true },
+      { label: <>Term Sheet<br />Offered</>, completed: false },
+      { label: <>Negotiation<br /></>, completed: false },
+      { label: <>Funding<br />Approved</>, completed: false },
+      { label: <>Closed<br />Failed/success</>, completed: false },
+    ].map((step, index) => {
+      let icon;
+      if (index === 0 || index === 1) {
+        icon = '✓';
+      } else if (index === 2) {
+        icon = '!';
+      } else {
+        icon = index + 1;
+      }
+
+      return (
+        <React.Fragment key={index}>
+          <div className={`dealflow-step ${step.completed ? 'completed-step' : ''} ${step.active ? 'active-step' : ''}`}>
+            <div className="step-icon">{icon}</div>
+            <div className="step-label">{step.label}</div>
           </div>
+          {index < 6 && <div className="step-connector">→</div>}
+        </React.Fragment>
+      );
+    })}
+  </div>
+</div>
 
           {/* Funnel Graph */}
           <div className="funnel-card">
