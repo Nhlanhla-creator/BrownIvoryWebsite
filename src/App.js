@@ -10,12 +10,20 @@ import MeetingsScheduled from './smespages/MeetingsScheduled';
 import FeedbackReceived from './smespages/FeedbackReceived';
 import ComplianceStatus from './smespages/ComplianceStatus';
 import BIGScoreSummary from './smespages/BIGScoreSummary';
+import LandingPage from './mainpages/LandingPage';
+import Investors from './mainpages/Investors';
+import PurposePartner from './mainpages/PurposePartner';
+import ServiceProvider from './mainpages/ServiceProvider';
+import SMEFunding from './mainpages/SMEFunding';
+import Solutions from './mainpages/Solutions';
+import GrowthEnabler from './mainpages/GrowthEnabler';
 
 function App() {
   return (
     <Router>
       <Routes>
-      <Route path="/" element={<AuthForm />} />
+      <Route path="/" element={<LandingPage />} />
+        <Route path="/AuthForm" element={<AuthForm />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/TotalMatchedFunders" element={<TotalMatchedFunders />} />
         <Route path="/ApplicationsSent" element={<ApplicationsSent />} />
@@ -25,6 +33,13 @@ function App() {
         <Route path="/FeedbackReceived" element={<FeedbackReceived />} />
         <Route path="/ComplianceStatus" element={<ComplianceStatus />} />
         <Route path="/BIGScoreSummary" element={<BIGScoreSummary />} />
+        <Route path="/LandingPage" element={<LandingPage />} />
+        <Route path="/Investors" element={<Investors/>} />
+        <Route path="/PurposePartner" element={<PurposePartner />} />
+        <Route path="/ServiceProvider" element={<ServiceProvider />} />
+        <Route path="/SMEFunding" element={<SMEFunding />} />
+        <Route path="/Solutions" element={<Solutions />} />
+        <Route path="/GrowthEnabler" element={<GrowthEnabler />} />
       </Routes>
     </Router>
   );
