@@ -1,0 +1,340 @@
+.settings-page.with-sidebar {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    padding: 30px;
+    background-color: #F2F0E6;
+    min-height: 100vh;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-top: 80px;
+}
+
+.settings-page h2 {
+    color: #754A2D;
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+}
+
+.settings-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #D3D2CE;
+    padding-bottom: 5px;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    padding: 12px 20px;
+    background-color: transparent;
+    border: none;
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+    font-weight: 500;
+    color: #372C27;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tab-btn.active {
+    background-color: #9E6E3C;
+    color: white;
+}
+
+.tab-btn:not(.active):hover {
+    background-color: #E8E1D1;
+}
+
+.settings-form {
+    background-color: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+}
+
+.form-section {
+    margin-bottom: 30px;
+}
+
+.form-section h3 {
+    color: #9E6E3C;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #D3D2CE;
+    padding-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #372C27;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px;
+    border: 1px solid #D3D2CE;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #372C27;
+    transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #9E6E3C;
+}
+
+.form-hint {
+    font-size: 0.85rem;
+    color: #9E6E3C;
+    margin-top: 5px;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.checkbox-group input {
+    width: auto;
+    transform: scale(1.2);
+}
+
+.change-password-btn {
+    padding: 10px 15px;
+    background-color: #F2F0E6;
+    color: #754A2D;
+    border: 1px solid #D3D2CE;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.change-password-btn:hover {
+    background-color: #E8E1D1;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #D3D2CE;
+}
+
+.cancel-btn,
+.save-btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+}
+
+.cancel-btn {
+    background-color: white;
+    color: #754A2D;
+    border: 1px solid #D3D2CE;
+}
+
+.cancel-btn:hover {
+    background-color: #F2F0E6;
+}
+
+.save-btn {
+    background-color: #9E6E3C;
+    color: white;
+    border: none;
+    min-width: 120px;
+}
+
+.save-btn:hover {
+    background-color: #754A2D;
+}
+
+.save-btn:disabled {
+    background-color: #BCAE9C;
+    cursor: not-allowed;
+}
+
+.save-success {
+    color: #2ECC71;
+    font-weight: 500;
+    margin-left: 15px;
+}
+
+.danger-zone {
+    background-color: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #FF6B6B;
+}
+
+.danger-zone h3 {
+    color: #E74C3C;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+.danger-zone-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.danger-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #FFD3D3;
+}
+
+.danger-action:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.danger-action h4 {
+    color: #372C27;
+    margin-bottom: 5px;
+    font-size: 1rem;
+}
+
+.danger-action p {
+    color: #6D6D6D;
+    font-size: 0.9rem;
+}
+
+.logout-btn,
+.delete-account-btn,
+.confirm-delete-btn,
+.cancel-delete-btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.logout-btn {
+    background-color: #9E6E3C;
+    color: white;
+    border: none;
+}
+
+.logout-btn:hover {
+    background-color: #754A2D;
+}
+
+.delete-account-btn {
+    background-color: white;
+    color: #E74C3C;
+    border: 1px solid #E74C3C;
+}
+
+.delete-account-btn:hover {
+    background-color: #FFEEEE;
+}
+
+.delete-confirm {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.delete-confirm p {
+    color: #E74C3C;
+    font-size: 0.9rem;
+    margin-right: 10px;
+}
+
+.confirm-delete-btn {
+    background-color: #E74C3C;
+    color: white;
+    border: none;
+}
+
+.confirm-delete-btn:hover {
+    background-color: #C0392B;
+}
+
+.cancel-delete-btn {
+    background-color: white;
+    color: #372C27;
+    border: 1px solid #D3D2CE;
+}
+
+.cancel-delete-btn:hover {
+    background-color: #F2F0E6;
+}
+
+@media (max-width: 992px) {
+    .settings-page.with-sidebar {
+        margin-left: 0;
+        width: 100%;
+        padding: 20px;
+    }
+    
+    .danger-action {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .danger-action button {
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 768px) {
+    .settings-tabs {
+        gap: 3px;
+    }
+    
+    .tab-btn {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+    }
+    
+    .save-success {
+        margin-left: 0;
+        margin-top: 10px;
+        align-self: center;
+    }
+    
+    .delete-confirm {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+    }
+    
+    .delete-confirm p {
+        align-self: flex-start;
+    }
+}

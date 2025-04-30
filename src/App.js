@@ -1,45 +1,66 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import AuthForm from '../src/smespages/LoginRegister';
-import Dashboard from './smespages/Dashboard';
-import TotalMatchedFunders from './smespages/TotalMatchedFunders';
-import ApplicationsSent from './smespages/ApplicationsSent';
-import PendingApplications from './smespages/PendingApplications';
-import FunderInterestReceived from './smespages/FunderInterestReceived';
-import MeetingsScheduled from './smespages/MeetingsScheduled';
-import FeedbackReceived from './smespages/FeedbackReceived';
-import ComplianceStatus from './smespages/ComplianceStatus';
-import BIGScoreSummary from './smespages/BIGScoreSummary';
+import Sidebar from './smespages/Sidebar/Sidebar';
+import Header from './smespages/Header/Header';
+
+import AuthForm from './smespages/LoginRegister';
 import LandingPage from './mainpages/LandingPage';
 import Investors from './mainpages/Investors';
 import PurposePartner from './mainpages/PurposePartner';
 import ServiceProvider from './mainpages/ServiceProvider';
 import SMEFunding from './mainpages/SMEFunding';
 import Solutions from './mainpages/Solutions';
-import GrowthEnabler from './mainpages/GrowthEnabler';
+import GrowthEnablerMain from './mainpages/GrowthEnabler';
+import Dashboard from './smespages/Dashboard/Dashboard';
+import Profile from './smespages/Profile/Profile';
+import Application from './smespages/Application/Application';
+import FindMatches from './smespages/FindMatches/FindMatches';
+import Investor from './smespages/Investor/Investor';
+import GrowthEnabler from './smespages/GrowthEnabler/GrowthEnabler';
+import Messages from './smespages/Messages/Messages';
+import Settings from './smespages/Settings/Settings';
+
+import './App.css';
 
 function App() {
+  const [profileImage, setProfileImage] = useState(null);
+  const companyName = 'Acme Inc';
+
+  const renderProtectedRoute = (Component) => (
+    <div className="app-layout">
+      <Sidebar companyName={companyName} />
+      <div className="main-content">
+        <Header
+          companyName={companyName}
+          profileImage={profileImage}
+          setProfileImage={setProfileImage}
+        />
+        <div className="page-content">
+          <Component />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <Router>
       <Routes>
-      <Route path="/" element={<LandingPage />} />
-        <Route path="/AuthForm" element={<AuthForm />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/TotalMatchedFunders" element={<TotalMatchedFunders />} />
-        <Route path="/ApplicationsSent" element={<ApplicationsSent />} />
-        <Route path="/PendingApplications" element={<PendingApplications />} />
-        <Route path="/FunderInterestReceived" element={<FunderInterestReceived />} />
-        <Route path="/MeetingsScheduled" element={<MeetingsScheduled />} />
-        <Route path="/FeedbackReceived" element={<FeedbackReceived />} />
-        <Route path="/ComplianceStatus" element={<ComplianceStatus />} />
-        <Route path="/BIGScoreSummary" element={<BIGScoreSummary />} />
-        <Route path="/LandingPage" element={<LandingPage />} />
-        <Route path="/Investors" element={<Investors/>} />
-        <Route path="/PurposePartner" element={<PurposePartner />} />
-        <Route path="/ServiceProvider" element={<ServiceProvider />} />
-        <Route path="/SMEFunding" element={<SMEFunding />} />
-        <Route path="/Solutions" element={<Solutions />} />
-        <Route path="/GrowthEnabler" element={<GrowthEnabler />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/auth" element={<AuthForm />} />
+        <Route path="/investors" element={<Investors />} />
+        <Route path="/purpose-partner" element={<PurposePartner />} />
+        <Route path="/service-provider" element={<ServiceProvider />} />
+        <Route path="/sme-funding" element={<SMEFunding />} />
+        <Route path="/solutions" element={<Solutions />} />
+        <Route path="/growth-enabler" element={<GrowthEnablerMain />} />
+        <Route path="/dashboard" element={renderProtectedRoute(Dashboard)} />
+        <Route path="/profile" element={renderProtectedRoute(Profile)} />
+        <Route path="/application" element={renderProtectedRoute(Application)} />
+        <Route path="/find-matches" element={renderProtectedRoute(FindMatches)} />
+        <Route path="/investor" element={renderProtectedRoute(Investor)} />
+        <Route path="/growth" element={renderProtectedRoute(GrowthEnabler)} />
+        <Route path="/messages" element={renderProtectedRoute(Messages)} />
+        <Route path="/settings" element={renderProtectedRoute(Settings)} />
       </Routes>
     </Router>
   );

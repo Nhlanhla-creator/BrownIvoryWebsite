@@ -1,0 +1,149 @@
+.sidebar {
+    width: 240px;
+    background-color:#372C27;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 240px;
+  overflow-y: auto; /* Allows scrolling if menu exceeds height */
+
+  scroll-behavior: smooth;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.05);
+}
+
+
+.menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.menu li {
+    display: flex;
+    align-items: center;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 4px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.menu li:hover {
+    background-color: rgba(158, 110, 60, 0.1); /* Light tint of brown */
+    color: #9E6E3C;
+}
+
+.menu li.active {
+    background-color: #9E6E3C; /* Warm brown */
+    color: #F2F0E6; /* Light cream */
+}
+
+.menu-icon {
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
+}
+
+.logout-section {
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    border-top: 2px solid rgba(247, 159, 101, 0.1);
+    cursor: pointer;
+    margin-top: 12px;
+    color: #BCAE9C;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.logout-section:hover {
+    background-color: rgba(158, 110, 60, 0.1);
+    color: #9E6E3C;
+}
+
+/* Optional: Add smooth transitions for icons */
+.menu-icon, .logout-section svg {
+    transition: transform 0.2s ease;
+}
+
+.menu li:hover .menu-icon,
+.logout-section:hover svg {
+    transform: translateX(2px);
+}
+/* Company Header Styles */
+.company-header {
+    display: flex;
+    align-items: center;
+    padding: 0 20px 20px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid rgba(248, 165, 110, 0.1);
+  }
+  
+  .company-info {
+    margin-left: 12px;
+  }
+  
+  .company-name {
+    font-weight: 600;
+    font-size: 26px;
+    color: #F2F0E6;
+    line-height: 1.3;
+  }
+  
+  .dashboard-title {
+    font-size: 13px;
+    color: #BCAE9C;
+    opacity: 0.8;
+    letter-spacing: 0.5px;
+  }
+  
+  /* Update logo circle to align with header */
+  .logo-circle {
+    background-color: #9E6E3C;
+    color: #F2F0E6;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    margin: 0;
+  }
+  
+  /* Update menu items to align with new design */
+  .menu {
+    padding: 12px;
+  }
+  
+  .menu li {
+    margin: 2px 0;
+    border-radius: 6px;
+  }
+  @media (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    
+    .main-content {
+      margin-left: 0;
+    }
+  }
+  
+  
