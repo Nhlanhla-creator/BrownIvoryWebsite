@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
 import Header from './Header';
 import Footer from './Footer';
 
-const HowItWorksInvestors = () => {
-  const [activeTab, setActiveTab] = useState('investors');
+const HowItWorksCorporates = () => {
+  const [activeTab, setActiveTab] = useState('corporates');
 
   return (
     <div style={styles.container}>
@@ -40,47 +40,46 @@ const HowItWorksInvestors = () => {
           </button>
         </div>
         
-        {activeTab === 'investors' && (
+        {activeTab === 'corporates' && (
           <div style={styles.tabContent}>
-            <h2 style={styles.sectionTitle}>Discover. Verify. Invest.</h2>
-            <p style={styles.videoTitle}>Explainer Video: "Find Fund-Ready SMEs in Minutes"</p>
+            <h2 style={styles.sectionTitle}>Source. Partner. Amplify Impact.</h2>
+            <p style={styles.videoTitle}>Explainer Video: "Meet Your CSI Goals with Data"</p>
             
             <div style={styles.stepContainer}>
               <div style={styles.step}>
                 <div style={styles.stepHeader}>
-                  <h3>Step 1: Set Your Criteria</h3>
+                  <h3>Step 1: Define Your Goals</h3>
                   <button style={styles.videoButton}>▶️ Watch</button>
                 </div>
                 <ul style={styles.stepList}>
-                  <li>Industry, risk level, ticket size.</li>
-                  <li>Opt-in for auto-matched SMEs.</li>
+                  <li>Select focus areas (e.g., women-led, green biz).</li>
                 </ul>
               </div>
               
               <div style={styles.step}>
                 <div style={styles.stepHeader}>
-                  <h3>Step 2: Review Scored Profiles</h3>
+                  <h3>Step 2: Access Vetted SMEs</h3>
                   <button style={styles.videoButton}>▶️ Watch</button>
                 </div>
                 <ul style={styles.stepList}>
-                  <li>Filter by BIG Score, growth metrics, or compliance.</li>
-                  <li>View SME pitch decks + score breakdowns.</li>
+                  <li>BIG Score ensures compliance and impact alignment.</li>
+                  <li>Dashboard tracks SME progress over time.</li>
                 </ul>
               </div>
               
               <div style={styles.step}>
                 <div style={styles.stepHeader}>
-                  <h3>Step 3: Connect & Fund</h3>
+                  <h3>Step 3: Partner or Fund</h3>
                   <button style={styles.videoButton}>▶️ Watch</button>
                 </div>
                 <ul style={styles.stepList}>
-                  <li>Message SMEs via platform.</li>
-                  <li>Track portfolio performance.</li>
+                  <li>Sponsor accelerators.</li>
+                  <li>Direct contracts with high-scoring SMEs.</li>
                 </ul>
               </div>
             </div>
             
-            <button style={styles.ctaButton}>Browse SMEs Now</button>
+            <button style={styles.ctaButton}>Explore SMEs</button>
           </div>
         )}
       </div>
@@ -256,4 +255,4 @@ const styles = {
   };
   
 
-export default HowItWorksInvestors;
+export default HowItWorksCorporates;

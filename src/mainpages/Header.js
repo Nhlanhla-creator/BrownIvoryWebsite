@@ -10,12 +10,16 @@ const Header = () => {
   };
 
   const handleHomeClick = () => {
-    navigate('/'); // This will navigate to your LandingPage
+    navigate('/');
   };
 
   const handleServiceClick = (path) => {
     navigate(path);
     setShowDropdown(false);
+  };
+
+  const handleNavClick = (path) => {
+    navigate(path);
   };
 
   return (
@@ -35,9 +39,24 @@ const Header = () => {
         >
           Home
         </button>
-        <a href="#about" style={styles.link}>About</a>
         
-        {/* Services Dropdown */}
+        {/* How it works link */}
+        <button 
+          style={styles.link}
+          onClick={() => handleNavClick('/how-it-works')}
+        >
+          How it works
+        </button>
+        
+        {/* BIG score link */}
+        <button 
+          style={styles.link}
+          onClick={() => handleNavClick('/BigScorePage')}
+        >
+          BIG score
+        </button>
+        
+        {/* Resources dropdown */}
         <div 
           style={styles.dropdownContainer}
           onMouseEnter={() => setShowDropdown(true)}
@@ -47,7 +66,7 @@ const Header = () => {
             ...styles.link,
             ...(showDropdown ? styles.linkActive : {})
           }}>
-            Services
+            Resources
           </button>
           {showDropdown && (
             <div style={styles.dropdown}>
@@ -103,7 +122,13 @@ const Header = () => {
           )}
         </div>
         
-        <a href="#footer-contact" style={styles.link}>Contact</a>
+        {/* Contact Us link */}
+        <button 
+          style={styles.link}
+          onClick={() => handleNavClick('/contact-us')}
+        >
+          Contact Us
+        </button>
       </nav>
       <div style={styles.buttonGroup}>
         <button style={styles.login} onClick={handleLoginClick}>Login</button>
