@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { db, auth } from '../../firebaseConfig';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 import './Profile.css';
 
 const africanCountries = [
@@ -12,6 +15,7 @@ const africanCountries = [
 ];
 
 const Profile = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     companyName: '',
     country: '',
@@ -20,33 +24,92 @@ const Profile = () => {
     services: ''
   });
   const [isEditMode, setIsEditMode] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
-    const saved = localStorage.getItem('companyProfile');
-    if (saved) {
-      setFormData(JSON.parse(saved));
-      setIsEditMode(false); // Show summary on return
+    if (!auth.currentUser) {
+      navigate('/login');
+      return;
     }
-  }, []);
+
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true);
+        const profileRef = doc(db, 'businessProfile', auth.currentUser.uid, 'profileData', 'details');
+        const docSnap = await getDoc(profileRef);
+        
+        if (docSnap.exists()) {
+          setFormData(docSnap.data());
+          setIsEditMode(false);
+        }
+      } catch (err) {
+        console.error('Error fetching profile:', err);
+        setError('Failed to load profile data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, [navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    localStorage.setItem('companyProfile', JSON.stringify(formData));
-    window.location.href = '/dashboard';
+    
+    if (!auth.currentUser) {
+      setError('User not authenticated');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      
+      // Save to businessProfile/{userId}/profileData/details
+      const profileRef = doc(db, 'businessProfile', auth.currentUser.uid, 'profileData', 'details');
+      await setDoc(profileRef, {
+        ...formData,
+        userId: auth.currentUser.uid, // Store user ID for reference
+        email: auth.currentUser.email, // Store user email
+        lastUpdated: new Date() // Add timestamp
+      });
+      
+      setSuccessMessage('Profile saved successfully!');
+      setTimeout(() => {
+        setSuccessMessage('');
+        setIsEditMode(false);
+      }, 3000);
+      
+    } catch (err) {
+      console.error('Error saving profile:', err);
+      setError('Failed to save profile');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleUpdate = () => {
     setIsEditMode(true);
   };
 
+  if (loading) {
+    return <div className="profile-page">Loading...</div>;
+  }
+
   return (
     <div className="profile-page">
       <h2>Company Profile</h2>
+      
+      {error && <div className="error-message">{error}</div>}
+      {successMessage && <div className="success-message">{successMessage}</div>}
+
       <p className="profile-description">
         {isEditMode
           ? 'Complete or update your company profile'
@@ -130,8 +193,8 @@ const Profile = () => {
           </div>
 
           <div className="form-actions">
-            <button type="submit" className="save-btn">
-              Save
+            <button type="submit" className="save-btn" disabled={loading}>
+              {loading ? 'Saving...' : 'Save'}
             </button>
           </div>
         </form>

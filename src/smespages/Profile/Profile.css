@@ -206,3 +206,56 @@
     margin-top: 8px;
     font-style: italic;
   }
+  /* Add these styles to your existing Profile.css */
+.error-message {
+  color: #d32f2f;
+  background-color: #fde7e7;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.success-message {
+  color: #2e7d32;
+  background-color: #e8f5e9;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  text-align: center;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Add to Profile.css */
+.error-message {
+  color: #d32f2f;
+  background-color: #fde7e7;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.success-message {
+  color: #2e7d32;
+  background-color: #e8f5e9;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  text-align: center;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}

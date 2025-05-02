@@ -53,6 +53,7 @@ function App() {
         <Route path="/sme-funding" element={<SMEFunding />} />
         <Route path="/solutions" element={<Solutions />} />
         <Route path="/growth-enabler" element={<GrowthEnablerMain />} />
+        <Route path="/auth" element={renderProtectedRoute(AuthForm)} />
         <Route path="/dashboard" element={renderProtectedRoute(Dashboard)} />
         <Route path="/profile" element={renderProtectedRoute(Profile)} />
         <Route path="/application" element={renderProtectedRoute(Application)} />
@@ -67,3 +68,4 @@ function App() {
 }
 
 export default App;
+

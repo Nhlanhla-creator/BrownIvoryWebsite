@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import './LoginRegister.css';
 import { Mail, Lock, CheckCircle, Rocket, Smile, User, Briefcase, HeartHandshake } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '../firebaseConfig';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 
 export default function LoginRegister() {
   const navigate = useNavigate();
@@ -14,10 +17,11 @@ export default function LoginRegister() {
   const [errors, setErrors] = useState({});
   const [role, setRole] = useState('');
   const [isHovering, setIsHovering] = useState(false);
+  const [authError, setAuthError] = useState('');
 
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     const newErrors = {};
     if (!validateEmail(email)) newErrors.email = 'Oops! Wrong email';
     if (password.length < 6) newErrors.password = 'Make it longer (at least 6 characters)';
@@ -26,9 +30,28 @@ export default function LoginRegister() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-    } else {
-      setErrors({});
+      return;
+    }
+
+    setErrors({});
+    setAuthError('');
+
+    try {
+      // Create user in Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      // Create user document in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        email: user.email,
+        role: role,
+        createdAt: new Date()
+      });
+
       setCodeSent(true);
+    } catch (error) {
+      console.error('Registration error:', error);
+      setAuthError(error.message);
     }
   };
 
@@ -41,16 +64,25 @@ export default function LoginRegister() {
     navigate('/dashboard');
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const newErrors = {};
     if (!validateEmail(email)) newErrors.email = 'Enter your email!';
     if (password === '') newErrors.password = 'Enter your password!';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-    } else {
-      setErrors({});
+      return;
+    }
+
+    setErrors({});
+    setAuthError('');
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       navigate('/dashboard');
+    } catch (error) {
+      console.error('Login error:', error);
+      setAuthError(error.message);
     }
   };
 
@@ -70,6 +102,7 @@ export default function LoginRegister() {
       <div className="auth-box">
         <div className="form-side">
           <div className="form-header">
+            {authError && <div className="auth-error">{authError}</div>}
             <h2>{isRegistering ? 'Create Your Account!' : 'Welcome Back!'}</h2>
             <div className={`icon-container ${isRegistering ? 'register' : 'login'}`}>
               {isRegistering ? <Rocket size={24} /> : <Smile size={24} />}
