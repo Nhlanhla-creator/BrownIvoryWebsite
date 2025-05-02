@@ -46,8 +46,10 @@ const HowItWorks = () => {
       <div style={styles.container}>
         {/* Hero Section */}
         <section style={styles.heroSection}>
-          <h1 style={styles.mainTitle}>How BIG Marketplace Works</h1>
-          <p style={styles.subTitle}>For Every Stakeholder in the SME Ecosystem</p>
+          <div style={styles.heroContent}>
+            <h1 style={styles.mainTitle}>How BIG Marketplace Works</h1>
+            <p style={styles.subTitle}>For Every Stakeholder in the SME Ecosystem</p>
+          </div>
         </section>
 
         {/* Tab Navigation */}
@@ -385,24 +387,37 @@ const styles = {
     minHeight: 'calc(100vh - 160px)'
   },
   heroSection: {
-    textAlign: 'center',
+    position: 'relative',
+    height: '400px',
     marginBottom: '40px',
-    padding: '40px 20px',
-    background: `linear-gradient(135deg, ${colors.lightBrown} 0%, ${colors.mediumBrown} 100%)`,
     borderRadius: '10px',
-    color: colors.white,
-    boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
+    overflow: 'hidden',
+    boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
+    backgroundImage: 'linear-gradient(rgba(55, 44, 39, 0.8), rgba(55, 44, 39, 0.8)), url(https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center'
+  },
+  heroContent: {
+    padding: '20px',
+    maxWidth: '800px',
+    zIndex: 2
   },
   mainTitle: {
-    fontSize: '2.8rem',
+    fontSize: '3rem',
     fontWeight: 'bold',
-    marginBottom: '15px',
-    textShadow: '1px 1px 3px rgba(0,0,0,0.2)'
+    color: colors.white,
+    marginBottom: '20px',
+    textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
   },
   subTitle: {
     fontSize: '1.5rem',
-    marginBottom: '10px',
-    opacity: 0.9
+    color: colors.lightGray,
+    marginBottom: '30px',
+    lineHeight: '1.5'
   },
   tabContainer: {
     display: 'flex',

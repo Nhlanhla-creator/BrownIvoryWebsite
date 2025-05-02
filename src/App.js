@@ -18,6 +18,7 @@ import HowItWorksInvestors from './mainpages/Investors';
 import HowItWorksSMSE from './mainpages/SMEFunding';
 import BigScorePage from './mainpages/BIGScorePage';
 import HowItWorks from './mainpages/HowItWorks';
+import LoginRegister from './smespages/LoginRegister';
 
 import './App.css';
 
@@ -46,6 +47,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<AuthForm />} />
+        <Route path="/LoginRegister" element={<LoginRegister/>} />
         <Route path="/HowItWorksAccelerators" element={<HowItWorksAccelerators />} />
         <Route path="/HowItWorksCorporates" element={<HowItWorksCorporates />} />
         <Route path="/HowItWorksInvestors" element={<HowItWorksInvestors/>} />

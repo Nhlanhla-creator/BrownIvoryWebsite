@@ -5,7 +5,7 @@ const Header = () => {
   const navigate = useNavigate();
 
   const handleLoginClick = () => {
-    navigate('/AuthForm');
+    navigate('/LoginRegister');
   };
 
   const handleNavigation = (path) => {
