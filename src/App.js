@@ -17,6 +17,7 @@ import HowItWorksCorporates from './mainpages/Corporates';
 import HowItWorksInvestors from './mainpages/Investors';
 import HowItWorksSMSE from './mainpages/SMEFunding';
 import BigScorePage from './mainpages/BIGScorePage';
+import HowItWorks from './mainpages/HowItWorks';
 
 import './App.css';
 
@@ -50,6 +51,7 @@ function App() {
         <Route path="/HowItWorksInvestors" element={<HowItWorksInvestors/>} />
         <Route path="/HowItWorksSMSE" element={<HowItWorksSMSE/>} />
         <Route path="/BigScorePage" element={<BigScorePage/>} />
+        <Route path="/HowItWorks" element={<HowItWorks/>} />
         <Route path="/dashboard" element={renderProtectedRoute(Dashboard)} />
         <Route path="/profile" element={renderProtectedRoute(Profile)} />
         <Route path="/application" element={renderProtectedRoute(Application)} />
