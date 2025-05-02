@@ -366,7 +366,7 @@ const LandingPage = () => {
               gap: '20px'
             }}>
               <Link 
-                to="/about-marketplace" 
+                to="/AboutPage" 
                 className="cta-button" 
                 style={{ 
                   backgroundColor: colors.primary,
@@ -383,7 +383,7 @@ const LandingPage = () => {
                 About Marketplace →
               </Link>
               <Link 
-                to="/AuthForm" 
+                to="/AboutPage" 
                 className="cta-button" 
                 style={{ 
                   backgroundColor: colors.primaryLight,

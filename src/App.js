@@ -12,6 +12,7 @@ import Investor from './smespages/Investor/Investor';
 import GrowthEnabler from './smespages/GrowthEnabler/GrowthEnabler';
 import Messages from './smespages/Messages/Messages';
 import Settings from './smespages/Settings/Settings';
+import AboutPage from './mainpages/About';
 import HowItWorksAccelerators from './mainpages/Accelerators';
 import HowItWorksCorporates from './mainpages/Corporates';
 import HowItWorksInvestors from './mainpages/Investors';
@@ -47,6 +48,8 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<AuthForm />} />
+        <Route path="/HowItWorks" element={<HowItWorks />} />
+        <Route path="/BigScorePage" element={<BigScorePage />} />
         {/* <Route path="/investors" element={<Investors />} />
         <Route path="/purpose-partner" element={<PurposePartner />} />
         <Route path="/service-provider" element={<ServiceProvider />} />
@@ -54,6 +57,7 @@ function App() {
         <Route path="/solutions" element={<Solutions />} />
         <Route path="/growth-enabler" element={<GrowthEnablerMain />} /> */}
         <Route path="/LoginRegister" element={<LoginRegister />} />
+        <Route path="/AboutPage" element={<AboutPage />} />
         <Route path="/dashboard" element={renderProtectedRoute(Dashboard)} />
         <Route path="/profile" element={renderProtectedRoute(Profile)} />
         <Route path="/application" element={renderProtectedRoute(Application)} />
