@@ -18,7 +18,7 @@ export default function LoginRegister() {
   const [role, setRole] = useState('');
   const [isHovering, setIsHovering] = useState(false);
   const [authError, setAuthError] = useState('');
-
+  const [isVerifying, setIsVerifying] = useState(false);
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
   const handleRegister = async () => {
@@ -48,7 +48,8 @@ export default function LoginRegister() {
         createdAt: new Date()
       });
 
-      setCodeSent(true);
+     setIsRegistering(false);
+     setIsVerifying(true);
     } catch (error) {
       console.error('Registration error:', error);
       setAuthError(error.message);
@@ -233,8 +234,9 @@ export default function LoginRegister() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
+                {isVerifying && <a>make sure email is verified</a>}
                 {errors.password && <p className="error-text">{errors.password}</p>}
-
+                
                 <button 
                   className="primary-btn" 
                   onClick={handleLogin}

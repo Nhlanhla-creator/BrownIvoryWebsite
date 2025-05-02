@@ -3,7 +3,7 @@ import { db, auth } from '../../firebaseConfig';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import './Profile.css';
-
+import ApplicationSummary from './ApplicationSummary'; // Import the ApplicationSummary component
 const africanCountries = [
   'Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi', 'Cabo Verde', 'Cameroon',
   'Central African Republic', 'Chad', 'Comoros', 'Congo', 'DR Congo', 'Djibouti', 'Egypt',
@@ -210,6 +210,7 @@ const Profile = () => {
           </div>
         </div>
       )}
+      <ApplicationSummary /> {/* Include the ApplicationSummary component here */}
     </div>
   );
 };

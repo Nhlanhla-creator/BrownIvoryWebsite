@@ -225,45 +225,42 @@ const Application = () => {
   // Save section data to Firestore
   const saveSectionToFirestore = async (sectionName) => {
     if (!auth.currentUser) return;
-
+  
     try {
       const sectionData = {};
       const fields = stepContent[sectionName].fields;
-      
-      // Process all fields including files
+  
       for (const field of fields) {
-        if (formData[field.name] !== undefined) {
+        const fieldValue = formData[field.name];
+  
+        if (fieldValue !== undefined) {
           if (field.type === 'file') {
-            // Upload file and store URL if it's a File object
-            if (formData[field.name] instanceof File) {
-              const fileUrl = await uploadFile(formData[field.name], field.name);
+            if (fieldValue instanceof File) {
+              const fileUrl = await uploadFile(fieldValue, field.name);
               if (fileUrl) {
                 sectionData[field.name] = fileUrl;
-                sectionData[`${field.name}_filename`] = formData[field.name].name;
+                sectionData[`${field.name}_filename`] = fieldValue.name;
               }
-            } else {
-              // Keep existing URL if it's already a string (from loaded data)
-              sectionData[field.name] = formData[field.name];
+            } else if (typeof fieldValue === 'string') {
+              // Already a URL, no need to upload
+              sectionData[field.name] = fieldValue;
             }
           } else {
-            sectionData[field.name] = formData[field.name];
+            sectionData[field.name] = fieldValue;
           }
         }
       }
-
+  
       const docName = formatSectionName(sectionName);
       const docRef = doc(db, 'SMEs', auth.currentUser.uid, 'application', docName);
-      
-      await setDoc(docRef, {
-        ...sectionData,
-        lastUpdated: new Date()
-      }, { merge: true });
-
-    } catch (err) {
-      console.error('Error saving section:', err);
-      throw err;
+      await setDoc(docRef, sectionData);
+  
+    } catch (error) {
+      console.error(`Error saving ${sectionName} data:`, error);
+      setError(`Failed to save ${sectionName} data`);
     }
   };
+  
 
   useEffect(() => {
     loadApplicationData();

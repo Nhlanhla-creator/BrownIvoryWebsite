@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Calendar, Clock, TrendingUp, Award, Users, CheckCircle, ChevronRight, ChevronLeft, Star, Plus, X } from 'lucide-react';
 import './Dashboard.css';
-
+import { auth } from '../../firebaseConfig';
 const Dashboard = () => {
+  const user = auth.currentUser;
+  const userName = user ? user.email : 'User';
   const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [currentMonth] = useState(new Date().getMonth());
@@ -149,6 +151,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-content">
+      <h1 className="welcome-text">Welcome back, {userName}!</h1>
       {/* First Row - Progress Tracker */}
       <div className="tracker-card">
         <h3 className="card-title">Funding Tracker</h3>

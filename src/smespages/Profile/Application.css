@@ -1,0 +1,25 @@
+.application-summary {
+    padding: 2rem;
+    background-color: #f9f9f9;
+  }
+  
+  .application-section {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 1rem;
+  }
+  
+  .application-section h3 {
+    margin-top: 0;
+    color: #2c3e50;
+  }
+  
+  .application-section ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .application-section li {
+    margin-bottom: 0.5rem;
+  }
+  

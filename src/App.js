@@ -47,12 +47,13 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<AuthForm />} />
-        <Route path="/investors" element={<Investors />} />
+        {/* <Route path="/investors" element={<Investors />} />
         <Route path="/purpose-partner" element={<PurposePartner />} />
         <Route path="/service-provider" element={<ServiceProvider />} />
         <Route path="/sme-funding" element={<SMEFunding />} />
         <Route path="/solutions" element={<Solutions />} />
-        <Route path="/growth-enabler" element={<GrowthEnablerMain />} />
+        <Route path="/growth-enabler" element={<GrowthEnablerMain />} /> */}
+        <Route path="/LoginRegister" element={<LoginRegister />} />
         <Route path="/dashboard" element={renderProtectedRoute(Dashboard)} />
         <Route path="/profile" element={renderProtectedRoute(Profile)} />
         <Route path="/application" element={renderProtectedRoute(Application)} />
