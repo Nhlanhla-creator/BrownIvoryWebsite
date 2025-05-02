@@ -1,16 +1,9 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Sidebar from './smespages/Sidebar/Sidebar';
-import Header from './smespages/Header/Header';
-
+import Header from './mainpages/Header';
 import AuthForm from './smespages/LoginRegister';
 import LandingPage from './mainpages/LandingPage';
-import Investors from './mainpages/Investors';
-import PurposePartner from './mainpages/PurposePartner';
-import ServiceProvider from './mainpages/ServiceProvider';
-import SMEFunding from './mainpages/SMEFunding';
-import Solutions from './mainpages/Solutions';
-import GrowthEnablerMain from './mainpages/GrowthEnabler';
 import Dashboard from './smespages/Dashboard/Dashboard';
 import Profile from './smespages/Profile/Profile';
 import Application from './smespages/Application/Application';
@@ -19,6 +12,13 @@ import Investor from './smespages/Investor/Investor';
 import GrowthEnabler from './smespages/GrowthEnabler/GrowthEnabler';
 import Messages from './smespages/Messages/Messages';
 import Settings from './smespages/Settings/Settings';
+import HowItWorksAccelerators from './mainpages/Accelerators';
+import HowItWorksCorporates from './mainpages/Corporates';
+import HowItWorksInvestors from './mainpages/Investors';
+import HowItWorksSMSE from './mainpages/SMEFunding';
+import BigScorePage from './mainpages/BIGScorePage';
+import HowItWorks from './mainpages/HowItWorks';
+import LoginRegister from './smespages/LoginRegister';
 
 import './App.css';
 
@@ -53,7 +53,6 @@ function App() {
         <Route path="/sme-funding" element={<SMEFunding />} />
         <Route path="/solutions" element={<Solutions />} />
         <Route path="/growth-enabler" element={<GrowthEnablerMain />} />
-        <Route path="/auth" element={renderProtectedRoute(AuthForm)} />
         <Route path="/dashboard" element={renderProtectedRoute(Dashboard)} />
         <Route path="/profile" element={renderProtectedRoute(Profile)} />
         <Route path="/application" element={renderProtectedRoute(Application)} />

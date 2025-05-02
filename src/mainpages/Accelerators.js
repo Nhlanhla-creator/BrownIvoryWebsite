@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 
-const HowItWorksInvestors = () => {
-  const [activeTab, setActiveTab] = useState('investors');
+const HowItWorksAccelerators = () => {
+  const [activeTab, setActiveTab] = useState('accelerators');
 
   return (
     <div style={styles.container}>
@@ -40,47 +40,46 @@ const HowItWorksInvestors = () => {
           </button>
         </div>
         
-        {activeTab === 'investors' && (
+        {activeTab === 'accelerators' && (
           <div style={styles.tabContent}>
-            <h2 style={styles.sectionTitle}>Discover. Verify. Invest.</h2>
-            <p style={styles.videoTitle}>Explainer Video: "Find Fund-Ready SMEs in Minutes"</p>
+            <h2 style={styles.sectionTitle}>Identify. Nurture. Track.</h2>
+            <p style={styles.videoTitle}>Explainer Video: "Supercharge Your Cohort"</p>
             
             <div style={styles.stepContainer}>
               <div style={styles.step}>
                 <div style={styles.stepHeader}>
-                  <h3>Step 1: Set Your Criteria</h3>
+                  <h3>Step 1: List Your Program</h3>
                   <button style={styles.videoButton}>▶️ Watch</button>
                 </div>
                 <ul style={styles.stepList}>
-                  <li>Industry, risk level, ticket size.</li>
-                  <li>Opt-in for auto-matched SMEs.</li>
+                  <li>Add eligibility criteria (e.g., "Scores 40-60").</li>
                 </ul>
               </div>
               
               <div style={styles.step}>
                 <div style={styles.stepHeader}>
-                  <h3>Step 2: Review Scored Profiles</h3>
+                  <h3>Step 2: Recruit from BIG's Pipeline</h3>
                   <button style={styles.videoButton}>▶️ Watch</button>
                 </div>
                 <ul style={styles.stepList}>
-                  <li>Filter by BIG Score, growth metrics, or compliance.</li>
-                  <li>View SME pitch decks + score breakdowns.</li>
+                  <li>Auto-receive applications from aligned SMEs.</li>
+                  <li>View SME score history.</li>
                 </ul>
               </div>
               
               <div style={styles.step}>
                 <div style={styles.stepHeader}>
-                  <h3>Step 3: Connect & Fund</h3>
+                  <h3>Step 3: Monitor Progress</h3>
                   <button style={styles.videoButton}>▶️ Watch</button>
                 </div>
                 <ul style={styles.stepList}>
-                  <li>Message SMEs via platform.</li>
-                  <li>Track portfolio performance.</li>
+                  <li>Track SME score improvements post-program.</li>
+                  <li>Highlight success stories to attract funders.</li>
                 </ul>
               </div>
             </div>
             
-            <button style={styles.ctaButton}>Browse SMEs Now</button>
+            <button style={styles.ctaButton}>Join as a Partner</button>
           </div>
         )}
       </div>
@@ -256,4 +255,5 @@ const styles = {
   };
   
 
-export default HowItWorksInvestors;
+export default HowItWorksAccelerators;
+
