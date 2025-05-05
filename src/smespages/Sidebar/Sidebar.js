@@ -19,11 +19,11 @@ const Sidebar = ({ companyName = "Company Name" }) => {
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <Home size={18} />, route: '/dashboard' },
-    { id: 'profile', label: 'Profile', icon: <User size={18} />, route: '/profile' },
     { id: 'application', label: 'Application', icon: <FileText size={18} />, route: '/application' },
     { id: 'find-matches', label: 'View Matches', icon: <Search size={18} />, route: '/find-matches' },
-    { id: 'investor', label: 'Investor', icon: <DollarSign size={18} />, route: '/investor' },
-    { id: 'growth-enabler', label: 'Growth Enabler', icon: <BarChart2 size={18} />, route: '/growth' },
+    { id: 'investor', label: '  My Investors', icon: <DollarSign size={18} />, route: '/investor' },
+    { id: 'growth-enabler', label: 'Growth Enablers', icon: <BarChart2 size={18} />, route: '/growth' },
+    { id: 'profile', label: 'My Customers', icon: <User size={18} />, route: '/profile' },
     { id: 'messages', label: 'Messages', icon: <MessageSquare size={18} />, route: '/messages' },
     { id: 'settings', label: 'Settings', icon: <Settings size={18} />, route: '/settings' },
   ];

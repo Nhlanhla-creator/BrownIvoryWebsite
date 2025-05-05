@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Bell, Mail, ChevronDown, ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import './Header.css';
+import './DashboardHeader.css';
 
 const Header = ({ companyName, profileImage, setProfileImage }) => {
   const navigate = useNavigate();

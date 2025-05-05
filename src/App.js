@@ -22,6 +22,7 @@ import HowItWorks from './mainpages/HowItWorks';
 import LoginRegister from './smespages/LoginRegister';
 
 import './App.css';
+import DashboardHeader from './smespages/DashboardHeader/DashboardHeader'; 
 
 function App() {
   const [profileImage, setProfileImage] = useState(null);
@@ -31,7 +32,7 @@ function App() {
     <div className="app-layout">
       <Sidebar companyName={companyName} />
       <div className="main-content">
-        <Header
+      <DashboardHeader 
           companyName={companyName}
           profileImage={profileImage}
           setProfileImage={setProfileImage}
