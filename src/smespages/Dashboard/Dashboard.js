@@ -526,7 +526,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-content">
-      <h1 className="welcome-text">Welcome back, {userName}!</h1>
+      
 
       {/* First Row - Progress Tracker */}
       <div className="tracker-card">

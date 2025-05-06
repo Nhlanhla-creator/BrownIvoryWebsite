@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { Bell, Mail, ChevronDown, ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './DashboardHeader.css';
+import { auth } from "../../firebaseConfig"
 
 const Header = ({ companyName, profileImage, setProfileImage }) => {
   const navigate = useNavigate();
+  const user = auth.currentUser
+    const userName = user ? user.email : "User"
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [unreadNotifications] = useState(3);
   const [unreadMessages] = useState(2);
@@ -48,7 +51,7 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
 
   return (
     <header className="header">
-      <h1 className="welcome-text">Welcome back, {companyName || 'Valued User'}!</h1>
+    <h1 className="welcome-text">Welcome back, {userName}!</h1>
       
       <div className="header-right">
         <div className="icon-buttons">

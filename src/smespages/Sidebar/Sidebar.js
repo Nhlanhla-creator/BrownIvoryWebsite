@@ -22,8 +22,8 @@ const Sidebar = ({ companyName = "Company Name" }) => {
     { id: 'application', label: 'Application', icon: <FileText size={18} />, route: '/application' },
     { id: 'find-matches', label: 'View Matches', icon: <Search size={18} />, route: '/find-matches' },
     { id: 'investor', label: '  My Investors', icon: <DollarSign size={18} />, route: '/investor' },
-    { id: 'growth-enabler', label: 'Growth Enablers', icon: <BarChart2 size={18} />, route: '/growth' },
-    { id: 'profile', label: 'My Customers', icon: <User size={18} />, route: '/profile' },
+    { id: 'growth-enabler', label: 'Corporates', icon: <BarChart2 size={18} />, route: '/growth' },
+    { id: 'profile', label: 'Support Partners', icon: <User size={18} />, route: '/profile' },
     { id: 'messages', label: 'Messages', icon: <MessageSquare size={18} />, route: '/messages' },
     { id: 'settings', label: 'Settings', icon: <Settings size={18} />, route: '/settings' },
   ];

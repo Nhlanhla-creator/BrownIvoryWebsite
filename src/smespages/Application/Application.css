@@ -319,11 +319,14 @@
   border-radius: 4px;
 }
 
-/* Multiselect */
 .application-page .multiselect-container {
   border: 1px solid var(--brown-200);
   border-radius: 6px;
   overflow: hidden;
+  background-color: #fff;
+  font-family: sans-serif;
+  width: 100%;
+  max-width: 400px;
 }
 
 .application-page .selected-count {
@@ -332,30 +335,43 @@
   color: var(--brown-700);
   font-size: 0.9rem;
   font-weight: 500;
+  border-bottom: 1px solid var(--brown-200);
 }
 
 .application-page .multiselect-options {
   max-height: 200px;
   overflow-y: auto;
-  padding: 0.5rem;
+  padding: 0.25rem 0;
 }
 
 .application-page .multiselect-option {
   display: flex;
   align-items: center;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   cursor: pointer;
   border-radius: 4px;
   transition: background-color 0.2s ease;
+  gap: 0.75rem;
+  font-size: 0.9rem;
 }
 
 .application-page .multiselect-option:hover {
   background-color: var(--brown-50);
 }
 
-.application-page .multiselect-option input {
-  margin-right: 0.75rem;
+.application-page .multiselect-option input[type="checkbox"] {
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--brown-500); /* Customize checkbox color */
 }
+
+.application-page .multiselect-option label {
+  flex: 1;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
 
 /* Pitch Evaluation */
 .application-page .pitch-evaluation {
@@ -827,4 +843,258 @@
     margin-bottom: 5px;
   }
 }
+/* Funder Types and Funding Types Styles */
+
+/* Checkbox Group Container */
+.checkbox-group-container {
+  margin-bottom: 2rem;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Category Sections */
+.checkbox-category {
+  margin-bottom: 1.5rem;
+  background-color: var(--brown-50, #f8f5f1);
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 3px solid var(--brown-600, #9c7654);
+}
+
+.category-title {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--brown-800, #6d4b38);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Checkbox Options Layout */
+.checkbox-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* Individual Checkbox Option */
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0.5rem 0.75rem;
+  background-color: white;
+  border: 1px solid var(--brown-200, #e0d0bc);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 200px;
+  flex: 1 0 calc(50% - 0.75rem);
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .checkbox-option {
+    flex: 1 0 100%;
+  }
+}
+
+.checkbox-option:hover {
+  background-color: var(--brown-100, #efe5d9);
+  border-color: var(--brown-300, #d1b99e);
+}
+
+.checkbox-option input[type="checkbox"] {
+  margin-right: 0.75rem;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brown-600, #9c7654);
+  cursor: pointer;
+}
+
+.checkbox-option input[type="checkbox"]:checked + .option-text {
+  font-weight: 500;
+  color: var(--brown-800, #6d4b38);
+}
+
+.option-text {
+  font-size: 0.9rem;
+  color: var(--text-dark, #2d1e17);
+}
+
+/* Tooltip for additional information */
+.tooltip-text {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--brown-800, #6d4b38);
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  max-width: 250px;
+  text-align: center;
+}
+
+.tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--brown-800, #6d4b38) transparent transparent transparent;
+}
+
+.checkbox-option:hover .tooltip-text {
+  display: block;
+}
+
+/* Funding Types Section */
+.funding-types {
+  padding: 1rem;
+  border: 1px solid var(--brown-200, #e0d0bc);
+  border-radius: 8px;
+  background-color: white;
+}
+
+/* Selected State */
+.checkbox-option.selected {
+  background-color: var(--brown-100, #efe5d9);
+  border-color: var(--brown-500, #b38b62);
+  box-shadow: 0 0 0 1px var(--brown-500, #b38b62);
+}
+
+/* Error State */
+.error-message {
+  color: var(--accent-red, #a34a28);
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+/* Help Icon */
+.help-icon {
+  margin-left: 0.5rem;
+  color: var(--brown-500, #b38b62);
+  width: 16px;
+  height: 16px;
+}
+
+/* Section Headers */
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-header h3 {
+  font-size: 1.1rem;
+  color: var(--brown-800, #6d4b38);
+  margin: 0;
+}
+
+/* Selected Options Summary */
+.selected-summary {
+  background-color: var(--brown-50, #f8f5f1);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1.5rem;
+}
+
+.selected-summary h4 {
+  font-size: 1rem;
+  color: var(--brown-700, #846046);
+  margin-bottom: 0.75rem;
+}
+
+.selected-summary ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 0;
+}
+
+.selected-summary li {
+  font-size: 0.9rem;
+  color: var(--text-dark, #2d1e17);
+  margin-bottom: 0.25rem;
+}
+
+.selected-summary .empty-selection {
+  font-style: italic;
+  color: var(--text-muted, #846046);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .checkbox-options {
+    gap: 0.5rem;
+  }
+
+  .checkbox-option {
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .checkbox-category {
+    padding: 0.75rem;
+  }
+
+  .checkbox-option {
+    padding: 0.5rem;
+  }
+}
+
+/* Animation for tooltip */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tooltip-text {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* Checkbox custom styling */
+.checkbox-option input[type="checkbox"] {
+  position: relative;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--brown-400, #c2a280);
+  border-radius: 3px;
+  outline: none;
+  transition: all 0.2s ease;
+  background-color: white;
+}
+
+.checkbox-option input[type="checkbox"]:checked {
+  background-color: var(--brown-600, #9c7654);
+  border-color: var(--brown-600, #9c7654);
+}
+
+.checkbox-option input[type="checkbox"]:checked::before {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+}
+
+.checkbox-option input[type="checkbox"]:focus {
+  box-shadow: 0 0 0 2px rgba(156, 118, 84, 0.3);
+}
+
+
 

@@ -1,8 +1,8 @@
 /* LoginRegister.css */
 @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Quicksand:wght@400;600;700&display=swap');
 
-:root {
-  --primary-dark: #754A2D;
+.auth-page {
+  --primary-dark:#372C27;
   --primary: #9E6E3C;
   --secondary: #BCAE9C;
   --background-light: #F2F0E6;
@@ -11,9 +11,9 @@
   --text-light: #5C534D;
   --error: #C44536;
   --success: #4A7C59;
-}
 
-.auth-page {
+  background-color: #F2F0E6; 
+
   min-height: 100vh;
   background: linear-gradient(135deg, var(background-light) 0%, var(--primary) 50%, var(--primary-dark) 100%);
   display: flex;
@@ -23,6 +23,7 @@
   font-family: 'Quicksand', sans-serif;
   animation: gradientShift 15s ease infinite;
   background-size: 200% 200%;
+  
 }
 
 @keyframes gradientShift {

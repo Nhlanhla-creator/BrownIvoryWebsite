@@ -6,6 +6,8 @@ import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
+
+
 export default function LoginRegister() {
   const navigate = useNavigate();
   const [isRegistering, setIsRegistering] = useState(true);
@@ -80,6 +82,9 @@ export default function LoginRegister() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      if(role == 'Investor/Funder'){
+        
+      }
       navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
@@ -89,17 +94,18 @@ export default function LoginRegister() {
 
   const getRoleIcon = (roleValue) => {
     switch(roleValue) {
-      case 'SME/BUSINESS': return <Briefcase size={16} />;
-      case 'Investor': return <Rocket size={16} />;
-      case 'Service Provider': return <User size={16} />;
-      case 'Growth Enabler': return <Rocket size={16} />;
-      case 'Purpose Partners': return <HeartHandshake size={16} />;
+      case 'SMSEs': return <Briefcase size={16} />;
+      case 'Investor/Funder': return <Rocket size={16} />;
+      case 'Corporates': return <User size={16} />;
+      case 'Support Partners': return <HeartHandshake  size={16} />;
       default: return <Smile size={16} />;
     }
   };
 
   return (
+    
     <div className="auth-page">
+    
       <div className="auth-box">
         <div className="form-side">
           <div className="form-header">
@@ -145,7 +151,7 @@ export default function LoginRegister() {
                     </div>
                     <input
                       type="email"
-                      placeholder="Your emqil"
+                      placeholder="Your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
@@ -187,12 +193,11 @@ export default function LoginRegister() {
                       onChange={(e) => setRole(e.target.value)}
                       className={role ? 'has-value' : ''}
                     >
-                      <option value="">Who are you?</option>
-                      <option value="SME/BUSINESS">SME/Business Owner</option>
-                      <option value="Investor">Investor</option>
-                      <option value="Service Provider">Service Provider</option>
-                      <option value="Growth Enabler">Growth Enabler</option>
-                      <option value="Purpose Partners">Purpose Partner</option>
+                      <option value="">I am a...</option>
+                      <option value="SMSE">SMSE/Business</option>
+                      <option value="Investor">Investor/Funder</option>
+                      <option value="Corporate">Corporate</option>
+                      <option value="Support Partners">Support Partner</option>
                     </select>
                   </div>
                   {errors.role && <p className="error-text">{errors.role}</p>}
@@ -204,7 +209,7 @@ export default function LoginRegister() {
                     Create Account <Rocket size={16} />
                   </button>
                   <p className="switch-link">
-                    Already part of us? <span onClick={() => setIsRegistering(false)}>Hop back in!</span>
+                    Already part of us? <span onClick={() => setIsRegistering(false)}>Login</span>
                   </p>
                 </div>
               )
