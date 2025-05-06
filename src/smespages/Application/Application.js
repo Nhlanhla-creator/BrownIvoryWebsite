@@ -4,7 +4,9 @@ import React, { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer"
 import "./Application.css"
-import { db, auth, storage, doc, setDoc, getDoc, ref, uploadBytes, getDownloadURL } from "../../firebaseConfig"
+import { db, auth, storage } from '../../firebaseConfig';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const africanCountries = [
   "Algeria",
@@ -112,62 +114,23 @@ const industrySectors = [
   "Other",
 ]
 
-const funderTypes = {
-  "Equity Investors": [
-    "Angel Investors (Early-stage, high-risk)",
-    "Venture Capital (VC) Firms (Startups/growth-stage)",
-    "Private Equity (PE) Firms (Mature businesses, buyouts)",
-    "Corporate Venture Capital (CVC) (Strategic investments)",
-    "Family Offices (Wealthy families investing directly)",
-    "Crowdfunding Platforms (Equity-based)",
+const lookingForOptions = {
+  "Funding": [
+    "Equity Investment",
+    "Debt Financing",
+    "Grant"
   ],
-  "Debt Providers": [
-    "Commercial Banks (Term loans, overdrafts)",
-    "Non-Banking Financial Companies (NBFCs) (Flexible debt)",
-    "Microfinance Institutions (MFIs) (Small-ticket loans)",
-    "Peer-to-Peer (P2P) Lenders (Marketplace lending)",
-    "Development Banks (SME-focused, low-interest)",
+  "Partnerships": [
+    "Growth Enablers",
+    "Customers",
+    "Strategic Partners"
   ],
-  "Alternative Financing": [
-    "Revenue-Based Financing (Repay via % revenue)",
-    "Convertible Note Investors (Debt → equity)",
-    "Mezzanine Financing (Hybrid debt/equity)",
-    "Factoring Companies (Invoice-based advances)",
-    "Supply Chain Financiers (Supplier/vendor credit)",
-  ],
-  "Grants & Subsidies": [
-    "Government Grants (Non-repayable, sector-specific)",
-    "Corporate Grants (CSR/foundation funding)",
-    "International Aid Agencies (UNDP, World Bank)",
-  ],
-  "Specialized Funders": [
-    "Impact Investors (ESG/social impact focus)",
-    "Real Estate Financiers (Property-backed loans)",
-    "Equipment Lessors (Hardware/tech leasing)",
-    "Franchise Financiers (Franchise-specific capital)",
-  ],
-  Other: [
-    "Incubators/Accelerators (Funding + mentorship)",
-    "Tokenized Investment Pools (Crypto/DeFi)",
-    "Trade Unions/Associations (Sector-specific loans)",
-  ],
+  "Support": [
+    "Mentorship",
+    "Market Access",
+    "Technical Assistance"
+  ]
 }
-
-const fundingTypes = [
-  "Equity Investment",
-  "Debt Financing",
-  "Convertible Debt",
-  "Revenue-Based Financing",
-  "Grants",
-  "Mezzanine Financing",
-  "Venture Debt",
-  "Asset-Based Lending",
-  "Invoice Factoring",
-  "Equipment Leasing",
-  "Microloans",
-  "Crowdfunding",
-  "Tokenized Funding",
-]
 
 const businessModels = [
   "Manufacturer",
@@ -555,6 +518,8 @@ const ApplicationPDF = ({ formData }) => (
   </Document>
 )
 
+
+
 const Application = () => {
   const navigate = useNavigate()
   const [activeStep, setActiveStep] = useState("Company Profile")
@@ -655,12 +620,11 @@ const Application = () => {
         { name: "country", label: "Country of Operation", type: "select", options: africanCountries, required: true },
         { name: "industry", label: "Industry Sector", type: "select", options: industrySectors, required: true },
         { name: "website", label: "Website / Social Media Links", type: "url" },
-       
         {
-          name: "selectedFundingTypes",
-          label: "Funding Types Offered",
-          type: "checkboxGroup",
-          options: fundingTypes,
+          name: "services",
+          label: "What are you looking for?",
+          type: "multiselect",
+          options: lookingForOptions,
           required: true,
         },
       ],
@@ -947,12 +911,6 @@ const Application = () => {
           description: "The attractiveness and growth potential of your target market",
         },
         {
-          name: "Market Size",
-          score: Math.floor(Math.random() * 51) + 50,
-          weight: 10,
-          description: "The attractiveness and growth potential of your target market",
-        },
-        {
           name: "Competitive Advantage",
           score: Math.floor(Math.random() * 51) + 50,
           weight: 10,
@@ -1054,13 +1012,13 @@ const Application = () => {
     setViewApplicationSummary(!viewApplicationSummary)
   }
 
-  const filteredFunderTypes = () => {
-    if (!searchTerm) return funderTypes
+  const filteredLookingForOptions = () => {
+    if (!searchTerm) return lookingForOptions
 
     const filtered = {}
-    for (const category in funderTypes) {
-      const filteredItems = funderTypes[category].filter((item) =>
-        item.toLowerCase().includes(searchTerm.toLowerCase()),
+    for (const category in lookingForOptions) {
+      const filteredItems = lookingForOptions[category].filter(item =>
+        item.toLowerCase().includes(searchTerm.toLowerCase())
       )
       if (filteredItems.length > 0) {
         filtered[category] = filteredItems
@@ -1069,58 +1027,8 @@ const Application = () => {
     return filtered
   }
 
-  const renderCheckboxGroup = (field) => {
-    return (
-      <div className="checkbox-group-container">
-        {field.name === "selectedFunderTypes" ? (
-          // Render funder types with categories
-          Object.entries(field.options).map(([category, options]) => (
-            <div key={category} className="checkbox-category">
-              <h4 className="category-title">{category}</h4>
-              <div className="checkbox-options">
-                {options.map((option) => {
-                  const optionValue = `${category}:${option}`
-                  return (
-                    <label key={optionValue} className="checkbox-option">
-                      <input
-                        type="checkbox"
-                        checked={formData[field.name]?.includes(optionValue) || false}
-                        onChange={(e) => handleMultiSelectChange(field.name, optionValue, e.target.checked)}
-                      />
-                      <span className="option-text">{option}</span>
-                      <span className="tooltip-text">
-                        {option.includes("(") ? option.split("(")[1].replace(")", "") : ""}
-                      </span>
-                    </label>
-                  )
-                })}
-              </div>
-            </div>
-          ))
-        ) : (
-          // Render funding types as a flat list
-          <div className="checkbox-options funding-types">
-            {field.options.map((option) => (
-              <label key={option} className="checkbox-option">
-                <input
-                  type="checkbox"
-                  checked={formData[field.name]?.includes(option) || false}
-                  onChange={(e) => handleMultiSelectChange(field.name, option, e.target.checked)}
-                />
-                <span>{option}</span>
-              </label>
-            ))}
-          </div>
-        )}
-        {errors[field.name] && <p className="error-message">{errors[field.name]}</p>}
-      </div>
-    )
-  }
-
   const renderField = (field) => {
     switch (field.type) {
-      case "checkboxGroup":
-        return renderCheckboxGroup(field)
       case "textarea":
         return (
           <textarea
@@ -1149,7 +1057,7 @@ const Application = () => {
         )
       case "multiselect":
         if (field.name === "services") {
-          const options = filteredFunderTypes()
+          const options = filteredLookingForOptions()
           return (
             <div className={`multiselect-container ${multiselectOpen[field.name] ? "open" : ""}`}>
               <div className="selected-count" onClick={() => toggleMultiselect(field.name)}>
@@ -1305,20 +1213,15 @@ const Application = () => {
             )}
           </p>
           <p>
-            
+            <strong>Looking For:</strong>
           </p>
-          <p>
-            <strong>Funding Types Offered:</strong>
-            {formData.selectedFundingTypes && formData.selectedFundingTypes.length > 0 ? (
-              <ul>
-                {formData.selectedFundingTypes.map((fundingType, index) => (
-                  <li key={index}>{fundingType}</li>
-                ))}
-              </ul>
+          <ul>
+            {formData.services && formData.services.length > 0 ? (
+              formData.services.map((service, index) => <li key={index}>{service}</li>)
             ) : (
-              "N/A"
+              <li>N/A</li>
             )}
-          </p>
+          </ul>
         </div>
         {formData.companyDescription && (
           <div className="summary-section">
@@ -1668,4 +1571,4 @@ const Application = () => {
   )
 }
 
-export default Application;
+export default Application
