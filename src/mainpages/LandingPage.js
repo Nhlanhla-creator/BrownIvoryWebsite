@@ -266,7 +266,7 @@ const LandingPage = () => {
                       <Link to={`/${item.link}`} className="dropdown-item">
                         <span>How it works</span> <FaArrowRight />
                       </Link>
-                      <Link to="/AuthForm" className="dropdown-item">
+                      <Link to="/LoginRegister" className="dropdown-item">
                         <span>Get started</span> <FaArrowRight />
                       </Link>
                     </div>
@@ -383,7 +383,7 @@ const LandingPage = () => {
                 About Marketplace →
               </Link>
               <Link 
-                to="/AboutPage" 
+                to="/LoginRegister" 
                 className="cta-button" 
                 style={{ 
                   backgroundColor: colors.primaryLight,
@@ -524,7 +524,7 @@ const LandingPage = () => {
                 Learn About BIG Score →
               </Link>
               <Link 
-                to="/AuthForm" 
+                to="/LoginRegister" 
                 className="cta-button" 
                 style={{ 
                   backgroundColor: colors.primaryLight,
@@ -658,7 +658,7 @@ const LandingPage = () => {
               gap: '20px'
             }}>
               <Link 
-                to="/AuthForm" 
+                to="/LoginRegister" 
                 className="cta-button" 
                 style={{ 
                   backgroundColor: colors.primary,
@@ -794,7 +794,7 @@ const LandingPage = () => {
                 Join the Movement
               </button>
               <Link 
-                to="/AuthForm" 
+                to="/LoginRegister" 
                 className="cta-button" 
                 style={{ 
                   backgroundColor: colors.primaryLight,

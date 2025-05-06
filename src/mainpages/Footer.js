@@ -24,17 +24,17 @@ const Footer = () => {
         <div style={styles.footerSection}>
           <h3 style={styles.footerHeading}>Follow Us</h3>
           <div style={styles.socialIcons}>
-            <a href="#" style={styles.socialLink}><FaFacebook /></a>
-            <a href="#" style={styles.socialLink}><FaTwitter /></a>
-            <a href="#" style={styles.socialLink}><FaLinkedin /></a>
+            <a href="https://facebook.com" style={styles.socialLink} target="_blank" rel="noopener noreferrer"><FaFacebook /></a>
+            <a href="https://twitter.com" style={styles.socialLink} target="_blank" rel="noopener noreferrer"><FaTwitter /></a>
+            <a href="https://linkedin.com" style={styles.socialLink} target="_blank" rel="noopener noreferrer"><FaLinkedin /></a>
           </div>
         </div>
 
         <div style={styles.footerSection}>
           <h3 style={styles.footerHeading}>Quick Links</h3>
-          <a href="#home" style={styles.footerLink}>Home</a>
-          <a href="#about" style={styles.footerLink}>About</a>
-          <a href="#services-section" style={styles.footerLink}>Services</a>
+          <a href="/" style={styles.footerLink}>Home</a>
+          <a href="/HowItWorks" style={styles.footerLink}>How it works</a>
+          <a href="/BigScorePage" style={styles.footerLink}>BIG score</a>
           <a href="#footer-contact" style={styles.footerLink}>Contact</a>
         </div>
       </div>

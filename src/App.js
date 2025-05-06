@@ -13,10 +13,10 @@ import GrowthEnabler from './smespages/GrowthEnabler/GrowthEnabler';
 import Messages from './smespages/Messages/Messages';
 import Settings from './smespages/Settings/Settings';
 import AboutPage from './mainpages/About';
-import HowItWorksAccelerators from './mainpages/Accelerators';
-import HowItWorksCorporates from './mainpages/Corporates';
-import HowItWorksInvestors from './mainpages/Investors';
-import HowItWorksSMSE from './mainpages/SMEFunding';
+import HowItWorksAccelerators from './mainpages/HowItWorksAccelarators';
+import HowItWorksCorporates from './mainpages/HowItWorksCoporate';
+import HowItWorksInvestors from './mainpages/HowItWorksInvestor';
+import HowItWorksSMSE from './mainpages/HowItWorksSMSE';
 import BigScorePage from './mainpages/BIGScorePage';
 import HowItWorks from './mainpages/HowItWorks';
 import LoginRegister from './smespages/LoginRegister';
@@ -51,12 +51,10 @@ function App() {
         <Route path="/auth" element={<AuthForm />} />
         <Route path="/HowItWorks" element={<HowItWorks />} />
         <Route path="/BigScorePage" element={<BigScorePage />} />
-        {/* <Route path="/investors" element={<Investors />} />
-        <Route path="/purpose-partner" element={<PurposePartner />} />
-        <Route path="/service-provider" element={<ServiceProvider />} />
-        <Route path="/sme-funding" element={<SMEFunding />} />
-        <Route path="/solutions" element={<Solutions />} />
-        <Route path="/growth-enabler" element={<GrowthEnablerMain />} /> */}
+        <Route path="/HowItWorksSMSE" element={<HowItWorksSMSE />} />
+        <Route path="/HowItWorksAccelerators" element={<HowItWorksAccelerators />} />
+        <Route path="/HowItWorksCorporates" element={<HowItWorksCorporates />} />
+        <Route path="/HowItWorksInvestors" element={<HowItWorksInvestors />} />
         <Route path="/LoginRegister" element={<LoginRegister />} />
         <Route path="/AboutPage" element={<AboutPage />} />
         <Route path="/dashboard" element={renderProtectedRoute(Dashboard)} />

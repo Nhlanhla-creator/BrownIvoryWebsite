@@ -9,7 +9,15 @@ const Header = () => {
   };
 
   const handleNavigation = (path) => {
-    navigate(path);
+    if (path.startsWith('#')) {
+      // Handle internal page anchor links
+      const element = document.getElementById(path.substring(1));
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      navigate(path);
+    }
   };
 
   // Inline styles for the main elements
@@ -204,7 +212,7 @@ const Header = () => {
           
           <button 
             className="nav-button"
-            onClick={() => handleNavigation('/contact-us')}
+            onClick={() => handleNavigation('#footer-contact')}
           >
             Contact Us
           </button>
