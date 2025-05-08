@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '../firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
-
-
+import { getDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function LoginRegister() {
   const navigate = useNavigate();
@@ -81,11 +81,29 @@ export default function LoginRegister() {
     setAuthError('');
 
     try {
+    
       await signInWithEmailAndPassword(auth, email, password);
-      if(role == 'Investor/Funder'){
-        
+      const userDocRef = doc(db, 'users', auth.currentUser.uid);
+      const userDocSnap = await getDoc(userDocRef);
+      if (userDocSnap.exists()) {
+        setRole(userDocSnap.data().role || 'No role set');
+        if(role === 'Investor') {
+          navigate('/investor-dashboard');
+        }
+        else if(role === 'SME/BUSINESS') {
+          navigate('/dashboard');
+        } else if(role === 'Service Provider') {
+          navigate('/service-provider-dashboard');
+        } else if(role === 'Growth Enabler') {
+          navigate('/growth-enabler-dashboard');
+        } else if(role === 'Purpose Partners') {
+          navigate('/purpose-partners-dashboard');
+        } 
+       
+      } else {
+        console.log('Not Registered!');
       }
-      navigate('/dashboard');
+      
     } catch (error) {
       console.error('Login error:', error);
       setAuthError(error.message);
@@ -94,18 +112,17 @@ export default function LoginRegister() {
 
   const getRoleIcon = (roleValue) => {
     switch(roleValue) {
-      case 'SMSEs': return <Briefcase size={16} />;
-      case 'Investor/Funder': return <Rocket size={16} />;
-      case 'Corporates': return <User size={16} />;
-      case 'Support Partners': return <HeartHandshake  size={16} />;
+      case 'SME/BUSINESS': return <Briefcase size={16} />;
+      case 'Investor': return <Rocket size={16} />;
+      case 'Service Provider': return <User size={16} />;
+      case 'Growth Enabler': return <Rocket size={16} />;
+      case 'Purpose Partners': return <HeartHandshake size={16} />;
       default: return <Smile size={16} />;
     }
   };
 
   return (
-    
     <div className="auth-page">
-    
       <div className="auth-box">
         <div className="form-side">
           <div className="form-header">
@@ -151,7 +168,7 @@ export default function LoginRegister() {
                     </div>
                     <input
                       type="email"
-                      placeholder="Your email"
+                      placeholder="Your emqil"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
@@ -193,11 +210,12 @@ export default function LoginRegister() {
                       onChange={(e) => setRole(e.target.value)}
                       className={role ? 'has-value' : ''}
                     >
-                      <option value="">I am a...</option>
-                      <option value="SMSE">SMSE/Business</option>
-                      <option value="Investor">Investor/Funder</option>
-                      <option value="Corporate">Corporate</option>
-                      <option value="Support Partners">Support Partner</option>
+                      <option value="">Who are you?</option>
+                      <option value="SME/BUSINESS">SME/Business Owner</option>
+                      <option value="Investor">Investor</option>
+                      <option value="Service Provider">Service Provider</option>
+                      <option value="Growth Enabler">Growth Enabler</option>
+                      <option value="Purpose Partners">Purpose Partner</option>
                     </select>
                   </div>
                   {errors.role && <p className="error-text">{errors.role}</p>}
@@ -209,7 +227,7 @@ export default function LoginRegister() {
                     Create Account <Rocket size={16} />
                   </button>
                   <p className="switch-link">
-                    Already part of us? <span onClick={() => setIsRegistering(false)}>Login</span>
+                    Already part of us? <span onClick={() => setIsRegistering(false)}>Hop back in!</span>
                   </p>
                 </div>
               )
