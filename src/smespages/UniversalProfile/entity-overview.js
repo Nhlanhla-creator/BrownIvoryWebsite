@@ -1,6 +1,10 @@
 import FormField from "./form-field"
 import FileUpload from "./file-upload"
 import './UniversalProfile.css';
+import { useEffect, useState } from 'react';
+import { db, auth, storage } from '../../firebaseConfig';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const entityTypes = [
   { value: "ptyLtd", label: "Pty Ltd" },
@@ -101,15 +105,140 @@ const africanCountries = [
   { value: "zimbabwe", label: "Zimbabwe" },
 ]
 
-export default function EntityOverview({ data = {}, updateData }) {
+export default function EntityOverview({ data = {}, updateData, onSave }) {
+  const [formData, setFormData] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
+  
+  useEffect(() => {
+    setFormData(data);
+  }, [data]);
+
   const handleChange = (e) => {
-    const { name, value } = e.target
-    updateData({ [name]: value })
-  }
+    const { name, value } = e.target;
+    const updatedData = { ...formData, [name]: value };
+    setFormData(updatedData);
+    updateData(updatedData);
+  };
 
   const handleFileChange = (name, files) => {
-    updateData({ [name]: files })
-  }
+    const updatedData = { ...formData, [name]: files };
+    setFormData(updatedData);
+    updateData(updatedData);
+  };
+
+  const saveEntityOverview = async () => {
+    if (!auth.currentUser) {
+      throw new Error("User not authenticated");
+    }
+
+    setIsSaving(true);
+    try {
+      const userId = auth.currentUser.uid;
+      const docRef = doc(db, `smes/${userId}/universalProfile/entityOverview`);
+
+      const { companyLogo, registrationCertificate, proofOfAddress, ...firestoreData } = formData;
+
+      await setDoc(docRef, firestoreData, { merge: true });
+
+      const uploadPromises = [];
+
+      if (companyLogo && companyLogo.length > 0) {
+        const logoRef = ref(storage, `smes/${userId}/universalProfile/entityOverview/companyLogo/${companyLogo[0].name}`);
+        uploadPromises.push(
+          uploadBytes(logoRef, companyLogo[0]).then(() =>
+            getDownloadURL(logoRef).then(url => ({
+              field: 'companyLogoUrl',
+              url
+            }))
+          )
+        );
+      }
+
+      if (registrationCertificate && registrationCertificate.length > 0) {
+        const certRef = ref(storage, `smes/${userId}/universalProfile/entityOverview/registrationCertificate/${registrationCertificate[0].name}`);
+        uploadPromises.push(
+          uploadBytes(certRef, registrationCertificate[0]).then(() =>
+            getDownloadURL(certRef).then(url => ({
+              field: 'registrationCertificateUrl',
+              url
+            }))
+          )
+        );
+      }
+
+      if (proofOfAddress && proofOfAddress.length > 0) {
+        const addressRef = ref(storage, `smes/${userId}/universalProfile/entityOverview/proofOfAddress/${proofOfAddress[0].name}`);
+        uploadPromises.push(
+          uploadBytes(addressRef, proofOfAddress[0]).then(() =>
+            getDownloadURL(addressRef).then(url => ({
+              field: 'proofOfAddressUrl',
+              url
+            }))
+          )
+        );
+      }
+
+      const uploadResults = await Promise.all(uploadPromises);
+
+      const urlUpdates = {};
+      uploadResults.forEach(result => {
+        urlUpdates[result.field] = result.url;
+      });
+
+      if (Object.keys(urlUpdates).length > 0) {
+        await setDoc(docRef, urlUpdates, { merge: true });
+      }
+
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const savedData = docSnap.data();
+        setFormData(savedData);
+        updateData(savedData);
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error("Error saving entity overview:", error);
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const loadEntityOverview = async (userId) => {
+    try {
+      const docRef = doc(db, `smes/${userId}/universalProfile/entityOverview`);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setFormData(data);
+        updateData(data);
+        return data;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error loading entity overview:", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (auth.currentUser) {
+        await loadEntityOverview(auth.currentUser.uid);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    if (onSave) {
+      onSave.current = saveEntityOverview;
+    }
+  }, [formData, onSave]);
+
 
   return (
     <div>
@@ -121,7 +250,7 @@ export default function EntityOverview({ data = {}, updateData }) {
             <input
               type="text"
               name="registeredName"
-              value={data.registeredName || ""}
+              value={formData.registeredName || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               required
@@ -132,7 +261,7 @@ export default function EntityOverview({ data = {}, updateData }) {
             <input
               type="text"
               name="tradingName"
-              value={data.tradingName || ""}
+              value={formData.tradingName || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
             />
@@ -142,7 +271,7 @@ export default function EntityOverview({ data = {}, updateData }) {
             <input
               type="text"
               name="registrationNumber"
-              value={data.registrationNumber || ""}
+              value={formData.registrationNumber || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               required
@@ -152,7 +281,7 @@ export default function EntityOverview({ data = {}, updateData }) {
           <FormField label="Entity Type" required>
             <select
               name="entityType"
-              value={data.entityType || ""}
+              value={formData.entityType || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               required
@@ -169,7 +298,7 @@ export default function EntityOverview({ data = {}, updateData }) {
           <FormField label="Entity Size" required>
             <select
               name="entitySize"
-              value={data.entitySize || ""}
+              value={formData.entitySize || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               required
@@ -187,7 +316,7 @@ export default function EntityOverview({ data = {}, updateData }) {
             <input
               type="month"
               name="financialYearEnd"
-              value={data.financialYearEnd || ""}
+              value={formData.financialYearEnd || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               required
@@ -198,7 +327,7 @@ export default function EntityOverview({ data = {}, updateData }) {
             <input
               type="number"
               name="employeeCount"
-              value={data.employeeCount || ""}
+              value={formData.employeeCount || ""}
               onChange={handleChange}
               min="0"
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
@@ -210,7 +339,7 @@ export default function EntityOverview({ data = {}, updateData }) {
             <input
               type="number"
               name="yearsInOperation"
-              value={data.yearsInOperation || ""}
+              value={formData.yearsInOperation || ""}
               onChange={handleChange}
               min="0"
               step="0.5"
@@ -224,7 +353,7 @@ export default function EntityOverview({ data = {}, updateData }) {
           <FormField label="Operation Stage" required>
             <select
               name="operationStage"
-              value={data.operationStage || ""}
+              value={formData.operationStage || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               required
@@ -241,7 +370,7 @@ export default function EntityOverview({ data = {}, updateData }) {
           <FormField label="Economic Sector" required>
             <select
               name="economicSector"
-              value={data.economicSector || ""}
+              value={formData.economicSector || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               required
@@ -259,7 +388,7 @@ export default function EntityOverview({ data = {}, updateData }) {
             <input
               type="text"
               name="targetMarket"
-              value={data.targetMarket || ""}
+              value={formData.targetMarket || ""}
               onChange={handleChange}
               placeholder="Describe your primary customers or market"
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
@@ -269,7 +398,7 @@ export default function EntityOverview({ data = {}, updateData }) {
           <FormField label="Location" required>
             <select
               name="location"
-              value={data.location || ""}
+              value={formData.location || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               required
@@ -286,7 +415,7 @@ export default function EntityOverview({ data = {}, updateData }) {
           <FormField label="Brief Business Description" required>
             <textarea
               name="businessDescription"
-              value={data.businessDescription || ""}
+              value={formData.businessDescription || ""}
               onChange={handleChange}
               rows={4}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
@@ -299,7 +428,7 @@ export default function EntityOverview({ data = {}, updateData }) {
               label=""
               accept=".jpg,.jpeg,.png,.svg"
               onChange={(files) => handleFileChange("companyLogo", files)}
-              value={data.companyLogo || []}
+              value={formData.companyLogo || []}
             />
           </FormField>
         </div>
@@ -314,7 +443,7 @@ export default function EntityOverview({ data = {}, updateData }) {
             accept=".pdf,.jpg,.jpeg,.png"
             required
             onChange={(files) => handleFileChange("registrationCertificate", files)}
-            value={data.registrationCertificate || []}
+            value={formData.registrationCertificate || []}
           />
 
           <FileUpload
@@ -322,13 +451,13 @@ export default function EntityOverview({ data = {}, updateData }) {
             accept=".pdf,.jpg,.jpeg,.png"
             required
             onChange={(files) => handleFileChange("proofOfAddress", files)}
-            value={data.proofOfAddress || []}
+            value={formData.proofOfAddress || []}
           />
         </div>
       </div>
 
       <div className="mt-8 flex justify-end">
-       
+
       </div>
     </div>
   )
