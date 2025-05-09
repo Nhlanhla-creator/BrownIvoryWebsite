@@ -1,17 +1,16 @@
-"use client"
+import FormField from "./FormField";
+import FileUpload from "./FileUpload";
+import "./FundingApplication.css" ;
 
-import { FormField, FileUpload } from "./form-components"
-import "./FundingApplication.css"
-
-export default function SocialImpact({ data, updateFormData }) {
+export const renderSocialImpact = (data, updateFormData) => {
   const handleChange = (e) => {
-    const { name, value } = e.target
-    updateFormData({ [name]: value })
-  }
+    const { name, value } = e.target;
+    updateFormData("socialImpact", { [name]: value });
+  };
 
   const handleFileChange = (name, files) => {
-    updateFormData({ [name]: files })
-  }
+    updateFormData("socialImpact", { [name]: files });
+  };
 
   return (
     <>
@@ -114,5 +113,5 @@ export default function SocialImpact({ data, updateFormData }) {
         />
       </div>
     </>
-  )
-}
+  );
+};

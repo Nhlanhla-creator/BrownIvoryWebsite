@@ -186,12 +186,7 @@ export default function ContactDetails({ data = {}, updateData }) {
       </div>
 
       <div className="mt-8 flex justify-end">
-        <button
-          type="button"
-          className="px-6 py-2 bg-brown-600 text-white rounded-md hover:bg-brown-700 focus:outline-none focus:ring-2 focus:ring-brown-500 focus:ring-offset-2"
-        >
-          Save & Continue
-        </button>
+       
       </div>
     </div>
   )

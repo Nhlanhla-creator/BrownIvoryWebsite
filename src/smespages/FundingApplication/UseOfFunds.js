@@ -1,49 +1,91 @@
-"use client"
-import { Plus, Trash2 } from "lucide-react"
-import { FormField, FileUpload } from "./form-components"
-import { fundingCategoryOptions, fundingInstrumentOptions, subAreaOptions } from "./form-options"
-import "./FundingApplication.css"
 
-export default function UseOfFunds({ data, updateFormData }) {
+import "./FundingApplication.css" ;
+import { useState } from "react";
+import FormField from "./FormField";
+import FileUpload from "./FileUpload";
+import { Plus, Trash2 } from "lucide-react";
+
+// Form data options
+const fundingInstrumentOptions = [
+  { value: "equity", label: "Equity" },
+  { value: "grant", label: "Grant" },
+  { value: "debt", label: "Debt" },
+  { value: "convertible", label: "Convertible" },
+  { value: "other", label: "Other" },
+];
+
+const fundingCategoryOptions = [
+  { value: "setup", label: "Set-Up" },
+  { value: "capex", label: "Capex" },
+  { value: "workingCapital", label: "Working Capital" },
+  { value: "acquisition", label: "Acquisition" },
+  { value: "businessDevelopment", label: "Business Development" },
+];
+
+const subAreaOptions = {
+  setup: [{ value: "feasibility", label: "Feasibility" }],
+  capex: [
+    { value: "upgrade", label: "Upgrade" },
+    { value: "expansion", label: "Expansion" },
+    { value: "newEquipment", label: "New Equipment" },
+    { value: "facilities", label: "Facilities" }
+  ],
+  workingCapital: [{ value: "bridgingFinance", label: "Bridging Finance" }],
+  acquisition: [
+    { value: "franchise", label: "Franchise" },
+    { value: "assetAcquisition", label: "Asset Acquisition" },
+  ],
+  businessDevelopment: [
+    { value: "productDesign", label: "Product Design & Development" },
+    { value: "packagingDesign", label: "Packaging Design & Development" },
+    { value: "conformityAssessment", label: "Conformity Assessment Certification" },
+    { value: "itSystems", label: "IT Systems" },
+    { value: "processOptimisation", label: "Process Optimisation" },
+    { value: "patents", label: "Patents" },
+    { value: "logistics", label: "Logistics" },
+    { value: "salesMarketing", label: "Sales and Marketing" },
+    { value: "postInvestment", label: "Post-investment Support" },
+  ],
+};
+
+export const renderUseOfFunds = (data, updateFormData) => {
   const handleChange = (e) => {
-    const { name, value } = e.target
-    updateFormData({ [name]: value })
-  }
+    const { name, value } = e.target;
+    updateFormData("useOfFunds", { [name]: value });
+  };
 
   const handleFileChange = (name, files) => {
-    updateFormData({ [name]: files })
-  }
+    updateFormData("useOfFunds", { [name]: files });
+  };
 
   const addFundingItem = () => {
-    const fundingItems = [...(data.fundingItems || [])]
-    updateFormData({
+    const fundingItems = [...(data.fundingItems || [])];
+    updateFormData("useOfFunds", {
       fundingItems: [...fundingItems, { category: "", subArea: "", description: "", amount: "" }],
-    })
-  }
+    });
+  };
 
   const updateFundingItem = (index, field, value) => {
-    const fundingItems = [...(data.fundingItems || [])]
-    fundingItems[index] = { ...fundingItems[index], [field]: value }
-    updateFormData({ fundingItems })
-  }
+    if (field === 'amount' && isNaN(value)) return;
+    
+    const fundingItems = [...(data.fundingItems || [])];
+    fundingItems[index] = { ...fundingItems[index], [field]: value };
+    updateFormData("useOfFunds", { fundingItems });
+  };
 
   const removeFundingItem = (index) => {
-    const fundingItems = [...(data.fundingItems || [])]
-    fundingItems.splice(index, 1)
-    updateFormData({ fundingItems })
-  }
+    const fundingItems = [...(data.fundingItems || [])];
+    fundingItems.splice(index, 1);
+    updateFormData("useOfFunds", { fundingItems });
+  };
 
   const getSubAreaOptions = (category) => {
-    return subAreaOptions[category] || []
-  }
+    return subAreaOptions[category] || [];
+  };
 
-  // Calculate total funds
   const calculateTotal = () => {
-    return (data.fundingItems || []).reduce((total, item) => {
-      const amount = Number.parseFloat(item.amount) || 0
-      return total + amount
-    }, 0)
-  }
+    return data.fundingItems?.reduce((sum, item) => sum + Number(item.amount || 0), 0) || 0;
+  };
 
   return (
     <>
@@ -151,9 +193,10 @@ export default function UseOfFunds({ data, updateFormData }) {
                     <textarea
                       value={item.description}
                       onChange={(e) => updateFundingItem(index, "description", e.target.value)}
-                      className="form-textarea"
-                      placeholder="Brief description"
-                      rows={3}
+                      className="form-textarea large"
+                      placeholder="Detailed description of how funds will be used"
+                      rows={4}
+                      style={{ minHeight: '100px' }}
                     />
                   </td>
                   <td>
@@ -172,11 +215,11 @@ export default function UseOfFunds({ data, updateFormData }) {
                   </td>
                 </tr>
               ))}
-              <tr>
-                <td colSpan={3} className="text-right" style={{ textAlign: "right", fontWeight: "bold" }}>
-                  Total:
+              <tr className="total-row">
+                <td colSpan="3" className="text-right"><strong>Total:</strong></td>
+                <td>
+                  <strong>R {calculateTotal().toLocaleString()}</strong>
                 </td>
-                <td style={{ fontWeight: "bold" }}>R {calculateTotal().toLocaleString()}</td>
                 <td></td>
               </tr>
             </tbody>
@@ -196,5 +239,11 @@ export default function UseOfFunds({ data, updateFormData }) {
         />
       </div>
     </>
-  )
-}
+  );
+};
+
+const UseOfFunds = ({ data, updateData }) => {
+  return renderUseOfFunds(data, updateData);
+};
+
+export default UseOfFunds;

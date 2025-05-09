@@ -168,7 +168,7 @@ export default function LoginRegister() {
                     </div>
                     <input
                       type="email"
-                      placeholder="Your emqil"
+                      placeholder="Your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
@@ -210,12 +210,11 @@ export default function LoginRegister() {
                       onChange={(e) => setRole(e.target.value)}
                       className={role ? 'has-value' : ''}
                     >
-                      <option value="">Who are you?</option>
-                      <option value="SME/BUSINESS">SME/Business Owner</option>
-                      <option value="Investor">Investor</option>
-                      <option value="Service Provider">Service Provider</option>
-                      <option value="Growth Enabler">Growth Enabler</option>
-                      <option value="Purpose Partners">Purpose Partner</option>
+                      <option value="">I am a </option>
+                      <option value="SME/BUSINESS">SMSE</option>
+                      <option value="Funder">Investor</option>
+                      <option value="Support Program">Service Provider</option>
+                     
                     </select>
                   </div>
                   {errors.role && <p className="error-text">{errors.role}</p>}
@@ -227,7 +226,7 @@ export default function LoginRegister() {
                     Create Account <Rocket size={16} />
                   </button>
                   <p className="switch-link">
-                    Already part of us? <span onClick={() => setIsRegistering(false)}>Hop back in!</span>
+                    Already part of us? <span onClick={() => setIsRegistering(false)}>Login</span>
                   </p>
                 </div>
               )

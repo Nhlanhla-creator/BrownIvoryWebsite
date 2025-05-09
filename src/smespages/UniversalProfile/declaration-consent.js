@@ -110,20 +110,7 @@ export default function DeclarationConsent({ data = {}, updateData }) {
         </div>
 
         <div className="mt-8 flex justify-between">
-          <button
-            type="button"
-            className="px-6 py-2 bg-brown-100 text-brown-700 rounded-md hover:bg-brown-200 focus:outline-none focus:ring-2 focus:ring-brown-500 focus:ring-offset-2"
-          >
-            Save as Draft
-          </button>
-
-          <button
-            type="button"
-            className="px-6 py-2 bg-brown-600 text-white rounded-md hover:bg-brown-700 focus:outline-none focus:ring-2 focus:ring-brown-500 focus:ring-offset-2"
-            disabled={!data.accuracy || !data.dataProcessing || !data.termsConditions}
-          >
-            Submit Profile
-          </button>
+        
         </div>
       </div>
     </div>

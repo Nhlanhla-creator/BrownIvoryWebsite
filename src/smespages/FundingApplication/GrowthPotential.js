@@ -1,17 +1,16 @@
-"use client"
+import FormField from "./FormField";
+import FileUpload from "./FileUpload";
+import "./FundingApplication.css" ;
 
-import { FormField, FileUpload } from "./form-components"
-import "./FundingApplication.css"
-
-export default function GrowthPotential({ data, updateFormData }) {
+export const renderGrowthPotential = (data, updateFormData) => {
   const handleChange = (e) => {
-    const { name, value } = e.target
-    updateFormData({ [name]: value })
-  }
+    const { name, value } = e.target;
+    updateFormData("growthPotential", { [name]: value });
+  };
 
   const handleFileChange = (name, files) => {
-    updateFormData({ [name]: files })
-  }
+    updateFormData("growthPotential", { [name]: files });
+  };
 
   return (
     <>
@@ -168,7 +167,10 @@ export default function GrowthPotential({ data, updateFormData }) {
             </div>
           </FormField>
 
-          <FormField label="Personal Risk - Any financial and/or non-financial contribution to the business?" required>
+          <FormField
+            label="Personal Risk - Any financial and/or non-financial contribution to the business?"
+            required
+          >
             <div className="radio-group">
               <label className="form-radio-label">
                 <input
@@ -276,5 +278,5 @@ export default function GrowthPotential({ data, updateFormData }) {
         />
       </div>
     </>
-  )
-}
+  );
+};

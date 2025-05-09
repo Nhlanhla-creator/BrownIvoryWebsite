@@ -1,18 +1,20 @@
-"use client"
 
-import { FormField, FileUpload } from "./form-components"
-import { profitabilityOptions } from "./form-options"
-import "./FundingApplication.css"
+import "./FundingApplication.css" ;
 
-export default function FinancialOverview({ data, updateFormData }) {
+import { useState } from "react";
+import FormField from "./FormField";
+import FileUpload from "./FileUpload";
+import { profitabilityOptions } from "./applicationOptions";
+
+export const renderFinancialOverview = (data, updateFormData) => {
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
-    updateFormData({ [name]: type === "checkbox" ? checked : value })
-  }
+    const { name, value, type, checked } = e.target;
+    updateFormData("financialOverview", { [name]: type === "checkbox" ? checked : value });
+  };
 
   const handleFileChange = (name, files) => {
-    updateFormData({ [name]: files })
-  }
+    updateFormData("financialOverview", { [name]: files });
+  };
 
   return (
     <>
@@ -128,11 +130,12 @@ export default function FinancialOverview({ data, updateFormData }) {
           />
 
           <FileUpload
-            label="Bank Details Confirmation"
+            label="Bank Details Confirmation Letter"
             accept=".pdf,.jpg,.jpeg,.png"
             required
-            onChange={(files) => handleFileChange("bankDetailsConfirmation", files)}
-            value={data.bankDetailsConfirmation || []}
+            onChange={(files) => handleFileChange("bankConfirmation", files)}
+            value={data.bankConfirmation || []}
+            tooltip="Official letter from your bank confirming account details"
           />
 
           <FileUpload
@@ -152,5 +155,11 @@ export default function FinancialOverview({ data, updateFormData }) {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
+
+const FinancialOverview = ({ data, updateData }) => {
+  return renderFinancialOverview(data, updateData);
+};
+
+export default FinancialOverview;

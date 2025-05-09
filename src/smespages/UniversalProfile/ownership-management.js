@@ -1,5 +1,5 @@
 "use client"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2 } from 'lucide-react'
 import FormField from "./form-field"
 import FileUpload from "./file-upload"
 import './UniversalProfile.css';
@@ -19,13 +19,61 @@ const genderOptions = [
   { value: "prefer_not", label: "Prefer not to say" },
 ]
 
-const countryOptions = [
-  { value: "za", label: "South Africa" },
-  { value: "na", label: "Namibia" },
-  { value: "bw", label: "Botswana" },
-  { value: "zw", label: "Zimbabwe" },
-  { value: "mz", label: "Mozambique" },
-  { value: "other", label: "Other" },
+const africanCountries = [
+  { value: "algeria", label: "Algeria" },
+  { value: "angola", label: "Angola" },
+  { value: "benin", label: "Benin" },
+  { value: "botswana", label: "Botswana" },
+  { value: "burkina_faso", label: "Burkina Faso" },
+  { value: "burundi", label: "Burundi" },
+  { value: "cabo_verde", label: "Cabo Verde" },
+  { value: "cameroon", label: "Cameroon" },
+  { value: "central_african_republic", label: "Central African Republic" },
+  { value: "chad", label: "Chad" },
+  { value: "comoros", label: "Comoros" },
+  { value: "congo", label: "Congo" },
+  { value: "cote_d_ivoire", label: "Côte d'Ivoire" },
+  { value: "djibouti", label: "Djibouti" },
+  { value: "drc", label: "DR Congo" },
+  { value: "egypt", label: "Egypt" },
+  { value: "equatorial_guinea", label: "Equatorial Guinea" },
+  { value: "eritrea", label: "Eritrea" },
+  { value: "eswatini", label: "Eswatini" },
+  { value: "ethiopia", label: "Ethiopia" },
+  { value: "gabon", label: "Gabon" },
+  { value: "gambia", label: "Gambia" },
+  { value: "ghana", label: "Ghana" },
+  { value: "guinea", label: "Guinea" },
+  { value: "guinea_bissau", label: "Guinea-Bissau" },
+  { value: "kenya", label: "Kenya" },
+  { value: "lesotho", label: "Lesotho" },
+  { value: "liberia", label: "Liberia" },
+  { value: "libya", label: "Libya" },
+  { value: "madagascar", label: "Madagascar" },
+  { value: "malawi", label: "Malawi" },
+  { value: "mali", label: "Mali" },
+  { value: "mauritania", label: "Mauritania" },
+  { value: "mauritius", label: "Mauritius" },
+  { value: "morocco", label: "Morocco" },
+  { value: "mozambique", label: "Mozambique" },
+  { value: "namibia", label: "Namibia" },
+  { value: "niger", label: "Niger" },
+  { value: "nigeria", label: "Nigeria" },
+  { value: "rwanda", label: "Rwanda" },
+  { value: "sao_tome_and_principe", label: "São Tomé and Príncipe" },
+  { value: "senegal", label: "Senegal" },
+  { value: "seychelles", label: "Seychelles" },
+  { value: "sierra_leone", label: "Sierra Leone" },
+  { value: "somalia", label: "Somalia" },
+  { value: "south_africa", label: "South Africa" },
+  { value: "south_sudan", label: "South Sudan" },
+  { value: "sudan", label: "Sudan" },
+  { value: "tanzania", label: "Tanzania" },
+  { value: "togo", label: "Togo" },
+  { value: "tunisia", label: "Tunisia" },
+  { value: "uganda", label: "Uganda" },
+  { value: "zambia", label: "Zambia" },
+  { value: "zimbabwe", label: "Zimbabwe" },
 ]
 
 export default function OwnershipManagement({ data = { shareholders: [], directors: [] }, updateData }) {
@@ -163,7 +211,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
                     >
                       <option value="">Select</option>
-                      {countryOptions.map((option) => (
+                      {africanCountries.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
                         </option>
@@ -305,12 +353,18 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                     />
                   </td>
                   <td className="px-4 py-2 border-b">
-                    <input
-                      type="text"
+                    <select
                       value={director.nationality}
                       onChange={(e) => updateDirector(index, "nationality", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
-                    />
+                    >
+                      <option value="">Select</option>
+                      {africanCountries.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
                   </td>
                   <td className="px-4 py-2 border-b text-center">
                     <select
@@ -362,12 +416,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
       </div>
 
       <div className="mt-8 flex justify-end">
-        <button
-          type="button"
-          className="px-6 py-2 bg-brown-600 text-white rounded-md hover:bg-brown-700 focus:outline-none focus:ring-2 focus:ring-brown-500 focus:ring-offset-2"
-        >
-          Save & Continue
-        </button>
+       
       </div>
     </div>
   )

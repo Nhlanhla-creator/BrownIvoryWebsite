@@ -1,14 +1,17 @@
-"use client"
+import FormField from "./FormField";
+import FileUpload from "./FileUpload";
+import {
+  applicationType,
+  businessFundingStage,
+  urgencyOptions,
+  supportFormatOptions,
+} from "./applicationOptions";
 
-import { FormField } from "./form-components"
-import { applicationType, businessFundingStage, urgencyOptions, supportFormatOptions } from "./form-options"
-import "./FundingApplication.css"
-
-export default function ApplicationOverview({ data, updateFormData }) {
+export const renderApplicationOverview = (data, updateFormData) => {
   const handleChange = (e) => {
-    const { name, value } = e.target
-    updateFormData({ [name]: value })
-  }
+    const { name, value } = e.target;
+    updateFormData("applicationOverview", { [name]: value });
+  };
 
   return (
     <>
@@ -75,7 +78,13 @@ export default function ApplicationOverview({ data, updateFormData }) {
 
         <div>
           <FormField label="Urgency" required>
-            <select name="urgency" value={data.urgency || ""} onChange={handleChange} className="form-select" required>
+            <select
+              name="urgency"
+              value={data.urgency || ""}
+              onChange={handleChange}
+              className="form-select"
+              required
+            >
               <option value="">Select Urgency</option>
               {urgencyOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -115,5 +124,5 @@ export default function ApplicationOverview({ data, updateFormData }) {
         </div>
       </div>
     </>
-  )
-}
+  );
+};

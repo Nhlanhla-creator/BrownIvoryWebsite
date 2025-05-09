@@ -1,31 +1,30 @@
-"use client"
+import FormField from "./FormField";
+import FileUpload from "./FileUpload";
+import { barrierOptions } from "./applicationOptions";
+import "./FundingApplication.css" ;
 
-import { FormField, FileUpload } from "./form-components"
-import { barrierOptions } from "./form-options"
-import "./FundingApplication.css"
-
-export default function EnterpriseReadiness({ data, updateFormData }) {
+export const renderEnterpriseReadiness = (data, updateFormData) => {
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
-    updateFormData({ [name]: type === "checkbox" ? checked : value })
-  }
+    const { name, value, type, checked } = e.target;
+    updateFormData("enterpriseReadiness", { [name]: type === "checkbox" ? checked : value });
+  };
 
   const handleMultiSelect = (e) => {
-    const { value, checked } = e.target
-    let barriers = [...(data.barriers || [])]
+    const { value, checked } = e.target;
+    let barriers = [...(data.barriers || [])];
 
     if (checked) {
-      barriers.push(value)
+      barriers.push(value);
     } else {
-      barriers = barriers.filter((item) => item !== value)
+      barriers = barriers.filter((item) => item !== value);
     }
 
-    updateFormData({ barriers })
-  }
+    updateFormData("enterpriseReadiness", { barriers });
+  };
 
   const handleFileChange = (name, files) => {
-    updateFormData({ [name]: files })
-  }
+    updateFormData("enterpriseReadiness", { [name]: files });
+  };
 
   return (
     <>
@@ -390,5 +389,5 @@ export default function EnterpriseReadiness({ data, updateFormData }) {
         </div>
       </div>
     </>
-  )
-}
+  );
+};

@@ -1,37 +1,8 @@
-"use client"
+import { useState } from "react";
+import { Upload, X, FileText } from "lucide-react";
+import "./FundingApplication.css" ;
 
-import { useState } from "react"
-import { Info, Upload, X, FileText } from "lucide-react"
-import "./FundingApplication.css"
-
-// Form Field Component
-export const FormField = ({ label, children, required = false, tooltip = null, className = "" }) => {
-  const [showTooltip, setShowTooltip] = useState(false)
-
-  return (
-    <div className={`form-field ${className}`}>
-      <div className="form-field-label">
-        <label>
-          {label} {required && <span className="required">*</span>}
-        </label>
-        {tooltip && (
-          <div className="form-field-tooltip">
-            <Info
-              className="tooltip-icon"
-              onMouseEnter={() => setShowTooltip(true)}
-              onMouseLeave={() => setShowTooltip(false)}
-            />
-            {showTooltip && <div className="tooltip-content">{tooltip}</div>}
-          </div>
-        )}
-      </div>
-      {children}
-    </div>
-  )
-}
-
-// File Upload Component
-export const FileUpload = ({
+const FileUpload = ({
   label,
   accept = ".pdf,.doc,.docx,.jpg,.jpeg,.png",
   multiple = false,
@@ -39,41 +10,41 @@ export const FileUpload = ({
   onChange,
   value = [],
 }) => {
-  const [files, setFiles] = useState(value)
-  const [isDragging, setIsDragging] = useState(false)
-  const inputId = `file-upload-${label.replace(/\s+/g, "-").toLowerCase()}`
+  const [files, setFiles] = useState(value);
+  const [isDragging, setIsDragging] = useState(false);
+  const inputId = `file-upload-${label.replace(/\s+/g, "-").toLowerCase()}`;
 
   const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files || [])
-    const newFiles = [...files, ...selectedFiles]
-    setFiles(newFiles)
-    if (onChange) onChange(newFiles)
-  }
+    const selectedFiles = Array.from(e.target.files || []);
+    const newFiles = [...files, ...selectedFiles];
+    setFiles(newFiles);
+    if (onChange) onChange(newFiles);
+  };
 
   const handleDragOver = (e) => {
-    e.preventDefault()
-    setIsDragging(true)
-  }
+    e.preventDefault();
+    setIsDragging(true);
+  };
 
   const handleDragLeave = () => {
-    setIsDragging(false)
-  }
+    setIsDragging(false);
+  };
 
   const handleDrop = (e) => {
-    e.preventDefault()
-    setIsDragging(false)
-    const droppedFiles = Array.from(e.dataTransfer.files)
-    const newFiles = [...files, ...droppedFiles]
-    setFiles(newFiles)
-    if (onChange) onChange(newFiles)
-  }
+    e.preventDefault();
+    setIsDragging(false);
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    const newFiles = [...files, ...droppedFiles];
+    setFiles(newFiles);
+    if (onChange) onChange(newFiles);
+  };
 
   const removeFile = (index) => {
-    const newFiles = [...files]
-    newFiles.splice(index, 1)
-    setFiles(newFiles)
-    if (onChange) onChange(newFiles)
-  }
+    const newFiles = [...files];
+    newFiles.splice(index, 1);
+    setFiles(newFiles);
+    if (onChange) onChange(newFiles);
+  };
 
   return (
     <div className="file-upload">
@@ -114,8 +85,8 @@ export const FileUpload = ({
                 <button
                   type="button"
                   onClick={(e) => {
-                    e.stopPropagation()
-                    removeFile(index)
+                    e.stopPropagation();
+                    removeFile(index);
                   }}
                   className="file-upload-item-remove"
                 >
@@ -127,5 +98,7 @@ export const FileUpload = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
+
+export default FileUpload;

@@ -1,17 +1,16 @@
-"use client"
+import FormField from "./FormField";
+import FileUpload from "./FileUpload";
+import "./FundingApplication.css" ;
 
-import { FileUpload } from "./form-components"
-import "./FundingApplication.css"
-
-export default function DeclarationCommitment({ data, updateFormData }) {
+export const renderDeclarationCommitment = (data, updateFormData) => {
   const handleChange = (e) => {
-    const { name, checked } = e.target
-    updateFormData({ [name]: checked })
-  }
+    const { name, checked } = e.target;
+    updateFormData("declarationCommitment", { [name]: checked });
+  };
 
   const handleFileChange = (name, files) => {
-    updateFormData({ [name]: files })
-  }
+    updateFormData("declarationCommitment", { [name]: files });
+  };
 
   return (
     <>
@@ -20,8 +19,8 @@ export default function DeclarationCommitment({ data, updateFormData }) {
       <div className="info-box">
         <h3>Declaration of Intent</h3>
         <p>
-          I hereby declare my intention to participate fully in the funding or support program if selected. I understand
-          that my active participation and commitment are essential for the success of this initiative.
+          I hereby declare my intention to participate fully in the funding or support program if selected. I
+          understand that my active participation and commitment are essential for the success of this initiative.
         </p>
         <div className="form-field">
           <label className="form-checkbox-label">
@@ -42,8 +41,8 @@ export default function DeclarationCommitment({ data, updateFormData }) {
         <h3>Reporting Requirements</h3>
         <p>
           I understand that if selected for funding or support, I will be required to provide regular progress reports
-          and financial updates as specified in the program guidelines. I commit to meeting all reporting deadlines and
-          providing accurate information.
+          and financial updates as specified in the program guidelines. I commit to meeting all reporting deadlines
+          and providing accurate information.
         </p>
         <div className="form-field">
           <label className="form-checkbox-label">
@@ -94,5 +93,5 @@ export default function DeclarationCommitment({ data, updateFormData }) {
         />
       </div>
     </>
-  )
-}
+  );
+};

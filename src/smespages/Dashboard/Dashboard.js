@@ -478,24 +478,6 @@ const Dashboard = () => {
       position: "CEO",
     },
     {
-      name: "Sarah Williams",
-      rating: 3,
-      date: "Apr 10, 2023",
-      comment:
-        "Good product but slow delivery. While the quality of service was good, we experienced some delays that affected our timeline.",
-      company: "Williams Consulting",
-      position: "Director",
-    },
-    {
-      name: "David Chen",
-      rating: 5,
-      date: "Apr 5, 2023",
-      comment:
-        "Excellent experience overall! The platform is intuitive and the support team is knowledgeable. Would highly recommend to other businesses.",
-      company: "Chen Technologies",
-      position: "CTO",
-    },
-    {
       name: "Priya Patel",
       rating: 4,
       date: "Apr 2, 2023",
@@ -504,15 +486,7 @@ const Dashboard = () => {
       company: "Patel Innovations",
       position: "COO",
     },
-    {
-      name: "James Wilson",
-      rating: 2,
-      date: "Mar 28, 2023",
-      comment:
-        "Product quality needs improvement. While the concept is good, we encountered several issues that need to be addressed.",
-      company: "Wilson Group",
-      position: "Managing Director",
-    },
+   
   ]
 
   // Category data for Top Matches
