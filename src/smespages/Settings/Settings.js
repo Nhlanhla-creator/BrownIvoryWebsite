@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Settings.css';
-
+import Dashboard from '../UniversalProfile/LindelaniTestView';
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('account');
   const [formData, setFormData] = useState({
@@ -252,7 +252,7 @@ const Settings = () => {
             </div>
             <button className="logout-btn">Logout</button>
           </div>
-          
+        
           <div className="danger-action">
             <div>
               <h4>Delete Account</h4>

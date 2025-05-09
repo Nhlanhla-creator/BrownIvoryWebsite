@@ -3,6 +3,12 @@ import { Plus, Trash2 } from 'lucide-react'
 import FormField from "./form-field"
 import FileUpload from "./file-upload"
 import './UniversalProfile.css';
+import { useEffect, useState } from 'react';
+import { db, auth, storage } from '../../firebaseConfig';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
+
 
 const raceOptions = [
   { value: "black", label: "Black African" },
@@ -75,6 +81,44 @@ const africanCountries = [
   { value: "zambia", label: "Zambia" },
   { value: "zimbabwe", label: "Zimbabwe" },
 ]
+
+
+const saveOwnershipManagement = async (formData) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error("User not authenticated");
+
+    const uid = user.uid;
+    const docRef = doc(db, "OwnershipManagement", uid);
+
+    // Upload document files (if any) and collect URLs
+    const uploadedFiles = {};
+    for (const key in formData) {
+      if (Array.isArray(formData[key]) && formData[key][0] instanceof File) {
+        const file = formData[key][0];
+        const storageRef = ref(storage, `ownershipDocs/${uid}/${key}`);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        uploadedFiles[key] = url;
+      }
+    }
+
+    // Prepare final data to save
+    const fullData = {
+      ...formData,
+      ...uploadedFiles,
+      uid,
+      timestamp: new Date().toISOString()
+    };
+
+    await setDoc(docRef, fullData);
+    alert("Ownership & Management data saved successfully!");
+  } catch (error) {
+    console.error("Error saving OwnershipManagement:", error);
+    alert("Failed to save data. Please try again.");
+  }
+};
+
 
 export default function OwnershipManagement({ data = { shareholders: [], directors: [] }, updateData }) {
   const addShareholder = () => {

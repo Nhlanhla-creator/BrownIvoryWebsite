@@ -1,7 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, ChevronRight, ChevronLeft, Save } from "lucide-react";
+import {
+  CheckCircle,
+  ChevronRight,
+  ChevronLeft,
+  Save,
+} from "lucide-react";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+} from "firebase/firestore";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
+import { auth, db, storage } from "../../firebaseConfig"; // adjust based on your setup
 import "./UniversalProfile.css";
 import Instructions from "./instructions";
 import EntityOverview from "./entity-overview";
@@ -49,14 +66,26 @@ export default function UniversalProfile() {
           gender: "",
           isYouth: false,
           isDisabled: false,
+          idDocument: null,
         },
       ],
-      directors: [{ name: "", id: "", position: "", nationality: "", isExec: false }],
+      directors: [
+        {
+          name: "",
+          id: "",
+          position: "",
+          nationality: "",
+          isExec: false,
+          doc: null,
+        },
+      ],
     },
     contactDetails: {
       sameAsPhysical: false,
     },
-    legalCompliance: {},
+    legalCompliance: {
+      licenseDoc: null,
+    },
     productsServices: {
       entityType: "smse",
       productCategories: [],
@@ -76,16 +105,11 @@ export default function UniversalProfile() {
     const savedData = localStorage.getItem("universalProfileData");
     const savedCompletedSections = localStorage.getItem("universalProfileCompletedSections");
 
-    if (savedData) {
-      setFormData(JSON.parse(savedData));
-    }
-
-    if (savedCompletedSections) {
-      setCompletedSections(JSON.parse(savedCompletedSections));
-    }
+    if (savedData) setFormData(JSON.parse(savedData));
+    if (savedCompletedSections) setCompletedSections(JSON.parse(savedCompletedSections));
   }, []);
 
-  // Save data to localStorage
+  // Save to localStorage
   useEffect(() => {
     localStorage.setItem("universalProfileData", JSON.stringify(formData));
     localStorage.setItem("universalProfileCompletedSections", JSON.stringify(completedSections));
@@ -109,36 +133,80 @@ export default function UniversalProfile() {
   };
 
   const navigateToNextSection = () => {
-    const currentIndex = sections.findIndex((section) => section.id === activeSection);
-    if (currentIndex < sections.length - 1) {
-      setActiveSection(sections[currentIndex + 1].id);
+    const index = sections.findIndex((s) => s.id === activeSection);
+    if (index < sections.length - 1) {
+      setActiveSection(sections[index + 1].id);
       window.scrollTo(0, 0);
     }
   };
 
   const navigateToPreviousSection = () => {
-    const currentIndex = sections.findIndex((section) => section.id === activeSection);
-    if (currentIndex > 0) {
-      setActiveSection(sections[currentIndex - 1].id);
+    const index = sections.findIndex((s) => s.id === activeSection);
+    if (index > 0) {
+      setActiveSection(sections[index - 1].id);
       window.scrollTo(0, 0);
     }
   };
 
-  const handleSaveSection = () => {
-    localStorage.setItem("universalProfileData", JSON.stringify(formData));
-    alert("Section saved successfully!");
+  const uploadFilesAndReplaceWithURLs = async (data, section) => {
+    const uploadRecursive = async (item, pathPrefix) => {
+      if (item instanceof File) {
+        const fileRef = ref(storage, `universalProfile/${auth.currentUser?.uid}/${pathPrefix}`);
+        await uploadBytes(fileRef, item);
+        return await getDownloadURL(fileRef);
+      } else if (Array.isArray(item)) {
+        return await Promise.all(
+          item.map((entry, idx) => uploadRecursive(entry, `${pathPrefix}/${idx}`))
+        );
+      } else if (typeof item === "object" && item !== null) {
+        const updated = {};
+        for (const key in item) {
+          updated[key] = await uploadRecursive(item[key], `${pathPrefix}/${key}`);
+        }
+        return updated;
+      } else {
+        return item;
+      }
+    };
+
+    return await uploadRecursive(data, section);
   };
 
-  const handleSaveAndContinue = () => {
+  const saveDataToFirebase = async (section = null) => {
+    try {
+      const userId = auth.currentUser?.uid;
+      if (!userId) throw new Error("User not logged in.");
+
+      const docRef = doc(db, "universalProfiles", userId);
+      let sectionData = section ? formData[section] : formData;
+
+      const uploaded = section
+        ? { [section]: await uploadFilesAndReplaceWithURLs(sectionData, section) }
+        : await uploadFilesAndReplaceWithURLs(formData, "full");
+
+      await setDoc(docRef, uploaded, { merge: true });
+    } catch (err) {
+      console.error("Error saving to Firebase:", err);
+      alert("Failed to save to Firebase.");
+    }
+  };
+
+  const handleSaveSection = async () => {
+    await saveDataToFirebase(activeSection);
+    alert("Section saved to Firebase!");
+  };
+
+  const handleSaveAndContinue = async () => {
     markSectionAsCompleted(activeSection);
-    localStorage.setItem("universalProfileData", JSON.stringify(formData));
+    await saveDataToFirebase(activeSection);
     navigateToNextSection();
   };
 
-  const handleSubmitProfile = () => {
+  const handleSubmitProfile = async () => {
     markSectionAsCompleted("declarationConsent");
+    await saveDataToFirebase(); // save full form
     alert("Profile submitted successfully!");
-    console.log("Submitted profile data:", formData);
+    console.log("Submitted:", formData);
   };
 
   const renderActiveSection = () => {
@@ -181,7 +249,11 @@ export default function UniversalProfile() {
               key={section.id}
               onClick={() => setActiveSection(section.id)}
               className={`profile-tracker-button ${
-                activeSection === section.id ? "active" : completedSections[section.id] ? "completed" : "pending"
+                activeSection === section.id
+                  ? "active"
+                  : completedSections[section.id]
+                  ? "completed"
+                  : "pending"
               }`}
             >
               {section.label.split("\n").map((line, i) => (

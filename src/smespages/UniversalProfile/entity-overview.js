@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { db, auth, storage } from '../../firebaseConfig';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-
+import ProfileView from "./LindelaniTestView"; // Adjust the import based on your file structure
 const entityTypes = [
   { value: "ptyLtd", label: "Pty Ltd" },
   { value: "cc", label: "CC" },
@@ -454,6 +454,7 @@ export default function EntityOverview({ data = {}, updateData, onSave }) {
             value={formData.proofOfAddress || []}
           />
         </div>
+       <ProfileView/>
       </div>
 
       <div className="mt-8 flex justify-end">
