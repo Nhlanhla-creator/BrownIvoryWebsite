@@ -90,15 +90,14 @@ export default function LoginRegister() {
         if(role === 'Investor') {
           navigate('/investor-dashboard');
         }
+
         else if(role === 'SME/BUSINESS') {
           navigate('/dashboard');
-        } else if(role === 'Service Provider') {
-          navigate('/service-provider-dashboard');
-        } else if(role === 'Growth Enabler') {
-          navigate('/growth-enabler-dashboard');
-        } else if(role === 'Purpose Partners') {
-          navigate('/purpose-partners-dashboard');
-        } 
+        }
+         else if(role === 'Support Program') {
+          navigate('/support-dashboard');
+        }
+        
        
       } else {
         console.log('Not Registered!');
@@ -114,9 +113,7 @@ export default function LoginRegister() {
     switch(roleValue) {
       case 'SME/BUSINESS': return <Briefcase size={16} />;
       case 'Investor': return <Rocket size={16} />;
-      case 'Service Provider': return <User size={16} />;
-      case 'Growth Enabler': return <Rocket size={16} />;
-      case 'Purpose Partners': return <HeartHandshake size={16} />;
+      case 'Support Program': return <User size={16} />;
       default: return <Smile size={16} />;
     }
   };
@@ -212,8 +209,8 @@ export default function LoginRegister() {
                     >
                       <option value="">I am a </option>
                       <option value="SME/BUSINESS">SMSE</option>
-                      <option value="Funder">Investor</option>
-                      <option value="Support Program">Service Provider</option>
+                      <option value="Investor">Investor</option>
+                      <option value="Support Program">Support Program</option>
                      
                     </select>
                   </div>

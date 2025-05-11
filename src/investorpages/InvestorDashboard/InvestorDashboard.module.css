@@ -1,0 +1,273 @@
+/* General Dashboard Styling */
+.investorDashboard {
+  display: flex;
+  flex-direction: column;
+  margin-left: 260px; /* Ensure the content is pushed to the right of the sidebar */
+  padding: 2rem;
+  background-color: #f4f4f4; /* Light background for the content */
+  min-height: 100vh;
+}
+
+.dashboardTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.dashboardSection {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Section Title */
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+/* Portfolio Overview Section Styling */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.statCard {
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.statCard h3 {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.statValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Recommended Opportunities Section */
+.opportunitiesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.opportunityCard {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.opportunityHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.opportunityHeader h3 {
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.matchBadge {
+  background-color: #f9c74f;
+  color: #333;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 16px;
+}
+
+.opportunityDetails {
+  margin-top: 1rem;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.detailLabel {
+  font-weight: 600;
+  color: #666;
+}
+
+.detailValue {
+  color: #333;
+}
+
+.opportunityDescription {
+  margin-top: 1rem;
+  color: #666;
+}
+
+.cardActions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.btnPrimary {
+  background-color: #f9c74f;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btnPrimary:hover {
+  background-color: #fdbf41;
+}
+
+.btnSecondary {
+  background-color: #ddd;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btnSecondary:hover {
+  background-color: #ccc;
+}
+
+/* Portfolio Companies Section */
+.tableResponsive {
+  overflow-x: auto;
+}
+
+.portfolioTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.portfolioTable th,
+.portfolioTable td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.portfolioTable th {
+  background-color: #f9f9f9;
+  font-weight: 600;
+}
+
+.portfolioTable td {
+  background-color: #fff;
+}
+
+.performance {
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+}
+
+.performance.positive {
+  background-color: #d1fad6;
+  color: #2d9a3b;
+}
+
+.performance.negative {
+  background-color: #fad1d1;
+  color: #d94c4c;
+}
+
+.performance.neutral {
+  background-color: #e1e1e1;
+  color: #333;
+}
+
+.updateBadge {
+  background-color: #f9c74f;
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  color: #333;
+}
+
+.noUpdates {
+  color: #ccc;
+}
+
+/* Events Section */
+.eventsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.eventCard {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.eventInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.eventInfo h4 {
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.eventTime {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.eventType {
+  color: #f9c74f;
+  font-weight: 600;
+}
+
+.eventActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btnIcon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.btnIcon:hover {
+  color: #f9c74f;
+}
+
+/* View All Link */
+.viewAllLink {
+  color: #f9c74f;
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+.viewAllLink:hover {
+  text-decoration: underline;
+}

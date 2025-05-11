@@ -181,7 +181,7 @@ const Sidebar = ({ companyName = "Company Name" }) => {
         <div className="logo-circle">{companyName.charAt(0)}</div>
         <div className="company-info">
           <div className="company-name">{companyName}</div>
-          <div className="dashboard-title">Dashboard</div>
+          <div className="dashboard-title">SMSE Dashboard</div>
         </div>
       </div>
 

@@ -1,0 +1,259 @@
+.investor-header {
+  background-color: #ffffff;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  position: fixed;
+  top: 0;
+  left: 240px; /* matches sidebar width */
+  width: calc(100% - 220px); /* fill the rest of the space */
+  z-index: 10;
+
+  }
+  
+  .header-left h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e40af; /* Blue color for investor theme */
+    margin: 0;
+  }
+  
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  /* Search Bar */
+  .search-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .search-bar input {
+    padding: 0.5rem 1rem;
+    padding-right: 2.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    width: 250px;
+    font-size: 0.875rem;
+  }
+  
+  .search-button {
+    position: absolute;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* Notification Styles */
+  .notification-container {
+    position: relative;
+  }
+  
+  .notification-button {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #ef4444;
+    color: white;
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 320px;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    margin-top: 0.5rem;
+  }
+  
+  .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .notification-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .mark-read-button {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+  
+  .notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .notification-item {
+    display: flex;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .notification-item.unread {
+    background-color: #f0f9ff;
+  }
+  
+  .notification-icon {
+    margin-right: 0.75rem;
+    font-size: 1.25rem;
+  }
+  
+  .notification-content {
+    flex: 1;
+  }
+  
+  .notification-content p {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.875rem;
+  }
+  
+  .notification-time {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+  
+  .notification-footer {
+    padding: 0.75rem 1rem;
+    text-align: center;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .notification-footer a {
+    color: #3b82f6;
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+  
+  .no-notifications {
+    padding: 1rem;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+  
+  /* Profile Styles */
+  .profile-container {
+    position: relative;
+  }
+  
+  .profile-button {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .profile-image {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 0.5rem;
+  }
+  
+  .profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .profile-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #1e40af;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+  
+  .company-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .profile-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 220px;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    margin-top: 0.5rem;
+  }
+  
+  .profile-dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .profile-dropdown li {
+    padding: 0.5rem 1rem;
+  }
+  
+  .profile-dropdown li a,
+  .profile-dropdown li button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.875rem;
+    color: #374151;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  
+  .profile-dropdown li a:hover,
+  .profile-dropdown li button:hover {
+    color: #1e40af;
+  }
+  
+  .profile-dropdown li.divider {
+    height: 1px;
+    background-color: #e5e7eb;
+    padding: 0;
+    margin: 0.5rem 0;
+  }
