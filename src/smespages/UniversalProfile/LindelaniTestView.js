@@ -180,8 +180,36 @@ export default function ProfileView() {
     );
   };
 
+  
+  const renderProducts = (products) => {
+    if (!products || products.length === 0) return <p>No products listed</p>;
+    
+    return (
+      <div className="data-table-container">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>Description</th>
+            
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((products, index) => (
+              <tr key={index}>
+                <td>{products.name || "N/A"}</td>
+                <td>{products.description || "N/A"}</td>
+             
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   const renderCategoriesList = (categories) => {
-    if (!categories || categories.length === 0) return <p>None selected</p>;
+    if (categories == null ) return <p>None selected</p>;
     
     return (
       <ul className="categories-list">
@@ -321,8 +349,30 @@ export default function ProfileView() {
             
             <h3>Directors</h3>
             {renderDirectors(profileData?.ownershipManagement?.directors)}
+
+             <div className="data-row">
+                <span className="data-label">certifiedIds</span>
+                <span className="data-value">
+                  {renderDocumentLink(profileData?.ownershipManagement?.certifiedIds || "N/A")}
+                </span>
+
+              </div>
+                 <div className="data-row">
+                <span className="data-label"> shareRegister</span>
+                <span className="data-value">
+                  {renderDocumentLink(profileData?.ownershipManagement?. shareRegister || "N/A")}
+                </span>
+
+              </div>
+    <div className="data-row">
+                <span className="data-label">certifiedIds:</span>
+                <span className="data-value">{profileData?.ownershipManagement?.certifiedIds || "N/A"}</span>
+              </div>
           </div>
+          
         )}
+         
+    
       </div>
       
       <div className="profile-section">
@@ -339,29 +389,55 @@ export default function ProfileView() {
             <h3>Business Address</h3>
             <div className="data-grid">
               <div className="data-row">
+                <span className="data-label">businessPhone:</span>
+                <span className="data-value">
+                  {profileData?.contactDetails?.businessPhone || "N/A"}
+                </span>
+              </div>
+ <div className="data-row">
+                <span className="data-label">contactId:</span>
+                <span className="data-value">
+                  {profileData?.contactDetails?.contactId || "N/A"}
+                </span>
+              </div> <div className="data-row">
+                <span className="data-label">contactName:</span>
+                <span className="data-value">
+                  {profileData?.contactDetails?.contactName || "N/A"}
+                </span>
+              </div> <div className="data-row">
+                <span className="data-label">contactTitle:</span>
+                <span className="data-value">
+                  {profileData?.contactDetails?.contactTitle || "N/A"}
+                </span>
+              </div>
+               <div className="data-row">
+                <span className="data-label">mobile:</span>
+                <span className="data-value">
+                  {profileData?.contactDetails?.mobile || "N/A"}
+                </span>
+              </div>
+               <div className="data-row">
+                <span className="data-label">otherSocial:</span>
+                <span className="data-value">
+                  {profileData?.contactDetails?.otherSocial || "N/A"}
+                </span>
+              </div>
+
+                 <div className="data-row">
+                <span className="data-label"> proofOfAddress:</span>
+                <span className="data-value">
+                  {renderDocumentLink(profileData?.ownershipManagement?. proofOfAddress || "N/A")}
+                </span>
+
+              </div>
+              
+              <div className="data-row">
                 <span className="data-label">Physical Address:</span>
                 <span className="data-value">
                   {profileData?.contactDetails?.physicalAddress || "N/A"}
                 </span>
               </div>
-              <div className="data-row">
-                <span className="data-label">City:</span>
-                <span className="data-value">
-                  {profileData?.contactDetails?.physicalCity || "N/A"}
-                </span>
-              </div>
-              <div className="data-row">
-                <span className="data-label">Postal Code:</span>
-                <span className="data-value">
-                  {profileData?.contactDetails?.physicalPostal || "N/A"}
-                </span>
-              </div>
-              <div className="data-row">
-                <span className="data-label">Province:</span>
-                <span className="data-value">
-                  {profileData?.contactDetails?.physicalProvince || "N/A"}
-                </span>
-              </div>
+             
             </div>
             
             <h3>Postal Address</h3>
@@ -452,24 +528,76 @@ export default function ProfileView() {
         {expandedSections.legalCompliance && (
           <div className="section-content">
             <div className="data-grid">
+
               <div className="data-row">
-                <span className="data-label">VAT Registered:</span>
+                <span className="data-label">taxClearanceDate:</span>
                 <span className="data-value">
-                  {profileData?.legalCompliance?.vatRegistered ? "Yes" : "No"}
+                  {profileData?.legalCompliance?.taxClearanceDate || "N/A"}
                 </span>
               </div>
-              {profileData?.legalCompliance?.vatRegistered && (
+                <div className="data-row">
+                <span className="data-label">taxClearanceNumber:</span>
+                <span className="data-value">
+                  {profileData?.legalCompliance?.taxClearanceNumber || "N/A"}
+                </span>
+              </div>
+                <div className="data-row">
+                <span className="data-label">uifNumber:</span>
+                <span className="data-value">
+                  {profileData?.legalCompliance?.uifNumber || "N/A"}
+                </span>
+              </div>
+                <div className="data-row">
+                <span className="data-label">licenseDoc:</span>
+                <span className="data-value">
+                  {profileData?.legalCompliance?.licenseDoc || "N/A"}
+                </span>
+              </div>
+
+              
+                 <div className="data-row">
+                <span className="data-label"> taxClearanceCert:</span>
+                <span className="data-value">
+                  {renderDocumentLink(profileData?.ownershipManagement?. taxClearanceCert || "N/A")}
+                </span>
+
+              </div> 
+                <div className="data-row">
+                <span className="data-label"> otherCerts:</span>
+                <span className="data-value">
+                  {renderDocumentLink(profileData?.ownershipManagement?. otherCerts || "N/A")}
+                </span>
+
+              </div>
+              <div className="data-row">
+                <span className="data-label"> bbbeeCert:</span>
+                <span className="data-value">
+                  {renderDocumentLink(profileData?.ownershipManagement?. bbbeeCert || "N/A")}
+                </span>
+
+              </div>
+              <div className="data-row">
+                <span className="data-label"> industryAccreditationDocs:</span>
+                <span className="data-value">
+                  {renderDocumentLink(profileData?.ownershipManagement?. industryAccreditationDocs || "N/A")}
+                </span>
+
+              </div>
+           
+
+              
+             
                 <div className="data-row">
                   <span className="data-label">VAT Number:</span>
                   <span className="data-value">
                     {profileData?.legalCompliance?.vatNumber || "N/A"}
                   </span>
                 </div>
-              )}
+              
               <div className="data-row">
-                <span className="data-label">Tax Compliant:</span>
+                <span className="data-label">payeNumber:</span>
                 <span className="data-value">
-                  {profileData?.legalCompliance?.taxCompliant ? "Yes" : "No"}
+                  {profileData?.legalCompliance?.payeNumber || "N/A"}
                 </span>
               </div>
               <div className="data-row">
@@ -479,11 +607,32 @@ export default function ProfileView() {
                 </span>
               </div>
               <div className="data-row">
-                <span className="data-label">License Required:</span>
+                <span className="data-label">bbbeeCertRenewalDate:</span>
                 <span className="data-value">
-                  {profileData?.legalCompliance?.licenseRequired ? "Yes" : "No"}
+                  {profileData?.legalCompliance?.bbbeeCertRenewalDate || "N/A"}
                 </span>
               </div>
+               <div className="data-row">
+                <span className="data-label">bbbeeLevel:</span>
+                <span className="data-value">
+                  {profileData?.legalCompliance?.bbbeeLevel || "N/A"}
+                </span>
+              </div>
+
+               <div className="data-row">
+                <span className="data-label">cipcStatus:</span>
+                <span className="data-value">
+                  {profileData?.legalCompliance?.cipcStatus || "N/A"}
+                </span>
+              </div>
+               <div className="data-row">
+                <span className="data-label">bbbeeCertRenewalDate:</span>
+                <span className="data-value">
+                  {profileData?.legalCompliance?.licenseRequired || "N/A"}
+                </span>
+              </div>
+
+              
               {profileData?.legalCompliance?.licenseRequired && (
                 <>
                   <div className="data-row">
@@ -526,7 +675,7 @@ export default function ProfileView() {
               <div className="data-row">
                 <span className="data-label">Entity Type:</span>
                 <span className="data-value">
-                  {profileData?.productsServices?.entityType === "smse" ? "SMSE (Small & Medium Sized Enterprise)" : 
+                  {profileData?.productsServices?.entityType === "smse" ? "SMSE (Small & Medium Service Enterprise)" : 
                    profileData?.productsServices?.entityType === "npo" ? "NPO (Non-Profit Organization)" : 
                    profileData?.productsServices?.entityType || "N/A"}
                 </span>
@@ -557,11 +706,12 @@ export default function ProfileView() {
               </div>
             </div>
             
+            
             <h3>Products</h3>
-            {renderCategoriesList(profileData?.productsServices?.productCategories)}
+            {renderProducts(profileData?.productsServices?.productCategories.products)}
             
             <h3>Services</h3>
-            {renderCategoriesList(profileData?.productsServices?.serviceCategories)}
+            {renderCategoriesList(profileData?.productsServices?.serviceCategories.services)}
             
             <h3>Key Clients</h3>
             {renderKeyClients(profileData?.productsServices?.keyClients)}
