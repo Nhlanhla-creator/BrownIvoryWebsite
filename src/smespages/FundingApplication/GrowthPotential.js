@@ -1,16 +1,27 @@
-import FormField from "./FormField";
-import FileUpload from "./FileUpload";
-import "./FundingApplication.css" ;
+"use client"
+import FormField from "./FormField"
+import FileUpload from "./FileUpload"
+import "./FundingApplication.css"
 
+// Component for Growth Potential
+const GrowthPotential = ({ data = {}, updateData }) => {
+  const updateFormData = (section, newData) => {
+    updateData({ ...data, [section]: { ...(data[section] || {}), ...newData } })
+  }
+
+  return renderGrowthPotential(data.growthPotential || {}, (section, newData) => updateFormData(section, newData))
+}
+
+// Rendering function for Growth Potential
 export const renderGrowthPotential = (data, updateFormData) => {
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    updateFormData("growthPotential", { [name]: value });
-  };
+    const { name, value } = e.target
+    updateFormData("growthPotential", { [name]: value })
+  }
 
   const handleFileChange = (name, files) => {
-    updateFormData("growthPotential", { [name]: files });
-  };
+    updateFormData("growthPotential", { [name]: files })
+  }
 
   return (
     <>
@@ -43,6 +54,18 @@ export const renderGrowthPotential = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.marketShare === "yes" && (
+              <div className="specification-field">
+                <textarea
+                  name="marketShareDetails"
+                  value={data.marketShareDetails || ""}
+                  onChange={handleChange}
+                  className="form-textarea"
+                  placeholder="Please explain how market shares will be secured or increased"
+                  rows={3}
+                ></textarea>
+              </div>
+            )}
           </FormField>
 
           <FormField
@@ -73,6 +96,18 @@ export const renderGrowthPotential = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.qualityImprovement === "yes" && (
+              <div className="specification-field">
+                <textarea
+                  name="qualityImprovementDetails"
+                  value={data.qualityImprovementDetails || ""}
+                  onChange={handleChange}
+                  className="form-textarea"
+                  placeholder="Please explain how prices will be lowered or quality improved"
+                  rows={3}
+                ></textarea>
+              </div>
+            )}
           </FormField>
 
           <FormField
@@ -103,6 +138,18 @@ export const renderGrowthPotential = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.greenTech === "yes" && (
+              <div className="specification-field">
+                <textarea
+                  name="greenTechDetails"
+                  value={data.greenTechDetails || ""}
+                  onChange={handleChange}
+                  className="form-textarea"
+                  placeholder="Please describe the environmental or resource efficiency improvements"
+                  rows={3}
+                ></textarea>
+              </div>
+            )}
           </FormField>
 
           <FormField
@@ -133,6 +180,18 @@ export const renderGrowthPotential = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.localisation === "yes" && (
+              <div className="specification-field">
+                <textarea
+                  name="localisationDetails"
+                  value={data.localisationDetails || ""}
+                  onChange={handleChange}
+                  className="form-textarea"
+                  placeholder="Please explain how production activities will be localized"
+                  rows={3}
+                ></textarea>
+              </div>
+            )}
           </FormField>
         </div>
 
@@ -165,12 +224,21 @@ export const renderGrowthPotential = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.regionalSpread === "yes" && (
+              <div className="specification-field">
+                <input
+                  type="text"
+                  name="regionalSpreadDetails"
+                  value={data.regionalSpreadDetails || ""}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="Please specify the location and unemployment rate"
+                />
+              </div>
+            )}
           </FormField>
 
-          <FormField
-            label="Personal Risk - Any financial and/or non-financial contribution to the business?"
-            required
-          >
+          <FormField label="Personal Risk - Any financial and/or non-financial contribution to the business?" required>
             <div className="radio-group">
               <label className="form-radio-label">
                 <input
@@ -195,6 +263,18 @@ export const renderGrowthPotential = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.personalRisk === "yes" && (
+              <div className="specification-field">
+                <textarea
+                  name="personalRiskDetails"
+                  value={data.personalRiskDetails || ""}
+                  onChange={handleChange}
+                  className="form-textarea"
+                  placeholder="Please describe your financial and/or non-financial contributions"
+                  rows={3}
+                ></textarea>
+              </div>
+            )}
           </FormField>
 
           <FormField label="Empowerment - Achieve at least a level Three (3) B-BBEE contributor?" required>
@@ -222,6 +302,18 @@ export const renderGrowthPotential = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.empowerment === "yes" && (
+              <div className="specification-field">
+                <input
+                  type="text"
+                  name="empowermentDetails"
+                  value={data.empowermentDetails || ""}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="Please specify your current or target B-BBEE level"
+                />
+              </div>
+            )}
           </FormField>
 
           <FormField label="Employment – will this project increase direct and indirect labour?" required>
@@ -249,20 +341,33 @@ export const renderGrowthPotential = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.employment === "yes" && (
+              <div className="specification-field">
+                <div className="grid-container">
+                  <FormField label="By how many direct jobs?">
+                    <input
+                      type="number"
+                      name="employmentIncreaseDirect"
+                      value={data.employmentIncreaseDirect || ""}
+                      onChange={handleChange}
+                      className="form-input"
+                      placeholder="Number of direct jobs"
+                    />
+                  </FormField>
+                  <FormField label="By how many indirect jobs?">
+                    <input
+                      type="number"
+                      name="employmentIncreaseIndirect"
+                      value={data.employmentIncreaseIndirect || ""}
+                      onChange={handleChange}
+                      className="form-input"
+                      placeholder="Number of indirect jobs"
+                    />
+                  </FormField>
+                </div>
+              </div>
+            )}
           </FormField>
-
-          {data.employment === "yes" && (
-            <FormField label="By how much?">
-              <input
-                type="number"
-                name="employmentIncrease"
-                value={data.employmentIncrease || ""}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="Number of jobs"
-              />
-            </FormField>
-          )}
         </div>
       </div>
 
@@ -278,5 +383,7 @@ export const renderGrowthPotential = (data, updateFormData) => {
         />
       </div>
     </>
-  );
-};
+  )
+}
+
+export default GrowthPotential

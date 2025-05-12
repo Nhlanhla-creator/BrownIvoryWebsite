@@ -1,30 +1,43 @@
-import FormField from "./FormField";
-import FileUpload from "./FileUpload";
-import { barrierOptions } from "./applicationOptions";
-import "./FundingApplication.css" ;
+"use client"
+import FormField from "./FormField"
+import FileUpload from "./FileUpload"
+import { barrierOptions } from "./applicationOptions"
+import "./FundingApplication.css"
 
+// Component for Enterprise Readiness
+const EnterpriseReadiness = ({ data = {}, updateData }) => {
+  const updateFormData = (section, newData) => {
+    updateData({ ...data, [section]: { ...(data[section] || {}), ...newData } })
+  }
+
+  return renderEnterpriseReadiness(data.enterpriseReadiness || {}, (section, newData) =>
+    updateFormData(section, newData),
+  )
+}
+
+// Rendering function for Enterprise Readiness
 export const renderEnterpriseReadiness = (data, updateFormData) => {
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    updateFormData("enterpriseReadiness", { [name]: type === "checkbox" ? checked : value });
-  };
+    const { name, value, type, checked } = e.target
+    updateFormData("enterpriseReadiness", { [name]: type === "checkbox" ? checked : value })
+  }
 
   const handleMultiSelect = (e) => {
-    const { value, checked } = e.target;
-    let barriers = [...(data.barriers || [])];
+    const { value, checked } = e.target
+    let barriers = [...(data.barriers || [])]
 
     if (checked) {
-      barriers.push(value);
+      barriers.push(value)
     } else {
-      barriers = barriers.filter((item) => item !== value);
+      barriers = barriers.filter((item) => item !== value)
     }
 
-    updateFormData("enterpriseReadiness", { barriers });
-  };
+    updateFormData("enterpriseReadiness", { barriers })
+  }
 
   const handleFileChange = (name, files) => {
-    updateFormData("enterpriseReadiness", { [name]: files });
-  };
+    updateFormData("enterpriseReadiness", { [name]: files })
+  }
 
   return (
     <>
@@ -57,6 +70,18 @@ export const renderEnterpriseReadiness = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.hasBusinessPlan === "yes" && (
+              <div className="specification-field">
+                <input
+                  type="text"
+                  name="businessPlanDetails"
+                  value={data.businessPlanDetails || ""}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="Please specify details about your business plan"
+                />
+              </div>
+            )}
           </FormField>
 
           <FormField label="Has Pitch Deck?" required>
@@ -84,6 +109,18 @@ export const renderEnterpriseReadiness = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.hasPitchDeck === "yes" && (
+              <div className="specification-field">
+                <input
+                  type="text"
+                  name="pitchDeckDetails"
+                  value={data.pitchDeckDetails || ""}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="Please specify details about your pitch deck"
+                />
+              </div>
+            )}
           </FormField>
 
           <FormField label="Has an MVP/prototype?" required>
@@ -111,6 +148,18 @@ export const renderEnterpriseReadiness = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.hasMvp === "yes" && (
+              <div className="specification-field">
+                <input
+                  type="text"
+                  name="mvpDetails"
+                  value={data.mvpDetails || ""}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="Please describe your MVP/prototype"
+                />
+              </div>
+            )}
           </FormField>
 
           <FormField label="Has traction to date: Revenue to date, pilots/partnerships secured?" required>
@@ -138,6 +187,18 @@ export const renderEnterpriseReadiness = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.hasTraction === "yes" && (
+              <div className="specification-field">
+                <textarea
+                  name="tractionDetails"
+                  value={data.tractionDetails || ""}
+                  onChange={handleChange}
+                  className="form-textarea"
+                  placeholder="Please provide details about your traction (revenue, partnerships, etc.)"
+                  rows={3}
+                ></textarea>
+              </div>
+            )}
           </FormField>
         </div>
 
@@ -167,6 +228,18 @@ export const renderEnterpriseReadiness = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.hasAuditedFinancials === "yes" && (
+              <div className="specification-field">
+                <input
+                  type="text"
+                  name="auditedFinancialsDetails"
+                  value={data.auditedFinancialsDetails || ""}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="Please specify the period of your audited financials"
+                />
+              </div>
+            )}
           </FormField>
 
           <FormField label="Has Mentor?" required>
@@ -194,6 +267,18 @@ export const renderEnterpriseReadiness = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.hasMentor === "yes" && (
+              <div className="specification-field">
+                <input
+                  type="text"
+                  name="mentorDetails"
+                  value={data.mentorDetails || ""}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="Please provide mentor's name and area of expertise"
+                />
+              </div>
+            )}
           </FormField>
 
           <FormField label="Has advisors/board?" required>
@@ -221,36 +306,59 @@ export const renderEnterpriseReadiness = (data, updateFormData) => {
                 <span>No</span>
               </label>
             </div>
+            {data.hasAdvisors === "yes" && (
+              <>
+                <div className="specification-field">
+                  <textarea
+                    name="advisorsDetails"
+                    value={data.advisorsDetails || ""}
+                    onChange={handleChange}
+                    className="form-textarea"
+                    placeholder="Please list your advisors/board members and their expertise"
+                    rows={3}
+                  ></textarea>
+                </div>
+                <FormField label="Do they meet regularly?" required>
+                  <div className="radio-group">
+                    <label className="form-radio-label">
+                      <input
+                        type="radio"
+                        name="advisorsMeetRegularly"
+                        value="yes"
+                        checked={data.advisorsMeetRegularly === "yes"}
+                        onChange={handleChange}
+                        className="form-radio"
+                      />
+                      <span>Yes</span>
+                    </label>
+                    <label className="form-radio-label">
+                      <input
+                        type="radio"
+                        name="advisorsMeetRegularly"
+                        value="no"
+                        checked={data.advisorsMeetRegularly === "no"}
+                        onChange={handleChange}
+                        className="form-radio"
+                      />
+                      <span>No</span>
+                    </label>
+                  </div>
+                  {data.advisorsMeetRegularly === "yes" && (
+                    <div className="specification-field">
+                      <input
+                        type="text"
+                        name="advisorsMeetingFrequency"
+                        value={data.advisorsMeetingFrequency || ""}
+                        onChange={handleChange}
+                        className="form-input"
+                        placeholder="How often do they meet? (e.g., monthly, quarterly)"
+                      />
+                    </div>
+                  )}
+                </FormField>
+              </>
+            )}
           </FormField>
-
-          {data.hasAdvisors === "yes" && (
-            <FormField label="Do they meet regularly?" required>
-              <div className="radio-group">
-                <label className="form-radio-label">
-                  <input
-                    type="radio"
-                    name="advisorsMeetRegularly"
-                    value="yes"
-                    checked={data.advisorsMeetRegularly === "yes"}
-                    onChange={handleChange}
-                    className="form-radio"
-                  />
-                  <span>Yes</span>
-                </label>
-                <label className="form-radio-label">
-                  <input
-                    type="radio"
-                    name="advisorsMeetRegularly"
-                    value="no"
-                    checked={data.advisorsMeetRegularly === "no"}
-                    onChange={handleChange}
-                    className="form-radio"
-                  />
-                  <span>No</span>
-                </label>
-              </div>
-            </FormField>
-          )}
         </div>
       </div>
 
@@ -352,6 +460,18 @@ export const renderEnterpriseReadiness = (data, updateFormData) => {
               <span>No</span>
             </label>
           </div>
+          {data.hasPayingCustomers === "yes" && (
+            <div className="specification-field">
+              <textarea
+                name="payingCustomersDetails"
+                value={data.payingCustomersDetails || ""}
+                onChange={handleChange}
+                className="form-textarea"
+                placeholder="Please provide details about your customers and revenue"
+                rows={3}
+              ></textarea>
+            </div>
+          )}
         </FormField>
       </div>
 
@@ -389,5 +509,7 @@ export const renderEnterpriseReadiness = (data, updateFormData) => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
+
+export default EnterpriseReadiness

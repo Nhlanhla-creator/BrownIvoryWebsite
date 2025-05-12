@@ -1,7 +1,6 @@
 "use client"
 import FormField from "./FormField"
 import FileUpload from "./FileUpload"
-import styles from "./InvestorUniversalProfile.module.css"
 const bbbeeOptions = [
   { value: "1", label: "Level 1" },
   { value: "2", label: "Level 2" },
@@ -16,10 +15,11 @@ const bbbeeOptions = [
 ]
 
 const cipcStatusOptions = [
-  { value: "current", label: "Current" },
   { value: "pending", label: "Pending" },
   { value: "overdue", label: "Overdue" },
-  { value: "na", label: "Not Applicable" },
+  { value: "compliant", label: "Compliant" },
+  { value: "nonCompliant", label: "Non Compliant" },
+  { value: "notApplicable", label: "Not Applicable" },
 ]
 
 export default function LegalCompliance({ data = {}, updateData }) {
@@ -172,6 +172,60 @@ export default function LegalCompliance({ data = {}, updateData }) {
             </select>
           </FormField>
 
+          <FormField label="POPIA Compliance" required>
+            <div className="flex space-x-4 mt-1">
+              <label className="inline-flex items-center">
+                <input
+                  type="radio"
+                  name="popiaCompliance"
+                  value="yes"
+                  checked={data.popiaCompliance === "yes"}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                <span>Yes</span>
+              </label>
+              <label className="inline-flex items-center">
+                <input
+                  type="radio"
+                  name="popiaCompliance"
+                  value="no"
+                  checked={data.popiaCompliance === "no"}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                <span>No</span>
+              </label>
+            </div>
+          </FormField>
+
+          <FormField label="AML/KYC Policy in Place" required>
+            <div className="flex space-x-4 mt-1">
+              <label className="inline-flex items-center">
+                <input
+                  type="radio"
+                  name="amlKycPolicy"
+                  value="yes"
+                  checked={data.amlKycPolicy === "yes"}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                <span>Yes</span>
+              </label>
+              <label className="inline-flex items-center">
+                <input
+                  type="radio"
+                  name="amlKycPolicy"
+                  value="no"
+                  checked={data.amlKycPolicy === "no"}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                <span>No</span>
+              </label>
+            </div>
+          </FormField>
+
           <FormField label="COIDA No. (if applicable)">
             <input
               type="text"
@@ -233,9 +287,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
         </div>
       </div>
 
-      <div className="mt-8 flex justify-end">
-      
-      </div>
+      <div className="mt-8 flex justify-end"></div>
     </div>
   )
 }

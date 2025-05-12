@@ -78,6 +78,12 @@ import FundingApplication from "./smespages/FundingApplication/FundingApplicatio
 // Product Application
 import ProductApplication from "./smespages/ProductApplication/ProductApplication"
 
+// Add these imports at the top of the file with the other imports
+import CustomerMatchesPage from "./smespages/MyCustomerMatches/customer-matches"
+import FundingMatchesPage from "./smespages/MyFunderMatches/funders-matches"
+import SupplierMatchesPage from "./smespages/MySupplierMatches/supplier-matches"
+import SupportProgramMatchesPage from "./smespages/MySupportProgramMatches/support-program-matches"
+
 // Initial Data States
 const initialFormData = {
   entityOverview: {},
@@ -395,6 +401,12 @@ function App() {
           path="/support-profile/declaration-consent"
           element={renderSupportProfileSection(SupportDeclarationConsent, "declarationConsent")}
         />
+
+        {/* Add these routes in the Routes component, after the existing routes and before the redirects */}
+        <Route path="/customer-matches" element={renderSMERoute(CustomerMatchesPage)} />
+        <Route path="/funding-matches" element={renderSMERoute(FundingMatchesPage)} />
+        <Route path="/supplier-matches" element={renderSMERoute(SupplierMatchesPage)} />
+        <Route path="/support-program-matches" element={renderSMERoute(SupportProgramMatchesPage)} />
 
         {/* Redirects */}
         <Route path="/universal-profile" element={<Navigate to="/investor-profile" replace />} />

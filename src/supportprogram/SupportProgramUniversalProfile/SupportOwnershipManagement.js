@@ -18,6 +18,11 @@ const genderOptions = [
   { value: "prefer_not", label: "Prefer not to say" },
 ]
 
+const execOptions = [
+  { value: "executive", label: "Executive" },
+  { value: "non-executive", label: "Non-Executive" },
+]
+
 const africanCountries = [
   { value: "algeria", label: "Algeria" },
   { value: "angola", label: "Angola" },
@@ -61,7 +66,20 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
 
   const addDirector = () => {
     updateData({
-      directors: [...data.directors, { name: "", id: "", position: "", nationality: "", isExec: false }],
+      directors: [
+        ...data.directors,
+        {
+          name: "",
+          id: "",
+          position: "",
+          nationality: "",
+          execType: "",
+          race: "",
+          gender: "",
+          isYouth: false,
+          isDisabled: false,
+        },
+      ],
     })
   }
 
@@ -164,7 +182,18 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
             <tr className="bg-brown-50">
               {(isShareholder
                 ? ["Name", "ID/Reg No.", "Country", "% Shareholding", "Race", "Gender", "Youth", "Disabled", "Actions"]
-                : ["Name", "ID", "Position", "Nationality", "Exec", "Actions"]
+                : [
+                    "Name",
+                    "ID",
+                    "Position",
+                    "Nationality",
+                    "Exec/Non-Exec",
+                    "Race",
+                    "Gender",
+                    "Is Youth",
+                    "Is Disabled",
+                    "Actions",
+                  ]
               ).map((header, i) => (
                 <th key={i} className="px-4 py-2 border-b font-semibold uppercase text-sm text-brown-600">
                   {header}
@@ -297,11 +326,62 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                       />
                     </td>
                     <td className="px-4 py-2 border-b">
+                      <select
+                        value={item.execType || ""}
+                        onChange={(e) => updateItem(index, "execType", e.target.value)}
+                        className={inputStyle}
+                      >
+                        <option value="">Select</option>
+                        {execOptions.map(({ value, label }) => (
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      <select
+                        value={item.race || ""}
+                        onChange={(e) => updateItem(index, "race", e.target.value)}
+                        className={inputStyle}
+                      >
+                        <option value="">Select</option>
+                        {raceOptions.map(({ value, label }) => (
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      <select
+                        value={item.gender || ""}
+                        onChange={(e) => updateItem(index, "gender", e.target.value)}
+                        className={inputStyle}
+                      >
+                        <option value="">Select</option>
+                        {genderOptions.map(({ value, label }) => (
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-4 py-2 border-b">
                       <div className="flex justify-center items-center">
                         <input
                           type="checkbox"
-                          checked={item.isExec}
-                          onChange={(e) => updateItem(index, "isExec", e.target.checked)}
+                          checked={item.isYouth || false}
+                          onChange={(e) => updateItem(index, "isYouth", e.target.checked)}
+                        />
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      <div className="flex justify-center items-center">
+                        <input
+                          type="checkbox"
+                          checked={item.isDisabled || false}
+                          onChange={(e) => updateItem(index, "isDisabled", e.target.checked)}
                         />
                       </div>
                     </td>

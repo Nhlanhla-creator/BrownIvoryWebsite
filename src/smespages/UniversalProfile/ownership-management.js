@@ -8,8 +8,6 @@ import { db, auth, storage } from '../../firebaseConfig';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-
-
 const raceOptions = [
   { value: "black", label: "Black African" },
   { value: "coloured", label: "Coloured" },
@@ -23,6 +21,11 @@ const genderOptions = [
   { value: "female", label: "Female" },
   { value: "other", label: "Other" },
   { value: "prefer_not", label: "Prefer not to say" },
+]
+
+const execOptions = [
+  { value: "executive", label: "Executive" },
+  { value: "non-executive", label: "Non-Executive" },
 ]
 
 const africanCountries = [
@@ -82,7 +85,6 @@ const africanCountries = [
   { value: "zimbabwe", label: "Zimbabwe" },
 ]
 
-
 const saveOwnershipManagement = async (formData) => {
   try {
     const user = auth.currentUser;
@@ -119,7 +121,6 @@ const saveOwnershipManagement = async (formData) => {
   }
 };
 
-
 export default function OwnershipManagement({ data = { shareholders: [], directors: [] }, updateData }) {
   const addShareholder = () => {
     const newShareholders = [
@@ -142,7 +143,17 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
   }
 
   const addDirector = () => {
-    const newDirectors = [...data.directors, { name: "", id: "", position: "", nationality: "", isExec: false }]
+    const newDirectors = [...data.directors, { 
+      name: "", 
+      id: "", 
+      position: "", 
+      nationality: "", 
+      execType: "", 
+      race: "", 
+      gender: "", 
+      isYouth: false, 
+      isDisabled: false 
+    }]
     updateData({ directors: newDirectors })
   }
 
@@ -362,7 +373,19 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                   Nationality
                 </th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Is Exec/Non-exec?
+                  Exec/Non-Exec
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
+                  Race
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
+                  Gender
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
+                  Is Youth?
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
+                  Is Disabled?
                 </th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
                   Actions
@@ -410,15 +433,63 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                       ))}
                     </select>
                   </td>
-                  <td className="px-4 py-2 border-b text-center">
+                  <td className="px-4 py-2 border-b">
                     <select
-                      value={director.isExec ? "exec" : "nonexec"}
-                      onChange={(e) => updateDirector(index, "isExec", e.target.value === "exec")}
+                      value={director.execType || ""}
+                      onChange={(e) => updateDirector(index, "execType", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
                     >
-                      <option value="exec">Executive</option>
-                      <option value="nonexec">Non-Executive</option>
+                      <option value="">Select</option>
+                      {execOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
                     </select>
+                  </td>
+                  <td className="px-4 py-2 border-b">
+                    <select
+                      value={director.race || ""}
+                      onChange={(e) => updateDirector(index, "race", e.target.value)}
+                      className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
+                    >
+                      <option value="">Select</option>
+                      {raceOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="px-4 py-2 border-b">
+                    <select
+                      value={director.gender || ""}
+                      onChange={(e) => updateDirector(index, "gender", e.target.value)}
+                      className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
+                    >
+                      <option value="">Select</option>
+                      {genderOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="px-4 py-2 border-b text-center">
+                    <input
+                      type="checkbox"
+                      checked={director.isYouth || false}
+                      onChange={(e) => updateDirector(index, "isYouth", e.target.checked)}
+                      className="h-4 w-4 text-brown-600 focus:ring-brown-500 border-brown-300 rounded"
+                    />
+                  </td>
+                  <td className="px-4 py-2 border-b text-center">
+                    <input
+                      type="checkbox"
+                      checked={director.isDisabled || false}
+                      onChange={(e) => updateDirector(index, "isDisabled", e.target.checked)}
+                      className="h-4 w-4 text-brown-600 focus:ring-brown-500 border-brown-300 rounded"
+                    />
                   </td>
                   <td className="px-4 py-2 border-b">
                     <button
@@ -457,10 +528,6 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
             value={data.shareRegister || []}
           />
         </div>
-      </div>
-
-      <div className="mt-8 flex justify-end">
-       
       </div>
     </div>
   )
