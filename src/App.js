@@ -7,8 +7,10 @@ import "./App.css"
 // Layout Components
 import Sidebar from "./smespages/Sidebar/Sidebar"
 import InvestorSidebar from "./investorpages/Sidebar/InvestorSidebar"
+import SupportProgramSidebar from "./supportprogram/SupportSidebar/SupportSidebar"
 import DashboardHeader from "./smespages/DashboardHeader/DashboardHeader"
 import InvestorHeader from "./investorpages/Header/InvestorHeader"
+import SupportProgramHeader from "./supportprogram/Header/SupportHeader"
 
 // Public Pages
 import LandingPage from "./mainpages/LandingPage"
@@ -24,6 +26,7 @@ import HowItWorksInvestors from "./mainpages/HowItWorksInvestor"
 import AuthForm from "./smespages/LoginRegister"
 import LoginRegister from "./smespages/LoginRegister"
 import InvestorDashboard from "./investorpages/InvestorDashboard/InvestorDashboard"
+import SupportProgramDashboard from "./supportprogram/SupportProgramDashboard/SupportProgramDashboard"
 
 // Protected Pages
 import Dashboard from "./smespages/SMSEDashboard/Dashboard"
@@ -57,6 +60,17 @@ import InvestorProductsServices from "./investorpages/InvestorUniversalProfile/P
 import InvestorHowDidYouHear from "./investorpages/InvestorUniversalProfile/HowDidYouHear"
 import InvestorDeclarationConsent from "./investorpages/InvestorUniversalProfile/DeclarationConsent"
 
+// Support Programs Universal Profile Components
+import SupportUniversalProfile from "./supportprogram/SupportProgramUniversalProfile/SupportUniversalProfile"
+import SupportProfileTracker from "./supportprogram/SupportProgramUniversalProfile/SupportProfileTracker"
+import SupportInstructions from "./supportprogram/SupportProgramUniversalProfile/SupportInstructions"
+import SupportEntityOverview from "./supportprogram/SupportProgramUniversalProfile/SupportEntityOverView"
+import SupportOwnershipManagement from "./supportprogram/SupportProgramUniversalProfile/SupportOwnershipManagement"
+import SupportContactDetails from "./supportprogram/SupportProgramUniversalProfile/SupportContactDetails"
+import SupportLegalCompliance from "./supportprogram/SupportProgramUniversalProfile/SupportLegalCompliance"
+import SupportProductsServices from "./supportprogram/SupportProgramUniversalProfile/SupportProductService"
+import SupportHowDidYouHear from "./supportprogram/SupportProgramUniversalProfile/SupportHowDidYouHear"
+import SupportDeclarationConsent from "./supportprogram/SupportProgramUniversalProfile/SupportDeclarationConsent"
 
 // Funding Application
 import FundingApplication from "./smespages/FundingApplication/FundingApplication"
@@ -129,6 +143,11 @@ function App() {
     return pathname.startsWith("/investor-dashboard")
   }
 
+  // Helper function to determine if a route is a support program route
+  const isSupportProgramRoute = (pathname) => {
+    return pathname.startsWith("/support-")
+  }
+
   // SME Protected Layout
   const SMELayout = ({ children }) => {
     const location = useLocation()
@@ -159,6 +178,25 @@ function App() {
     )
   }
 
+  // Support Program Protected Layout
+  const SupportProgramLayout = ({ children }) => {
+    const location = useLocation()
+
+    return (
+      <div className="app-layout">
+        <SupportProgramSidebar companyName={companyName} />
+        <div className="main-content">
+          <SupportProgramHeader
+            companyName={companyName}
+            profileImage={profileImage}
+            setProfileImage={setProfileImage}
+          />
+          <div className="page-content">{children}</div>
+        </div>
+      </div>
+    )
+  }
+
   const renderSMERoute = (Component, props = {}) => (
     <SMELayout>
       <Component {...props} />
@@ -169,6 +207,12 @@ function App() {
     <InvestorLayout>
       <Component {...props} />
     </InvestorLayout>
+  )
+
+  const renderSupportProgramRoute = (Component, props = {}) => (
+    <SupportProgramLayout>
+      <Component {...props} />
+    </SupportProgramLayout>
   )
 
   const renderSMEProfileSection = (Component, section) => (
@@ -197,6 +241,20 @@ function App() {
         )}
       </div>
     </InvestorLayout>
+  )
+
+  const renderSupportProfileSection = (Component, section) => (
+    <SupportProgramLayout>
+      <h1 className="text-3xl font-bold text-brown-800 mb-8">My Universal Profile</h1>
+      <SupportProfileTracker activeSection={section} />
+      <div className="bg-white rounded-lg shadow-md p-6 mt-6">
+        {formData[section] ? (
+          <Component data={formData[section]} updateData={(data) => updateFormData(section, data)} />
+        ) : (
+          <p>Loading data...</p>
+        )}
+      </div>
+    </SupportProgramLayout>
   )
 
   return (
@@ -230,6 +288,17 @@ function App() {
         <Route path="/investor-portfolio" element={renderInvestorRoute(Investor)} />
         <Route path="/investor-messages" element={renderInvestorRoute(Messages)} />
         <Route path="/investor-settings" element={renderInvestorRoute(Settings)} />
+
+        {/* Protected Support Program Dashboard Routes */}
+        <Route path="/support-dashboard" element={renderSupportProgramRoute(SupportProgramDashboard)} />
+        <Route path="/support-profile" element={renderSupportProgramRoute(SupportUniversalProfile)} />
+        <Route path="/support-beneficiaries" element={renderSupportProgramRoute(FindMatches)} />
+        <Route path="/support-matches" element={renderSupportProgramRoute(FindMatches)} />
+        <Route path="/support-programs" element={renderSupportProgramRoute(Investor)} />
+        <Route path="/support-documents" element={renderSupportProgramRoute(Investor)} />
+        <Route path="/support-analytics" element={renderSupportProgramRoute(GrowthEnabler)} />
+        <Route path="/support-messages" element={renderSupportProgramRoute(Messages)} />
+        <Route path="/support-settings" element={renderSupportProgramRoute(Settings)} />
 
         {/* Application Routes */}
         <Route path="/applications/funding" element={renderSMERoute(FundingApplication)} />
@@ -293,9 +362,44 @@ function App() {
           element={renderInvestorProfileSection(InvestorDeclarationConsent, "declarationConsent")}
         />
 
+        {/* Support Program Universal Profile Sub-Routes */}
+        <Route
+          path="/support-profile/instructions"
+          element={renderSupportProfileSection(SupportInstructions, "instructions")}
+        />
+        <Route
+          path="/support-profile/entity-overview"
+          element={renderSupportProfileSection(SupportEntityOverview, "entityOverview")}
+        />
+        <Route
+          path="/support-profile/ownership-management"
+          element={renderSupportProfileSection(SupportOwnershipManagement, "ownershipManagement")}
+        />
+        <Route
+          path="/support-profile/contact-details"
+          element={renderSupportProfileSection(SupportContactDetails, "contactDetails")}
+        />
+        <Route
+          path="/support-profile/legal-compliance"
+          element={renderSupportProfileSection(SupportLegalCompliance, "legalCompliance")}
+        />
+        <Route
+          path="/support-profile/products-services"
+          element={renderSupportProfileSection(SupportProductsServices, "productsServices")}
+        />
+        <Route
+          path="/support-profile/how-did-you-hear"
+          element={renderSupportProfileSection(SupportHowDidYouHear, "howDidYouHear")}
+        />
+        <Route
+          path="/support-profile/declaration-consent"
+          element={renderSupportProfileSection(SupportDeclarationConsent, "declarationConsent")}
+        />
+
         {/* Redirects */}
         <Route path="/universal-profile" element={<Navigate to="/investor-profile" replace />} />
         <Route path="/investor-universal-profile" element={<Navigate to="/investor-profile/instructions" replace />} />
+        <Route path="/support-universal-profile" element={<Navigate to="/support-profile/instructions" replace />} />
         <Route path="/applications/funding-application" element={<Navigate to="/applications/funding" replace />} />
         <Route path="/applications/product-application" element={<Navigate to="/applications/product" replace />} />
       </Routes>

@@ -1,0 +1,158 @@
+.sidebar {
+  width: 260px;
+  background-color: #372c27;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  position: fixed;
+  height: 100vh;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.menuContainer {
+  flex-grow: 1;
+  margin-top: 10px;
+}
+
+.menu {
+  list-style: none;
+  padding: 0 12px;
+  margin: 0;
+}
+
+.menu li {
+  margin: 6px 0;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.menuItemWrapper {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  color: inherit;
+  text-decoration: none;
+}
+
+.menu li:hover .menuItemWrapper {
+  background-color: rgba(158, 110, 60, 0.15);
+  color: #f2f0e6;
+}
+
+.active .menuItemWrapper {
+  background-color: #9e6e3c;
+  color: #f2f0e6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.menuIconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  width: 24px;
+  height: 24px;
+  color: #bcae9c;
+}
+
+.active .menuIconContainer {
+  color: #f2f0e6;
+}
+
+.menuLabel {
+  font-size: 0.95rem;
+  letter-spacing: 0.2px;
+}
+
+.logoutSection {
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid rgba(247, 159, 101, 0.15);
+  cursor: pointer;
+  margin: 16px 24px 24px;
+  color: #bcae9c;
+  transition: all 0.25s ease;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+.logoutSection:hover {
+  background-color: rgba(158, 110, 60, 0.15);
+  color: #f2f0e6;
+}
+
+.menuIconContainer svg,
+.logoutSection svg {
+  transition: transform 0.2s ease;
+}
+
+.menu li:hover .menuIconContainer svg,
+.logoutSection:hover svg {
+  transform: translateX(2px);
+}
+
+.companyHeader {
+  display: flex;
+  align-items: center;
+  padding: 0 24px 20px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(248, 165, 110, 0.15);
+}
+
+.companyInfo {
+  margin-left: 12px;
+}
+
+.companyName {
+  font-weight: 600;
+  font-size: 22px;
+  color: #f2f0e6;
+  line-height: 1.3;
+  letter-spacing: 0.2px;
+}
+
+.dashboardTitle {
+  font-size: 13px;
+  color: #bcae9c;
+  opacity: 0.9;
+  letter-spacing: 0.7px;
+  margin-top: 2px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.logoCircle {
+  background-color: #9e6e3c;
+  color: #f2f0e6;
+  border-radius: 10px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+}
