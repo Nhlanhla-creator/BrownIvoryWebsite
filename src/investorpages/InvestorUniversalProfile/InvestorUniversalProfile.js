@@ -13,6 +13,21 @@ import ProductsServices from "./ProductsService"
 import HowDidYouHear from "./HowDidYouHear"
 import DeclarationConsent from "./DeclarationConsent"
 
+import { getAuth } from "firebase/auth"
+// Adjust the path as needed
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+} from "firebase/firestore";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
+import { auth, db, storage } from "../../firebaseConfig";
 const sections = [
   { id: "instructions", label: "Instructions" },
   { id: "entityOverview", label: "Entity\nOverview" },
@@ -72,32 +87,38 @@ export default function UniversalProfile() {
     },
   })
 
-  // Load saved data from localStorage
+  const auth = getAuth()
+
   useEffect(() => {
-    const savedData = localStorage.getItem("universalProfileData")
-    const savedCompletedSections = localStorage.getItem("universalProfileCompletedSections")
+    const fetchData = async () => {
+      const user = auth.currentUser
+      if (!user) return
 
-    if (savedData) {
-      try {
-        setFormData(JSON.parse(savedData))
-      } catch (err) {
-        console.error("Failed to parse saved form data:", err)
+      const docRef = doc(db, "MyuniversalProfiles", user.uid)
+      const docSnap = await getDoc(docRef)
+
+      if (docSnap.exists()) {
+        const data = docSnap.data()
+        setFormData(data.formData)
+        setCompletedSections(data.completedSections)
       }
     }
 
-    if (savedCompletedSections) {
-      try {
-        setCompletedSections(JSON.parse(savedCompletedSections))
-      } catch (err) {
-        console.error("Failed to parse saved completion status:", err)
-      }
-    }
+    fetchData()
   }, [])
 
-  // Save data to localStorage
   useEffect(() => {
-    localStorage.setItem("universalProfileData", JSON.stringify(formData))
-    localStorage.setItem("universalProfileCompletedSections", JSON.stringify(completedSections))
+    const saveData = async () => {
+      const user = auth.currentUser
+      if (!user) return
+
+      // await setDoc(doc(db, "MyuniversalProfiles", user.uid), {
+      //   formData,
+      //   completedSections,
+      // })
+    }
+
+    saveData()
   }, [formData, completedSections])
 
   const updateFormData = (section, data) => {
@@ -110,6 +131,7 @@ export default function UniversalProfile() {
     }))
   }
 
+  
   const markSectionAsCompleted = (section) => {
     setCompletedSections((prev) => ({
       ...prev,
@@ -133,23 +155,7 @@ export default function UniversalProfile() {
     }
   }
 
-  const handleSaveSection = () => {
-    localStorage.setItem("universalProfileData", JSON.stringify(formData))
-    alert("Section saved successfully!")
-  }
-
-  const handleSaveAndContinue = () => {
-    markSectionAsCompleted(activeSection)
-    handleSaveSection()
-    navigateToNextSection()
-  }
-
-  const handleSubmitProfile = () => {
-    markSectionAsCompleted("declarationConsent")
-    alert("Profile submitted successfully!")
-    console.log("Submitted profile data:", formData)
-  }
-
+  
   const renderActiveSection = () => {
     const sectionData = formData[activeSection] || {}
     const updateData = (data) => updateFormData(activeSection, data)
@@ -177,6 +183,71 @@ export default function UniversalProfile() {
         return <Instructions />
     }
   }
+
+  
+    const uploadFilesAndReplaceWithURLs = async (data, section) => {
+      const uploadRecursive = async (item, pathPrefix) => {
+        if (item instanceof File) {
+          const fileRef = ref(storage, `MyuniversalProfile/${auth.currentUser?.uid}/${pathPrefix}`);
+          await uploadBytes(fileRef, item);
+          return await getDownloadURL(fileRef);
+        } else if (Array.isArray(item)) {
+          return await Promise.all(
+            item.map((entry, idx) => uploadRecursive(entry, `${pathPrefix}/${idx}`))
+          );
+        } else if (typeof item === "object" && item !== null) {
+          const updated = {};
+          for (const key in item) {
+            updated[key] = await uploadRecursive(item[key], `${pathPrefix}/${key}`);
+          }
+          return updated;
+        } else {
+          return item;
+        }
+      };
+  
+      return await uploadRecursive(data, section);
+    };
+  
+    const saveDataToFirebase = async (section = null) => {
+      try {
+        const userId = auth.currentUser?.uid;
+        if (!userId) throw new Error("User not logged in.");
+  
+        const docRef = doc(db, "MyuniversalProfiles", userId);
+        let sectionData = section ? formData[section] : formData;
+  
+         const uploaded = section
+     ? { [section]: await uploadFilesAndReplaceWithURLs(sectionData, section) }
+     : await uploadFilesAndReplaceWithURLs(formData, "full");
+   
+   
+         await setDoc(docRef, uploaded, { merge: true });
+       } catch (err) {
+         console.error("Error saving to Firebase:", err);
+         alert("Failed to save to Firebase.");
+       }
+    };
+  
+const handleSaveSection = async () => {
+    await saveDataToFirebase(activeSection);
+    alert("Section saved to Firebase!");
+  };
+
+  const handleSaveAndContinue = async () => {
+    
+    await saveDataToFirebase(activeSection);
+     alert("Section saved to Firebase!");
+    markSectionAsCompleted(activeSection);
+    navigateToNextSection();
+  };
+
+  const handleSubmitProfile = async () => {
+    markSectionAsCompleted("declarationConsent");
+    await saveDataToFirebase(); // save full form
+    alert("Profile submitted successfully!");
+    console.log("Submitted:", formData);
+  };
 
   return (
     <div className="universal-profile-container">

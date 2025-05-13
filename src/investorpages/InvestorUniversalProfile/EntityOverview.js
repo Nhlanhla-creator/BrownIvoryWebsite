@@ -2,7 +2,7 @@
 import FormField from "./FormField"
 import FileUpload from "./FileUpload"
 import styles from "./InvestorUniversalProfile.module.css"
-
+import ViewUniversalProfile from './Investortestview'
 const entityTypes = [
   { value: "ptyLtd", label: "Pty Ltd" },
   { value: "cc", label: "CC" },
@@ -312,6 +312,7 @@ export default function EntityOverview({ data = {}, updateData }) {
             value={data.companyLogo || []}
           />
         </div>
+        <ViewUniversalProfile/>
       </div>
     </div>
   )
