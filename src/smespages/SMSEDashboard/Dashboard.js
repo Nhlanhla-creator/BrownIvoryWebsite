@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import {
   TrendingUp,
@@ -20,7 +20,8 @@ import {
   Check,
 } from "lucide-react"
 import "./Dashboard.css"
-import { auth } from "../../firebaseConfig"
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../../firebaseConfig";
 import { useNavigate } from "react-router-dom"
 
 const Dashboard = () => {
@@ -43,6 +44,275 @@ const Dashboard = () => {
   // State for company summary modal
   const [showCompanySummary, setShowCompanySummary] = useState(false)
   const [selectedCompany, setSelectedCompany] = useState(null)
+
+  // In your Dashboard component
+  const [complianceScore, setComplianceScore] = useState(0);
+  const [profileData, setProfileData] = useState(null);
+  const [missingDocuments, setMissingDocuments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [categoryScores, setCategoryScores] = useState({
+    financialHealth: 0,
+    operationalStrength: 0,
+    pitchQuality: 0,
+    impactProof: 0
+  });
+
+  // Define weights for each operating stage
+  const operationStageWeights = {
+    ideation: {
+      compliance: 0.15,
+      financialHealth: 0.10,
+      operationalStrength: 0.15,
+      pitchQuality: 0.30,
+      impactProof: 0.30
+    },
+    startup: {
+      compliance: 0.20,
+      financialHealth: 0.15,
+      operationalStrength: 0.20,
+      pitchQuality: 0.25,
+      impactProof: 0.20
+    },
+    growth: {
+      compliance: 0.25,
+      financialHealth: 0.20,
+      operationalStrength: 0.25,
+      pitchQuality: 0.15,
+      impactProof: 0.15
+    },
+    mature: {
+      compliance: 0.30,
+      financialHealth: 0.25,
+      operationalStrength: 0.20,
+      pitchQuality: 0.10,
+      impactProof: 0.15
+    },
+    turnaround: {
+      compliance: 0.35,
+      financialHealth: 0.20,
+      operationalStrength: 0.15,
+      pitchQuality: 0.15,
+      impactProof: 0.15
+    }
+  };
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const userId = auth.currentUser?.uid;
+        if (!userId) {
+          console.error("User not logged in");
+          return;
+        }
+
+        const docRef = doc(db, "universalProfiles", userId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setProfileData(docSnap.data());
+        } else {
+          console.error("No profile found");
+        }
+      } catch (err) {
+        console.error("Error fetching profile data:", err);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
+
+
+
+  // Update the score calculation to use stage-specific weights
+  useEffect(() => {
+    if (profileData) {
+      const operationStage = profileData.entityOverview?.operationStage || 'ideation';
+      const weights = operationStageWeights[operationStage] || operationStageWeights.ideation;
+
+      // Calculate individual scores (0-100 range)
+      const complianceScoreValue = calculateComplianceScore(profileData);
+      const financialHealth = calculateFinancialHealth(profileData);
+      const operationalStrength = calculateOperationalStrength(profileData);
+      const pitchQuality = calculatePitchQuality(profileData);
+      const impactProof = calculateImpactProof(profileData);
+
+      // Apply weights
+      const weightedScores = {
+        compliance: Math.round(complianceScoreValue * weights.compliance),
+        financialHealth: Math.round(financialHealth * weights.financialHealth),
+        operationalStrength: Math.round(operationalStrength * weights.operationalStrength),
+        pitchQuality: Math.round(pitchQuality * weights.pitchQuality),
+        impactProof: Math.round(impactProof * weights.impactProof)
+      };
+
+      // Update state
+      setComplianceScore(weightedScores.compliance);
+      setCategoryScores({
+        financialHealth: weightedScores.financialHealth,
+        operationalStrength: weightedScores.operationalStrength,
+        pitchQuality: weightedScores.pitchQuality,
+        impactProof: weightedScores.impactProof
+      });
+    }
+  }, [profileData]);
+
+  // Update calculation functions to return 0-100 scores
+  const calculateComplianceScore = (profileData) => {
+    const requiredDocuments = [
+      'entityOverview.registrationCertificate',
+      'entityOverview.proofOfAddress',
+      'ownershipManagement.certifiedIds',
+      'ownershipManagement.shareRegister',
+      'legalCompliance.taxClearanceCert',
+      'legalCompliance.bbbeeCert',
+      'declarationConsent.signedDocument'
+    ];
+
+    const presentCount = requiredDocuments.filter(path => {
+      const parts = path.split('.');
+      let value = profileData;
+      for (const part of parts) {
+        value = value?.[part];
+        if (value === undefined || value === null || value === '') {
+          return false;
+        }
+        if (typeof value === 'object' && value.url) {
+          return true;
+        }
+      }
+      return true;
+    }).length;
+
+    return (presentCount / requiredDocuments.length) * 100;
+  };
+
+  const calculateFinancialHealth = (profileData) => {
+    let score = 0;
+
+    // Financial indicators
+    if (profileData?.entityOverview?.financialYearEnd) score += 0;
+    if (profileData?.entityOverview?.yearsInOperation) {
+      const years = parseInt(profileData.entityOverview.yearsInOperation);
+      score += Math.min(years * 0, 0); // Up to 20 points for longevity
+    }
+    if (profileData?.productsServices?.annualTurnover) score += 0;
+    if (profileData?.legalCompliance?.taxClearanceNumber) score += 0;
+    if (profileData?.legalCompliance?.vatNumber) score += 0;
+
+    return Math.min(100, score);
+  };
+
+  const calculateOperationalStrength = (profileData) => {
+    let score = 0;
+
+    if (profileData?.entityOverview?.employeeCount) {
+      const employees = parseInt(profileData.entityOverview.employeeCount);
+      score += Math.min(employees * 0, 0); // Up to 20 points for team size
+    }
+    if (profileData?.entityOverview?.yearsInOperation) {
+      const years = parseInt(profileData.entityOverview.yearsInOperation);
+      score += Math.min(years * 0, 0); // Up to 20 points for longevity
+    }
+    if (profileData?.productsServices?.keyClients?.length > 0) {
+      score += Math.min(profileData.productsServices.keyClients.length * 0, 0);
+    }
+    if (profileData?.ownershipManagement?.directors?.length > 0) score += 0;
+    if (profileData?.contactDetails?.website) score += 0;
+
+    return Math.min(100, score);
+  };
+
+  const calculatePitchQuality = (profileData) => {
+    let score = 0;
+
+    if (profileData?.entityOverview?.businessDescription) {
+      const descLength = profileData.entityOverview.businessDescription.length;
+      score += Math.min(descLength / 1, 0); // Up to 30 points for description
+    }
+    if (profileData?.productsServices?.productCategories?.products?.length > 0) {
+      score += Math.min(profileData.productsServices.productCategories.products.length * 0, 0);
+    }
+    if (profileData?.productsServices?.serviceCategories?.services?.length > 0) {
+      score += Math.min(profileData.productsServices.serviceCategories.services.length * 0, 0);
+    }
+    if (profileData?.entityOverview?.targetMarket) score += 0;
+
+    return Math.min(100, score);
+  };
+
+  const calculateImpactProof = (profileData) => {
+    let score = 0;
+
+    if (profileData?.entityOverview?.targetMarket?.includes('social') ||
+      profileData?.entityOverview?.targetMarket?.includes('impact')) {
+      score += 0;
+    }
+    if (profileData?.entityOverview?.businessDescription?.includes('impact') ||
+      profileData?.entityOverview?.businessDescription?.includes('social')) {
+      score += 0;
+    }
+    if (profileData?.howDidYouHear?.source === 'Referral') score += 0;
+    if (profileData?.declarationConsent?.accuracy) score += 0;
+    if (profileData?.declarationConsent?.dataProcessing) score += 0;
+
+    return Math.min(100, score);
+  };
+
+  // Set other categories to 0 (12.5% each when implemented)
+  const fundabilityScoreData = [
+    {
+      name: "Compliance",
+      value: complianceScore,
+      color: "#8D6E63",
+      weight: operationStageWeights[profileData?.entityOverview?.operationStage || 'ideation']?.compliance * 100 + '%',
+      description: "Legal and regulatory documentation completeness"
+    },
+    {
+      name: "Financial Health",
+      value: categoryScores.financialHealth,
+      color: "#6D4C41",
+      weight: operationStageWeights[profileData?.entityOverview?.operationStage || 'ideation']?.financialHealth * 100 + '%',
+      description: "Financial stability and performance metrics"
+    },
+    {
+      name: "Operational Strength",
+      value: categoryScores.operationalStrength,
+      color: "#A67C52",
+      weight: operationStageWeights[profileData?.entityOverview?.operationStage || 'ideation']?.operationalStrength * 100 + '%',
+      description: "Team size, experience, and operational capabilities"
+    },
+    {
+      name: "Pitch Quality",
+      value: categoryScores.pitchQuality,
+      color: "#795548",
+      weight: operationStageWeights[profileData?.entityOverview?.operationStage || 'ideation']?.pitchQuality * 100 + '%',
+      description: "Business narrative clarity and attractiveness"
+    },
+    {
+      name: "Impact Proof",
+      value: categoryScores.impactProof,
+      color: "#5D4037",
+      weight: operationStageWeights[profileData?.entityOverview?.operationStage || 'ideation']?.impactProof * 100 + '%',
+      description: "Social/environmental impact and market need validation"
+    },
+    // Additional category for visualization (not included in total score)
+    {
+      name: "Stage Weighting Profile",
+      value: 100,
+      color: "#BCAAA4",
+      weight: "N/A",
+      description: `Current weighting: ${profileData?.entityOverview?.operationStage || 'ideation'} stage`
+    }
+  ];
+
+  // Calculate total score
+  const totalFundabilityScore = Math.round(
+    complianceScore +
+    categoryScores.financialHealth +
+    categoryScores.operationalStrength +
+    categoryScores.pitchQuality +
+    categoryScores.impactProof
+  );
 
   // State for document selection modal
   const [showDocumentModal, setShowDocumentModal] = useState(false)
@@ -395,16 +665,8 @@ const Dashboard = () => {
   }
 
   // Legitimacy score data
-  const legitimacyScore = 80
+  const legitimacyScore = complianceScore * 2
 
-  // Big Fundability Score data
-  const fundabilityScoreData = [
-    { name: "Compliance", value: 15, color: "#8D6E63" },
-    { name: "Financial Health", value: 20, color: "#6D4C41" },
-    { name: "Operational Strength", value: 20, color: "#A67C52" },
-    { name: "Pitch Quality", value: 20, color: "#795548" },
-    { name: "Impact Proof", value: 20, color: "#5D4037" },
-  ]
 
   // Service Score data
   const serviceScoreData = [
@@ -414,7 +676,6 @@ const Dashboard = () => {
   ]
 
   // Total score calculation
-  const totalFundabilityScore = fundabilityScoreData.reduce((sum, item) => sum + item.value, 0)
   const totalServiceScore = serviceScoreData.reduce((sum, item) => sum + item.value, 0)
 
   const bigScoreData = [
@@ -486,7 +747,7 @@ const Dashboard = () => {
       company: "Patel Innovations",
       position: "COO",
     },
-   
+
   ]
 
   // Category data for Top Matches
@@ -1637,12 +1898,28 @@ const Dashboard = () => {
                         fontWeight: "600",
                         fontSize: "1.5rem",
                         boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                        flexShrink: 0,
                       }}
                     >
                       {totalFundabilityScore}%
                     </div>
 
                     <div style={{ flex: 1 }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '8px'
+                      }}>
+                        <span style={{ fontSize: "0.9rem", color: "#666" }}>Operation Stage:</span>
+                        <span style={{
+                          fontWeight: '600',
+                          color: '#555',
+                          textTransform: 'uppercase'
+                        }}>
+                          {profileData?.entityOverview?.operationStage || 'ideation'}
+                        </span>
+                      </div>
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px" }}>
                         {fundabilityScoreData.map((item, index) => (
                           <div
@@ -1682,6 +1959,118 @@ const Dashboard = () => {
                           </div>
                         ))}
                       </div>
+                    </div>
+                  </div>
+
+                  {/* New Compliance Document Status Section */}
+                  <div style={{
+                    backgroundColor: "white",
+                    padding: "15px",
+                    borderRadius: "8px",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                    marginBottom: "20px"
+                  }}>
+                    <h4 style={{ fontWeight: "500", color: "#555", marginBottom: "15px" }}>
+                      Compliance Document Status ({complianceScore}%)
+                    </h4>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px" }}>
+                      {[
+                        'Company Registration Certificate',
+                        'Proof of Operating Address',
+                        'Certified IDs',
+                        'Share Register',
+                        'Proof of Address',
+                        'Tax Clearance Certificate',
+                        'B-BBEE Certificate',
+                        'Signed Declaration/Consent Form'
+                      ].map((doc, index) => {
+                        const docKey = doc.toLowerCase()
+                          .replace(/\s+/g, '')
+                          .replace(/-/g, '')
+                          .replace(/\//g, '');
+                        const isPresent = !missingDocuments.includes(docKey);
+
+                        return (
+                          <div key={index} style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            backgroundColor: "white",
+                            padding: "8px 12px",
+                            borderRadius: "6px",
+                            boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                            borderLeft: `3px solid ${isPresent ? '#4CAF50' : '#F44336'}`
+                          }}>
+                            <div style={{
+                              width: "12px",
+                              height: "12px",
+                              borderRadius: "50%",
+                              backgroundColor: isPresent ? '#4CAF50' : '#F44336'
+                            }}></div>
+                            <span style={{ fontSize: "0.85rem", color: "#555" }}>{doc}</span>
+                            <span style={{
+                              marginLeft: "auto",
+                              fontSize: "0.75rem",
+                              color: isPresent ? '#4CAF50' : '#F44336',
+                              fontWeight: "500"
+                            }}>
+                              {isPresent ? 'Uploaded' : 'Missing'}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Score Categories Section */}
+                  <div style={{
+                    backgroundColor: "white",
+                    padding: "15px",
+                    borderRadius: "8px",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                    marginBottom: "20px"
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                      <h4 style={{ fontWeight: "500", color: "#555", marginBottom: "15px" }}>
+                        Score Breakdown by Category
+                      </h4>
+                      <div style={{
+                        backgroundColor: '#f0f0f0',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        fontSize: '0.85rem',
+                        fontWeight: '500'
+                      }}>
+                        Current Stage: {profileData?.entityOverview?.operationStage?.toUpperCase() || 'IDEATION'}
+                      </div>
+                    </div>
+                    <div className="score-categories">
+                      {fundabilityScoreData.filter(cat => cat.name !== "Stage Weighting Profile").map((category, index) => (
+                        <div key={index} className="category-item">
+                          <div className="category-header">
+                            <div
+                              className="category-color"
+                              style={{ backgroundColor: category.color }}
+                            ></div>
+                            <h4>{category.name}</h4>
+                            <span className="category-weight">Weight: {category.weight}</span>
+                          </div>
+                          <div className="category-details">
+                            <p>{category.description}</p>
+                            <div className="score-bar">
+                              <div
+                                className="score-progress"
+                                style={{
+                                  width: `${category.value}%`,
+                                  backgroundColor: category.color
+                                }}
+                              ></div>
+                              <span className="score-value">{category.value}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
