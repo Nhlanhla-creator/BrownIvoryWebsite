@@ -1,82 +1,117 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye, FileText, MessageCircle, ExternalLink } from "lucide-react";
 import styles from "./funding.module.css";
+import { db } from '../../firebaseConfig';
+import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 
 export function FundingTable() {
-  const [funders] = useState([
-    {
-      id: "1",
-      name: "Funder A",
-      matchPercentage: 92,
-      investmentType: "Equity, Convertible",
-      targetStage: "Seed, Series A",
-      ticketSize: "$50K - $500K",
-      sectorFocus: "ICT, Agri, Energy",
-      geographicFocus: "South Africa",
-      supportOffered: "Mentorship, Technical Assistance",
-      applicationDeadline: "2025-06-15",
-      responseTime: "5 days",
-      status: "Rejected",
-    },
-    {
-      id: "2",
-      name: "Funder B",
-      matchPercentage: 87,
-      investmentType: "Debt, Blended",
-      targetStage: "Growth, Maturity",
-      ticketSize: "$200K - $2M",
-      sectorFocus: "Manufacturing, Retail",
-      geographicFocus: "SADC Region",
-      supportOffered: "Market Access, ESG Support",
-      applicationDeadline: "2025-07-01",
-      responseTime: "7 days",
-      status: "Funded",
-    },
-    {
-      id: "3",
-      name: "Funder C",
-      matchPercentage: 85,
-      investmentType: "Grant, Equity",
-      targetStage: "Pre-seed, Seed",
-      ticketSize: "$10K - $100K",
-      sectorFocus: "Healthcare, Education",
-      geographicFocus: "South Africa, Namibia",
-      supportOffered: "Mentorship, Network Access",
-      applicationDeadline: "2025-06-30",
-      responseTime: "10 days",
-      status: "Under Review",
-    },
-    {
-      id: "4",
-      name: "Funder D",
-      matchPercentage: 80,
-      investmentType: "Equity",
-      targetStage: "Series A, Growth",
-      ticketSize: "$500K - $5M",
-      sectorFocus: "ICT, Financial Services",
-      geographicFocus: "Africa (All)",
-      supportOffered: "Technical Assistance",
-      applicationDeadline: "2025-08-15",
-      responseTime: "14 days",
-      status: "Not Contacted",
-    },
-    {
-      id: "5",
-      name: "Funder E",
-      matchPercentage: 78,
-      investmentType: "Debt",
-      targetStage: "Maturity, Turnaround",
-      ticketSize: "$1M - $10M",
-      sectorFocus: "Manufacturing, Mining",
-      geographicFocus: "South Africa",
-      supportOffered: "None",
-      applicationDeadline: "2025-07-15",
-      responseTime: "3 days",
-      status: "Applied",
-    },
-  ]);
+  const [funders, setFunders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentBusiness, setCurrentBusiness] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // 1. Fetch current business profile
+        const businessDocRef = doc(db, "universalProfiles", "${userId}");
+        const businessDocSnap = await getDoc(businessDocRef);
+        
+        if (!businessDocSnap.exists()) {
+          throw new Error("Business profile not found");
+        }
+        
+        const businessData = businessDocSnap.data().entityOverview;
+        setCurrentBusiness(businessData);
+
+        // 2. Fetch all investors who might match
+        const investorsCollectionRef = collection(db, "MyuniversalProfiles");
+        const investorsQuery = query(
+          investorsCollectionRef,
+          where("entityOverview.investmentType", "!=", null)
+        );
+        
+        const investorsSnapshot = await getDocs(investorsQuery);
+        const matchedInvestors = [];
+
+        for (const doc of investorsSnapshot.docs) {
+          const investorData = doc.data().entityOverview;
+          const funds = doc.data().productsServices?.funds || [];
+          
+          const matchScore = calculateMatchScore(businessData, { ...investorData, funds });
+          
+          if (matchScore > 70) { // Only include investors with good matches
+            matchedInvestors.push({
+              id: doc.id,
+              name: investorData.registeredName || investorData.tradingName || "Unnamed Investor",
+              matchPercentage: matchScore,
+              investmentType: investorData.investmentType || "Not specified",
+              targetStage: investorData.stages?.join(", ") || "Various",
+              ticketSize: investorData.ticketMin && investorData.ticketMax 
+                ? `R${Number(investorData.ticketMin).toLocaleString()} - R${Number(investorData.ticketMax).toLocaleString()}`
+                : "Not specified",
+              sectorFocus: investorData.sectorFocus?.join(", ") || investorData.sectors?.join(", ") || "Various",
+              geographicFocus: investorData.geographicFocus?.join(", ") || investorData.location || "Various",
+              supportOffered: investorData.supportOffered?.join(", ") || "None",
+              applicationDeadline: investorData.deadline || "Not specified",
+              responseTime: investorData.responseTime || "Not specified",
+              status: "Not Contacted" // Default status
+            });
+          }
+        }
+
+        matchedInvestors.sort((a, b) => b.matchPercentage - a.matchPercentage);
+        setFunders(matchedInvestors);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const calculateMatchScore = (business, investor) => {
+    let score = 0;
+    
+    // Economic Sector Match (40%)
+    const businessSector = business.economicSector?.toLowerCase();
+    if (investor.sectorFocus?.some(s => s.toLowerCase() === businessSector)) {
+      score += 40;
+    } else if (investor.sectors?.some(s => s.toLowerCase() === businessSector)) {
+      score += 40;
+    } else if (investor.funds?.some(fund => 
+      fund.sectorFocus?.some(s => s.toLowerCase() === businessSector)
+    )) {
+      score += 40;
+    }
+    
+    // Location Match (30%)
+    const businessLocation = business.location?.toLowerCase();
+    if (investor.geographicFocus?.some(l => l.toLowerCase() === businessLocation)) {
+      score += 30;
+    } else if (investor.funds?.some(fund => 
+      fund.geographicFocus?.some(l => l.toLowerCase() === businessLocation)
+    )) {
+      score += 30;
+    } else if (investor.location?.toLowerCase() === businessLocation) {
+      score += 20;
+    }
+    
+    // Operation Stage Match (30%)
+    const businessStage = business.operationStage?.toLowerCase();
+    if (investor.stages?.some(s => s.toLowerCase() === businessStage)) {
+      score += 30;
+    } else if (investor.funds?.some(fund => 
+      fund.stages?.some(s => s.toLowerCase() === businessStage)
+    )) {
+      score += 30;
+    }
+    
+    return score;
+  };
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -95,8 +130,24 @@ export function FundingTable() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+        <p>Loading investor matches...</p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.tableContainer}>
+      {currentBusiness && (
+        <div className={styles.businessSummary}>
+          <h3>Matching investors for: {currentBusiness.registeredName || currentBusiness.tradingName || "Your Business"}</h3>
+          <p>Sector: {currentBusiness.economicSector} | Location: {currentBusiness.location} | Stage: {currentBusiness.operationStage}</p>
+        </div>
+      )}
+      
       <table className={styles.fundingTable}>
         <thead>
           <tr>
@@ -115,39 +166,47 @@ export function FundingTable() {
           </tr>
         </thead>
         <tbody>
-          {funders.map((funder) => (
-            <tr key={funder.id}>
-              <td>{funder.name}</td>
-              <td className={styles.matchPercentage}>{funder.matchPercentage}%</td>
-              <td>{funder.investmentType}</td>
-              <td>{funder.targetStage}</td>
-              <td>{funder.ticketSize}</td>
-              <td>{funder.sectorFocus}</td>
-              <td>{funder.geographicFocus}</td>
-              <td>{funder.supportOffered}</td>
-              <td>{funder.applicationDeadline}</td>
-              <td>{funder.responseTime}</td>
-              <td>
-                <span className={getStatusClass(funder.status)}>{funder.status}</span>
-              </td>
-              <td>
-                <div className={styles.actionButtons}>
-                  <button className={styles.actionButton} title="View Details">
-                    <Eye size={16} />
-                  </button>
-                  <button className={styles.actionButton} title="Apply">
-                    <ExternalLink size={16} />
-                  </button>
-                  <button className={styles.actionButton} title="Track">
-                    <FileText size={16} />
-                  </button>
-                  <button className={styles.actionButton} title="Feedback">
-                    <MessageCircle size={16} />
-                  </button>
-                </div>
+          {funders.length > 0 ? (
+            funders.map((funder) => (
+              <tr key={funder.id}>
+                <td>{funder.name}</td>
+                <td className={styles.matchPercentage}>{funder.matchPercentage}%</td>
+                <td>{funder.investmentType}</td>
+                <td>{funder.targetStage}</td>
+                <td>{funder.ticketSize}</td>
+                <td>{funder.sectorFocus}</td>
+                <td>{funder.geographicFocus}</td>
+                <td>{funder.supportOffered}</td>
+                <td>{funder.applicationDeadline}</td>
+                <td>{funder.responseTime}</td>
+                <td>
+                  <span className={getStatusClass(funder.status)}>{funder.status}</span>
+                </td>
+                <td>
+                  <div className={styles.actionButtons}>
+                    <button className={styles.actionButton} title="View Details">
+                      <Eye size={16} />
+                    </button>
+                    <button className={styles.actionButton} title="Apply">
+                      <ExternalLink size={16} />
+                    </button>
+                    <button className={styles.actionButton} title="Track">
+                      <FileText size={16} />
+                    </button>
+                    <button className={styles.actionButton} title="Feedback">
+                      <MessageCircle size={16} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="12" className={styles.noResults}>
+                No matching investors found. Try adjusting your business profile.
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>
