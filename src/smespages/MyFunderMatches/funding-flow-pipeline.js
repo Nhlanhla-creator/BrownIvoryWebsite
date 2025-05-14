@@ -20,7 +20,7 @@ export function FundingFlowPipeline() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-brown-800 mb-4">Deal Flow Pipeline</h2>
+      <h2 className={styles.sectionTitle}>Deal Flow Pipeline</h2>
       <div className={styles.pipelineContainer}>
         {stages.map((stage) => (
           <div
@@ -29,14 +29,23 @@ export function FundingFlowPipeline() {
             onMouseEnter={() => setHoveredStage(stage.id)}
             onMouseLeave={() => setHoveredStage(null)}
           >
-            <div className={styles.stageCircle}>{stage.count}</div>
-            <div className={styles.stageName}>{stage.name}</div>
+            <div
+              className={`${styles.stageCircle} ${
+                stage.id === "deals"
+                  ? styles.stageSuccess
+                  : stage.id === "declined" || stage.id === "withdrawn"
+                    ? styles.stageFailed
+                    : ""
+              }`}
+            >
+              {stage.count}
+            </div>
+            <div className={styles.stageName}>{stage.name.split(" ")[0]}</div>
             {hoveredStage === stage.id && (
               <div className={styles.stageTooltip}>
                 <p>
                   {stage.name}: {stage.count}
                 </p>
-                {stage.id === "termsheets" && <p className="text-xs">Add robot for status</p>}
               </div>
             )}
           </div>

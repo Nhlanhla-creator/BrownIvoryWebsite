@@ -22,6 +22,21 @@ export function FundingInsights() {
     charts.current.forEach((chart) => chart.destroy())
     charts.current = []
 
+    // Brown color palette
+    const brownPalette = {
+      primary: "#795548",
+      secondary: "#8D6E63",
+      tertiary: "#A1887F",
+      light: "#BCAAA4",
+      lighter: "#D7CCC8",
+      lightest: "#EFEBE9",
+      accent1: "#FF8A65", // Orange-brown
+      accent2: "#FFB74D", // Light orange
+      accent3: "#4FC3F7", // Blue
+      accent4: "#81C784", // Green
+      accent5: "#9575CD", // Purple
+    }
+
     const createChart = (ref, config) => {
       if (ref.current) {
         const ctx = ref.current.getContext("2d")
@@ -39,8 +54,8 @@ export function FundingInsights() {
         datasets: [{
           label: "Number of Requests",
           data: [12, 12, 8, 20, 30],
-          backgroundColor: "#FF8A65",
-          borderColor: "#E64A19",
+          backgroundColor: brownPalette.accent1,
+          borderColor: brownPalette.primary,
           borderWidth: 1,
         }],
       },
@@ -51,20 +66,23 @@ export function FundingInsights() {
           title: {
             display: true,
             text: "Funding Ask Breakdown by Use",
-            color: "#5D4037",
+            color: brownPalette.primary,
+            font: {
+              weight: "bold"
+            }
           },
           legend: { display: false },
         },
         scales: {
           x: {
             beginAtZero: true,
-            title: { display: true, text: "Number of Requests", color: "#5D4037" },
-            ticks: { color: "#5D4037" },
-            grid: { color: "#D7CCC8" },
+            title: { display: true, text: "Number of Requests", color: brownPalette.primary },
+            ticks: { color: brownPalette.primary },
+            grid: { color: brownPalette.lighter },
           },
           y: {
-            ticks: { color: "#5D4037" },
-            grid: { color: "#D7CCC8" },
+            ticks: { color: brownPalette.primary },
+            grid: { color: brownPalette.lighter },
           },
         },
       }
@@ -76,8 +94,14 @@ export function FundingInsights() {
         labels: ["Equity", "Debt", "Grant", "Convertible", "Blended"],
         datasets: [{
           data: [35, 25, 15, 15, 10],
-          backgroundColor: ["#FFB74D", "#FFA726", "#FF9800", "#FB8C00", "#F57C00"],
-          borderColor: "#E65100",
+          backgroundColor: [
+            brownPalette.primary,
+            brownPalette.secondary,
+            brownPalette.tertiary,
+            brownPalette.light,
+            brownPalette.lighter,
+          ],
+          borderColor: "#FFFFFF",
           borderWidth: 1,
         }],
       },
@@ -87,11 +111,14 @@ export function FundingInsights() {
           title: {
             display: true,
             text: "Funding Type Breakdown",
-            color: "#5D4037",
+            color: brownPalette.primary,
+            font: {
+              weight: "bold"
+            }
           },
           legend: {
             position: "right",
-            labels: { color: "#5D4037" },
+            labels: { color: brownPalette.primary },
           },
         },
       },
@@ -104,8 +131,8 @@ export function FundingInsights() {
         datasets: [{
           label: "Number of Matches",
           data: [18, 15, 12, 10, 8],
-          backgroundColor: "#4FC3F7",
-          borderColor: "#0288D1",
+          backgroundColor: brownPalette.accent3,
+          borderColor: brownPalette.primary,
           borderWidth: 1,
         }],
       },
@@ -115,17 +142,20 @@ export function FundingInsights() {
           title: {
             display: true,
             text: "Top 5 Matched Sectors",
-            color: "#5D4037",
+            color: brownPalette.primary,
+            font: {
+              weight: "bold"
+            }
           },
           legend: { display: false },
         },
         scales: {
-          x: { ticks: { color: "#5D4037" }, grid: { color: "#D7CCC8" } },
+          x: { ticks: { color: brownPalette.primary }, grid: { color: brownPalette.lighter } },
           y: {
             beginAtZero: true,
-            title: { display: true, text: "Number of Matches", color: "#5D4037" },
-            ticks: { color: "#5D4037" },
-            grid: { color: "#D7CCC8" },
+            title: { display: true, text: "Number of Matches", color: brownPalette.primary },
+            ticks: { color: brownPalette.primary },
+            grid: { color: brownPalette.lighter },
           },
         },
       },
@@ -138,8 +168,8 @@ export function FundingInsights() {
         datasets: [{
           label: "Number of Funders",
           data: [25, 22, 15, 10, 5],
-          backgroundColor: "#81C784",
-          borderColor: "#388E3C",
+          backgroundColor: brownPalette.accent4,
+          borderColor: brownPalette.primary,
           borderWidth: 1,
         }],
       },
@@ -149,17 +179,20 @@ export function FundingInsights() {
           title: {
             display: true,
             text: "Target Growth Stages",
-            color: "#5D4037",
+            color: brownPalette.primary,
+            font: {
+              weight: "bold"
+            }
           },
           legend: { display: false },
         },
         scales: {
-          x: { ticks: { color: "#5D4037" }, grid: { color: "#D7CCC8" } },
+          x: { ticks: { color: brownPalette.primary }, grid: { color: brownPalette.lighter } },
           y: {
             beginAtZero: true,
-            title: { display: true, text: "Number of Funders", color: "#5D4037" },
-            ticks: { color: "#5D4037" },
-            grid: { color: "#D7CCC8" },
+            title: { display: true, text: "Number of Funders", color: brownPalette.primary },
+            ticks: { color: brownPalette.primary },
+            grid: { color: brownPalette.lighter },
           },
         },
       },
@@ -172,8 +205,8 @@ export function FundingInsights() {
         datasets: [{
           label: "Number of Funders",
           data: [2, 3, 3, 3, 3, 3, 3, 3, 1, 2],
-          backgroundColor: "#9575CD",
-          borderColor: "#512DA8",
+          backgroundColor: brownPalette.accent5,
+          borderColor: brownPalette.primary,
           borderWidth: 1,
         }],
       },
@@ -183,21 +216,24 @@ export function FundingInsights() {
           title: {
             display: true,
             text: "Funder Response Time Distribution",
-            color: "#5D4037",
+            color: brownPalette.primary,
+            font: {
+              weight: "bold"
+            }
           },
           legend: { display: false },
         },
         scales: {
           x: {
-            title: { display: true, text: "Response Time (Days)", color: "#5D4037" },
-            ticks: { color: "#5D4037" },
-            grid: { color: "#D7CCC8" },
+            title: { display: true, text: "Response Time (Days)", color: brownPalette.primary },
+            ticks: { color: brownPalette.primary },
+            grid: { color: brownPalette.lighter },
           },
           y: {
             beginAtZero: true,
-            title: { display: true, text: "Number of Funders", color: "#5D4037" },
-            ticks: { color: "#5D4037" },
-            grid: { color: "#D7CCC8" },
+            title: { display: true, text: "Number of Funders", color: brownPalette.primary },
+            ticks: { color: brownPalette.primary },
+            grid: { color: brownPalette.lighter },
           },
         },
       },

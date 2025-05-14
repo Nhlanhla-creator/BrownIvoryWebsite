@@ -147,7 +147,29 @@ const Sidebar = ({ companyName = "Company Name" }) => {
       label: "Billing and Payments",
       icon: <RandIcon size={18} />,
       route: "/legal",
+      hasSubmenu: true,
+      subItems: [
+        {
+          id: "billing-info",
+          label: "Billing info",
+          icon: <FileText size={16} />,
+          route: "/legal/billing-info",
+        },
+        {
+          id: "subscriptions",
+          label: "My subscriptions",
+          icon: <FileText size={16} />,
+          route: "/legal/subscriptions",
+        },
+        {
+          id: "growth-orders",
+          label: "My Growth Tools Orders",
+          icon: <Tool size={16} />,
+          route: "/legal/growth-orders",
+        },
+      ],
     },
+    
     {
       id: "settings",
       label: "Settings",
