@@ -11,9 +11,22 @@ import { renderFinancialOverview } from "./FinancialOverview";
 import { renderGrowthPotential } from "./GrowthPotential";
 import { renderSocialImpact } from "./SocialImpact";
 import { renderDeclarationCommitment } from "./DeclarationCommitment";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+} from "firebase/firestore";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
+import { auth, db, storage } from "../../firebaseConfig";
 
 export default function FundingApplication() {
   const [activeSection, setActiveSection] = useState("applicationOverview");
+  
   const [completedSections, setCompletedSections] = useState({
     applicationOverview: false,
     useOfFunds: false,
@@ -103,16 +116,7 @@ export default function FundingApplication() {
     }
   };
 
-  const handleSaveSection = () => {
-    localStorage.setItem("fundingApplicationData", JSON.stringify(formData));
-    alert("Section saved successfully!");
-  };
 
-  const handleSaveAndContinue = () => {
-    markSectionAsCompleted(activeSection);
-    localStorage.setItem("fundingApplicationData", JSON.stringify(formData));
-    navigateToNextSection();
-  };
 
   const handleSubmitApplication = () => {
     markSectionAsCompleted("declarationCommitment");
@@ -140,6 +144,69 @@ export default function FundingApplication() {
         return renderApplicationOverview(formData.applicationOverview, updateFormData);
     }
   };
+
+  
+  const uploadFilesAndReplaceWithURLs = async (data, section) => {
+    const uploadRecursive = async (item, pathPrefix) => {
+      if (item instanceof File) {
+        const fileRef = ref(storage, `universalProfile/${auth.currentUser?.uid}/${pathPrefix}`);
+        await uploadBytes(fileRef, item);
+        return await getDownloadURL(fileRef);
+      } else if (Array.isArray(item)) {
+        return await Promise.all(
+          item.map((entry, idx) => uploadRecursive(entry, `${pathPrefix}/${idx}`))
+        );
+      } else if (typeof item === "object" && item !== null) {
+        const updated = {};
+        for (const key in item) {
+          updated[key] = await uploadRecursive(item[key], `${pathPrefix}/${key}`);
+        }
+        return updated;
+      } else {
+        return item;
+      }
+    };
+
+    return await uploadRecursive(data, section);
+  };
+
+  const saveDataToFirebase = async (section = null) => {
+    try {
+      const userId = auth.currentUser?.uid;
+      if (!userId) throw new Error("User not logged in.");
+
+      const docRef = doc(db, "universalProfiles", userId);
+      let sectionData = section ? formData[section] : formData;
+
+      const uploaded = section
+        ? { [section]: await uploadFilesAndReplaceWithURLs(sectionData, section) }
+        : await uploadFilesAndReplaceWithURLs(formData, "full");
+
+      await setDoc(docRef, uploaded, { merge: true });
+    } catch (err) {
+      console.error("Error saving to Firebase:", err);
+      alert("Failed to save to Firebase.");
+    }
+  };
+
+  const handleSaveSection = async () => {
+    await saveDataToFirebase(activeSection);
+    alert("Section saved to Firebase!");
+  };
+
+  const handleSaveAndContinue = async () => {
+    markSectionAsCompleted(activeSection);
+    await saveDataToFirebase(activeSection);
+    navigateToNextSection();
+  };
+
+  const handleSubmitProfile = async () => {
+
+    await saveDataToFirebase(); // save full form
+    alert("Profile submitted successfully!");
+    console.log("Submitted:", formData);
+  };
+
 
   return (
     <div className="funding-application-container">
