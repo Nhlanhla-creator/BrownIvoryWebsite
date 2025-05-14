@@ -14,20 +14,20 @@ import HowDidYouHear from "./HowDidYouHear"
 import DeclarationConsent from "./DeclarationConsent"
 
 import { getAuth } from "firebase/auth"
-// Adjust the path as needed
 import {
   getFirestore,
   doc,
   getDoc,
   setDoc,
-} from "firebase/firestore";
+} from "firebase/firestore"
 import {
   getStorage,
   ref,
   uploadBytes,
   getDownloadURL,
-} from "firebase/storage";
-import { auth, db, storage } from "../../firebaseConfig";
+} from "firebase/storage"
+import { auth, db, storage } from "../../firebaseConfig"
+
 const sections = [
   { id: "instructions", label: "Instructions" },
   { id: "entityOverview", label: "Entity\nOverview" },
@@ -88,8 +88,6 @@ export default function UniversalProfile() {
     },
   })
 
-  const auth = getAuth()
-
   useEffect(() => {
     const fetchData = async () => {
       const user = auth.currentUser
@@ -100,27 +98,19 @@ export default function UniversalProfile() {
 
       if (docSnap.exists()) {
         const data = docSnap.data()
-        setFormData(data.formData)
-        setCompletedSections(data.completedSections)
+        setFormData(prev => ({
+          ...prev,
+          ...data.formData
+        }))
+        setCompletedSections(prev => ({
+          ...prev,
+          ...data.completedSections
+        }))
       }
     }
 
     fetchData()
   }, [])
-
-  useEffect(() => {
-    const saveData = async () => {
-      const user = auth.currentUser
-      if (!user) return
-
-      // await setDoc(doc(db, "MyuniversalProfiles", user.uid), {
-      //   formData,
-      //   completedSections,
-      // })
-    }
-
-    saveData()
-  }, [formData, completedSections])
 
   const updateFormData = (section, data) => {
     setFormData((prev) => ({
@@ -132,7 +122,6 @@ export default function UniversalProfile() {
     }))
   }
 
-  
   const markSectionAsCompleted = (section) => {
     setCompletedSections((prev) => ({
       ...prev,
@@ -156,7 +145,6 @@ export default function UniversalProfile() {
     }
   }
 
-  
   const renderActiveSection = () => {
     const sectionData = formData[activeSection] || {}
     const updateData = (data) => updateFormData(activeSection, data)
@@ -185,70 +173,69 @@ export default function UniversalProfile() {
     }
   }
 
-  
-    const uploadFilesAndReplaceWithURLs = async (data, section) => {
-      const uploadRecursive = async (item, pathPrefix) => {
-        if (item instanceof File) {
-          const fileRef = ref(storage, `MyuniversalProfile/${auth.currentUser?.uid}/${pathPrefix}`);
-          await uploadBytes(fileRef, item);
-          return await getDownloadURL(fileRef);
-        } else if (Array.isArray(item)) {
-          return await Promise.all(
-            item.map((entry, idx) => uploadRecursive(entry, `${pathPrefix}/${idx}`))
-          );
-        } else if (typeof item === "object" && item !== null) {
-          const updated = {};
-          for (const key in item) {
-            updated[key] = await uploadRecursive(item[key], `${pathPrefix}/${key}`);
-          }
-          return updated;
-        } else {
-          return item;
+  const uploadFilesAndReplaceWithURLs = async (data, section) => {
+    const uploadRecursive = async (item, pathPrefix) => {
+      if (item instanceof File) {
+        const fileRef = ref(storage, `MyuniversalProfile/${auth.currentUser?.uid}/${pathPrefix}`);
+        await uploadBytes(fileRef, item);
+        return await getDownloadURL(fileRef);
+      } else if (Array.isArray(item)) {
+        return await Promise.all(
+          item.map((entry, idx) => uploadRecursive(entry, `${pathPrefix}/${idx}`))
+        );
+      } else if (typeof item === "object" && item !== null) {
+        const updated = {};
+        for (const key in item) {
+          updated[key] = await uploadRecursive(item[key], `${pathPrefix}/${key}`);
         }
-      };
-  
-      return await uploadRecursive(data, section);
+        return updated;
+      } else {
+        return item;
+      }
     };
   
-    const saveDataToFirebase = async (section = null) => {
-      try {
-        const userId = auth.currentUser?.uid;
-        if (!userId) throw new Error("User not logged in.");
-  
-        const docRef = doc(db, "MyuniversalProfiles", userId);
-        let sectionData = section ? formData[section] : formData;
-  
-         const uploaded = section
-     ? { [section]: await uploadFilesAndReplaceWithURLs(sectionData, section) }
-     : await uploadFilesAndReplaceWithURLs(formData, "full");
-   
-   
-         await setDoc(docRef, uploaded, { merge: true });
-       } catch (err) {
-         console.error("Error saving to Firebase:", err);
-         alert("Failed to save to Firebase.");
-       }
-    };
-  
-const handleSaveSection = async () => {
-    await saveDataToFirebase(activeSection);
-    alert("Section saved to Firebase!");
+    return await uploadRecursive(data, section);
   };
+  const saveDataToFirebase = async (section = null) => {
+    try {
+      const userId = auth.currentUser?.uid
+      if (!userId) throw new Error("User not logged in.")
+
+      const docRef = doc(db, "MyuniversalProfiles", userId)
+      let sectionData = section ? formData[section] : formData
+
+      const uploaded = section
+        ? { [section]: await uploadFilesAndReplaceWithURLs(sectionData, section) }
+        : await uploadFilesAndReplaceWithURLs(formData, "full")
+
+      await setDoc(docRef, {
+        formData: uploaded,
+        completedSections
+      }, { merge: true })
+    } catch (err) {
+      console.error("Error saving to Firebase:", err)
+      alert("Failed to save to Firebase.")
+    }
+  }
+
+  const handleSaveSection = async () => {
+    await saveDataToFirebase(activeSection)
+    alert("Section saved to Firebase!")
+  }
 
   const handleSaveAndContinue = async () => {
-    
-    await saveDataToFirebase(activeSection);
-     alert("Section saved to Firebase!");
-    markSectionAsCompleted(activeSection);
-    navigateToNextSection();
-  };
+    await saveDataToFirebase(activeSection)
+    alert("Section saved to Firebase!")
+    markSectionAsCompleted(activeSection)
+    navigateToNextSection()
+  }
 
   const handleSubmitProfile = async () => {
-    markSectionAsCompleted("declarationConsent");
-    await saveDataToFirebase(); // save full form
-    alert("Profile submitted successfully!");
-    console.log("Submitted:", formData);
-  };
+    markSectionAsCompleted("declarationConsent")
+    await saveDataToFirebase()
+    alert("Profile submitted successfully!")
+    console.log("Submitted:", formData)
+  }
 
   return (
     <div className="universal-profile-container">
