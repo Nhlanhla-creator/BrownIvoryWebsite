@@ -157,6 +157,21 @@ const supportOptions = [
   { value: "governance", label: "Governance Support" },
 ]
 
+// Sector Experts options
+const sectorExpertsOptions = [
+  { value: "aquaculture", label: "Aquaculture" },
+  { value: "agritech", label: "Agritech" },
+  { value: "horticulture", label: "Horticulture" },
+  { value: "all", label: "All of the above" },
+]
+
+// Preferred Engagement Method options
+const preferredEngagementOptions = [
+  { value: "intro", label: "Intro call, pitch, and farm/site visit" },
+  { value: "pitch", label: "Pitch deck only" },
+  { value: "referral", label: "Referral-based introductions" },
+]
+
 // Add countries array after the other option arrays
 const countries = [
   { value: "southAfrica", label: "South Africa" },
@@ -299,6 +314,10 @@ export default function ProductsServices({ data = {}, updateData }) {
           roi: "",
           exitYear: "",
           support: [],
+          // Team and Management
+          investmentCommittee: "",
+          sectorExperts: [],
+          diStatement: "",
           // Program details
           programType: "",
           sectorFocus: [],
@@ -317,6 +336,9 @@ export default function ProductsServices({ data = {}, updateData }) {
           requiredDocuments: [],
           dueDiligenceTimeline: "",
           decisionMakingProcess: "",
+          // Matching criteria
+          preferredMatchingCriteria: "",
+          preferredEngagementMethod: "",
         },
       ],
     })
@@ -481,6 +503,40 @@ export default function ProductsServices({ data = {}, updateData }) {
                 />
               </FormField>
             </div>
+            <div className={styles.gridContainer}>
+              <FormField label="Support Offered Beyond Capital">
+                <MultiSelect
+                  options={supportOptions}
+                  selected={fund.support || []}
+                  onChange={(value) => updateFund(fundIndex, "support", value)}
+                  label="Support Options"
+                />
+              </FormField>
+
+              <FormField label="ROI">
+                <input
+                  type="text"
+                  value={fund.roi || ""}
+                  onChange={(e) => updateFund(fundIndex, "roi", e.target.value)}
+                  className={styles.formInput}
+                  placeholder="e.g., 15%, 2x"
+                />
+              </FormField>
+            </div>
+
+            <div className={styles.gridContainer}>
+              <FormField label="Exit Year">
+                <input
+                  type="text"
+                  value={fund.exitYear || ""}
+                  onChange={(e) => updateFund(fundIndex, "exitYear", e.target.value)}
+                  className={styles.formInput}
+                  placeholder="e.g., 2028, 5 years"
+                />
+              </FormField>
+            </div>
+
+          
 
             <div className={styles.sectionDivider}>
               <h5 className={styles.subSectionHeading}>Program Details</h5>
@@ -675,39 +731,75 @@ export default function ProductsServices({ data = {}, updateData }) {
                 </FormField>
               </div>
             </div>
+            <div className={styles.sectionDivider}>
+              <h5 className={styles.subSectionHeading}>Team and Management</h5>
 
-            <div className={styles.gridContainer}>
-              <FormField label="Support Offered Beyond Capital">
-                <MultiSelect
-                  options={supportOptions}
-                  selected={fund.support || []}
-                  onChange={(value) => updateFund(fundIndex, "support", value)}
-                  label="Support Options"
-                />
-              </FormField>
+              <div className={styles.gridContainer}>
+                <FormField label="Investment Committee Members">
+                  <input
+                    type="text"
+                    value={fund.investmentCommittee || ""}
+                    onChange={(e) => updateFund(fundIndex, "investmentCommittee", e.target.value)}
+                    className={styles.formInput}
+                    placeholder="e.g., 4 (1 external agribusiness specialist)"
+                  />
+                </FormField>
 
-              <FormField label="ROI">
-                <input
-                  type="text"
-                  value={fund.roi || ""}
-                  onChange={(e) => updateFund(fundIndex, "roi", e.target.value)}
-                  className={styles.formInput}
-                  placeholder="e.g., 15%, 2x"
-                />
-              </FormField>
+                <FormField label="Sector Experts">
+                  <MultiSelect
+                    options={sectorExpertsOptions}
+                    selected={fund.sectorExperts || []}
+                    onChange={(value) => updateFund(fundIndex, "sectorExperts", value)}
+                    label="Available for aquaculture, agritech, and horticulture"
+                  />
+                </FormField>
+              </div>
+
+              <div className={styles.gridContainer}>
+                <FormField label="D&I Statement">
+                  <input
+                    type="text"
+                    value={fund.diStatement || ""}
+                    onChange={(e) => updateFund(fundIndex, "diStatement", e.target.value)}
+                    className={styles.formInput}
+                    placeholder="e.g., We prioritize inclusive innovation and rural development"
+                  />
+                </FormField>
+              </div>
             </div>
 
-            <div className={styles.gridContainer}>
-              <FormField label="Exit Year">
-                <input
-                  type="text"
-                  value={fund.exitYear || ""}
-                  onChange={(e) => updateFund(fundIndex, "exitYear", e.target.value)}
-                  className={styles.formInput}
-                  placeholder="e.g., 2028, 5 years"
-                />
-              </FormField>
+            <div className={styles.sectionDivider}>
+          
+
+              <div className={styles.gridContainer}>
+                <FormField label="Preferred Matching Criteria">
+                  <input
+                    type="text"
+                    value={fund.preferredMatchingCriteria || ""}
+                    onChange={(e) => updateFund(fundIndex, "preferredMatchingCriteria", e.target.value)}
+                    className={styles.formInput}
+                    placeholder="e.g., Impact alignment, sector expertise, viable go-to-market plan"
+                  />
+                </FormField>
+
+                <FormField label="Preferred Engagement Method">
+                  <select
+                    value={fund.preferredEngagementMethod || ""}
+                    onChange={(e) => updateFund(fundIndex, "preferredEngagementMethod", e.target.value)}
+                    className={styles.formInput}
+                  >
+                    <option value="">Select</option>
+                    {preferredEngagementOptions.map(({ value, label }) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </FormField>
+              </div>
             </div>
+
+           
           </div>
         ))}
 
