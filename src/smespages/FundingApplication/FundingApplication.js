@@ -24,9 +24,10 @@ import {
 } from "firebase/storage";
 import { auth, db, storage } from "../../firebaseConfig";
 
+
 export default function FundingApplication() {
   const [activeSection, setActiveSection] = useState("applicationOverview");
-  
+
   const [completedSections, setCompletedSections] = useState({
     applicationOverview: false,
     useOfFunds: false,

@@ -9,6 +9,18 @@ import ProductsServices from "./ProductsServices"
 import MatchingPreferences from "./MatchingPreferences"
 import ContactSubmission from "./ContactSubmission"
 import "./ProductApplication.css"
+import {
+  getFirestore,
+  doc,
+  setDoc,
+} from "firebase/firestore";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
+import { auth, db, storage } from "../../firebaseConfig";
 
 const ProductApplication = () => {
   const { section: urlSection } = useParams()
@@ -95,6 +107,7 @@ const ProductApplication = () => {
     }
   }
 
+
   // Data handling functions
   const updateFormData = (section, newData) => {
     setFormData((prev) => ({
@@ -122,6 +135,7 @@ const ProductApplication = () => {
     }
   }
 
+
   // Navigate to previous section
   const goToPreviousSection = () => {
     const currentIndex = sections.findIndex((s) => s.id === activeSection)
@@ -131,12 +145,17 @@ const ProductApplication = () => {
   }
 
   // Submit the application
-  const submitApplication = () => {
-    setCompletedSections((prev) => ({ ...prev, [activeSection]: true }))
-    // Here you would typically send the data to your backend
-    console.log("Submitted application data:", formData)
-    alert("Application submitted successfully!")
+const submitApplication = async () => {
+  try {
+    await saveDataToFirebase(); // Save entire form to Firebase
+    setCompletedSections((prev) => ({ ...prev, [activeSection]: true }));
+    alert("Application submitted successfully!");
+  } catch (err) {
+    console.error("Failed to submit application:", err);
+    alert("Failed to submit application.");
   }
+};
+
 
   // Render current section
   const renderActiveSection = () => {
@@ -164,6 +183,66 @@ const ProductApplication = () => {
 
   const isLastSection = activeSection === sections[sections.length - 1].id
   const isFirstSection = activeSection === sections[0].id
+
+
+  
+    
+    const uploadFilesAndReplaceWithURLs = async (data, section) => {
+      const uploadRecursive = async (item, pathPrefix) => {
+        if (item instanceof File) {
+          const fileRef = ref(storage, `universalProfile/${auth.currentUser?.uid}/${pathPrefix}`);
+          await uploadBytes(fileRef, item);
+          return await getDownloadURL(fileRef);
+        } else if (Array.isArray(item)) {
+          return await Promise.all(
+            item.map((entry, idx) => uploadRecursive(entry, `${pathPrefix}/${idx}`))
+          );
+        } else if (typeof item === "object" && item !== null) {
+          const updated = {};
+          for (const key in item) {
+            updated[key] = await uploadRecursive(item[key], `${pathPrefix}/${key}`);
+          }
+          return updated;
+        } else {
+          return item;
+        }
+      };
+  
+      return await uploadRecursive(data, section);
+    };
+  
+    const saveDataToFirebase = async (section = null) => {
+      try {
+        const userId = auth.currentUser?.uid;
+        if (!userId) throw new Error("User not logged in.");
+  
+        const docRef = doc(db, "universalProfiles", userId);
+        let sectionData = section ? formData[section] : formData;
+  
+        const uploaded = section
+          ? { [section]: await uploadFilesAndReplaceWithURLs(sectionData, section) }
+          : await uploadFilesAndReplaceWithURLs(formData, "full");
+  
+        await setDoc(docRef, uploaded, { merge: true });
+      } catch (err) {
+        console.error("Error saving to Firebase:", err);
+        alert("Failed to save to Firebase.");
+      }
+    };
+  
+    const handleSaveSection = async () => {
+
+      await saveDataToFirebase(activeSection);
+       setCompletedSections((prev) => ({ ...prev, [activeSection]: true }))
+    alert("Section saved successfully!")
+    };
+  
+    const handleSaveAndContinue = async () => {
+    
+      await saveDataToFirebase(activeSection);
+     goToNextSection();
+    };
+  
 
   return (
     <div className="product-application-container">
@@ -203,7 +282,7 @@ const ProductApplication = () => {
             </button>
           )}
 
-          <button type="button" onClick={saveCurrentSection} className="btn btn-secondary">
+          <button type="button" onClick={handleSaveSection} className="btn btn-secondary">
             <Save size={16} /> Save
           </button>
 
