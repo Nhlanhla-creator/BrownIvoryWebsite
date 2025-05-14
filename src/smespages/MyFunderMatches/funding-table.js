@@ -3,267 +3,154 @@
 import { useState, useEffect } from "react"
 import { Eye, ExternalLink, Search } from "lucide-react"
 import styles from "./funding.module.css"
+import { db } from "../../firebaseConfig"
+import { doc, getDoc, collection, getDocs } from "firebase/firestore"
+import { getAuth } from "firebase/auth"
 
-// Mock data for demonstration
-const mockFunders = [
-  {
-    id: "1",
-    name: "Brown Capital Ventures",
-    matchPercentage: 95,
-    investmentType: "Equity",
-    targetStage: "Seed, Series A",
-    ticketSize: "R500,000 - R5,000,000",
-    sectorFocus: "ICT, Fintech",
-    geographicFocus: "South Africa",
-    supportOffered: "Mentorship, Technical Assistance",
-    applicationDeadline: "2023-12-31",
-    responseTime: "3-5 days",
-    status: "Not Contacted",
-  },
-  {
-    id: "2",
-    name: "Savanna Growth Fund",
-    matchPercentage: 88,
-    investmentType: "Debt",
-    targetStage: "Growth",
-    ticketSize: "R2,000,000 - R10,000,000",
-    sectorFocus: "Agriculture, Manufacturing",
-    geographicFocus: "Southern Africa",
-    supportOffered: "Market Access",
-    applicationDeadline: "2023-11-15",
-    responseTime: "7-10 days",
-    status: "Applied",
-  },
-  {
-    id: "3",
-    name: "Umoja Impact Investors",
-    matchPercentage: 85,
-    investmentType: "Blended Finance",
-    targetStage: "Early Growth",
-    ticketSize: "R1,000,000 - R8,000,000",
-    sectorFocus: "Clean Energy, Agriculture",
-    geographicFocus: "East Africa, South Africa",
-    supportOffered: "Technical Assistance, ESG Support",
-    applicationDeadline: "2023-10-30",
-    responseTime: "5-7 days",
-    status: "Under Review",
-  },
-  {
-    id: "4",
-    name: "Baobab Venture Partners",
-    matchPercentage: 82,
-    investmentType: "Equity, Convertible Note",
-    targetStage: "Seed",
-    ticketSize: "R250,000 - R3,000,000",
-    sectorFocus: "Healthcare, EdTech",
-    geographicFocus: "South Africa, Botswana",
-    supportOffered: "Mentorship, Network Access",
-    applicationDeadline: "2023-12-15",
-    responseTime: "2-4 days",
-    status: "Not Contacted",
-  },
-  {
-    id: "5",
-    name: "Serengeti Growth Capital",
-    matchPercentage: 80,
-    investmentType: "Equity",
-    targetStage: "Series A, Growth",
-    ticketSize: "R5,000,000 - R20,000,000",
-    sectorFocus: "Retail, Logistics",
-    geographicFocus: "Pan-African",
-    supportOffered: "Strategic Partnerships",
-    applicationDeadline: "2023-11-30",
-    responseTime: "7-14 days",
-    status: "Not Contacted",
-  },
-  {
-    id: "6",
-    name: "Acacia Innovation Fund",
-    matchPercentage: 78,
-    investmentType: "Grant, Equity",
-    targetStage: "Pre-seed, Seed",
-    ticketSize: "R100,000 - R1,500,000",
-    sectorFocus: "AgriTech, CleanTech",
-    geographicFocus: "South Africa",
-    supportOffered: "Technical Assistance, Mentorship",
-    applicationDeadline: "2023-10-15",
-    responseTime: "5-10 days",
-    status: "Funded",
-  },
-  {
-    id: "7",
-    name: "Kalahari Angels",
-    matchPercentage: 75,
-    investmentType: "Equity, Convertible Note",
-    targetStage: "Seed",
-    ticketSize: "R250,000 - R2,000,000",
-    sectorFocus: "ICT, E-commerce",
-    geographicFocus: "Southern Africa",
-    supportOffered: "Mentorship, Network Access",
-    applicationDeadline: "2023-12-01",
-    responseTime: "3-5 days",
-    status: "Rejected",
-  },
-  {
-    id: "8",
-    name: "Sahara Development Bank",
-    matchPercentage: 72,
-    investmentType: "Debt",
-    targetStage: "Growth, Mature",
-    ticketSize: "R5,000,000 - R50,000,000",
-    sectorFocus: "Manufacturing, Infrastructure",
-    geographicFocus: "Africa-wide",
-    supportOffered: "Financial Advisory",
-    applicationDeadline: "2023-11-20",
-    responseTime: "14-21 days",
-    status: "Not Contacted",
-  },
-]
+// Configuration matching Python implementation
+const ADJACENT_INDUSTRIES = {
+  "ict": ["technology", "software", "digital services"],
+  "education": ["e-learning", "training", "edtech"],
+  "manufacturing": ["construction", "engineering", "industrial"],
+  "healthcare": ["medtech", "biotech", "pharmaceuticals"]
+}
+
+const FUNDING_STAGES = ["Pre-Seed", "Seed", "Series A", "Series B", "Growth"]
 
 export function FundingTable({ filters }) {
-  const [funders, setFunders] = useState(mockFunders)
-  const [filteredFunders, setFilteredFunders] = useState(mockFunders)
+  const [funders, setFunders] = useState([])
+  const [currentBusiness, setCurrentBusiness] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-  // Apply filters when they change
   useEffect(() => {
-    setLoading(true)
+    const fetchData = async () => {
+      try {
+        const auth = getAuth()
+        const user = auth.currentUser
+        
+        if (!user) throw new Error("User not authenticated")
 
-    // Filter the funders based on the current filters
-    let filtered = [...funders]
+        // Fetch business profile with financial data
+        const businessRef = doc(db, "universalProfiles", user.uid)
+        const businessSnap = await getDoc(businessRef)
+        
+        if (!businessSnap.exists()) throw new Error("Business profile not found")
+        
+        const businessData = {
+          ...businessSnap.data().entityOverview,
+          financials: businessSnap.data().financialOverview,
+          useOfFunds: businessSnap.data().useOfFunds
+        }
+        setCurrentBusiness(businessData)
 
-    // Apply search term
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase()
-      filtered = filtered.filter(
-        (funder) =>
-          funder.name.toLowerCase().includes(term) ||
-          funder.sectorFocus.toLowerCase().includes(term) ||
-          funder.geographicFocus.toLowerCase().includes(term),
-      )
-    }
+        // Fetch investors and funds
+        const investorsSnapshot = await getDocs(collection(db, "MyuniversalProfiles"))
+        const matchedFunds = []
 
-    // Apply location filter
-    if (filters.location) {
-      filtered = filtered.filter((funder) => funder.geographicFocus.includes(filters.location))
-    }
-
-    // Apply match score filter
-    if (filters.matchScore) {
-      filtered = filtered.filter((funder) => funder.matchPercentage >= filters.matchScore)
-    }
-
-    // Apply investment range filter
-    if (filters.minValue) {
-      const minValue = Number.parseFloat(filters.minValue.replace(/[^0-9.-]+/g, ""))
-      if (!isNaN(minValue)) {
-        filtered = filtered.filter((funder) => {
-          const ticketMin = Number.parseFloat(funder.ticketSize.split(" - ")[0].replace(/[^0-9.-]+/g, ""))
-          return !isNaN(ticketMin) && ticketMin >= minValue
-        })
-      }
-    }
-
-    if (filters.maxValue) {
-      const maxValue = Number.parseFloat(filters.maxValue.replace(/[^0-9.-]+/g, ""))
-      if (!isNaN(maxValue)) {
-        filtered = filtered.filter((funder) => {
-          const ticketMax = Number.parseFloat(funder.ticketSize.split(" - ")[1].replace(/[^0-9.-]+/g, ""))
-          return !isNaN(ticketMax) && ticketMax <= maxValue
-        })
-      }
-    }
-
-    // Apply instruments filter
-    if (filters.instruments && filters.instruments.length > 0) {
-      filtered = filtered.filter((funder) =>
-        filters.instruments.some((instrument) => funder.investmentType.includes(instrument)),
-      )
-    }
-
-    // Apply stages filter
-    if (filters.stages && filters.stages.length > 0) {
-      filtered = filtered.filter((funder) => filters.stages.some((stage) => funder.targetStage.includes(stage)))
-    }
-
-    // Apply sectors filter
-    if (filters.sectors && filters.sectors.length > 0) {
-      filtered = filtered.filter((funder) => filters.sectors.some((sector) => funder.sectorFocus.includes(sector)))
-    }
-
-    // Apply support types filter
-    if (filters.supportTypes && filters.supportTypes.length > 0) {
-      filtered = filtered.filter((funder) =>
-        filters.supportTypes.some((support) => funder.supportOffered.includes(support)),
-      )
-    }
-
-    // Apply funder type filter
-    if (filters.funderType) {
-      filtered = filtered.filter((funder) => funder.name.includes(filters.funderType))
-    }
-
-    // Apply sorting
-    if (filters.sortBy) {
-      switch (filters.sortBy) {
-        case "Match Score (High to Low)":
-          filtered.sort((a, b) => b.matchPercentage - a.matchPercentage)
-          break
-        case "Match Score (Low to High)":
-          filtered.sort((a, b) => a.matchPercentage - b.matchPercentage)
-          break
-        case "Deadline (Soonest First)":
-          filtered.sort((a, b) => new Date(a.applicationDeadline) - new Date(b.applicationDeadline))
-          break
-        case "Amount (High to Low)":
-          filtered.sort((a, b) => {
-            const aMax = Number.parseFloat(a.ticketSize.split(" - ")[1].replace(/[^0-9.-]+/g, ""))
-            const bMax = Number.parseFloat(b.ticketSize.split(" - ")[1].replace(/[^0-9.-]+/g, ""))
-            return bMax - aMax
+        investorsSnapshot.forEach(investorDoc => {
+          const funds = investorDoc.data().productsServices?.funds || []
+          
+          funds.forEach(fund => {
+            const matchScore = calculateMatchScore(businessData, fund)
+            
+            if (matchScore >= 6) { // Minimum score threshold
+              matchedFunds.push({
+                id: `${investorDoc.id}_${fund.name}`,
+                name: fund.name || "Unnamed Fund",
+                matchPercentage: matchScore,
+                investmentType: fund.type?.join(", ") || "Various",
+                targetStage: fund.stages?.join(", ") || "Various",
+                ticketSize: formatTicketSize(fund.ticketMin, fund.ticketMax),
+                sectorFocus: fund.sectorFocus?.join(", ") || "Various",
+                geographicFocus: fund.geographicFocus?.join(", ") || "Various",
+                supportOffered: fund.support?.join(", ") || "Not specified",
+                minInvestment: Number(fund.ticketMin) || 0,
+                maxInvestment: Number(fund.ticketMax) || 0,
+                ...fund
+              })
+            }
           })
-          break
-        case "Amount (Low to High)":
-          filtered.sort((a, b) => {
-            const aMin = Number.parseFloat(a.ticketSize.split(" - ")[0].replace(/[^0-9.-]+/g, ""))
-            const bMin = Number.parseFloat(b.ticketSize.split(" - ")[0].replace(/[^0-9.-]+/g, ""))
-            return aMin - bMin
-          })
-          break
-        default:
-          break
+        })
+
+        // Hybrid Gale-Shapley inspired sorting
+        const sortedFunds = matchedFunds.sort((a, b) => 
+          b.matchPercentage - a.matchPercentage || 
+          a.minInvestment - b.minInvestment
+        )
+        
+        setFunders(sortedFunds)
+      } catch (error) {
+        console.error("Error:", error)
+      } finally {
+        setLoading(false)
       }
     }
 
-    setFilteredFunders(filtered)
+    fetchData()
+  }, [])
 
-    // Simulate loading delay
-    setTimeout(() => {
-      setLoading(false)
-    }, 300)
-  }, [funders, filters, searchTerm])
+   const calculateMatchScore = (business, fund) => {
+    let score = 0
+    const businessSector = (business.economicSector || "").toLowerCase().trim()
+    const businessStage = (business.operationStage || "").toLowerCase().trim()
+    const businessLocation = (business.location || "").toLowerCase().trim()
+    const requestedAmount = parseFloat(business.useOfFunds?.amountRequested || 0)
 
-  const getStatusClass = (status) => {
-    switch (status) {
-      case "Not Contacted":
-        return styles.statusNotContacted
-      case "Applied":
-        return styles.statusApplied
-      case "Under Review":
-        return styles.statusUnderReview
-      case "Funded":
-        return styles.statusFunded
-      case "Rejected":
-        return styles.statusRejected
-      default:
-        return styles.statusDefault
+    // Industry Match (30%)
+    if (fund.sectorFocus?.some(s => s.toLowerCase() === businessSector)) {
+      score += 30
+    } else if (ADJACENT_INDUSTRIES[businessSector]?.some(ai => 
+      fund.sectorFocus?.includes(ai))) {
+      score += 20
     }
+
+    // Stage Match (30%)
+    const stageIndex = FUNDING_STAGES.indexOf(business.operationStage)
+    const fundStageIndex = FUNDING_STAGES.indexOf(fund.stages?.[0])
+    if (stageIndex === fundStageIndex) {
+      score += 30
+    } else if (Math.abs(stageIndex - fundStageIndex) === 1) {
+      score += 15
+    }
+
+    // Financial Match (25%)
+    const min = parseFloat(fund.ticketMin || 0)
+    const max = parseFloat(fund.ticketMax || Infinity)
+    if (requestedAmount >= min && requestedAmount <= max) {
+      score += 25
+    } else {
+      const midpoint = (min + max) / 2
+      const penalty = Math.abs(requestedAmount - midpoint) / (max - min) * 25
+      score += Math.max(0, 25 - penalty)
+    }
+
+    // Location Match (15%)
+    if (fund.geographicFocus?.some(l => l.toLowerCase() === businessLocation)) {
+      score += 15
+    }
+
+    return Math.min(100, Math.round(score)) // Cap at 100%
   }
+
+  const formatTicketSize = (min, max) => {
+    if (!min && !max) return "Not specified"
+    return `R${Number(min).toLocaleString()} - R${Number(max).toLocaleString()}`
+  }
+
 
   return (
     <div>
       <div className={styles.tableHeader}>
         <h2 className={styles.sectionTitle}>Funding Matches</h2>
+        {currentBusiness && (
+          <div className={styles.businessSummary}>
+            Matching for: {currentBusiness.registeredName || "Your Business"} | 
+            Sector: {currentBusiness.economicSector || "N/A"} | 
+            Location: {currentBusiness.location || "N/A"} | 
+            Stage: {currentBusiness.operationStage || "N/A"}
+          </div>
+        )}
         <div className={styles.tableSearch}>
           <Search size={16} className={styles.searchIcon} />
           <input
@@ -276,11 +163,12 @@ export function FundingTable({ filters }) {
         </div>
         <div className={styles.tableStats}>
           <span className={styles.statItem}>
-            <span className={styles.statValue}>{filteredFunders.length}</span> matches
+            <span className={styles.statValue}>{funders.length}</span> matches
           </span>
           <span className={styles.statItem}>
-            <span className={styles.statValue}>{filteredFunders.filter((f) => f.matchPercentage >= 80).length}</span>{" "}
-            high matches
+            <span className={styles.statValue}>
+              {funders.filter(f => f.matchPercentage >= 80).length}
+            </span> high matches
           </span>
         </div>
       </div>
@@ -289,7 +177,7 @@ export function FundingTable({ filters }) {
         {loading ? (
           <div className={styles.loadingContainer}>
             <div className={styles.spinner}></div>
-            <p>Filtering results...</p>
+            <p>Loading matches...</p>
           </div>
         ) : (
           <table className={styles.fundingTable}>
@@ -303,27 +191,29 @@ export function FundingTable({ filters }) {
                 <th>Sector</th>
                 <th>Location</th>
                 <th>Support</th>
-                <th>Deadline</th>
-                <th>Status</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {filteredFunders.length > 0 ? (
-                filteredFunders.map((funder) => (
+              {funders.length > 0 ? (
+                funders.map(funder => (
                   <tr key={funder.id}>
                     <td className={styles.funderName}>{funder.name}</td>
-                    <td className={styles.matchPercentage}>{funder.matchPercentage}%</td>
+                    <td className={styles.matchPercentage}>
+                      <div className={styles.matchBarContainer}>
+                        <div 
+                          className={styles.matchBar} 
+                          style={{ width: `${funder.matchPercentage}%` }}
+                        ></div>
+                        <span>{funder.matchPercentage}%</span>
+                      </div>
+                    </td>
                     <td>{funder.investmentType}</td>
                     <td>{funder.targetStage}</td>
                     <td>{funder.ticketSize}</td>
                     <td>{funder.sectorFocus}</td>
                     <td>{funder.geographicFocus}</td>
                     <td>{funder.supportOffered}</td>
-                    <td>{funder.applicationDeadline}</td>
-                    <td>
-                      <span className={getStatusClass(funder.status)}>{funder.status}</span>
-                    </td>
                     <td>
                       <div className={styles.actionButtons}>
                         <button className={styles.actionButton} title="View Details">
@@ -338,8 +228,8 @@ export function FundingTable({ filters }) {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="11" className={styles.noResults}>
-                    No matching investors found. Try adjusting your filters.
+                  <td colSpan="9" className={styles.noResults}>
+                    {!loading && 'No matching funds found. Try adjusting your filters.'}
                   </td>
                 </tr>
               )}
