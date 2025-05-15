@@ -1,8 +1,11 @@
 "use client"
+import { useState, useRef, useEffect } from "react"
+import { ChevronDown } from "lucide-react"
 import FormField from "./FormField"
 import FileUpload from "./FileUpload"
 import styles from "./InvestorUniversalProfile.module.css"
 import ViewUniversalProfile from "./Investortestview"
+
 const entityTypes = [
   { value: "ptyLtd", label: "Pty Ltd" },
   { value: "cc", label: "CC" },
@@ -87,19 +90,129 @@ const saProvinces = [
   { value: "northernCape", label: "Northern Cape" },
 ]
 
+// MultiSelectDropdown component integrated directly into the file
+function MultiSelectDropdown({
+  options,
+  value = [],
+  onChange,
+  placeholder = "Select options",
+  name,
+  required = false,
+}) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [selectedOptions, setSelectedOptions] = useState(value)
+  const dropdownRef = useRef(null)
+
+  useEffect(() => {
+    setSelectedOptions(value)
+  }, [value])
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
+
+  const toggleOption = (optionValue) => {
+    let newSelectedOptions
+
+    if (selectedOptions.includes(optionValue)) {
+      newSelectedOptions = selectedOptions.filter((value) => value !== optionValue)
+    } else {
+      newSelectedOptions = [...selectedOptions, optionValue]
+    }
+
+    setSelectedOptions(newSelectedOptions)
+    onChange(newSelectedOptions)
+  }
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen)
+  }
+
+  const getSelectedLabels = () => {
+    return options.filter((option) => selectedOptions.includes(option.value)).map((option) => option.label)
+  }
+
+  return (
+    <div className={styles.multiSelectContainer} ref={dropdownRef}>
+      <div className={styles.multiSelectHeader} onClick={toggleDropdown} aria-haspopup="listbox" aria-expanded={isOpen}>
+        {selectedOptions.length > 0 ? (
+          <div className={styles.selectedItems}>
+            {getSelectedLabels().map((label) => (
+              <span key={label} className={styles.selectedItem}>
+                {label}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <span className={styles.placeholder}>{placeholder}</span>
+        )}
+        <ChevronDown size={16} />
+      </div>
+
+      {isOpen && (
+        <div className={styles.multiSelectDropdown}>
+          <div className={styles.multiSelectOptions} role="listbox">
+            {options.map((option) => (
+              <div
+                key={option.value}
+                className={`${styles.multiSelectOption} ${
+                  selectedOptions.includes(option.value) ? styles.selected : ""
+                }`}
+                onClick={() => toggleOption(option.value)}
+                role="option"
+                aria-selected={selectedOptions.includes(option.value)}
+              >
+                <input
+                  type="checkbox"
+                  className={styles.multiSelectCheckbox}
+                  checked={selectedOptions.includes(option.value)}
+                  onChange={() => {}}
+                  id={`${name}-${option.value}`}
+                />
+                <label htmlFor={`${name}-${option.value}`}>{option.label}</label>
+              </div>
+            ))}
+          </div>
+          <div className={styles.multiSelectActions}>
+            <button type="button" className={styles.multiSelectButton} onClick={() => setIsOpen(false)}>
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden select for form submission */}
+      <select
+        name={name}
+        multiple
+        value={selectedOptions}
+        onChange={() => {}}
+        required={required}
+        style={{ display: "none" }}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+}
+
 export default function EntityOverview({ data = {}, updateData }) {
   const handleChange = (e) => {
     const { name, value } = e.target
-
-    // Handle multi-select for economic sectors
-    if (name === "economicSectors" && Array.isArray(e.target.options)) {
-      const selectedOptions = Array.from(e.target.options)
-        .filter((option) => option.selected)
-        .map((option) => option.value)
-      updateData({ [name]: selectedOptions })
-    } else {
-      updateData({ [name]: value })
-    }
+    updateData({ [name]: value })
   }
 
   const handleFileChange = (name, files) => {
@@ -229,21 +342,14 @@ export default function EntityOverview({ data = {}, updateData }) {
 
         <div className={styles.gridContainer}>
           <FormField label="Economic Sectors" required>
-            <select
+            <MultiSelectDropdown
               name="economicSectors"
+              options={economicSectors}
               value={data.economicSectors || []}
-              onChange={handleChange}
-              className={styles.formSelect}
+              onChange={(selectedOptions) => updateData({ economicSectors: selectedOptions })}
+              placeholder="Select Economic Sectors"
               required
-              multiple
-              size={4}
-            >
-              {economicSectors.map((sector) => (
-                <option key={sector.value} value={sector.value}>
-                  {sector.label}
-                </option>
-              ))}
-            </select>
+            />
           </FormField>
 
           <FormField label="Location" required>
