@@ -28,10 +28,11 @@
   padding: 12px;
   box-sizing: border-box;
   width: calc(100% - 250px); /* Adjust based on your left sidebar width */
-  max-width: 900px; /* Limit the maximum width */
+  max-width: 100%; /* Limit the maximum width */
   margin-left: 250PX; /* Push content to the right */
   margin-right: 0;
   background-color: var(--brown-50);
+ margin-top:90px;
 }
 
 .pageContainer {

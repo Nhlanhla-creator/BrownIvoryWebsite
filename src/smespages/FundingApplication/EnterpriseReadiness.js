@@ -39,6 +39,9 @@ export const renderEnterpriseReadiness = (data, updateFormData) => {
     updateFormData("enterpriseReadiness", { [name]: files })
   }
 
+  // Check if "other" is selected in barriers
+  const isOtherBarrierSelected = (data.barriers || []).includes("other")
+
   return (
     <>
       <h2>Enterprise Readiness</h2>
@@ -72,13 +75,12 @@ export const renderEnterpriseReadiness = (data, updateFormData) => {
             </div>
             {data.hasBusinessPlan === "yes" && (
               <div className="specification-field">
-                <input
-                  type="text"
-                  name="businessPlanDetails"
-                  value={data.businessPlanDetails || ""}
-                  onChange={handleChange}
-                  className="form-input"
-                  placeholder="Please specify details about your business plan"
+                <FileUpload
+                  label="Upload Business Plan"
+                  accept=".pdf,.doc,.docx"
+                  required
+                  onChange={(files) => handleFileChange("businessPlanFile", files)}
+                  value={data.businessPlanFile || []}
                 />
               </div>
             )}
@@ -111,13 +113,12 @@ export const renderEnterpriseReadiness = (data, updateFormData) => {
             </div>
             {data.hasPitchDeck === "yes" && (
               <div className="specification-field">
-                <input
-                  type="text"
-                  name="pitchDeckDetails"
-                  value={data.pitchDeckDetails || ""}
-                  onChange={handleChange}
-                  className="form-input"
-                  placeholder="Please specify details about your pitch deck"
+                <FileUpload
+                  label="Upload Pitch Deck"
+                  accept=".pdf,.ppt,.pptx"
+                  required
+                  onChange={(files) => handleFileChange("pitchDeckFile", files)}
+                  value={data.pitchDeckFile || []}
                 />
               </div>
             )}
@@ -379,6 +380,20 @@ export const renderEnterpriseReadiness = (data, updateFormData) => {
             </label>
           ))}
         </div>
+
+        {/* Add text field for "other" barrier specification */}
+        {isOtherBarrierSelected && (
+          <div className="mt-2">
+            <input
+              type="text"
+              name="otherBarrierDetails"
+              value={data.otherBarrierDetails || ""}
+              onChange={handleChange}
+              className="form-input"
+              placeholder="Please specify other barrier"
+            />
+          </div>
+        )}
       </div>
 
       <div className="form-field">
@@ -479,26 +494,21 @@ export const renderEnterpriseReadiness = (data, updateFormData) => {
         <h3>Required Documents</h3>
 
         <div className="grid-container">
-          <FileUpload
+          {/* <FileUpload
             label="Business Plan"
             accept=".pdf,.doc,.docx"
             onChange={(files) => handleFileChange("businessPlan", files)}
             value={data.businessPlan || []}
-          />
-
+          /> */}
+{/* 
           <FileUpload
             label="Pitch Deck"
             accept=".pdf,.ppt,.pptx"
             onChange={(files) => handleFileChange("pitchDeck", files)}
             value={data.pitchDeck || []}
-          />
+          /> */}
 
-          <FileUpload
-            label="Management Accounts or Latest Financials"
-            accept=".pdf,.xlsx,.xls,.csv"
-            onChange={(files) => handleFileChange("financials", files)}
-            value={data.financials || []}
-          />
+          {/* Removed "Management Accounts or Latest Financials" document */}
 
           <FileUpload
             label="Previous Program Reports (if applicable)"

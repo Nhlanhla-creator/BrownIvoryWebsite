@@ -22,7 +22,7 @@ export const businessFundingStage = [
 
 export const urgencyOptions = [
   { value: "immediate", label: "Immediate" },
-  { value: "3-6months", label: "3-6 months" },
+  { value: "1-3months", label: "1-3 months" },
   { value: "6-12months", label: "6-12 months" },
 ];
 

@@ -16,7 +16,7 @@
   .header-left h1 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1e40af; /* Blue color for investor theme */
+    color:#4e342e; /* Blue color for investor theme */
     margin: 0;
   }
   
@@ -108,7 +108,7 @@
   .mark-read-button {
     background: none;
     border: none;
-    color: #3b82f6;
+    color:#4e342e;
     font-size: 0.75rem;
     cursor: pointer;
   }
@@ -154,7 +154,7 @@
   }
   
   .notification-footer a {
-    color: #3b82f6;
+    color: #4e342e;
     font-size: 0.875rem;
     text-decoration: none;
   }
@@ -196,7 +196,7 @@
   .profile-placeholder {
     width: 100%;
     height: 100%;
-    background-color: #1e40af;
+    background-color: #4e342e;
     color: white;
     display: flex;
     align-items: center;
@@ -248,7 +248,7 @@
   
   .profile-dropdown li a:hover,
   .profile-dropdown li button:hover {
-    color: #1e40af;
+    color: #4e342e;
   }
   
   .profile-dropdown li.divider {

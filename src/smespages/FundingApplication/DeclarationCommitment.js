@@ -84,13 +84,7 @@ export const renderDeclarationCommitment = (data, updateFormData) => {
       <div className="section-divider">
         <h3>Required Documents</h3>
 
-        <FileUpload
-          label="Signed Declaration Form (or digital acceptance)"
-          accept=".pdf,.jpg,.jpeg,.png"
-          required
-          onChange={(files) => handleFileChange("signedDeclaration", files)}
-          value={data.signedDeclaration || []}
-        />
+      
       </div>
     </>
   );

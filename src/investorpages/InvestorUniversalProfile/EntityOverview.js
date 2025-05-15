@@ -2,7 +2,7 @@
 import FormField from "./FormField"
 import FileUpload from "./FileUpload"
 import styles from "./InvestorUniversalProfile.module.css"
-import ViewUniversalProfile from './Investortestview'
+import ViewUniversalProfile from "./Investortestview"
 const entityTypes = [
   { value: "ptyLtd", label: "Pty Ltd" },
   { value: "cc", label: "CC" },
@@ -75,10 +75,31 @@ const countries = [
   { value: "other", label: "Other" },
 ]
 
+const saProvinces = [
+  { value: "gauteng", label: "Gauteng" },
+  { value: "westernCape", label: "Western Cape" },
+  { value: "easternCape", label: "Eastern Cape" },
+  { value: "kwazuluNatal", label: "KwaZulu-Natal" },
+  { value: "freeState", label: "Free State" },
+  { value: "northWest", label: "North West" },
+  { value: "mpumalanga", label: "Mpumalanga" },
+  { value: "limpopo", label: "Limpopo" },
+  { value: "northernCape", label: "Northern Cape" },
+]
+
 export default function EntityOverview({ data = {}, updateData }) {
   const handleChange = (e) => {
     const { name, value } = e.target
-    updateData({ [name]: value })
+
+    // Handle multi-select for economic sectors
+    if (name === "economicSectors" && Array.isArray(e.target.options)) {
+      const selectedOptions = Array.from(e.target.options)
+        .filter((option) => option.selected)
+        .map((option) => option.value)
+      updateData({ [name]: selectedOptions })
+    } else {
+      updateData({ [name]: value })
+    }
   }
 
   const handleFileChange = (name, files) => {
@@ -207,15 +228,16 @@ export default function EntityOverview({ data = {}, updateData }) {
         </div>
 
         <div className={styles.gridContainer}>
-          <FormField label="Economic Sector" required>
+          <FormField label="Economic Sectors" required>
             <select
-              name="economicSector"
-              value={data.economicSector || ""}
+              name="economicSectors"
+              value={data.economicSectors || []}
               onChange={handleChange}
               className={styles.formSelect}
               required
+              multiple
+              size={4}
             >
-              <option value="">Select Economic Sector</option>
               {economicSectors.map((sector) => (
                 <option key={sector.value} value={sector.value}>
                   {sector.label}
@@ -239,6 +261,27 @@ export default function EntityOverview({ data = {}, updateData }) {
                 </option>
               ))}
             </select>
+
+            {data.location === "southAfrica" && (
+              <div className={styles.provinceSelect}>
+                <FormField label="Province" required>
+                  <select
+                    name="province"
+                    value={data.province || ""}
+                    onChange={handleChange}
+                    className={styles.formSelect}
+                    required
+                  >
+                    <option value="">Select Province</option>
+                    {saProvinces.map((province) => (
+                      <option key={province.value} value={province.value}>
+                        {province.label}
+                      </option>
+                    ))}
+                  </select>
+                </FormField>
+              </div>
+            )}
           </FormField>
         </div>
 
@@ -312,7 +355,7 @@ export default function EntityOverview({ data = {}, updateData }) {
             value={data.companyLogo || []}
           />
         </div>
-        <ViewUniversalProfile/>
+        <ViewUniversalProfile />
       </div>
     </div>
   )

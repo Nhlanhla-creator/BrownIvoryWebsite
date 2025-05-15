@@ -1,11 +1,14 @@
+"use client"
+import { useEffect, useState } from "react"
 import FormField from "./form-field"
 import FileUpload from "./file-upload"
-import './UniversalProfile.css';
-import { useEffect, useState } from 'react';
-import { db, auth, storage } from '../../firebaseConfig';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import ProfileView from "./LindelaniTestView"; // Adjust the import based on your file structure
+import "./UniversalProfile.css"
+import { db, auth, storage } from "../../firebaseConfig"
+import { doc, setDoc, getDoc } from "firebase/firestore"
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import ProfileView from "./LindelaniTestView" // Adjust the import based on your file structure
+import { ChevronDown, ChevronUp } from "lucide-react"
+
 const entityTypes = [
   { value: "ptyLtd", label: "Pty Ltd" },
   { value: "cc", label: "CC" },
@@ -23,11 +26,14 @@ const entitySizes = [
 ]
 
 const operationStages = [
-  { value: "ideation", label: "Ideation" },
+  { value: "ideation", label: "Idea" },
+  { value: "prototype", label: "Prototype" },
   { value: "startup", label: "Startup" },
+  { value: "early-growth", label: "Early-Growth" },
   { value: "growth", label: "Growth" },
+  { value: "scale-up", label: "Scale-up" },
   { value: "mature", label: "Mature" },
-  { value: "turnaround", label: "Turnaround" },
+  
 ]
 
 const economicSectors = [
@@ -105,140 +111,213 @@ const africanCountries = [
   { value: "zimbabwe", label: "Zimbabwe" },
 ]
 
+// MultiSelect component for Economic Sector
+function MultiSelect({ options, selected, onChange, label }) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const toggleDropdown = () => setIsOpen(!isOpen)
+  const closeDropdown = () => setIsOpen(false)
+
+  const handleSelect = (value) => {
+    const newSelected = selected.includes(value) ? selected.filter((item) => item !== value) : [...selected, value]
+    onChange(newSelected)
+  }
+
+  return (
+    <div className="multi-select-container">
+      <div className="multi-select-header" onClick={toggleDropdown}>
+        {selected.length > 0 ? (
+          <div className="selected-items">
+            {selected.map((sector) => (
+              <span key={sector} className="selected-item">
+                {options.find((opt) => opt.value === sector)?.label || sector}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <span className="placeholder">Select {label}</span>
+        )}
+        {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+      </div>
+
+      {isOpen && (
+        <div className="multi-select-dropdown">
+          <div className="multi-select-options">
+            {options.map((option) => (
+              <div
+                key={option.value}
+                className={`multi-select-option ${selected.includes(option.value) ? "selected" : ""}`}
+                onClick={() => handleSelect(option.value)}
+              >
+                <input
+                  type="checkbox"
+                  checked={selected.includes(option.value)}
+                  onChange={() => {}}
+                  className="multi-select-checkbox"
+                />
+                <span>{option.label}</span>
+              </div>
+            ))}
+          </div>
+          <div className="multi-select-actions">
+            <button type="button" className="multi-select-button" onClick={closeDropdown}>
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function EntityOverview({ data = {}, updateData, onSave }) {
-  const [formData, setFormData] = useState({});
-  const [isSaving, setIsSaving] = useState(false);
-  
+  const [formData, setFormData] = useState({})
+  const [isSaving, setIsSaving] = useState(false)
+
   useEffect(() => {
-    setFormData(data);
-  }, [data]);
+    setFormData(data)
+  }, [data])
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    const updatedData = { ...formData, [name]: value };
-    setFormData(updatedData);
-    updateData(updatedData);
-  };
+    const { name, value } = e.target
+    const updatedData = { ...formData, [name]: value }
+    setFormData(updatedData)
+    updateData(updatedData)
+  }
+
+  const handleMultiSelectChange = (field, value) => {
+    const updatedData = { ...formData, [field]: value }
+    setFormData(updatedData)
+    updateData(updatedData)
+  }
 
   const handleFileChange = (name, files) => {
-    const updatedData = { ...formData, [name]: files };
-    setFormData(updatedData);
-    updateData(updatedData);
-  };
+    const updatedData = { ...formData, [name]: files }
+    setFormData(updatedData)
+    updateData(updatedData)
+  }
 
   const saveEntityOverview = async () => {
     if (!auth.currentUser) {
-      throw new Error("User not authenticated");
+      throw new Error("User not authenticated")
     }
 
-    setIsSaving(true);
+    setIsSaving(true)
     try {
-      const userId = auth.currentUser.uid;
-      const docRef = doc(db, `smes/${userId}/universalProfile/entityOverview`);
+      const userId = auth.currentUser.uid
+      const docRef = doc(db, `smes/${userId}/universalProfile/entityOverview`)
 
-      const { companyLogo, registrationCertificate, proofOfAddress, ...firestoreData } = formData;
+      const { companyLogo, registrationCertificate, proofOfAddress, ...firestoreData } = formData
 
-      await setDoc(docRef, firestoreData, { merge: true });
+      await setDoc(docRef, firestoreData, { merge: true })
 
-      const uploadPromises = [];
+      const uploadPromises = []
 
       if (companyLogo && companyLogo.length > 0) {
-        const logoRef = ref(storage, `smes/${userId}/universalProfile/entityOverview/companyLogo/${companyLogo[0].name}`);
+        const logoRef = ref(
+          storage,
+          `smes/${userId}/universalProfile/entityOverview/companyLogo/${companyLogo[0].name}`,
+        )
         uploadPromises.push(
           uploadBytes(logoRef, companyLogo[0]).then(() =>
-            getDownloadURL(logoRef).then(url => ({
-              field: 'companyLogoUrl',
-              url
-            }))
-          )
-        );
+            getDownloadURL(logoRef).then((url) => ({
+              field: "companyLogoUrl",
+              url,
+            })),
+          ),
+        )
       }
 
       if (registrationCertificate && registrationCertificate.length > 0) {
-        const certRef = ref(storage, `smes/${userId}/universalProfile/entityOverview/registrationCertificate/${registrationCertificate[0].name}`);
+        const certRef = ref(
+          storage,
+          `smes/${userId}/universalProfile/entityOverview/registrationCertificate/${registrationCertificate[0].name}`,
+        )
         uploadPromises.push(
           uploadBytes(certRef, registrationCertificate[0]).then(() =>
-            getDownloadURL(certRef).then(url => ({
-              field: 'registrationCertificateUrl',
-              url
-            }))
-          )
-        );
+            getDownloadURL(certRef).then((url) => ({
+              field: "registrationCertificateUrl",
+              url,
+            })),
+          ),
+        )
       }
 
       if (proofOfAddress && proofOfAddress.length > 0) {
-        const addressRef = ref(storage, `smes/${userId}/universalProfile/entityOverview/proofOfAddress/${proofOfAddress[0].name}`);
+        const addressRef = ref(
+          storage,
+          `smes/${userId}/universalProfile/entityOverview/proofOfAddress/${proofOfAddress[0].name}`,
+        )
         uploadPromises.push(
           uploadBytes(addressRef, proofOfAddress[0]).then(() =>
-            getDownloadURL(addressRef).then(url => ({
-              field: 'proofOfAddressUrl',
-              url
-            }))
-          )
-        );
+            getDownloadURL(addressRef).then((url) => ({
+              field: "proofOfAddressUrl",
+              url,
+            })),
+          ),
+        )
       }
 
-      const uploadResults = await Promise.all(uploadPromises);
+      const uploadResults = await Promise.all(uploadPromises)
 
-      const urlUpdates = {};
-      uploadResults.forEach(result => {
-        urlUpdates[result.field] = result.url;
-      });
+      const urlUpdates = {}
+      uploadResults.forEach((result) => {
+        urlUpdates[result.field] = result.url
+      })
 
       if (Object.keys(urlUpdates).length > 0) {
-        await setDoc(docRef, urlUpdates, { merge: true });
+        await setDoc(docRef, urlUpdates, { merge: true })
       }
 
-      const docSnap = await getDoc(docRef);
+      const docSnap = await getDoc(docRef)
       if (docSnap.exists()) {
-        const savedData = docSnap.data();
-        setFormData(savedData);
-        updateData(savedData);
+        const savedData = docSnap.data()
+        setFormData(savedData)
+        updateData(savedData)
       }
 
-      return { success: true };
+      return { success: true }
     } catch (error) {
-      console.error("Error saving entity overview:", error);
-      throw error;
+      console.error("Error saving entity overview:", error)
+      throw error
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
   const loadEntityOverview = async (userId) => {
     try {
-      const docRef = doc(db, `smes/${userId}/universalProfile/entityOverview`);
-      const docSnap = await getDoc(docRef);
+      const docRef = doc(db, `smes/${userId}/universalProfile/entityOverview`)
+      const docSnap = await getDoc(docRef)
 
       if (docSnap.exists()) {
-        const data = docSnap.data();
-        setFormData(data);
-        updateData(data);
-        return data;
+        const data = docSnap.data()
+        setFormData(data)
+        updateData(data)
+        return data
       }
-      return null;
+      return null
     } catch (error) {
-      console.error("Error loading entity overview:", error);
-      return null;
+      console.error("Error loading entity overview:", error)
+      return null
     }
-  };
+  }
 
   useEffect(() => {
     const loadData = async () => {
       if (auth.currentUser) {
-        await loadEntityOverview(auth.currentUser.uid);
+        await loadEntityOverview(auth.currentUser.uid)
       }
-    };
+    }
 
-    loadData();
-  }, []);
+    loadData()
+  }, [])
 
   useEffect(() => {
     if (onSave) {
-      onSave.current = saveEntityOverview;
+      onSave.current = saveEntityOverview
     }
-  }, [formData, onSave]);
-
+  }, [formData, onSave])
 
   return (
     <div>
@@ -368,20 +447,12 @@ export default function EntityOverview({ data = {}, updateData, onSave }) {
           </FormField>
 
           <FormField label="Economic Sector" required>
-            <select
-              name="economicSector"
-              value={formData.economicSector || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
-              required
-            >
-              <option value="">Select Economic Sector</option>
-              {economicSectors.map((sector) => (
-                <option key={sector.value} value={sector.value}>
-                  {sector.label}
-                </option>
-              ))}
-            </select>
+            <MultiSelect
+              options={economicSectors}
+              selected={formData.economicSectors || []}
+              onChange={(value) => handleMultiSelectChange("economicSectors", value)}
+              label="Economic Sectors"
+            />
           </FormField>
 
           <FormField label="Target Market">
@@ -411,6 +482,29 @@ export default function EntityOverview({ data = {}, updateData, onSave }) {
               ))}
             </select>
           </FormField>
+
+          {formData.location === "south_africa" && (
+            <FormField label="Province" required>
+              <select
+                name="province"
+                value={formData.province || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
+                required
+              >
+                <option value="">Select Province</option>
+                <option value="eastern_cape">Eastern Cape</option>
+                <option value="free_state">Free State</option>
+                <option value="gauteng">Gauteng</option>
+                <option value="kwazulu_natal">KwaZulu-Natal</option>
+                <option value="limpopo">Limpopo</option>
+                <option value="mpumalanga">Mpumalanga</option>
+                <option value="northern_cape">Northern Cape</option>
+                <option value="north_west">North West</option>
+                <option value="western_cape">Western Cape</option>
+              </select>
+            </FormField>
+          )}
 
           <FormField label="Brief Business Description" required>
             <textarea
@@ -446,20 +540,12 @@ export default function EntityOverview({ data = {}, updateData, onSave }) {
             value={formData.registrationCertificate || []}
           />
 
-          <FileUpload
-            label="Proof of Operating Address"
-            accept=".pdf,.jpg,.jpeg,.png"
-            required
-            onChange={(files) => handleFileChange("proofOfAddress", files)}
-            value={formData.proofOfAddress || []}
-          />
+          {/* Removed Proof of Operating Address as requested */}
         </div>
-       <ProfileView/>
+        <ProfileView />
       </div>
 
-      <div className="mt-8 flex justify-end">
-
-      </div>
+      <div className="mt-8 flex justify-end"></div>
     </div>
   )
 }

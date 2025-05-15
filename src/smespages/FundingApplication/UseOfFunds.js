@@ -65,6 +65,7 @@ const fundingCategoryOptions = [
   { value: "workingCapital", label: "Working Capital" },
   { value: "acquisition", label: "Acquisition" },
   { value: "businessDevelopment", label: "Business Development" },
+  { value: "opex", label: "Opex" },
 ]
 
 // Sub-area options based on category
@@ -91,6 +92,15 @@ const subAreaOptions = {
     { value: "logistics", label: "Logistics" },
     { value: "salesMarketing", label: "Sales and Marketing" },
     { value: "postInvestment", label: "Post-investment Support" },
+  ],
+  opex: [
+    { value: "salaries", label: "Salaries & Wages" },
+    { value: "rent", label: "Rent & Utilities" },
+    { value: "supplies", label: "Office Supplies" },
+    { value: "marketing", label: "Marketing & Advertising" },
+    { value: "insurance", label: "Insurance" },
+    { value: "maintenance", label: "Maintenance & Repairs" },
+    { value: "other", label: "Other Operating Expenses" },
   ],
 }
 

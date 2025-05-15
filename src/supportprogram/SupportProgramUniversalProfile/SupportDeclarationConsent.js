@@ -100,13 +100,7 @@ export default function DeclarationConsent({ data = {}, updateData }) {
         <div className="mt-8 border-t pt-6">
           <h3 className={`${styles.subtitle} text-lg font-semibold mb-4`}>Required Documents</h3>
 
-          <FileUpload
-            label="Signed Declaration / Consent Form"
-            accept=".pdf,.jpg,.jpeg,.png"
-            required
-            onChange={(files) => handleFileChange("signedDeclaration", files)}
-            value={data.signedDeclaration || []}
-          />
+          
         </div>
 
         <div className="mt-8 flex justify-between"></div>

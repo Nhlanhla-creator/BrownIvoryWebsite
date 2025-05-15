@@ -34,7 +34,6 @@ function InvestorSidebar({ companyName }) {
             { to: "/", label: "Home", icon: <Home size={20} /> },
             { to: "/investor-dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
             { to: "/investor-profile", label: "Universal Profile", icon: <User size={20} /> },
-            { to: "/investor-application", label: "Application Form", icon: <FileText size={20} /> },
             { to: "/investor-matches", label: "Matches", icon: <HeartHandshake size={20} /> },
             { to: "/investor-documnets", label: "Documents", icon: <Book size={20} /> },
             { to: "/investor-messages", label: "Messages", icon: <MessageSquare size={20} /> },

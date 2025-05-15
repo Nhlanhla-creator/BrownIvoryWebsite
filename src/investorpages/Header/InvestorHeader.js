@@ -1,5 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+import {
+  Bell,
+  Briefcase,
+  BarChart2,
+  Mail,
+  Search
+} from "lucide-react";
 import styles from "./InvestorHeader.module.css";
 
 function InvestorHeader({ companyName, profileImage, setProfileImage }) {
@@ -69,23 +76,36 @@ function InvestorHeader({ companyName, profileImage, setProfileImage }) {
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case "opportunity":
+        return <Briefcase size={18} />;
+      case "update":
+        return <BarChart2 size={18} />;
+      case "message":
+        return <Mail size={18} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <header className={styles["investor-header"]}>
       <div className={styles["header-left"]}>
-        <h1>Investor Portal</h1>
+        <h1>Investor Dashboard</h1>
       </div>
 
       <div className={styles["header-right"]}>
         <div className={styles["search-bar"]}>
-          <input type="text" placeholder="Search opportunities..." />
+          <input type="text" placeholder="Search ..." />
           <button className={styles["search-button"]}>
-            <span>🔍</span>
+            <Search size={18} />
           </button>
         </div>
 
         <div className={styles["notification-container"]} ref={notificationRef}>
           <button className={styles["notification-button"]} onClick={handleNotificationClick}>
-            <span>🔔</span>
+            <Bell size={20} />
             {unreadCount > 0 && (
               <span className={styles["notification-badge"]}>{unreadCount}</span>
             )}
@@ -110,9 +130,7 @@ function InvestorHeader({ companyName, profileImage, setProfileImage }) {
                       className={`${styles["notification-item"]} ${!notification.read ? styles["unread"] : ""}`}
                     >
                       <div className={styles["notification-icon"]}>
-                        {notification.type === "opportunity" && <span>💼</span>}
-                        {notification.type === "update" && <span>📊</span>}
-                        {notification.type === "message" && <span>✉️</span>}
+                        {getNotificationIcon(notification.type)}
                       </div>
                       <div className={styles["notification-content"]}>
                         <p>{notification.message}</p>
