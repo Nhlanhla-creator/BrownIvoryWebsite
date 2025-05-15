@@ -1,8 +1,12 @@
 "use client"
-import FileUpload from "./file-upload"
-import './UniversalProfile.css';
 
-export default function DeclarationConsent({ data = {}, updateData }) {
+import { useState } from "react"
+import RegistrationSummary from "./registration-summary"
+import "./UniversalProfile.css"
+
+export default function DeclarationConsent({ data = {}, updateData, allFormData, onComplete }) {
+  const [showSummary, setShowSummary] = useState(false)
+
   const handleChange = (e) => {
     const { name, checked } = e.target
     updateData({ [name]: checked })
@@ -10,6 +14,11 @@ export default function DeclarationConsent({ data = {}, updateData }) {
 
   const handleFileChange = (name, files) => {
     updateData({ [name]: files })
+  }
+
+  const handleSubmit = () => {
+    // Show the summary when the form is submitted
+    setShowSummary(true)
   }
 
   return (
@@ -97,16 +106,27 @@ export default function DeclarationConsent({ data = {}, updateData }) {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-brown-200 pt-6">
-          
+        <div className="mt-8 border-t border-brown-200 pt-6"></div>
 
-         
-        </div>
-
-        <div className="mt-8 flex justify-between">
-        
+        <div className="mt-8 flex justify-end">
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!data.accuracy || !data.dataProcessing || !data.termsConditions}
+            className="px-4 py-2 bg-brown-600 text-white rounded-md hover:bg-brown-700 disabled:opacity-50"
+          >
+            Submit Registration
+          </button>
         </div>
       </div>
+
+      {/* Registration Summary Modal */}
+      <RegistrationSummary
+        data={allFormData || data}
+        open={showSummary}
+        onClose={() => setShowSummary(false)}
+        onComplete={onComplete}
+      />
     </div>
   )
 }

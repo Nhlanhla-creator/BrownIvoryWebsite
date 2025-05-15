@@ -4,7 +4,6 @@ import { useState } from "react"
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom"
 import "./App.css"
 
-
 // Layout Components
 import Sidebar from "./smespages/Sidebar/Sidebar"
 import InvestorSidebar from "./investorpages/Sidebar/InvestorSidebar"
@@ -48,6 +47,7 @@ import SMELegalCompliance from "./smespages/UniversalProfile/legal-compliance"
 import SMEProductsServices from "./smespages/UniversalProfile/products-services"
 import SMEHowDidYouHear from "./smespages/UniversalProfile/how-did-you-hear"
 import SMEDeclarationConsent from "./smespages/UniversalProfile/declaration-consent"
+import RegistrationSummary from "./smespages/UniversalProfile/registration-summary" // Import the registration summary component
 
 // Investor Universal Profile Components
 import InvestorUniversalProfile from "./investorpages/InvestorUniversalProfile/InvestorUniversalProfile"
@@ -133,6 +133,7 @@ const initialFormData = {
 function App() {
   const [profileImage, setProfileImage] = useState(null)
   const [formData, setFormData] = useState(initialFormData)
+  const [showSummary, setShowSummary] = useState(false) // State to control showing the summary
   const companyName = "Acme Inc"
 
   const updateFormData = (section, data) => {
@@ -143,6 +144,11 @@ function App() {
         ...data,
       },
     }))
+  }
+
+  // Function to handle form submission and show summary
+  const handleFormSubmit = () => {
+    setShowSummary(true)
   }
 
   // Helper function to determine if a route is an investor route
@@ -166,6 +172,13 @@ function App() {
           <DashboardHeader companyName={companyName} profileImage={profileImage} setProfileImage={setProfileImage} />
           <div className="page-content">{children}</div>
         </div>
+        
+        {/* Registration Summary Modal - will only show when showSummary is true */}
+        <RegistrationSummary 
+          data={formData} 
+          open={showSummary} 
+          onClose={() => setShowSummary(false)} 
+        />
       </div>
     )
   }
@@ -228,7 +241,11 @@ function App() {
       <SMEProfileTracker activeSection={section} />
       <div className="bg-white rounded-lg shadow-md p-6 mt-6">
         {formData[section] ? (
-          <Component data={formData[section]} updateData={(data) => updateFormData(section, data)} />
+          <Component 
+            data={formData[section]} 
+            updateData={(data) => updateFormData(section, data)} 
+            onSubmit={section === "declarationConsent" ? handleFormSubmit : undefined}
+          />
         ) : (
           <p>Loading data...</p>
         )}

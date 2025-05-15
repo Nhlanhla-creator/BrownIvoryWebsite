@@ -1,33 +1,21 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import {
-  CheckCircle,
-  ChevronRight,
-  ChevronLeft,
-  Save,
-} from "lucide-react";
-import {
-  getFirestore,
-  doc,
-  setDoc,
-} from "firebase/firestore";
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-} from "firebase/storage";
-import { auth, db, storage } from "../../firebaseConfig"; // adjust based on your setup
-import "./UniversalProfile.css";
-import Instructions from "./instructions";
-import EntityOverview from "./entity-overview";
-import OwnershipManagement from "./ownership-management";
-import ContactDetails from "./contact-details";
-import LegalCompliance from "./legal-compliance";
-import ProductsServices from "./products-services";
-import HowDidYouHear from "./how-did-you-hear";
-import DeclarationConsent from "./declaration-consent";
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import { CheckCircle, ChevronRight, ChevronLeft, Save } from "lucide-react"
+import { doc, setDoc } from "firebase/firestore"
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import { auth, db, storage } from "../../firebaseConfig" // adjust based on your setup
+import "./UniversalProfile.css"
+import Instructions from "./instructions"
+import EntityOverview from "./entity-overview"
+import OwnershipManagement from "./ownership-management"
+import ContactDetails from "./contact-details"
+import LegalCompliance from "./legal-compliance"
+import ProductsServices from "./products-services"
+import HowDidYouHear from "./how-did-you-hear"
+import DeclarationConsent from "./declaration-consent"
+import RegistrationSummary from "./registration-summary"
 
 const sections = [
   { id: "instructions", label: "Instructions" },
@@ -38,10 +26,11 @@ const sections = [
   { id: "productsServices", label: "Products &\nServices" },
   { id: "howDidYouHear", label: "How Did\nYou Hear" },
   { id: "declarationConsent", label: "Declaration &\nConsent" },
-];
+]
 
 export default function UniversalProfile() {
-  const [activeSection, setActiveSection] = useState("instructions");
+  const navigate = useNavigate()
+  const [activeSection, setActiveSection] = useState("instructions")
   const [completedSections, setCompletedSections] = useState({
     instructions: true,
     entityOverview: false,
@@ -51,7 +40,8 @@ export default function UniversalProfile() {
     productsServices: false,
     howDidYouHear: false,
     declarationConsent: false,
-  });
+  })
+  const [showSummary, setShowSummary] = useState(false)
 
   const [formData, setFormData] = useState({
     entityOverview: {},
@@ -98,22 +88,22 @@ export default function UniversalProfile() {
       dataProcessing: false,
       termsConditions: false,
     },
-  });
+  })
 
   // Load saved data from localStorage
   useEffect(() => {
-    const savedData = localStorage.getItem("universalProfileData");
-    const savedCompletedSections = localStorage.getItem("universalProfileCompletedSections");
+    const savedData = localStorage.getItem("universalProfileData")
+    const savedCompletedSections = localStorage.getItem("universalProfileCompletedSections")
 
-    if (savedData) setFormData(JSON.parse(savedData));
-    if (savedCompletedSections) setCompletedSections(JSON.parse(savedCompletedSections));
-  }, []);
+    if (savedData) setFormData(JSON.parse(savedData))
+    if (savedCompletedSections) setCompletedSections(JSON.parse(savedCompletedSections))
+  }, [])
 
   // Save to localStorage
   useEffect(() => {
-    localStorage.setItem("universalProfileData", JSON.stringify(formData));
-    localStorage.setItem("universalProfileCompletedSections", JSON.stringify(completedSections));
-  }, [formData, completedSections]);
+    localStorage.setItem("universalProfileData", JSON.stringify(formData))
+    localStorage.setItem("universalProfileCompletedSections", JSON.stringify(completedSections))
+  }, [formData, completedSections])
 
   const updateFormData = (section, data) => {
     setFormData((prev) => ({
@@ -122,121 +112,130 @@ export default function UniversalProfile() {
         ...prev[section],
         ...data,
       },
-    }));
-  };
+    }))
+  }
 
   const markSectionAsCompleted = (section) => {
     setCompletedSections((prev) => ({
       ...prev,
       [section]: true,
-    }));
-  };
+    }))
+  }
 
   const navigateToNextSection = () => {
-    const index = sections.findIndex((s) => s.id === activeSection);
+    const index = sections.findIndex((s) => s.id === activeSection)
     if (index < sections.length - 1) {
-      setActiveSection(sections[index + 1].id);
-      window.scrollTo(0, 0);
+      setActiveSection(sections[index + 1].id)
+      window.scrollTo(0, 0)
     }
-  };
+  }
 
   const navigateToPreviousSection = () => {
-    const index = sections.findIndex((s) => s.id === activeSection);
+    const index = sections.findIndex((s) => s.id === activeSection)
     if (index > 0) {
-      setActiveSection(sections[index - 1].id);
-      window.scrollTo(0, 0);
+      setActiveSection(sections[index - 1].id)
+      window.scrollTo(0, 0)
     }
-  };
+  }
 
   const uploadFilesAndReplaceWithURLs = async (data, section) => {
     const uploadRecursive = async (item, pathPrefix) => {
       if (item instanceof File) {
-        const fileRef = ref(storage, `universalProfile/${auth.currentUser?.uid}/${pathPrefix}`);
-        await uploadBytes(fileRef, item);
-        return await getDownloadURL(fileRef);
+        const fileRef = ref(storage, `universalProfile/${auth.currentUser?.uid}/${pathPrefix}`)
+        await uploadBytes(fileRef, item)
+        return await getDownloadURL(fileRef)
       } else if (Array.isArray(item)) {
-        return await Promise.all(
-          item.map((entry, idx) => uploadRecursive(entry, `${pathPrefix}/${idx}`))
-        );
+        return await Promise.all(item.map((entry, idx) => uploadRecursive(entry, `${pathPrefix}/${idx}`)))
       } else if (typeof item === "object" && item !== null) {
-        const updated = {};
+        const updated = {}
         for (const key in item) {
-          updated[key] = await uploadRecursive(item[key], `${pathPrefix}/${key}`);
+          updated[key] = await uploadRecursive(item[key], `${pathPrefix}/${key}`)
         }
-        return updated;
+        return updated
       } else {
-        return item;
+        return item
       }
-    };
+    }
 
-    return await uploadRecursive(data, section);
-  };
+    return await uploadRecursive(data, section)
+  }
 
   const saveDataToFirebase = async (section = null) => {
     try {
-      const userId = auth.currentUser?.uid;
-      if (!userId) throw new Error("User not logged in.");
+      const userId = auth.currentUser?.uid
+      if (!userId) throw new Error("User not logged in.")
 
-      const docRef = doc(db, "universalProfiles", userId);
-      let sectionData = section ? formData[section] : formData;
+      const docRef = doc(db, "universalProfiles", userId)
+      const sectionData = section ? formData[section] : formData
 
       const uploaded = section
         ? { [section]: await uploadFilesAndReplaceWithURLs(sectionData, section) }
-        : await uploadFilesAndReplaceWithURLs(formData, "full");
+        : await uploadFilesAndReplaceWithURLs(formData, "full")
 
-      await setDoc(docRef, uploaded, { merge: true });
+      await setDoc(docRef, uploaded, { merge: true })
     } catch (err) {
-      console.error("Error saving to Firebase:", err);
-      alert("Failed to save to Firebase.");
+      console.error("Error saving to Firebase:", err)
+      alert("Failed to save to Firebase.")
     }
-  };
+  }
 
   const handleSaveSection = async () => {
-    await saveDataToFirebase(activeSection);
-    alert("Section saved to Firebase!");
-  };
+    await saveDataToFirebase(activeSection)
+    alert("Section saved to Firebase!")
+  }
 
   const handleSaveAndContinue = async () => {
-    markSectionAsCompleted(activeSection);
-    await saveDataToFirebase(activeSection);
-    navigateToNextSection();
-  };
+    markSectionAsCompleted(activeSection)
+    await saveDataToFirebase(activeSection)
+    navigateToNextSection()
+  }
 
   const handleSubmitProfile = async () => {
-    markSectionAsCompleted("declarationConsent");
-    await saveDataToFirebase(); // save full form
-    alert("Profile submitted successfully!");
-    console.log("Submitted:", formData);
-  };
+    markSectionAsCompleted("declarationConsent")
+    await saveDataToFirebase() // save full form
+    setShowSummary(true) // Show the summary after submission
+    console.log("Submitted:", formData)
+  }
+
+  // Function to handle completion of the registration process
+  const handleRegistrationComplete = async () => {
+    // Any final submission logic here
+
+    // Show a success message
+    alert("Your profile has been successfully submitted!")
+
+    // Redirect to dashboard
+    navigate("/dashboard")
+  }
 
   const renderActiveSection = () => {
-    const sectionData = formData[activeSection] || {};
+    const sectionData = formData[activeSection] || {}
     const commonProps = {
       data: sectionData,
       updateData: (data) => updateFormData(activeSection, data),
-    };
+    }
 
     switch (activeSection) {
       case "instructions":
-        return <Instructions />;
+        return <Instructions />
       case "entityOverview":
-        return <EntityOverview {...commonProps} />;
+        return <EntityOverview {...commonProps} />
       case "ownershipManagement":
-        return <OwnershipManagement {...commonProps} />;
+        return <OwnershipManagement {...commonProps} />
       case "contactDetails":
-        return <ContactDetails {...commonProps} />;
+        return <ContactDetails {...commonProps} />
       case "legalCompliance":
-        return <LegalCompliance {...commonProps} />;
+        return <LegalCompliance {...commonProps} />
       case "productsServices":
-        return <ProductsServices {...commonProps} />;
+        return <ProductsServices {...commonProps} />
       case "howDidYouHear":
-        return <HowDidYouHear {...commonProps} />;
+        return <HowDidYouHear {...commonProps} />
       case "declarationConsent":
-        return <DeclarationConsent {...commonProps} />;
+        return <DeclarationConsent {...commonProps} allFormData={formData} onComplete={handleRegistrationComplete} />
       default:
-        return <Instructions />;
+        return <Instructions />
     }
-  };
+  }
 
   return (
     <div className="universal-profile-container">
@@ -249,11 +248,7 @@ export default function UniversalProfile() {
               key={section.id}
               onClick={() => setActiveSection(section.id)}
               className={`profile-tracker-button ${
-                activeSection === section.id
-                  ? "active"
-                  : completedSections[section.id]
-                  ? "completed"
-                  : "pending"
+                activeSection === section.id ? "active" : completedSections[section.id] ? "completed" : "pending"
               }`}
             >
               {section.label.split("\n").map((line, i) => (
@@ -301,6 +296,14 @@ export default function UniversalProfile() {
           )}
         </div>
       </div>
+
+      {/* Registration Summary Modal */}
+      <RegistrationSummary
+        data={formData}
+        open={showSummary}
+        onClose={() => setShowSummary(false)}
+        onComplete={handleRegistrationComplete}
+      />
     </div>
-  );
+  )
 }
