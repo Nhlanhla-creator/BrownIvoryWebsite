@@ -1,5 +1,5 @@
 "use client"
-
+import {auth} from "../../firebaseConfig"
 import { useState } from "react"
 import RegistrationSummary from "./registration-summary"
 import "./UniversalProfile.css"
@@ -20,6 +20,7 @@ export default function DeclarationConsent({ data = {}, updateData, allFormData,
     // Show the summary when the form is submitted
     setShowSummary(true)
   }
+  const user = auth.currentUser
 
   return (
     <div>
@@ -104,6 +105,7 @@ export default function DeclarationConsent({ data = {}, updateData, allFormData,
               <span className="ml-2 text-brown-700">I agree to the platform's Terms & Conditions</span>
             </label>
           </div>
+
         </div>
 
         <div className="mt-8 border-t border-brown-200 pt-6"></div>

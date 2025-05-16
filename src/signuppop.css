@@ -1,0 +1,233 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f3f4f6;
+}
+
+.signup-form {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 28rem;
+}
+
+.signup-form h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  background-color: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #b91c1c;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: #2563eb;
+  color: white;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.btn-secondary {
+  background-color: #9ca3af;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #6b7280;
+}
+
+.btn-success {
+  background-color: #10b981;
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #059669;
+}
+
+.btn-disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+  color: #6b7280;
+}
+
+.success-message {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 28rem;
+}
+
+.success-message h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.user-info-box {
+  background-color: #f3f4f6;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  z-index: 50;
+}
+
+.popup-content {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 50rem;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.popup-header h2 {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.nda-content {
+  padding: 1rem;
+  overflow-y: auto;
+  font-size: 0.875rem;
+  flex-grow: 1;
+  max-height: 60vh;
+}
+
+.nda-title {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.nda-title h3 {
+  font-weight: bold;
+}
+
+.company-name {
+  font-weight: bold;
+  margin-top: 0.25rem;
+}
+
+.nda-content h4 {
+  font-weight: bold;
+  text-decoration: underline;
+  margin-top: 1.5rem;
+}
+
+.nda-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.nda-content ol li {
+  margin-bottom: 0.5rem;
+}
+
+.nda-note {
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.signature-section {
+  padding: 1rem;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.signature-info {
+  margin-bottom: 1rem;
+}
+
+.signature-canvas-container {
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  background-color: white;
+  margin-bottom: 0.5rem;
+}
+
+.signature-canvas {
+  width: 100%;
+  cursor: crosshair;
+}
+
+.clear-signature-btn {
+  font-size: 0.875rem;
+  color: #2563eb;
+}
+
+.clear-signature-btn:hover {
+  text-decoration: underline;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.warning-text {
+  font-size: 0.875rem;
+  color: #f59e0b;
+  margin-top: 0.5rem;
+}
