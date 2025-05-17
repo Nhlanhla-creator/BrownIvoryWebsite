@@ -1,10 +1,11 @@
 "use client"
-
+import {  getDoc } from "firebase/firestore";
+import { ref, getDownloadURL } from "firebase/storage";
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { CheckCircle, ChevronRight, ChevronLeft, Save } from "lucide-react"
 import { doc, setDoc } from "firebase/firestore"
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import { uploadBytes } from "firebase/storage"
 import { auth, db, storage } from "../../firebaseConfig" // adjust based on your setup
 import "./UniversalProfile.css"
 import Instructions from "./instructions"
@@ -29,6 +30,8 @@ const sections = [
 ]
 
 export default function UniversalProfile() {
+   const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
   const navigate = useNavigate()
   const [activeSection, setActiveSection] = useState("instructions")
   const [completedSections, setCompletedSections] = useState({
@@ -42,7 +45,7 @@ export default function UniversalProfile() {
     declarationConsent: false,
   })
   const [showSummary, setShowSummary] = useState(false)
-
+const [profileData, setProfileData] = useState(null);
   const [formData, setFormData] = useState({
     entityOverview: {},
     ownershipManagement: {
@@ -191,8 +194,9 @@ export default function UniversalProfile() {
   }
 
   const handleSubmitProfile = async () => {
-    markSectionAsCompleted("declarationConsent")
-    await saveDataToFirebase() // save full form
+   
+    // await saveDataToFirebase() // save full form
+     markSectionAsCompleted("declarationConsent")
     setShowSummary(true) // Show the summary after submission
     console.log("Submitted:", formData)
   }
@@ -236,6 +240,35 @@ export default function UniversalProfile() {
         return <Instructions />
     }
   }
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true);
+        const userId = auth.currentUser?.uid;
+        
+        if (!userId) {
+          throw new Error("User not logged in");
+        }
+
+        const docRef = doc(db, "universalProfiles", userId);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          setProfileData(docSnap.data());
+        } else {
+          setError("No profile found. Please complete your Universal Profile first.");
+        }
+      } catch (err) {
+        console.error("Error fetching profile data:", err);
+        setError("Failed to load profile data. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
 
   return (
     <div className="universal-profile-container">
@@ -299,7 +332,7 @@ export default function UniversalProfile() {
 
       {/* Registration Summary Modal */}
       <RegistrationSummary
-        data={formData}
+        data={profileData || formData}
         open={showSummary}
         onClose={() => setShowSummary(false)}
         onComplete={handleRegistrationComplete}

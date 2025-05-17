@@ -8,7 +8,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore"
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import ProfileView from "./LindelaniTestView" // Adjust the import based on your file structure
 import { ChevronDown, ChevronUp } from "lucide-react"
-
+import RegistrationSummary from "./registration-summary"
 const entityTypes = [
   { value: "ptyLtd", label: "Pty Ltd" },
   { value: "cc", label: "CC" },
@@ -542,7 +542,12 @@ export default function EntityOverview({ data = {}, updateData, onSave }) {
 
           {/* Removed Proof of Operating Address as requested */}
         </div>
-        <ProfileView />
+          {/* <RegistrationSummary
+                data={profileData}
+                // open={showSummary}
+                // onClose={() => setShowSummary(false)}
+                // onComplete={handleRegistrationComplete}
+              /> */}
       </div>
 
       <div className="mt-8 flex justify-end"></div>
