@@ -15,15 +15,15 @@ export default function DealFlowPipeline() {
       id: "initial",
       name: "Initial Matches",
       count: 85,
-      description: "Funders that match your profile with a score of 80% or higher",
+      description: "SMSEs that match your profile with a score of 80% or higher",
       colorClass: styles.stageInitial,
       iconColor: "#8d6e63"
     },
     {
       id: "application",
-      name: "Application Sent",
+      name: "Recieved Applications",
       count: 65,
-      description: "Applications you've submitted to potential funders",
+      description: "Applications Received from SMSEs",
       colorClass: styles.stageApplication,
       iconColor: "#795548"
     },
@@ -31,15 +31,15 @@ export default function DealFlowPipeline() {
       id: "review",
       name: "Under Review",
       count: 45,
-      description: "Applications currently being reviewed by funders",
+      description: "Applications currently being reviewed",
       colorClass: styles.stageReview,
       iconColor: "#6d4c41"
     },
     {
       id: "feedback",
-      name: "Investor Feedback",
+      name: "Feedback Sent",
       count: 25,
-      description: "Feedback received from potential investors",
+      description: "Feedback sent",
       hasMessages: true,
       colorClass: styles.stageFeedback,
       iconColor: "#5d4037"
@@ -56,7 +56,7 @@ export default function DealFlowPipeline() {
       id: "withdrawn",
       name: "Withdrawn /Declined",
       count: 12,
-      description: "Applications withdrawn by you or declined by funders",
+      description: "Applications withdrawn by you or declined ",
       showRejectionInfo: true,
       colorClass: styles.stageWithdrawn,
       iconColor: "#3e2723"

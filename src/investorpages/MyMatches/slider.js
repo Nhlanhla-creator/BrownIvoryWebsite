@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import * as SliderPrimitive from "@radix-ui/react-slider"
-import styles from "./funding.module.css"
+import styles from "./investor-funding.module.css"
 
 const Slider = React.forwardRef(({ className, ...props }, ref) => (
   <SliderPrimitive.Root ref={ref} className={`${styles.sliderRoot} ${className}`} {...props}>

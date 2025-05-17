@@ -84,6 +84,7 @@ import CustomerMatchesPage from "./smespages/MyCustomerMatches/customer-matches"
 import FundingMatchesPage from "./smespages/MyFunderMatches/funders-matches"
 import SupplierMatchesPage from "./smespages/MySupplierMatches/supplier-matches"
 import SupportProgramMatchesPage from "./smespages/MySupportProgramMatches/support-program-matches"
+import MatchesPage from "./investorpages/MyMatches/investor-matches"
 
 // Initial Data States
 const initialFormData = {
@@ -425,6 +426,7 @@ function App() {
         <Route path="/funding-matches" element={renderSMERoute(FundingMatchesPage)} />
         <Route path="/supplier-matches" element={renderSMERoute(SupplierMatchesPage)} />
         <Route path="/support-program-matches" element={renderSMERoute(SupportProgramMatchesPage)} />
+        <Route path="/investor-matches" element={renderInvestorRoute(MatchesPage)} />
 
         {/* Redirects */}
         <Route path="/universal-profile" element={<Navigate to="/investor-profile" replace />} />
@@ -432,6 +434,7 @@ function App() {
         <Route path="/support-universal-profile" element={<Navigate to="/support-profile/instructions" replace />} />
         <Route path="/applications/funding-application" element={<Navigate to="/applications/funding" replace />} />
         <Route path="/applications/product-application" element={<Navigate to="/applications/product" replace />} />
+        
       </Routes>
     </Router>
   )

@@ -1,0 +1,364 @@
+.dealflowPipelineContainer {
+    background-color: white;
+    border-radius: 20px;
+    padding: 1px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin: -16px 1;
+    position: relative;
+    font-family: 'Comic Sans MS', 'Segoe UI', cursive, sans-serif;
+    transition: background-color 0.3s ease;
+  }
+  
+  .pipelineHeader {
+    margin-bottom: 5px;
+    text-align: center;
+  }
+  
+  .pipelineTitle {
+    font-size: 22px;
+    color: #5d4037;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  
+  .pipelineDescription {
+    font-size: 15px;
+    color: #7d6e67;
+    margin: 0;
+  }
+  
+  .pipelineStagesContainer {
+    position: relative;
+    padding: 20px 0;
+  }
+  
+  .pipelineStagesRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    gap: 12px;
+  }
+  
+  .pipelineStage {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+    transition: transform 0.2s;
+  }
+  
+  .pipelineStage:hover {
+    transform: scale(1.05);
+  }
+  
+  .stageCard {
+    width: 120px;
+    height: 100px;
+    border-radius: 16px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s, box-shadow 0.3s;
+    background-color: white;
+    text-align: center;
+    animation: floatUp 0.3s ease-in-out;
+  }
+  
+  @keyframes floatUp {
+    from { transform: translateY(10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  .pipelineStage:hover .stageCard {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  }
+  
+  .stageContent {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .stageHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  
+  .stageName {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+    color: #4e342e;
+  }
+  
+  .stageIcon {
+    opacity: 0.9;
+    font-size: 16px;
+  }
+  
+  .stageCount {
+    font-size: 30px;
+    font-weight: 800;
+    margin: auto 0 0 0;
+    text-align: center;
+    color: #3e2723;
+  }
+  
+  /* Stage colors with brown tones */
+  .stageInitial {
+    --stage-color: rgba(101, 67, 33, 0.1);
+    --stage-border: rgba(101, 67, 33, 0.3);
+  }
+  
+  .stageApplication {
+    --stage-color: rgba(139, 69, 19, 0.1);
+    --stage-border: rgba(139, 69, 19, 0.3);
+  }
+  
+  .stageReview {
+    --stage-color: rgba(160, 82, 45, 0.1);
+    --stage-border: rgba(160, 82, 45, 0.3);
+  }
+  
+  .stageFeedback {
+    --stage-color: rgba(210, 180, 140, 0.1);
+    --stage-border: rgba(210, 180, 140, 0.3);
+  }
+  
+  .stageDeals {
+    --stage-color: rgba(205, 133, 63, 0.1);
+    --stage-border: rgba(205, 133, 63, 0.3);
+  }
+  
+  .stageWithdrawn {
+    --stage-color: rgba(165, 42, 42, 0.1);
+    --stage-border: rgba(165, 42, 42, 0.3);
+  }
+  
+  .stageInitial .stageCard,
+  .stageApplication .stageCard,
+  .stageReview .stageCard,
+  .stageFeedback .stageCard,
+  .stageDeals .stageCard,
+  .stageWithdrawn .stageCard {
+    background-color: var(--stage-color);
+    border: 2px dashed var(--stage-border);
+  }
+  
+  /* Tooltip styling */
+  .stageTooltip {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fffaf0;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 14px;
+    width: 200px;
+    z-index: 10;
+    margin-top: 10px;
+    opacity: 1;
+    transition: opacity 0.2s;
+  }
+  
+  .stageTooltip::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 12px;
+    height: 12px;
+    background-color: #fffaf0;
+    z-index: -1;
+  }
+  
+  .tooltipTitle {
+    font-size: 15px;
+    font-weight: bold;
+    margin: 0 0 6px 0;
+    color: #4e342e;
+  }
+  
+  .tooltipDescription {
+    font-size: 13px;
+    margin: 0 0 10px 0;
+    color: #6d4c41;
+    line-height: 1.4;
+  }
+  
+  .tooltipAction {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: none;
+    border: none;
+    padding: 8px;
+    width: 100%;
+    text-align: left;
+    font-size: 13px;
+    color: #b07449;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+  }
+  
+  .tooltipAction:hover {
+    background-color: rgba(176, 116, 73, 0.1);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .stageCard {
+      width: 100%;
+      height: auto;
+      flex-direction: row;
+      align-items: center;
+      padding: 8px;
+    }
+  
+    .stageTooltip {
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-top: 0;
+      margin-left: 10px;
+    }
+  
+    .stageTooltip::before {
+      top: 50%;
+      left: -6px;
+      transform: translateY(-50%) rotate(45deg);
+    }
+  }
+  .pipelineModalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+  }
+  
+  .pipelineModal {
+    background-color: #fffaf0;
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    animation: fadeInScale 0.3s ease;
+    position: relative;
+  }
+  
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  .modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .modalTitle {
+    font-size: 18px;
+    font-weight: bold;
+    color: #5d4037;
+    margin: 0;
+  }
+  
+  .modalCloseBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #5d4037;
+  }
+  
+  .modalBody {
+    padding-top: 10px;
+  }
+  
+  .statusIndicator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .statusDot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+  
+  .statusText {
+    font-size: 14px;
+    font-weight: 600;
+    color: #5d4037;
+  }
+  
+  .rejectionContent {
+    margin-bottom: 20px;
+  }
+  
+  .rejectionTitle {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #4e342e;
+  }
+  
+  .rejectionReason {
+    font-size: 13px;
+    color: #6d4c41;
+    line-height: 1.4;
+  }
+  
+  .detailsSection {
+    border-top: 1px dashed #d7ccc8;
+    padding-top: 12px;
+  }
+  
+  .detailRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  
+  .detailLabel {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4e342e;
+  }
+  
+  .detailValue {
+    font-size: 13px;
+    color: #6d4c41;
+  }
+  

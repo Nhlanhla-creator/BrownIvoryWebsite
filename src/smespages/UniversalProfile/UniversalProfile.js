@@ -18,6 +18,7 @@ import HowDidYouHear from "./how-did-you-hear"
 import DeclarationConsent from "./declaration-consent"
 import RegistrationSummary from "./registration-summary"
 
+
 const sections = [
   { id: "instructions", label: "Instructions" },
   { id: "entityOverview", label: "Entity\nOverview" },

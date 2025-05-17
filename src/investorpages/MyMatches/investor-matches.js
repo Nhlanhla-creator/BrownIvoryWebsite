@@ -1,13 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import  FundingFlowPipeline  from "./funding-flow-pipeline"
-import { FundingInsights } from "./funding-insights"
-import { FilterFunding } from "./filter-funding"
-import { FundingTable } from "./funding-table"
-import styles from "./funding.module.css"
 
-export default function FundingMatchesPage() {
+import InvestorDealFlowPipeline  from "./investor-deal-flow"
+import { InvestorInsights } from "./investor-insights"
+import { FilterFunding } from "./filter-funding"
+import { InvestorSMETable } from "./investor-sme-table"
+
+import styles from "./investor-funding.module.css"
+
+export default function InvestorDashboardPage() {
   const [filters, setFilters] = useState({
     location: "",
     matchScore: 50,
@@ -17,7 +19,7 @@ export default function FundingMatchesPage() {
     stages: [],
     sectors: [],
     supportTypes: [],
-    funderType: "",
+    smeType: "",
     sortBy: "",
   })
 
@@ -28,25 +30,31 @@ export default function FundingMatchesPage() {
   return (
     <div className={styles.mainContent}>
       <div className={styles.pageContainer}>
-        <h1 className={styles.pageTitle}>My Funding Matches and Insights</h1>
+        <h1 className={styles.pageTitle}>My Matches and Insights</h1>
 
         <div className={styles.sectionCard}>
-          <FundingFlowPipeline />
+          <h2 className={styles.sectionTitle}></h2>
+          <InvestorDealFlowPipeline />
         </div>
+      
 
         <div className={styles.sectionCard}>
-          <h2 className={styles.sectionTitle}>Funding Insights</h2>
-          <FundingInsights />
+          <h2 className={styles.sectionTitle}>Investment Insights</h2>
+          <InvestorInsights />
         </div>
+       
 
         <div className={styles.sectionCard}>
-          <h2 className={styles.sectionTitle}>Filter Matches</h2>
+          <h2 className={styles.sectionTitle}>Filter SMEs</h2>
           <FilterFunding onFilterChange={handleFilterChange} filters={filters} />
         </div>
 
         <div className={styles.sectionCard}>
-          <FundingTable filters={filters} />
+        
+          <InvestorSMETable filters={filters} />
         </div>
+
+       
       </div>
     </div>
   )

@@ -1,28 +1,25 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import {
-  TrendingUp,
-  Award,
-  Users,
   CheckCircle,
   ChevronRight,
-  ChevronLeft,
   Star,
   Plus,
   X,
   ChevronDown,
-  Mail,
   FileText,
   Upload,
   ExternalLink,
   Check,
+  ChevronLeft,
+  Calendar,
 } from "lucide-react"
-import styles from "./InvestorDashboard.module.css"
 import { doc, getDoc } from "firebase/firestore"
 import { auth, db } from "../../firebaseConfig"
 import { useNavigate } from "react-router-dom"
+import styles from "./InvestorDashboard.module.css"
 
 const Dashboard = () => {
   const user = auth.currentUser
@@ -930,13 +927,13 @@ const Dashboard = () => {
   const getCategoryColor = (category) => {
     switch (category) {
       case "Customers":
-        return "#1e3a8a" // Dark blue
+        return "#5D4037" // Dark brown
       case "Suppliers":
-        return "#9b1c1c" // Dark red
+        return "#8D6E63" // Medium brown
       case "Funders":
-        return "#065f46" // Dark green
+        return "#A67C52" // Light brown
       case "Support":
-        return "#d97706" // Dark amber
+        return "#BCAAA4" // Pale brown
       default:
         return "#6b7280" // Gray
     }
@@ -946,13 +943,13 @@ const Dashboard = () => {
   const getCategoryBgColor = (category) => {
     switch (category) {
       case "Customers":
-        return "bg-blue-100"
+        return "bg-brown-100"
       case "Suppliers":
-        return "bg-red-100"
+        return "bg-brown-50"
       case "Funders":
-        return "bg-green-100"
+        return "bg-brown-200"
       case "Support":
-        return "bg-amber-100"
+        return "bg-brown-300"
       default:
         return "bg-gray-100"
     }
@@ -962,13 +959,13 @@ const Dashboard = () => {
   const getCategoryTextColor = (category) => {
     switch (category) {
       case "Customers":
-        return "text-blue-800"
+        return "text-brown-800"
       case "Suppliers":
-        return "text-red-800"
+        return "text-brown-700"
       case "Funders":
-        return "text-green-800"
+        return "text-brown-600"
       case "Support":
-        return "text-amber-800"
+        return "text-brown-500"
       default:
         return "text-gray-800"
     }
@@ -978,713 +975,711 @@ const Dashboard = () => {
   const [visibleReviewDetails, setVisibleReviewDetails] = useState({})
   const [showReviewModal, setShowReviewModal] = useState(false)
   const [selectedReview, setSelectedReview] = useState(null)
+  // Add this with the other state declarations
+  const [calendarViewFilter, setCalendarViewFilter] = useState("month")
+
+  // Updated CSS classes with brown shades
+  const styles = {
+    primaryBrown: "#5D4037",
+    lightBrown: "#8D6E63",
+    darkBrown: "#3E2723",
+    accentBrown: "#A67C52",
+    paleBrown: "#D7CCC8",
+    backgroundBrown: "#EFEBE9",
+  }
+
+  // Updated Calendar Component - More Compact
+  const CompactCalendar = () => {
+    const [showFullCalendar, setShowFullCalendar] = useState(false)
+    
+    return (
+      <div className="compact-calendar">
+        <div className="calendar-header">
+          <span className="current-month">
+            {currentDate.toLocaleString('default', { month: 'short', year: 'numeric' })}
+          </span>
+          <button 
+            className="view-calendar-btn"
+            onClick={() => setShowFullCalendar(true)}
+          >
+            <Calendar size={16} />
+          </button>
+        </div>
+        
+        <div className="calendar-days-grid compact">
+          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) => (
+            <div key={day} className="day-header compact">{day}</div>
+          ))}
+          
+          {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+            <div key={`empty-${i}`} className="empty-day compact"></div>
+          ))}
+          
+          {Array.from({ length: Math.min(14, daysInMonth) }).map((_, i) => {
+            const day = i + 1
+            const isDeadline = deadlines.some(d => d.date === day)
+            const isToday = day === new Date().getDate() && 
+              currentDate.getMonth() === new Date().getMonth() && 
+              currentDate.getFullYear() === new Date().getFullYear()
+              
+            return (
+              <div
+                key={`day-${day}`}
+                className={`calendar-day compact ${isDeadline ? 'deadline' : ''} ${isToday ? 'today' : ''}`}
+                onClick={() => handleDayClick(day)}
+              >
+                <span className="day-number">{day}</span>
+                {isDeadline && <div className="deadline-dot"></div>}
+              </div>
+            )
+          })}
+        </div>
+        
+        {/* Full Calendar Modal */}
+        {showFullCalendar && (
+          <div className="modal-overlay">
+            <div className="ios-calendar-modal">
+              <div className="modal-header">
+                <h3>Calendar</h3>
+                <button onClick={() => setShowFullCalendar(false)}>
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="modal-body">
+                <div className="ios-calendar">
+                  <div className="calendar-header">
+                    <button onClick={() => navigateMonth("prev")} className="month-nav-btn">
+                      <ChevronLeft size={16} />
+                    </button>
+                    <span className="current-month">
+                      {currentDate.toLocaleString("default", { month: "long", year: "numeric" })}
+                    </span>
+                    <button onClick={() => navigateMonth("next")} className="month-nav-btn">
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+
+                  <div className="calendar-days-header">
+                    {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
+                      <div key={day} className="day-header">
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="calendar-days-grid">
+                    {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+                      <div key={`empty-${i}`} className="empty-day"></div>
+                    ))}
+                    {Array.from({ length: daysInMonth }).map((_, i) => {
+                      const day = i + 1
+                      const isDeadline = deadlines.some((d) => d.date === day)
+                      const isToday =
+                        day === new Date().getDate() &&
+                        currentDate.getMonth() === new Date().getMonth() &&
+                        currentDate.getFullYear() === new Date().getFullYear()
+
+                      const hasEvents = upcomingEvents.some((event) => {
+                        const eventDate = new Date(event.date)
+                        return (
+                          eventDate.getDate() === day &&
+                          eventDate.getMonth() === currentDate.getMonth() &&
+                          eventDate.getFullYear() === currentDate.getFullYear()
+                        )
+                      })
+
+                      return (
+                        <div
+                          key={`day-${day}`}
+                          className={`calendar-day ${isDeadline ? "deadline" : ""} ${isToday ? "today" : ""} ${hasEvents ? "has-events" : ""}`}
+                          onClick={() => handleDayClick(day)}
+                        >
+                          <span className="day-number">{day}</span>
+                          {hasEvents && <div className="event-dot"></div>}
+                          {isDeadline && <div className="deadline-dot"></div>}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="upcoming-events">
+                  <h4 className="events-title">Upcoming Events</h4>
+                  <div className="events-list">
+                    {upcomingEvents.map((event, index) => (
+                      <div key={index} className="ios-event-item">
+                        <div className={`event-color-indicator ${event.type}`}></div>
+                        <div className="event-details">
+                          <span className="event-title">{event.title}</span>
+                          <span className="event-date">{event.date}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="ios-button add" onClick={() => setShowDeadlineModal(true)}>
+                  <Plus size={14} /> Add Event
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Updated Big Legitimacy Score Component with Popup
+  const LegitimacyScoreCard = () => {
+    return (
+      <div className="readiness-card compact" style={{ borderColor: styles.lightBrown }}>
+        <div className="card-header">
+          <h3 style={{ fontWeight: "500", color: styles.primaryBrown }}>BIG Legitimacy Score</h3>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "center", padding: "10px" }}>
+          <div 
+            className="score-circle" 
+            style={{ 
+              backgroundColor: styles.backgroundBrown,
+              color: styles.primaryBrown,
+              borderColor: styles.accentBrown
+            }}
+          >
+            {legitimacyScore}%
+          </div>
+        </div>
+
+        <button
+          className="view-summary-btn centered-btn"
+          onClick={() => setShowBigScoreSummary(!showBigScoreSummary)}
+          style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+        >
+          View More
+          <ChevronDown className={`summary-icon ${showBigScoreSummary ? "rotate" : ""}`} size={16} />
+        </button>
+
+        {showBigScoreSummary && (
+          <div className="score-summary-content">
+            <p className="summary-title" style={{ color: styles.darkBrown }}>Legitimacy Verification:</p>
+            <ul className="summary-list">
+              <li className="summary-item">
+                <div className="summary-bullet" style={{ backgroundColor: styles.accentBrown }}></div>
+                <span>Business registration verified</span>
+                <span className="status-indicator verified" style={{ color: styles.primaryBrown }}>✓</span>
+              </li>
+              <li className="summary-item">
+                <div className="summary-bullet" style={{ backgroundColor: styles.accentBrown }}></div>
+                <span>Tax compliance confirmed</span>
+                <span className="status-indicator verified" style={{ color: styles.primaryBrown }}>✓</span>
+              </li>
+              <li className="summary-item">
+                <div className="summary-bullet" style={{ backgroundColor: styles.accentBrown }}></div>
+                <span>Industry certifications valid</span>
+                <span className="status-indicator verified" style={{ color: styles.primaryBrown }}>✓</span>
+              </li>
+              <li className="summary-item">
+                <div className="summary-bullet" style={{ backgroundColor: styles.accentBrown }}></div>
+                <span>Company address verified</span>
+                <span className="status-indicator verified" style={{ color: styles.primaryBrown }}>✓</span>
+              </li>
+            </ul>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Updated Top Matches Table without Action column
+  const TopMatchesTable = () => {
+    return (
+      <div className="matches-table-card" style={{ 
+        borderColor: styles.lightBrown,
+        backgroundColor: styles.backgroundBrown
+      }}>
+        <div className="card-header">
+          <h3 style={{ fontWeight: "500", color: styles.primaryBrown }}>Top Matches</h3>
+          <div className="category-tabs">
+            {Object.keys(categoryData).map((category) => (
+              <button
+                key={category}
+                className={`category-tab ${selectedCategory === category ? "active" : ""}`}
+                style={{
+                  borderColor: selectedCategory === category ? getCategoryColor(category) : "transparent",
+                  color: selectedCategory === category ? styles.primaryBrown : styles.lightBrown,
+                }}
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="matches-table">
+          <table>
+            <thead>
+              <tr style={{ backgroundColor: styles.paleBrown }}>
+                {selectedCategory === "Customers" && (
+                  <>
+                    <th style={{ color: styles.primaryBrown }}>Customer Name</th>
+                    <th style={{ color: styles.primaryBrown }}>Service Category</th>
+                    <th style={{ color: styles.primaryBrown }}>Service Needed</th>
+                    <th style={{ color: styles.primaryBrown }}>% Match</th>
+                    <th style={{ color: styles.primaryBrown }}>Location</th>
+                    <th style={{ color: styles.primaryBrown }}>Deal Size</th>
+                    <th style={{ color: styles.primaryBrown }}>Status</th>
+                  </>
+                )}
+                {selectedCategory === "Suppliers" && (
+                  <>
+                    <th style={{ color: styles.primaryBrown }}>Supplier Name</th>
+                    <th style={{ color: styles.primaryBrown }}>Service Category</th>
+                    <th style={{ color: styles.primaryBrown }}>Service Offered</th>
+                    <th style={{ color: styles.primaryBrown }}>% Match</th>
+                    <th style={{ color: styles.primaryBrown }}>Location</th>
+                    <th style={{ color: styles.primaryBrown }}>Av. Supplier Rating</th>
+                    <th style={{ color: styles.primaryBrown }}>Status</th>
+                  </>
+                )}
+                {selectedCategory === "Funders" && (
+                  <>
+                    <th style={{ color: styles.primaryBrown }}>Funder Name</th>
+                    <th style={{ color: styles.primaryBrown }}>Investment Type</th>
+                    <th style={{ color: styles.primaryBrown }}>% Match</th>
+                    <th style={{ color: styles.primaryBrown }}>Location</th>
+                    <th style={{ color: styles.primaryBrown }}>Stage/Focus</th>
+                    <th style={{ color: styles.primaryBrown }}>Status</th>
+                  </>
+                )}
+                {selectedCategory === "Support" && (
+                  <>
+                    <th style={{ color: styles.primaryBrown }}>Program Name</th>
+                    <th style={{ color: styles.primaryBrown }}>Program Type</th>
+                    <th style={{ color: styles.primaryBrown }}>% Match</th>
+                    <th style={{ color: styles.primaryBrown }}>Location</th>
+                    <th style={{ color: styles.primaryBrown }}>Focus Area</th>
+                    <th style={{ color: styles.primaryBrown }}>Status</th>
+                  </>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {categoryData[selectedCategory].map((item, index) => (
+                <tr 
+                  key={index} 
+                  className="match-row"
+                  style={{ 
+                    backgroundColor: index % 2 === 0 ? 'white' : styles.backgroundBrown,
+                    borderBottom: `1px solid ${styles.paleBrown}`
+                  }}
+                >
+                  {selectedCategory === "Customers" && (
+                    <>
+                      <td className="investor-name" style={{ color: styles.darkBrown }}>{item.name}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.serviceCategory}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.serviceNeeded}</td>
+                      <td className="match-score-cell">
+                        <div className="match-score-wrapper">
+                          <div
+                            className="match-bar"
+                            style={{
+                              width: `${item.match}%`,
+                              background: `linear-gradient(90deg, ${styles.accentBrown}, ${styles.paleBrown})`,
+                            }}
+                          ></div>
+                          <span className="match-percent" style={{ color: styles.primaryBrown }}>
+                            {item.match}%
+                          </span>
+                        </div>
+                      </td>
+                      <td style={{ color: styles.primaryBrown }}>{item.location}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.dealSize}</td>
+                      <td>
+                        <span 
+                          className="status-badge"
+                          style={{ 
+                            backgroundColor: styles.paleBrown,
+                            color: styles.primaryBrown
+                          }}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+                    </>
+                  )}
+                  {selectedCategory === "Suppliers" && (
+                    <>
+                      <td className="investor-name" style={{ color: styles.darkBrown }}>{item.name}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.serviceCategory}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.serviceOffered}</td>
+                      <td className="match-score-cell">
+                        <div className="match-score-wrapper">
+                          <div
+                            className="match-bar"
+                            style={{
+                              width: `${item.match}%`,
+                              background: `linear-gradient(90deg, ${styles.accentBrown}, ${styles.paleBrown})`,
+                            }}
+                          ></div>
+                          <span className="match-percent" style={{ color: styles.primaryBrown }}>
+                            {item.match}%
+                          </span>
+                        </div>
+                      </td>
+                      <td style={{ color: styles.primaryBrown }}>{item.location}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.rating}</td>
+                      <td>
+                        <span 
+                          className="status-badge"
+                          style={{ 
+                            backgroundColor: styles.paleBrown,
+                            color: styles.primaryBrown
+                          }}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+                    </>
+                  )}
+                  {selectedCategory === "Funders" && (
+                    <>
+                      <td className="investor-name" style={{ color: styles.darkBrown }}>{item.name}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.investmentType}</td>
+                      <td className="match-score-cell">
+                        <div className="match-score-wrapper">
+                          <div
+                            className="match-bar"
+                            style={{
+                              width: `${item.match}%`,
+                              background: `linear-gradient(90deg, ${styles.accentBrown}, ${styles.paleBrown})`,
+                            }}
+                          ></div>
+                          <span className="match-percent" style={{ color: styles.primaryBrown }}>
+                            {item.match}%
+                          </span>
+                        </div>
+                      </td>
+                      <td style={{ color: styles.primaryBrown }}>{item.location}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.stageFocus}</td>
+                      <td>
+                        <span 
+                          className="status-badge"
+                          style={{ 
+                            backgroundColor: styles.paleBrown,
+                            color: styles.primaryBrown
+                          }}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+                    </>
+                  )}
+                  {selectedCategory === "Support" && (
+                    <>
+                      <td className="investor-name" style={{ color: styles.darkBrown }}>{item.name}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.programType}</td>
+                      <td className="match-score-cell">
+                        <div className="match-score-wrapper">
+                          <div
+                            className="match-bar"
+                            style={{
+                              width: `${item.match}%`,
+                              background: `linear-gradient(90deg, ${styles.accentBrown}, ${styles.paleBrown})`,
+                            }}
+                          ></div>
+                          <span className="match-percent" style={{ color: styles.primaryBrown }}>
+                            {item.match}%
+                          </span>
+                        </div>
+                      </td>
+                      <td style={{ color: styles.primaryBrown }}>{item.location}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.focusArea}</td>
+                      <td>
+                        <span 
+                          className="status-badge"
+                          style={{ 
+                            backgroundColor: styles.paleBrown,
+                            color: styles.primaryBrown
+                          }}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+                    </>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className={styles["dashboard-container"]}>
-      <div className={styles.content}>
-        <main className={styles["dashboard-main"]}>
+    <div className="dashboard-container" style={{ backgroundColor: styles.backgroundBrown }}>
+      <div className="content">
+        <main className="dashboard-main">
           {/* Written Tracker */}
-          <div className={styles["tracker-card"]}>
-            <div className={styles["tracker-header"]}>
-              <h3 className={styles["card-title"]}>Application Tracker</h3>
+          <div className="tracker-card" style={{ borderColor: styles.lightBrown }}>
+            <div className="tracker-header">
+              <h3 className="card-title" style={{ color: styles.primaryBrown }}>Application Tracker</h3>
             </div>
-            <div className={styles["tracker-content"]}>
-              <div className={styles["tracker-steps"]}>
+            <div className="tracker-content">
+              <div className="tracker-steps">
                 {trackerSteps.map((step, index) => (
                   <div
                     key={index}
-                    className={`${styles["tracker-step"]} ${step.completed ? styles.completed : ""} ${step.active ? styles.active : ""}`}
-                    onClick={() => toggleStepDetails(index)}
-                    style={{ backgroundColor: "#fafafa", borderColor: "#e5e5e5" }}
+                    className={`tracker-step ${step.completed ? "completed" : step.active ? "active" : ""}`}
+                    data-tooltip={`${expectedActions[step.label]}`}
                   >
-                    <div className={styles["step-marker"]}>
+                    <div className="step-marker">
                       {step.completed ? (
-                        <CheckCircle size={16} />
+                        <CheckCircle size={16} color={styles.primaryBrown} />
                       ) : step.active ? (
-                        <div className={styles["active-dot"]}></div>
+                        <div className="active-dot" style={{ backgroundColor: styles.accentBrown }}></div>
                       ) : (
-                        <div className={styles["inactive-dot"]}></div>
+                        <div className="inactive-dot" style={{ backgroundColor: styles.paleBrown }}></div>
                       )}
                     </div>
-                    <div className={styles["step-info"]}>
-                      <span className={styles["step-label"]} style={{ fontWeight: "500", color: "#555" }}>
+                    <div className="step-info">
+                      <span className="step-label" style={{ color: styles.primaryBrown }}>
                         {step.label.split("\n").map((line, i) => (
-                          <span key={i} className={styles["step-label-line"]}>
+                          <span key={i} className="step-label-line">
                             {line}
                             {i === 0 && <br />}
                           </span>
                         ))}
                       </span>
-                      {step.description && <span className={styles["step-description"]}>{step.description}</span>}
+                      {step.description && <span className="step-description">{step.description}</span>}
                     </div>
-                    {index < trackerSteps.length - 1 && <ChevronRight size={16} className={styles["step-arrow"]} />}
+                    {index < trackerSteps.length - 1 && (
+                      <ChevronRight size={16} className="step-arrow" color={styles.lightBrown} />
+                    )}
                   </div>
                 ))}
-              </div>
-              <div className={styles["tracker-details"]}>
-                {trackerSteps.map(
-                  (step, index) =>
-                    step.showDetails && (
-                      <div key={`details-${index}`} className={styles["step-details-panel"]}>
-                        <h4>{step.label}</h4>
-
-                        {/* Expected Actions */}
-                        <div className={styles["step-expectations"]}>
-                          <h5>Expected Actions:</h5>
-                          <p>{expectedActions[step.label]}</p>
-                        </div>
-
-                        {/* Required Documents */}
-                        <div className={styles["step-documents"]}>
-                          <h5>Required Documents:</h5>
-                          <ul className={styles["document-list"]}>
-                            {requiredDocuments[step.label].map((doc, i) => (
-                              <li key={i}>{doc}</li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        {/* Status Information */}
-                        {step.completed && (
-                          <div className={styles["step-complete-info"]}>
-                            <p>
-                              Completed on: <strong>May 10, 2023</strong>
-                            </p>
-                            <p>
-                              Approved by: <strong>System Verification</strong>
-                            </p>
-                          </div>
-                        )}
-
-                        {step.active && (
-                          <div className={styles["step-pending-info"]}>
-                            <p>
-                              Current status: <strong>In Progress</strong>
-                            </p>
-                            <p>
-                              Expected completion: <strong>June 15, 2023</strong>
-                            </p>
-                          </div>
-                        )}
-
-                        {!step.completed && !step.active && (
-                          <div className={styles["step-pending-info"]}>
-                            <p>
-                              Estimated start: <strong>July 1, 2023</strong>
-                            </p>
-                            <p>
-                              Required documents: <strong>{requiredDocuments[step.label].join(", ")}</strong>
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    ),
-                )}
               </div>
             </div>
           </div>
 
-          {/* First Content Row - Legitimacy Score, Customer Reviews, Fundability Score, Upcoming Events */}
-          <div className={styles["main-stats-row"]}>
-            {/* Big Legitimacy Score */}
-            <div className={`${styles["readiness-card"]} ${styles.compact}`}>
-              <div className={styles["single-line-header"]}>
-                <h3 style={{ fontWeight: "500", color: "#555" }}>BIG Legitimacy Score</h3>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0 10px" }}>
-                <div
-                  style={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "#f8f5f2",
-                    border: "1px solid #e8e0da",
-                    color: "#555",
-                    fontWeight: "500",
-                    fontSize: "1.5rem",
-                    marginBottom: "15px",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-                  }}
-                >
-                  {legitimacyScore}%
-                </div>
-
-                <div style={{ width: "100%" }}>
-                  <p style={{ fontSize: "0.8rem", color: "#666", marginBottom: "8px", textAlign: "center" }}>
-                    Legitimacy Verification:
-                  </p>
-                  <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                    <li
-                      style={{
-                        fontSize: "0.75rem",
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "6px",
-                        color: "#555",
-                        backgroundColor: "white",
-                        padding: "6px 10px",
-                        borderRadius: "4px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "6px",
-                          height: "6px",
-                          borderRadius: "50%",
-                          backgroundColor: "#8D6E63",
-                          marginRight: "8px",
-                        }}
-                      ></div>
-                      Business registration verified
-                    </li>
-                    <li
-                      style={{
-                        fontSize: "0.75rem",
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "6px",
-                        color: "#555",
-                        backgroundColor: "white",
-                        padding: "6px 10px",
-                        borderRadius: "4px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "6px",
-                          height: "6px",
-                          borderRadius: "50%",
-                          backgroundColor: "#8D6E63",
-                          marginRight: "8px",
-                        }}
-                      ></div>
-                      Tax compliance confirmed
-                    </li>
-                    <li
-                      style={{
-                        fontSize: "0.75rem",
-                        display: "flex",
-                        alignItems: "center",
-                        color: "#555",
-                        backgroundColor: "white",
-                        padding: "6px 10px",
-                        borderRadius: "4px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "6px",
-                          height: "6px",
-                          borderRadius: "50%",
-                          backgroundColor: "#8D6E63",
-                          marginRight: "8px",
-                        }}
-                      ></div>
-                      Industry certifications valid
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
+          {/* First Content Row */}
+          <div className="main-stats-row">
+            <LegitimacyScoreCard />
+            
             {/* Customer Reviews & Ratings */}
-            <div className={`${styles["ratings-card"]} ${styles.compact}`}>
-              <div className={styles["single-line-header"]}>
-                <h3 style={{ fontWeight: "500", color: "#555" }}>Customer Reviews & Ratings</h3>
+            <div className="ratings-card compact" style={{ borderColor: styles.lightBrown }}>
+              <div className="card-header">
+                <h3 style={{ fontWeight: "500", color: styles.primaryBrown }}>Customer Reviews & Ratings</h3>
               </div>
-              <div className={styles["ratings-summary"]}>
-                <div className={styles["ratings-count"]}>
-                  <span className="text-2xl font-bold text-brown-800">25</span>
-                  <span className="text-sm text-brown-600">Reviews</span>
+              <div className="ratings-summary">
+                <div className="ratings-count">
+                  <span className="text-2xl font-bold" style={{ color: styles.primaryBrown }}>25</span>
+                  <span className="text-sm" style={{ color: styles.lightBrown }}>Reviews</span>
                 </div>
-                <div className={styles["average-rating"]}>
-                  <div className={styles.stars}>
+                <div className="average-rating">
+                  <div className="stars">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
                         size={16}
-                        fill={i < 4 ? "#C69C6D" : "#E5E7EB"}
-                        color={i < 4 ? "#C69C6D" : "#E5E7EB"}
+                        fill={i < 4 ? styles.accentBrown : styles.paleBrown}
+                        color={i < 4 ? styles.accentBrown : styles.paleBrown}
                       />
                     ))}
                   </div>
-                  <span className="text-sm text-brown-600">4.0 Average</span>
+                  <span className="text-sm" style={{ color: styles.lightBrown }}>4.0 Average</span>
                 </div>
               </div>
-              <div
-                className={styles["ratings-list"]}
-                style={{
-                  maxHeight:
-                    visibleReviewDetails[0] || visibleReviewDetails[1] || visibleReviewDetails[2] ? "250px" : "180px",
-                }}
+
+              <button
+                className="view-summary-btn centered-btn"
+                onClick={() => setShowDetailedReviews(!showDetailedReviews)}
+                style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
               >
-                {ratings.slice(0, 3).map((rating, index) => (
-                  <div
-                    key={index}
-                    className={styles["rating-item-with-details"]}
-                    style={{
-                      backgroundColor: "#fafafa",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    <div className={styles["rating-header"]}>
-                      <div className={styles["rating-info"]}>
-                        <div className={styles["rating-name-actions"]}>
-                          <h4 style={{ fontWeight: "500" }}>{rating.name}</h4>
-                          <button
-                            className={styles["view-details-btn"]}
-                            style={{ backgroundColor: "#f5f5f5", color: "#666" }}
-                            onClick={() => {
-                              setSelectedReview(rating)
-                              setShowReviewModal(true)
-                            }}
-                          >
-                            View Details
-                          </button>
-                        </div>
-                        <div className={styles.stars}>
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              size={14}
-                              fill={i < rating.rating ? "#C69C6D" : "#E5E7EB"}
-                              color={i < rating.rating ? "#C69C6D" : "#E5E7EB"}
-                            />
-                          ))}
+                View More
+                <ChevronDown className={`summary-icon ${showDetailedReviews ? "rotate" : ""}`} size={16} />
+              </button>
+
+              {showDetailedReviews && (
+                <div className="ratings-list">
+                  {ratings.slice(0, 3).map((rating, index) => (
+                    <div
+                      key={index}
+                      className="rating-item-with-details"
+                      onMouseEnter={() => setVisibleReviewDetails({ ...visibleReviewDetails, [index]: true })}
+                      onMouseLeave={() => setVisibleReviewDetails({ ...visibleReviewDetails, [index]: false })}
+                    >
+                      <div className="rating-header">
+                        <div className="rating-info">
+                          <div className="rating-name-actions">
+                            <h4 style={{ color: styles.primaryBrown }}>{rating.name}</h4>
+                            <button
+                              className="view-details-btn"
+                              onClick={() => {
+                                setSelectedReview(rating)
+                                setShowReviewModal(true)
+                              }}
+                              style={{ color: styles.accentBrown }}
+                            >
+                              View Details
+                            </button>
+                          </div>
+                          <div className="stars">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                size={14}
+                                fill={i < rating.rating ? styles.accentBrown : styles.paleBrown}
+                                color={i < rating.rating ? styles.accentBrown : styles.paleBrown}
+                              />
+                            ))}
+                          </div>
                         </div>
                       </div>
+                      {visibleReviewDetails[index] && (
+                        <div className="rating-comment">
+                          <p style={{ color: styles.primaryBrown }}>{rating.comment.substring(0, 100)}...</p>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Big Fundability Score */}
-            <div className={`${styles["readiness-card"]} ${styles.compact}`}>
-              <div className={styles["single-line-header"]}>
-                <h3 style={{ fontWeight: "500", color: "#555" }}>BIG Fundability Score</h3>
+            <div className="readiness-card compact" style={{ borderColor: styles.lightBrown }}>
+              <div className="card-header">
+                <h3 style={{ fontWeight: "500", color: styles.primaryBrown }}>BIG Fundability Score</h3>
               </div>
-              <button
-                className={`${styles["view-summary-btn"]} ${styles["centered-btn"]}`}
-                onClick={toggleBigScoreSummary}
-              >
-                View Summary
-                <ChevronDown className={styles["summary-icon"]} size={16} />
-              </button>
 
-              <div className={styles["score-donut"]}>
-                <ResponsiveContainer width="100%" height={90}>
-                  <PieChart>
-                    <Pie
-                      data={fundabilityScoreData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={30}
-                      outerRadius={40}
-                      paddingAngle={2}
-                      dataKey="value"
-                    >
-                      {fundabilityScoreData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <text
-                      x="50%"
-                      y="50%"
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      className={styles["donut-score"]}
-                      style={{ fontWeight: "500", fill: "#555" }}
-                    >
-                      {totalFundabilityScore}
-                    </text>
-                  </PieChart>
-                </ResponsiveContainer>
+              <div style={{ display: "flex", justifyContent: "center", padding: "10px" }}>
+                <div 
+                  className="score-circle"
+                  style={{ 
+                    backgroundColor: styles.backgroundBrown,
+                    color: styles.primaryBrown,
+                    borderColor: styles.accentBrown
+                  }}
+                >
+                  {totalFundabilityScore}
+                </div>
               </div>
-              <div className={styles["score-legend"]}>
-                {fundabilityScoreData.map((item, index) => (
-                  <div key={index} className={styles["legend-item"]}>
-                    <div className={styles["legend-color"]} style={{ backgroundColor: item.color }}></div>
-                    <span>{item.name}</span>
-                    <span className={styles["legend-value"]}>{item.value}%</span>
-                  </div>
-                ))}
-              </div>
+
+              <button 
+                className="view-summary-btn centered-btn"
+                onClick={toggleBigScoreSummary}
+                style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+              >
+                View More
+                <ChevronDown className={`summary-icon ${showScoreSummaryModal ? "rotate" : ""}`} size={16} />
+              </button>
             </div>
 
-            {/* Upcoming Events */}
-            <div className={`${styles["events-card"]} ${styles.compact}`}>
-              <div className={styles["single-line-header"]}>
-                <h3 style={{ fontWeight: "500", color: "#555" }}>Upcoming Events</h3>
-                <button className={styles["add-event-btn"]} onClick={() => setShowDeadlineModal(true)}>
-                  <Plus size={14} /> Add
-                </button>
+            {/* Compact Calendar */}
+            <div className="ios-calendar-card compact" style={{ borderColor: styles.lightBrown }}>
+              <div className="card-header">
+                <h3 style={{ fontWeight: "500", color: styles.primaryBrown }}>Calendar & Events</h3>
               </div>
-              <div className={`${styles["events-list"]} ${styles.scrollable}`}>
-                {upcomingEvents.map((event, index) => (
-                  <div key={index} className={styles["event-item"]}>
-                    <div className={`${styles["event-icon"]} ${styles[event.type]}`}>
-                      {event.type === "meeting" && <Users size={12} />}
-                      {event.type === "workshop" && <TrendingUp size={12} />}
-                      {event.type === "deadline" && <Award size={12} />}
+              <CompactCalendar />
+              <div className="upcoming-events">
+                <h4 className="events-title" style={{ color: styles.primaryBrown }}>Upcoming</h4>
+                <div className="events-list">
+                  {upcomingEvents.slice(0, 2).map((event, index) => (
+                    <div key={index} className="ios-event-item">
+                      <div 
+                        className={`event-color-indicator ${event.type}`}
+                        style={{ backgroundColor: styles.accentBrown }}
+                      ></div>
+                      <div className="event-details">
+                        <span className="event-title" style={{ color: styles.primaryBrown }}>{event.title}</span>
+                        <span className="event-date" style={{ color: styles.lightBrown }}>{event.date}</span>
+                      </div>
                     </div>
-                    <div className={styles["event-details"]}>
-                      <h5>{event.title}</h5>
-                      <p>{event.date}</p>
-                    </div>
-                  </div>
-                ))}
-                {deadlines.map((deadline, index) => (
-                  <div key={`deadline-${index}`} className={styles["event-item"]}>
-                    <div className={`${styles["event-icon"]} ${styles.deadline}`}>
-                      <Award size={12} />
-                    </div>
-                    <div className={styles["event-details"]}>
-                      <h5>{deadline.title}</h5>
-                      <p>
-                        {currentDate.toLocaleString("default", { month: "long" })} {deadline.date}
-                      </p>
-                      <button
-                        className={styles["remove-deadline"]}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          removeDeadline(index)
-                        }}
-                      >
-                        <X size={12} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <button 
+                  className="add-event-btn" 
+                  onClick={() => setShowDeadlineModal(true)}
+                  style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+                >
+                  <Plus size={14} color={styles.primaryBrown} /> Add Event
+                </button>
               </div>
             </div>
           </div>
 
-          {/* Second Row - Top Matches and Calendar */}
-          <div className={styles["second-row"]}>
-            {/* Matches Table */}
-            <div className={styles["matches-table-card"]}>
-              <div className={styles["card-header"]}>
-                <h3 style={{ fontWeight: "500", color: "#555" }}>Top Matches</h3>
-                <div className={styles["category-tabs"]}>
-                  {Object.keys(categoryData).map((category) => (
-                    <button
-                      key={category}
-                      className={`${styles["category-tab"]} ${selectedCategory === category ? styles.active : ""}`}
-                      style={{
-                        borderColor: selectedCategory === category ? getCategoryColor(category) : "transparent",
-                        color: selectedCategory === category ? getCategoryColor(category) : "#6b7280",
-                      }}
-                      onClick={() => setSelectedCategory(category)}
-                    >
-                      {category}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className={styles["matches-table"]}>
-                <table>
-                  <thead>
-                    <tr style={{ backgroundColor: `${getCategoryBgColor(selectedCategory)}` }}>
-                      {selectedCategory === "Customers" && (
-                        <>
-                          <th className={getCategoryTextColor(selectedCategory)}>Customer Name</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Service Category</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Service Needed</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>% Match</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Location</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Deal Size</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Status</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Action</th>
-                        </>
-                      )}
-                      {selectedCategory === "Suppliers" && (
-                        <>
-                          <th className={getCategoryTextColor(selectedCategory)}>Supplier Name</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Service Category</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Service Offered</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>% Match</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Location</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Av. Supplier Rating</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Status</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Action</th>
-                        </>
-                      )}
-                      {selectedCategory === "Funders" && (
-                        <>
-                          <th className={getCategoryTextColor(selectedCategory)}>Funder Name</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Investment Type</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>% Match</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Location</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Stage/Focus</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Status</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Action</th>
-                        </>
-                      )}
-                      {selectedCategory === "Support" && (
-                        <>
-                          <th className={getCategoryTextColor(selectedCategory)}>Program Name</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Program Type</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>% Match</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Location</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Focus Area</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Status</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Action</th>
-                        </>
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {categoryData[selectedCategory].map((item, index) => (
-                      <tr key={index} className={styles["match-row"]}>
-                        {selectedCategory === "Customers" && (
-                          <>
-                            <td className={styles["investor-name"]}>{item.name}</td>
-                            <td>{item.serviceCategory}</td>
-                            <td>{item.serviceNeeded}</td>
-                            <td className={styles["match-score-cell"]}>
-                              <div className={styles["match-score-wrapper"]}>
-                                <div
-                                  className={styles["match-bar"]}
-                                  style={{
-                                    width: `${item.match}%`,
-                                    background: `linear-gradient(90deg, ${getCategoryColor(
-                                      selectedCategory,
-                                    )}, rgba(107, 114, 128, 0.3))`,
-                                  }}
-                                ></div>
-                                <span className={styles["match-percent"]}>{item.match}%</span>
-                              </div>
-                            </td>
-                            <td>{item.location}</td>
-                            <td>{item.dealSize}</td>
-                            <td>
-                              <span className={styles["status-badge"]}>{item.status}</span>
-                            </td>
-                            <td className={styles["match-action"]}>
-                              <button className={styles["view-investor-btn"]}>View</button>
-                            </td>
-                          </>
-                        )}
-                        {selectedCategory === "Suppliers" && (
-                          <>
-                            <td className={styles["investor-name"]}>{item.name}</td>
-                            <td>{item.serviceCategory}</td>
-                            <td>{item.serviceOffered}</td>
-                            <td className={styles["match-score-cell"]}>
-                              <div className={styles["match-score-wrapper"]}>
-                                <div
-                                  className={styles["match-bar"]}
-                                  style={{
-                                    width: `${item.match}%`,
-                                    background: `linear-gradient(90deg, ${getCategoryColor(
-                                      selectedCategory,
-                                    )}, rgba(107, 114, 128, 0.3))`,
-                                  }}
-                                ></div>
-                                <span className={styles["match-percent"]}>{item.match}%</span>
-                              </div>
-                            </td>
-                            <td>{item.location}</td>
-                            <td>{item.rating}</td>
-                            <td>
-                              <span className={styles["status-badge"]}>{item.status}</span>
-                            </td>
-                            <td className={styles["match-action"]}>
-                              <button className={styles["view-investor-btn"]}>View</button>
-                            </td>
-                          </>
-                        )}
-                        {selectedCategory === "Funders" && (
-                          <>
-                            <td className={styles["investor-name"]}>{item.name}</td>
-                            <td>{item.investmentType}</td>
-                            <td className={styles["match-score-cell"]}>
-                              <div className={styles["match-score-wrapper"]}>
-                                <div
-                                  className={styles["match-bar"]}
-                                  style={{
-                                    width: `${item.match}%`,
-                                    background: `linear-gradient(90deg, ${getCategoryColor(
-                                      selectedCategory,
-                                    )}, rgba(107, 114, 128, 0.3))`,
-                                  }}
-                                ></div>
-                                <span className={styles["match-percent"]}>{item.match}%</span>
-                              </div>
-                            </td>
-                            <td>{item.location}</td>
-                            <td>{item.stageFocus}</td>
-                            <td>
-                              <span className={styles["status-badge"]}>{item.status}</span>
-                            </td>
-                            <td className={styles["match-action"]}>
-                              <button className={styles["view-investor-btn"]}>View</button>
-                            </td>
-                          </>
-                        )}
-                        {selectedCategory === "Support" && (
-                          <>
-                            <td className={styles["investor-name"]}>{item.name}</td>
-                            <td>{item.programType}</td>
-                            <td className={styles["match-score-cell"]}>
-                              <div className={styles["match-score-wrapper"]}>
-                                <div
-                                  className={styles["match-bar"]}
-                                  style={{
-                                    width: `${item.match}%`,
-                                    background: `linear-gradient(90deg, ${getCategoryColor(
-                                      selectedCategory,
-                                    )}, rgba(107, 114, 128, 0.3))`,
-                                  }}
-                                ></div>
-                                <span className={styles["match-percent"]}>{item.match}%</span>
-                              </div>
-                            </td>
-                            <td>{item.location}</td>
-                            <td>{item.focusArea}</td>
-                            <td>
-                              <span className={styles["status-badge"]}>{item.status}</span>
-                            </td>
-                            <td className={styles["match-action"]}>
-                              <button className={styles["view-investor-btn"]}>View</button>
-                            </td>
-                          </>
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Calendar */}
-            <div className={styles["calendar-card"]}>
-              <div className={styles["card-header"]}>
-                <h3 style={{ fontWeight: "500", color: "#555" }}>My Calendar</h3>
-                <div className={styles["calendar-actions"]}>
-                  <a
-                    href="https://outlook.office.com/calendar/addcalendar"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles["outlook-btn"]}
-                    style={{ textDecoration: "none", display: "flex", justifyContent: "center" }}
-                  >
-                    <Mail size={14} className="mr-1" /> Integrate with Outlook
-                  </a>
-                  <div className={styles["month-navigation"]}>
-                    <button onClick={() => navigateMonth("prev")}>
-                      <ChevronLeft size={14} />
-                    </button>
-                    <span>{currentDate.toLocaleString("default", { month: "long", year: "numeric" })}</span>
-                    <button onClick={() => navigateMonth("next")}>
-                      <ChevronRight size={14} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className={styles["mini-calendar"]}>
-                <div className={styles["calendar-header"]}>
-                  {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
-                    <div key={day} className={styles["day-header"]}>
-                      {day}
-                    </div>
-                  ))}
-                </div>
-                <div className={styles["calendar-days"]}>
-                  {Array.from({ length: firstDayOfMonth }).map((_, i) => (
-                    <div key={`empty-${i}`} className={styles["empty-day"]}></div>
-                  ))}
-                  {Array.from({ length: daysInMonth }).map((_, i) => {
-                    const day = i + 1
-                    const isDeadline = deadlines.some((d) => d.date === day)
-                    const isToday =
-                      day === new Date().getDate() &&
-                      currentDate.getMonth() === new Date().getMonth() &&
-                      currentDate.getFullYear() === new Date().getFullYear()
-
-                    return (
-                      <div
-                        key={`day-${day}`}
-                        className={`${styles["calendar-day"]} ${isDeadline ? styles.deadline : ""} ${isToday ? styles.today : ""}`}
-                        onClick={() => handleDayClick(day)}
-                      >
-                        {day}
-                        {isDeadline && <div className={styles["deadline-dot"]}></div>}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
+          {/* Second Row - Top Matches */}
+          <div className="second-row">
+            <TopMatchesTable />
           </div>
 
           {/* Detailed Reviews Modal */}
           {showDetailedReviews && (
-            <div className={styles["modal-overlay"]}>
-              <div className={styles["reviews-modal"]}>
-                <div className={styles["modal-header"]}>
+            <div className="modal-overlay">
+              <div className="reviews-modal">
+                <div className="modal-header">
                   <h3 style={{ fontWeight: "500", color: "#555" }}>Detailed Customer Reviews</h3>
                   <button onClick={() => setShowDetailedReviews(false)}>
                     <X size={20} />
                   </button>
                 </div>
-                <div className={styles["modal-body"]}>
-                  <div className={styles["reviews-summary"]}>
-                    <div className={styles["ratings-count"]}>
-                      <span className="text-3xl font-bold text-brown-800">25</span>
-                      <span className="text-sm text-brown-600">Total Reviews</span>
+                <div className="modal-body">
+                  <div className="reviews-summary">
+                    <div className="ratings-count">
+                      <span className="text-3xl font-bold" style={{ color: styles.primaryBrown }}>25</span>
+                      <span className="text-sm" style={{ color: styles.lightBrown }}>Total Reviews</span>
                     </div>
-                    <div className={styles["average-rating"]}>
-                      <div className={styles.stars}>
+                    <div className="average-rating">
+                      <div className="stars">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
                             size={20}
-                            fill={i < 4 ? "#C69C6D" : "#E5E7EB"}
-                            color={i < 4 ? "#C69C6D" : "#E5E7EB"}
+                            fill={i < 4 ? styles.accentBrown : styles.paleBrown}
+                            color={i < 4 ? styles.accentBrown : styles.paleBrown}
                           />
                         ))}
                       </div>
-                      <span className="text-lg font-semibold text-brown-800">4.0 Average</span>
+                      <span className="text-lg font-semibold" style={{ color: styles.primaryBrown }}>4.0 Average</span>
                     </div>
                   </div>
-                  <div className={styles["reviews-list-detailed"]}>
+                  <div className="reviews-list-detailed">
                     {ratings.map((rating, index) => (
-                      <div key={index} className={styles["review-item-detailed"]}>
-                        <div className={styles["review-header"]}>
-                          <div className={styles["reviewer-info"]}>
-                            <h4>{rating.name}</h4>
-                            <p className={styles["reviewer-company"]}>
+                      <div key={index} className="review-item-detailed">
+                        <div className="review-header">
+                          <div className="reviewer-info">
+                            <h4 style={{ color: styles.primaryBrown }}>{rating.name}</h4>
+                            <p className="reviewer-company" style={{ color: styles.lightBrown }}>
                               {rating.company} • {rating.position}
                             </p>
-                            <p>{rating.date}</p>
+                            <p style={{ color: styles.lightBrown }}>{rating.date}</p>
                           </div>
-                          <div className={styles.stars}>
+                          <div className="stars">
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
                                 size={16}
-                                fill={i < rating.rating ? "#C69C6D" : "#E5E7EB"}
-                                color={i < rating.rating ? "#C69C6D" : "#E5E7EB"}
+                                fill={i < rating.rating ? styles.accentBrown : styles.paleBrown}
+                                color={i < rating.rating ? styles.accentBrown : styles.paleBrown}
                               />
                             ))}
                           </div>
                         </div>
-                        <div className={styles["review-comment"]}>
-                          <p>{rating.comment}</p>
+                        <div className="review-comment">
+                          <p style={{ color: styles.primaryBrown }}>{rating.comment}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className={styles["modal-footer"]}>
-                  <button className={styles["cancel-btn"]} onClick={() => setShowDetailedReviews(false)}>
+                <div className="modal-footer">
+                  <button 
+                    className="cancel-btn" 
+                    onClick={() => setShowDetailedReviews(false)}
+                    style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+                  >
                     Close
                   </button>
                 </div>
@@ -1694,39 +1689,57 @@ const Dashboard = () => {
 
           {/* Deadline Modal */}
           {showDeadlineModal && (
-            <div className={styles["modal-overlay"]}>
-              <div className={styles["deadline-modal"]}>
-                <div className={styles["modal-header"]}>
-                  <h3 style={{ fontWeight: "500", color: "#555" }}>Add New Deadline</h3>
+            <div className="modal-overlay">
+              <div className="ios-modal">
+                <div className="modal-header">
+                  <h3>New Event</h3>
                   <button onClick={() => setShowDeadlineModal(false)}>
                     <X size={20} />
                   </button>
                 </div>
-                <div className={styles["modal-body"]}>
-                  <div className={styles["form-group"]}>
+                <div className="modal-body">
+                  <div className="form-group">
                     <label>Title</label>
                     <input
                       type="text"
                       value={newDeadline.title}
                       onChange={(e) => setNewDeadline({ ...newDeadline, title: e.target.value })}
-                      placeholder="Enter deadline title"
+                      placeholder="Enter event title"
+                      className="ios-input"
                     />
                   </div>
-                  <div className={styles["form-group"]}>
+                  <div className="form-group">
                     <label>Date</label>
                     <input
                       type="date"
                       value={newDeadline.date}
                       onChange={(e) => setNewDeadline({ ...newDeadline, date: e.target.value })}
+                      className="ios-input"
                     />
                   </div>
+                  <div className="form-group">
+                    <label>Event Type</label>
+                    <select className="ios-select" defaultValue="meeting">
+                      <option value="meeting">Meeting</option>
+                      <option value="deadline">Deadline</option>
+                      <option value="workshop">Workshop</option>
+                    </select>
+                  </div>
                 </div>
-                <div className={styles["modal-footer"]}>
-                  <button className={styles["cancel-btn"]} onClick={() => setShowDeadlineModal(false)}>
+                <div className="modal-footer">
+                  <button 
+                    className="ios-button cancel" 
+                    onClick={() => setShowDeadlineModal(false)}
+                    style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+                  >
                     Cancel
                   </button>
-                  <button className={styles["add-btn"]} onClick={addDeadline}>
-                    <Plus size={16} /> Add Deadline
+                  <button 
+                    className="ios-button add" 
+                    onClick={addDeadline}
+                    style={{ backgroundColor: styles.primaryBrown, color: 'white' }}
+                  >
+                    Add Event
                   </button>
                 </div>
               </div>
@@ -1735,63 +1748,68 @@ const Dashboard = () => {
 
           {/* Company Summary Modal */}
           {showCompanySummary && selectedCompany && (
-            <div className={styles["modal-overlay"]}>
-              <div className={styles["company-modal"]}>
-                <div className={styles["modal-header"]}>
+            <div className="modal-overlay">
+              <div className="company-modal">
+                <div className="modal-header">
                   <h3 style={{ fontWeight: "500", color: "#555" }}>Company Summary: {selectedCompany.name}</h3>
                   <button onClick={() => setShowCompanySummary(false)}>
                     <X size={20} />
                   </button>
                 </div>
-                <div className={styles["modal-body"]}>
-                  <div className={styles["company-info"]}>
-                    <div className={styles["info-group"]}>
+                <div className="modal-body">
+                  <div className="company-info">
+                    <div className="info-group">
                       <h4>Company Focus</h4>
                       <p>{selectedCompany.companyFocus}</p>
                     </div>
-                    <div className={styles["info-group"]}>
+                    <div className="info-group">
                       <h4>Investment Criteria</h4>
                       <p>{selectedCompany.investmentCriteria}</p>
                     </div>
-                    <div className={styles["info-group"]}>
+                    <div className="info-group">
                       <h4>Portfolio Companies</h4>
-                      <ul className={styles["portfolio-list"]}>
+                      <ul className="portfolio-list">
                         {selectedCompany.portfolio.map((company, index) => (
                           <li key={index}>{company}</li>
                         ))}
                       </ul>
                     </div>
-                    <div className={styles["info-group"]}>
+                    <div className="info-group">
                       <h4>Description</h4>
                       <p>{selectedCompany.description}</p>
                     </div>
-                    <div className={styles["info-group"]}>
+                    <div className="info-group">
                       <h4>Contact Person</h4>
                       <p>{selectedCompany.contactPerson}</p>
                     </div>
-                    <div className={styles["info-group"]}>
+                    <div className="info-group">
                       <h4>Website</h4>
                       <a
                         href={`https://${selectedCompany.website}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={styles["website-link"]}
+                        className="website-link"
                       >
                         <ExternalLink size={14} /> {selectedCompany.website}
                       </a>
                     </div>
                   </div>
                 </div>
-                <div className={styles["modal-footer"]}>
-                  <button className={styles["cancel-btn"]} onClick={() => setShowCompanySummary(false)}>
+                <div className="modal-footer">
+                  <button 
+                    className="cancel-btn" 
+                    onClick={() => setShowCompanySummary(false)}
+                    style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+                  >
                     Close
                   </button>
                   <button
-                    className={styles["add-btn"]}
+                    className="add-btn"
                     onClick={() => {
                       handleSendApplication(selectedCompany.id)
                       setShowCompanySummary(false)
                     }}
+                    style={{ backgroundColor: styles.primaryBrown, color: 'white' }}
                   >
                     Send Application
                   </button>
@@ -1802,17 +1820,17 @@ const Dashboard = () => {
 
           {/* Document Selection Modal */}
           {showDocumentModal && (
-            <div className={styles["modal-overlay"]}>
-              <div className={styles["document-modal"]}>
-                <div className={styles["modal-header"]}>
+            <div className="modal-overlay">
+              <div className="document-modal">
+                <div className="modal-header">
                   <h3 style={{ fontWeight: "500", color: "#555" }}>Select Documents to Submit</h3>
                   <button onClick={() => setShowDocumentModal(false)}>
                     <X size={20} />
                   </button>
                 </div>
-                <div className={styles["modal-body"]}>
-                  <div className={styles["document-list-container"]}>
-                    <table className={styles["document-selection-table"]}>
+                <div className="modal-body">
+                  <div className="document-list-container">
+                    <table className="document-selection-table">
                       <thead>
                         <tr>
                           <th></th>
@@ -1825,17 +1843,17 @@ const Dashboard = () => {
                         {documents.map((doc) => (
                           <tr
                             key={doc.id}
-                            className={doc.selected ? styles.selected : ""}
+                            className={doc.selected ? "selected" : ""}
                             onClick={() => toggleDocumentSelection(doc.id)}
                           >
                             <td>
-                              <div className={`${styles.checkbox} ${doc.selected ? styles.checked : ""}`}>
+                              <div className={`checkbox ${doc.selected ? "checked" : ""}`}>
                                 {doc.selected && <Check size={14} />}
                               </div>
                             </td>
                             <td>
-                              <div className={styles["document-name"]}>
-                                <FileText size={16} className={styles["doc-icon"]} />
+                              <div className="document-name">
+                                <FileText size={16} className="doc-icon" />
                                 {doc.name}
                               </div>
                             </td>
@@ -1846,20 +1864,25 @@ const Dashboard = () => {
                       </tbody>
                     </table>
                   </div>
-                  <div className={styles["upload-section"]}>
-                    <button className={styles["upload-btn"]}>
+                  <div className="upload-section">
+                    <button className="upload-btn">
                       <Upload size={14} /> Upload New Document
                     </button>
                   </div>
                 </div>
-                <div className={styles["modal-footer"]}>
-                  <button className={styles["cancel-btn"]} onClick={() => setShowDocumentModal(false)}>
+                <div className="modal-footer">
+                  <button 
+                    className="cancel-btn" 
+                    onClick={() => setShowDocumentModal(false)}
+                    style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+                  >
                     Cancel
                   </button>
                   <button
-                    className={styles["add-btn"]}
+                    className="add-btn"
                     onClick={submitSelectedDocuments}
                     disabled={!documents.some((doc) => doc.selected)}
+                    style={{ backgroundColor: styles.primaryBrown, color: 'white' }}
                   >
                     <Check size={16} /> Submit Selected Documents
                   </button>
@@ -1870,15 +1893,15 @@ const Dashboard = () => {
 
           {/* Score Summary Modal */}
           {showScoreSummaryModal && (
-            <div className={styles["modal-overlay"]}>
-              <div className={styles["reviews-modal"]} style={{ maxWidth: "700px" }}>
-                <div className={styles["modal-header"]}>
+            <div className="modal-overlay">
+              <div className="reviews-modal" style={{ maxWidth: "700px" }}>
+                <div className="modal-header">
                   <h3 style={{ fontWeight: "500", color: "#555" }}>BIG Fundability Score Summary</h3>
                   <button onClick={() => setShowScoreSummaryModal(false)}>
                     <X size={20} />
                   </button>
                 </div>
-                <div className={styles["modal-body"]}>
+                <div className="modal-body">
                   <div
                     style={{
                       display: "flex",
@@ -2073,30 +2096,27 @@ const Dashboard = () => {
                         Current Stage: {profileData?.entityOverview?.operationStage?.toUpperCase() || "IDEATION"}
                       </div>
                     </div>
-                    <div className={styles["score-categories"]}>
+                    <div className="score-categories">
                       {fundabilityScoreData
                         .filter((cat) => cat.name !== "Stage Weighting Profile")
                         .map((category, index) => (
-                          <div key={index} className={styles["category-item"]}>
-                            <div className={styles["category-header"]}>
-                              <div
-                                className={styles["category-color"]}
-                                style={{ backgroundColor: category.color }}
-                              ></div>
+                          <div key={index} className="category-item">
+                            <div className="category-header">
+                              <div className="category-color" style={{ backgroundColor: category.color }}></div>
                               <h4>{category.name}</h4>
-                              <span className={styles["category-weight"]}>Weight: {category.weight}</span>
+                              <span className="category-weight">Weight: {category.weight}</span>
                             </div>
-                            <div className={styles["category-details"]}>
+                            <div className="category-details">
                               <p>{category.description}</p>
-                              <div className={styles["score-bar"]}>
+                              <div className="score-bar">
                                 <div
-                                  className={styles["score-progress"]}
+                                  className="score-progress"
                                   style={{
                                     width: `${category.value}%`,
                                     backgroundColor: category.color,
                                   }}
                                 ></div>
-                                <span className={styles["score-value"]}>{category.value}%</span>
+                                <span className="score-value">{category.value}%</span>
                               </div>
                             </div>
                           </div>
@@ -2135,9 +2155,9 @@ const Dashboard = () => {
                       </ResponsiveContainer>
                     </div>
                     <div style={{ display: "flex", gap: "8px", justifyContent: "center", marginTop: "10px" }}>
-                      <button className={`${styles["time-filter"]} ${styles.active}`}>3M</button>
-                      <button className={styles["time-filter"]}>6M</button>
-                      <button className={styles["time-filter"]}>12M</button>
+                      <button className="time-filter active">3M</button>
+                      <button className="time-filter">6M</button>
+                      <button className="time-filter">12M</button>
                     </div>
                   </div>
 
@@ -2187,16 +2207,16 @@ const Dashboard = () => {
                     </ul>
                   </div>
                 </div>
-                <div className={styles["modal-footer"]} style={{ marginTop: "20px" }}>
+                <div className="modal-footer" style={{ marginTop: "20px" }}>
                   <button
-                    className={styles["cancel-btn"]}
+                    className="cancel-btn"
                     onClick={() => setShowScoreSummaryModal(false)}
                     style={{
-                      backgroundColor: "#f5f5f5",
+                      backgroundColor: styles.paleBrown,
+                      color: styles.primaryBrown,
                       border: "none",
                       padding: "8px 16px",
                       borderRadius: "6px",
-                      color: "#555",
                       fontWeight: "500",
                       cursor: "pointer",
                     }}
@@ -2210,15 +2230,15 @@ const Dashboard = () => {
 
           {/* Review Detail Modal */}
           {showReviewModal && selectedReview && (
-            <div className={styles["modal-overlay"]}>
-              <div className={styles["reviews-modal"]} style={{ maxWidth: "500px" }}>
-                <div className={styles["modal-header"]}>
+            <div className="modal-overlay">
+              <div className="reviews-modal" style={{ maxWidth: "500px" }}>
+                <div className="modal-header">
                   <h3 style={{ fontWeight: "500", color: "#555" }}>Customer Review</h3>
                   <button onClick={() => setShowReviewModal(false)}>
                     <X size={20} />
                   </button>
                 </div>
-                <div className={styles["modal-body"]}>
+                <div className="modal-body">
                   <div
                     style={{
                       backgroundColor: "white",
@@ -2244,13 +2264,13 @@ const Dashboard = () => {
                         </p>
                         <p style={{ fontSize: "0.8rem", color: "#888", margin: 0 }}>{selectedReview.date}</p>
                       </div>
-                      <div className={styles.stars} style={{ marginLeft: "auto" }}>
+                      <div className="stars" style={{ marginLeft: "auto" }}>
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
                             size={18}
-                            fill={i < selectedReview.rating ? "#C69C6D" : "#E5E7EB"}
-                            color={i < selectedReview.rating ? "#C69C6D" : "#E5E7EB"}
+                            fill={i < selectedReview.rating ? styles.accentBrown : styles.paleBrown}
+                            color={i < selectedReview.rating ? styles.accentBrown : styles.paleBrown}
                           />
                         ))}
                       </div>
@@ -2270,16 +2290,16 @@ const Dashboard = () => {
                     </div>
                   </div>
                 </div>
-                <div className={styles["modal-footer"]}>
+                <div className="modal-footer">
                   <button
-                    className={styles["cancel-btn"]}
+                    className="cancel-btn"
                     onClick={() => setShowReviewModal(false)}
                     style={{
-                      backgroundColor: "#f5f5f5",
+                      backgroundColor: styles.paleBrown,
+                      color: styles.primaryBrown,
                       border: "none",
                       padding: "8px 16px",
                       borderRadius: "6px",
-                      color: "#555",
                       fontWeight: "500",
                       cursor: "pointer",
                     }}

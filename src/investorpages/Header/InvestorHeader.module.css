@@ -1,15 +1,15 @@
 .investor-header {
   background-color: #ffffff;
-  padding: 20px 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
-  position: fixed;
-  top: 0;
-  left: 240px; /* matches sidebar width */
-  width: calc(100% - 220px); /* fill the rest of the space */
-  z-index: 10;
+        padding: 2px 35px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        position: fixed;
+        top: 0;
+        left: 240px; /* matches sidebar width */
+        width: calc(100% - 220px); /* fill the rest of the space */
+        z-index: 10;
 
   }
   

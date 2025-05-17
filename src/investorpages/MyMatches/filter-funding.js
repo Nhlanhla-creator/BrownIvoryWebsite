@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Slider } from "./slider"
 import { Filter, X, ChevronDown, ChevronUp, Check, Search } from "lucide-react"
-import styles from "./funding.module.css"
+import styles from "./investor-funding.module.css"
 
 export function FilterFunding({ onFilterChange, filters }) {
   const [location, setLocation] = useState(filters.location || "")

@@ -92,7 +92,7 @@ function InvestorHeader({ companyName, profileImage, setProfileImage }) {
   return (
     <header className={styles["investor-header"]}>
       <div className={styles["header-left"]}>
-        <h1>Investor Dashboard</h1>
+        <h1>Investor X</h1>
       </div>
 
       <div className={styles["header-right"]}>

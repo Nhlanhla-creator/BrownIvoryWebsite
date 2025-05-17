@@ -111,14 +111,14 @@ export default function DeclarationConsent({ data = {}, updateData, allFormData,
         <div className="mt-8 border-t border-brown-200 pt-6"></div>
 
         <div className="mt-8 flex justify-end">
-          <button
+          {/* <button
             type="button"
             onClick={handleSubmit}
             disabled={!data.accuracy || !data.dataProcessing || !data.termsConditions}
             className="px-4 py-2 bg-brown-600 text-white rounded-md hover:bg-brown-700 disabled:opacity-50"
           >
             Submit Registration
-          </button>
+          </button> */}
         </div>
       </div>
 

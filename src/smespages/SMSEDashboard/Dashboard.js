@@ -1,27 +1,24 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
+import { useState, useEffect, useCallback } from "react"
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import {
-  TrendingUp,
-  Award,
-  Users,
   CheckCircle,
   ChevronRight,
-  ChevronLeft,
   Star,
   Plus,
   X,
   ChevronDown,
-  Mail,
   FileText,
   Upload,
   ExternalLink,
   Check,
+  ChevronLeft,
+  Calendar,
 } from "lucide-react"
 import "./Dashboard.css"
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../../firebaseConfig";
+import { doc, getDoc } from "firebase/firestore"
+import { auth, db } from "../../firebaseConfig"
 import { useNavigate } from "react-router-dom"
 
 const Dashboard = () => {
@@ -46,95 +43,93 @@ const Dashboard = () => {
   const [selectedCompany, setSelectedCompany] = useState(null)
 
   // In your Dashboard component
-  const [complianceScore, setComplianceScore] = useState(0);
-  const [profileData, setProfileData] = useState(null);
-  const [missingDocuments, setMissingDocuments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [complianceScore, setComplianceScore] = useState(0)
+  const [profileData, setProfileData] = useState(null)
+  const [missingDocuments, setMissingDocuments] = useState([])
+  const [loading, setLoading] = useState(true)
   const [categoryScores, setCategoryScores] = useState({
     financialHealth: 0,
     operationalStrength: 0,
     pitchQuality: 0,
-    impactProof: 0
-  });
+    impactProof: 0,
+  })
 
   // Define weights for each operating stage
   const operationStageWeights = {
     ideation: {
       compliance: 0.15,
-      financialHealth: 0.10,
+      financialHealth: 0.1,
       operationalStrength: 0.15,
-      pitchQuality: 0.30,
-      impactProof: 0.30
+      pitchQuality: 0.3,
+      impactProof: 0.3,
     },
     startup: {
-      compliance: 0.20,
+      compliance: 0.2,
       financialHealth: 0.15,
-      operationalStrength: 0.20,
+      operationalStrength: 0.2,
       pitchQuality: 0.25,
-      impactProof: 0.20
+      impactProof: 0.2,
     },
     growth: {
       compliance: 0.25,
-      financialHealth: 0.20,
+      financialHealth: 0.2,
       operationalStrength: 0.25,
       pitchQuality: 0.15,
-      impactProof: 0.15
+      impactProof: 0.15,
     },
     mature: {
-      compliance: 0.30,
+      compliance: 0.3,
       financialHealth: 0.25,
-      operationalStrength: 0.20,
-      pitchQuality: 0.10,
-      impactProof: 0.15
+      operationalStrength: 0.2,
+      pitchQuality: 0.1,
+      impactProof: 0.15,
     },
     turnaround: {
       compliance: 0.35,
-      financialHealth: 0.20,
+      financialHealth: 0.2,
       operationalStrength: 0.15,
       pitchQuality: 0.15,
-      impactProof: 0.15
-    }
-  };
+      impactProof: 0.15,
+    },
+  }
 
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const userId = auth.currentUser?.uid;
+        const userId = auth.currentUser?.uid
         if (!userId) {
-          console.error("User not logged in");
-          return;
+          console.error("User not logged in")
+          return
         }
 
-        const docRef = doc(db, "universalProfiles", userId);
-        const docSnap = await getDoc(docRef);
+        const docRef = doc(db, "universalProfiles", userId)
+        const docSnap = await getDoc(docRef)
 
         if (docSnap.exists()) {
-          setProfileData(docSnap.data());
+          setProfileData(docSnap.data())
         } else {
-          console.error("No profile found");
+          console.error("No profile found")
         }
       } catch (err) {
-        console.error("Error fetching profile data:", err);
+        console.error("Error fetching profile data:", err)
       }
-    };
+    }
 
-    fetchProfileData();
-  }, []);
-
-
+    fetchProfileData()
+  }, [])
 
   // Update the score calculation to use stage-specific weights
   useEffect(() => {
     if (profileData) {
-      const operationStage = profileData.entityOverview?.operationStage || 'ideation';
-      const weights = operationStageWeights[operationStage] || operationStageWeights.ideation;
+      const operationStage = profileData.entityOverview?.operationStage || "ideation"
+      const weights = operationStageWeights[operationStage] || operationStageWeights.ideation
 
       // Calculate individual scores (0-100 range)
-      const complianceScoreValue = calculateComplianceScore(profileData);
-      const financialHealth = calculateFinancialHealth(profileData);
-      const operationalStrength = calculateOperationalStrength(profileData);
-      const pitchQuality = calculatePitchQuality(profileData);
-      const impactProof = calculateImpactProof(profileData);
+      const complianceScoreValue = calculateComplianceScore(profileData)
+      const financialHealth = calculateFinancialHealth(profileData)
+      const operationalStrength = calculateOperationalStrength(profileData)
+      const pitchQuality = calculatePitchQuality(profileData)
+      const impactProof = calculateImpactProof(profileData)
 
       // Apply weights
       const weightedScores = {
@@ -142,121 +137,125 @@ const Dashboard = () => {
         financialHealth: Math.round(financialHealth * weights.financialHealth),
         operationalStrength: Math.round(operationalStrength * weights.operationalStrength),
         pitchQuality: Math.round(pitchQuality * weights.pitchQuality),
-        impactProof: Math.round(impactProof * weights.impactProof)
-      };
+        impactProof: Math.round(impactProof * weights.impactProof),
+      }
 
       // Update state
-      setComplianceScore(weightedScores.compliance);
+      setComplianceScore(weightedScores.compliance)
       setCategoryScores({
         financialHealth: weightedScores.financialHealth,
         operationalStrength: weightedScores.operationalStrength,
         pitchQuality: weightedScores.pitchQuality,
-        impactProof: weightedScores.impactProof
-      });
+        impactProof: weightedScores.impactProof,
+      })
     }
-  }, [profileData]);
+  }, [profileData])
 
   // Update calculation functions to return 0-100 scores
   const calculateComplianceScore = (profileData) => {
     const requiredDocuments = [
-      'entityOverview.registrationCertificate',
-      'entityOverview.proofOfAddress',
-      'ownershipManagement.certifiedIds',
-      'ownershipManagement.shareRegister',
-      'legalCompliance.taxClearanceCert',
-      'legalCompliance.bbbeeCert',
-      'declarationConsent.signedDocument'
-    ];
+      "entityOverview.registrationCertificate",
+      "entityOverview.proofOfAddress",
+      "ownershipManagement.certifiedIds",
+      "ownershipManagement.shareRegister",
+      "legalCompliance.taxClearanceCert",
+      "legalCompliance.bbbeeCert",
+      "declarationConsent.signedDocument",
+    ]
 
-    const presentCount = requiredDocuments.filter(path => {
-      const parts = path.split('.');
-      let value = profileData;
+    const presentCount = requiredDocuments.filter((path) => {
+      const parts = path.split(".")
+      let value = profileData
       for (const part of parts) {
-        value = value?.[part];
-        if (value === undefined || value === null || value === '') {
-          return false;
+        value = value?.[part]
+        if (value === undefined || value === null || value === "") {
+          return false
         }
-        if (typeof value === 'object' && value.url) {
-          return true;
+        if (typeof value === "object" && value.url) {
+          return true
         }
       }
-      return true;
-    }).length;
+      return true
+    }).length
 
-    return (presentCount / requiredDocuments.length) * 100;
-  };
+    return (presentCount / requiredDocuments.length) * 100
+  }
 
   const calculateFinancialHealth = (profileData) => {
-    let score = 0;
+    let score = 0
 
     // Financial indicators
-    if (profileData?.entityOverview?.financialYearEnd) score += 0;
+    if (profileData?.entityOverview?.financialYearEnd) score += 0
     if (profileData?.entityOverview?.yearsInOperation) {
-      const years = parseInt(profileData.entityOverview.yearsInOperation);
-      score += Math.min(years * 0, 0); // Up to 20 points for longevity
+      const years = Number.parseInt(profileData.entityOverview.yearsInOperation)
+      score += Math.min(years * 0, 0) // Up to 20 points for longevity
     }
-    if (profileData?.productsServices?.annualTurnover) score += 0;
-    if (profileData?.legalCompliance?.taxClearanceNumber) score += 0;
-    if (profileData?.legalCompliance?.vatNumber) score += 0;
+    if (profileData?.productsServices?.annualTurnover) score += 0
+    if (profileData?.legalCompliance?.taxClearanceNumber) score += 0
+    if (profileData?.legalCompliance?.vatNumber) score += 0
 
-    return Math.min(100, score);
-  };
+    return Math.min(100, score)
+  }
 
   const calculateOperationalStrength = (profileData) => {
-    let score = 0;
+    let score = 0
 
     if (profileData?.entityOverview?.employeeCount) {
-      const employees = parseInt(profileData.entityOverview.employeeCount);
-      score += Math.min(employees * 0, 0); // Up to 20 points for team size
+      const employees = Number.parseInt(profileData.entityOverview.employeeCount)
+      score += Math.min(employees * 0, 0) // Up to 20 points for team size
     }
     if (profileData?.entityOverview?.yearsInOperation) {
-      const years = parseInt(profileData.entityOverview.yearsInOperation);
-      score += Math.min(years * 0, 0); // Up to 20 points for longevity
+      const years = Number.parseInt(profileData.entityOverview.yearsInOperation)
+      score += Math.min(years * 0, 0) // Up to 20 points for longevity
     }
     if (profileData?.productsServices?.keyClients?.length > 0) {
-      score += Math.min(profileData.productsServices.keyClients.length * 0, 0);
+      score += Math.min(profileData.productsServices.keyClients.length * 0, 0)
     }
-    if (profileData?.ownershipManagement?.directors?.length > 0) score += 0;
-    if (profileData?.contactDetails?.website) score += 0;
+    if (profileData?.ownershipManagement?.directors?.length > 0) score += 0
+    if (profileData?.contactDetails?.website) score += 0
 
-    return Math.min(100, score);
-  };
+    return Math.min(100, score)
+  }
 
   const calculatePitchQuality = (profileData) => {
-    let score = 0;
+    let score = 0
 
     if (profileData?.entityOverview?.businessDescription) {
-      const descLength = profileData.entityOverview.businessDescription.length;
-      score += Math.min(descLength / 1, 0); // Up to 30 points for description
+      const descLength = profileData.entityOverview.businessDescription.length
+      score += Math.min(descLength / 1, 0) // Up to 30 points for description
     }
     if (profileData?.productsServices?.productCategories?.products?.length > 0) {
-      score += Math.min(profileData.productsServices.productCategories.products.length * 0, 0);
+      score += Math.min(profileData.productsServices.productCategories.products.length * 0, 0)
     }
     if (profileData?.productsServices?.serviceCategories?.services?.length > 0) {
-      score += Math.min(profileData.productsServices.serviceCategories.services.length * 0, 0);
+      score += Math.min(profileData.productsServices.serviceCategories.services.length * 0, 0)
     }
-    if (profileData?.entityOverview?.targetMarket) score += 0;
+    if (profileData?.entityOverview?.targetMarket) score += 0
 
-    return Math.min(100, score);
-  };
+    return Math.min(100, score)
+  }
 
   const calculateImpactProof = (profileData) => {
-    let score = 0;
+    let score = 0
 
-    if (profileData?.entityOverview?.targetMarket?.includes('social') ||
-      profileData?.entityOverview?.targetMarket?.includes('impact')) {
-      score += 0;
+    if (
+      profileData?.entityOverview?.targetMarket?.includes("social") ||
+      profileData?.entityOverview?.targetMarket?.includes("impact")
+    ) {
+      score += 0
     }
-    if (profileData?.entityOverview?.businessDescription?.includes('impact') ||
-      profileData?.entityOverview?.businessDescription?.includes('social')) {
-      score += 0;
+    if (
+      profileData?.entityOverview?.businessDescription?.includes("impact") ||
+      profileData?.entityOverview?.businessDescription?.includes("social")
+    ) {
+      score += 0
     }
-    if (profileData?.howDidYouHear?.source === 'Referral') score += 0;
-    if (profileData?.declarationConsent?.accuracy) score += 0;
-    if (profileData?.declarationConsent?.dataProcessing) score += 0;
+    if (profileData?.howDidYouHear?.source === "Referral") score += 0
+    if (profileData?.declarationConsent?.accuracy) score += 0
+    if (profileData?.declarationConsent?.dataProcessing) score += 0
 
-    return Math.min(100, score);
-  };
+    return Math.min(100, score)
+  }
 
   // Set other categories to 0 (12.5% each when implemented)
   const fundabilityScoreData = [
@@ -264,36 +263,40 @@ const Dashboard = () => {
       name: "Compliance",
       value: complianceScore,
       color: "#8D6E63",
-      weight: operationStageWeights[profileData?.entityOverview?.operationStage || 'ideation']?.compliance * 100 + '%',
-      description: "Legal and regulatory documentation completeness"
+      weight: operationStageWeights[profileData?.entityOverview?.operationStage || "ideation"]?.compliance * 100 + "%",
+      description: "Legal and regulatory documentation completeness",
     },
     {
       name: "Financial Health",
       value: categoryScores.financialHealth,
       color: "#6D4C41",
-      weight: operationStageWeights[profileData?.entityOverview?.operationStage || 'ideation']?.financialHealth * 100 + '%',
-      description: "Financial stability and performance metrics"
+      weight:
+        operationStageWeights[profileData?.entityOverview?.operationStage || "ideation"]?.financialHealth * 100 + "%",
+      description: "Financial stability and performance metrics",
     },
     {
       name: "Operational Strength",
       value: categoryScores.operationalStrength,
       color: "#A67C52",
-      weight: operationStageWeights[profileData?.entityOverview?.operationStage || 'ideation']?.operationalStrength * 100 + '%',
-      description: "Team size, experience, and operational capabilities"
+      weight:
+        operationStageWeights[profileData?.entityOverview?.operationStage || "ideation"]?.operationalStrength * 100 +
+        "%",
+      description: "Team size, experience, and operational capabilities",
     },
     {
       name: "Pitch Quality",
       value: categoryScores.pitchQuality,
       color: "#795548",
-      weight: operationStageWeights[profileData?.entityOverview?.operationStage || 'ideation']?.pitchQuality * 100 + '%',
-      description: "Business narrative clarity and attractiveness"
+      weight:
+        operationStageWeights[profileData?.entityOverview?.operationStage || "ideation"]?.pitchQuality * 100 + "%",
+      description: "Business narrative clarity and attractiveness",
     },
     {
       name: "Impact Proof",
       value: categoryScores.impactProof,
       color: "#5D4037",
-      weight: operationStageWeights[profileData?.entityOverview?.operationStage || 'ideation']?.impactProof * 100 + '%',
-      description: "Social/environmental impact and market need validation"
+      weight: operationStageWeights[profileData?.entityOverview?.operationStage || "ideation"]?.impactProof * 100 + "%",
+      description: "Social/environmental impact and market need validation",
     },
     // Additional category for visualization (not included in total score)
     {
@@ -301,18 +304,18 @@ const Dashboard = () => {
       value: 100,
       color: "#BCAAA4",
       weight: "N/A",
-      description: `Current weighting: ${profileData?.entityOverview?.operationStage || 'ideation'} stage`
-    }
-  ];
+      description: `Current weighting: ${profileData?.entityOverview?.operationStage || "ideation"} stage`,
+    },
+  ]
 
   // Calculate total score
   const totalFundabilityScore = Math.round(
     complianceScore +
-    categoryScores.financialHealth +
-    categoryScores.operationalStrength +
-    categoryScores.pitchQuality +
-    categoryScores.impactProof
-  );
+      categoryScores.financialHealth +
+      categoryScores.operationalStrength +
+      categoryScores.pitchQuality +
+      categoryScores.impactProof,
+  )
 
   // State for document selection modal
   const [showDocumentModal, setShowDocumentModal] = useState(false)
@@ -667,7 +670,6 @@ const Dashboard = () => {
   // Legitimacy score data
   const legitimacyScore = complianceScore * 2
 
-
   // Service Score data
   const serviceScoreData = [
     { name: "Compliance", value: 20, color: "#8D6E63" },
@@ -747,7 +749,6 @@ const Dashboard = () => {
       company: "Patel Innovations",
       position: "COO",
     },
-
   ]
 
   // Category data for Top Matches
@@ -926,13 +927,13 @@ const Dashboard = () => {
   const getCategoryColor = (category) => {
     switch (category) {
       case "Customers":
-        return "#1e3a8a" // Dark blue
+        return "#5D4037" // Dark brown
       case "Suppliers":
-        return "#9b1c1c" // Dark red
+        return "#8D6E63" // Medium brown
       case "Funders":
-        return "#065f46" // Dark green
+        return "#A67C52" // Light brown
       case "Support":
-        return "#d97706" // Dark amber
+        return "#BCAAA4" // Pale brown
       default:
         return "#6b7280" // Gray
     }
@@ -942,13 +943,13 @@ const Dashboard = () => {
   const getCategoryBgColor = (category) => {
     switch (category) {
       case "Customers":
-        return "bg-blue-100"
+        return "bg-brown-100"
       case "Suppliers":
-        return "bg-red-100"
+        return "bg-brown-50"
       case "Funders":
-        return "bg-green-100"
+        return "bg-brown-200"
       case "Support":
-        return "bg-amber-100"
+        return "bg-brown-300"
       default:
         return "bg-gray-100"
     }
@@ -958,13 +959,13 @@ const Dashboard = () => {
   const getCategoryTextColor = (category) => {
     switch (category) {
       case "Customers":
-        return "text-blue-800"
+        return "text-brown-800"
       case "Suppliers":
-        return "text-red-800"
+        return "text-brown-700"
       case "Funders":
-        return "text-green-800"
+        return "text-brown-600"
       case "Support":
-        return "text-amber-800"
+        return "text-brown-500"
       default:
         return "text-gray-800"
     }
@@ -974,15 +975,456 @@ const Dashboard = () => {
   const [visibleReviewDetails, setVisibleReviewDetails] = useState({})
   const [showReviewModal, setShowReviewModal] = useState(false)
   const [selectedReview, setSelectedReview] = useState(null)
+  // Add this with the other state declarations
+  const [calendarViewFilter, setCalendarViewFilter] = useState("month")
+
+  // Updated CSS classes with brown shades
+  const styles = {
+    primaryBrown: "#5D4037",
+    lightBrown: "#8D6E63",
+    darkBrown: "#3E2723",
+    accentBrown: "#A67C52",
+    paleBrown: "#D7CCC8",
+    backgroundBrown: "#EFEBE9",
+  }
+
+  // Updated Calendar Component - More Compact
+  const CompactCalendar = () => {
+    const [showFullCalendar, setShowFullCalendar] = useState(false)
+    
+    return (
+      <div className="compact-calendar">
+        <div className="calendar-header">
+          <span className="current-month">
+            {currentDate.toLocaleString('default', { month: 'short', year: 'numeric' })}
+          </span>
+          <button 
+            className="view-calendar-btn"
+            onClick={() => setShowFullCalendar(true)}
+          >
+            <Calendar size={16} />
+          </button>
+        </div>
+        
+        <div className="calendar-days-grid compact">
+          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) => (
+            <div key={day} className="day-header compact">{day}</div>
+          ))}
+          
+          {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+            <div key={`empty-${i}`} className="empty-day compact"></div>
+          ))}
+          
+          {Array.from({ length: Math.min(14, daysInMonth) }).map((_, i) => {
+            const day = i + 1
+            const isDeadline = deadlines.some(d => d.date === day)
+            const isToday = day === new Date().getDate() && 
+              currentDate.getMonth() === new Date().getMonth() && 
+              currentDate.getFullYear() === new Date().getFullYear()
+              
+            return (
+              <div
+                key={`day-${day}`}
+                className={`calendar-day compact ${isDeadline ? 'deadline' : ''} ${isToday ? 'today' : ''}`}
+                onClick={() => handleDayClick(day)}
+              >
+                <span className="day-number">{day}</span>
+                {isDeadline && <div className="deadline-dot"></div>}
+              </div>
+            )
+          })}
+        </div>
+        
+        {/* Full Calendar Modal */}
+        {showFullCalendar && (
+          <div className="modal-overlay">
+            <div className="ios-calendar-modal">
+              <div className="modal-header">
+                <h3>Calendar</h3>
+                <button onClick={() => setShowFullCalendar(false)}>
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="modal-body">
+                <div className="ios-calendar">
+                  <div className="calendar-header">
+                    <button onClick={() => navigateMonth("prev")} className="month-nav-btn">
+                      <ChevronLeft size={16} />
+                    </button>
+                    <span className="current-month">
+                      {currentDate.toLocaleString("default", { month: "long", year: "numeric" })}
+                    </span>
+                    <button onClick={() => navigateMonth("next")} className="month-nav-btn">
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+
+                  <div className="calendar-days-header">
+                    {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
+                      <div key={day} className="day-header">
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="calendar-days-grid">
+                    {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+                      <div key={`empty-${i}`} className="empty-day"></div>
+                    ))}
+                    {Array.from({ length: daysInMonth }).map((_, i) => {
+                      const day = i + 1
+                      const isDeadline = deadlines.some((d) => d.date === day)
+                      const isToday =
+                        day === new Date().getDate() &&
+                        currentDate.getMonth() === new Date().getMonth() &&
+                        currentDate.getFullYear() === new Date().getFullYear()
+
+                      const hasEvents = upcomingEvents.some((event) => {
+                        const eventDate = new Date(event.date)
+                        return (
+                          eventDate.getDate() === day &&
+                          eventDate.getMonth() === currentDate.getMonth() &&
+                          eventDate.getFullYear() === currentDate.getFullYear()
+                        )
+                      })
+
+                      return (
+                        <div
+                          key={`day-${day}`}
+                          className={`calendar-day ${isDeadline ? "deadline" : ""} ${isToday ? "today" : ""} ${hasEvents ? "has-events" : ""}`}
+                          onClick={() => handleDayClick(day)}
+                        >
+                          <span className="day-number">{day}</span>
+                          {hasEvents && <div className="event-dot"></div>}
+                          {isDeadline && <div className="deadline-dot"></div>}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="upcoming-events">
+                  <h4 className="events-title">Upcoming Events</h4>
+                  <div className="events-list">
+                    {upcomingEvents.map((event, index) => (
+                      <div key={index} className="ios-event-item">
+                        <div className={`event-color-indicator ${event.type}`}></div>
+                        <div className="event-details">
+                          <span className="event-title">{event.title}</span>
+                          <span className="event-date">{event.date}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="ios-button add" onClick={() => setShowDeadlineModal(true)}>
+                  <Plus size={14} /> Add Event
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Updated Big Legitimacy Score Component with Popup
+  const LegitimacyScoreCard = () => {
+    return (
+      <div className="readiness-card compact" style={{ borderColor: styles.lightBrown }}>
+        <div className="card-header">
+          <h3 style={{ fontWeight: "500", color: styles.primaryBrown }}>BIG Legitimacy Score</h3>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "center", padding: "10px" }}>
+          <div 
+            className="score-circle" 
+            style={{ 
+              backgroundColor: styles.backgroundBrown,
+              color: styles.primaryBrown,
+              borderColor: styles.accentBrown
+            }}
+          >
+            {legitimacyScore}%
+          </div>
+        </div>
+
+        <button
+          className="view-summary-btn centered-btn"
+          onClick={() => setShowBigScoreSummary(!showBigScoreSummary)}
+          style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+        >
+          View More
+          <ChevronDown className={`summary-icon ${showBigScoreSummary ? "rotate" : ""}`} size={16} />
+        </button>
+
+        {showBigScoreSummary && (
+          <div className="score-summary-content">
+            <p className="summary-title" style={{ color: styles.darkBrown }}>Legitimacy Verification:</p>
+            <ul className="summary-list">
+              <li className="summary-item">
+                <div className="summary-bullet" style={{ backgroundColor: styles.accentBrown }}></div>
+                <span>Business registration verified</span>
+                <span className="status-indicator verified" style={{ color: styles.primaryBrown }}>✓</span>
+              </li>
+              <li className="summary-item">
+                <div className="summary-bullet" style={{ backgroundColor: styles.accentBrown }}></div>
+                <span>Tax compliance confirmed</span>
+                <span className="status-indicator verified" style={{ color: styles.primaryBrown }}>✓</span>
+              </li>
+              <li className="summary-item">
+                <div className="summary-bullet" style={{ backgroundColor: styles.accentBrown }}></div>
+                <span>Industry certifications valid</span>
+                <span className="status-indicator verified" style={{ color: styles.primaryBrown }}>✓</span>
+              </li>
+              <li className="summary-item">
+                <div className="summary-bullet" style={{ backgroundColor: styles.accentBrown }}></div>
+                <span>Company address verified</span>
+                <span className="status-indicator verified" style={{ color: styles.primaryBrown }}>✓</span>
+              </li>
+            </ul>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Updated Top Matches Table without Action column
+  const TopMatchesTable = () => {
+    return (
+      <div className="matches-table-card" style={{ 
+        borderColor: styles.lightBrown,
+        backgroundColor: styles.backgroundBrown
+      }}>
+        <div className="card-header">
+          <h3 style={{ fontWeight: "500", color: styles.primaryBrown }}>Top Matches</h3>
+          <div className="category-tabs">
+            {Object.keys(categoryData).map((category) => (
+              <button
+                key={category}
+                className={`category-tab ${selectedCategory === category ? "active" : ""}`}
+                style={{
+                  borderColor: selectedCategory === category ? getCategoryColor(category) : "transparent",
+                  color: selectedCategory === category ? styles.primaryBrown : styles.lightBrown,
+                }}
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="matches-table">
+          <table>
+            <thead>
+              <tr style={{ backgroundColor: styles.paleBrown }}>
+                {selectedCategory === "Customers" && (
+                  <>
+                    <th style={{ color: styles.primaryBrown }}>Customer Name</th>
+                    <th style={{ color: styles.primaryBrown }}>Service Category</th>
+                    <th style={{ color: styles.primaryBrown }}>Service Needed</th>
+                    <th style={{ color: styles.primaryBrown }}>% Match</th>
+                    <th style={{ color: styles.primaryBrown }}>Location</th>
+                    <th style={{ color: styles.primaryBrown }}>Deal Size</th>
+                    <th style={{ color: styles.primaryBrown }}>Status</th>
+                  </>
+                )}
+                {selectedCategory === "Suppliers" && (
+                  <>
+                    <th style={{ color: styles.primaryBrown }}>Supplier Name</th>
+                    <th style={{ color: styles.primaryBrown }}>Service Category</th>
+                    <th style={{ color: styles.primaryBrown }}>Service Offered</th>
+                    <th style={{ color: styles.primaryBrown }}>% Match</th>
+                    <th style={{ color: styles.primaryBrown }}>Location</th>
+                    <th style={{ color: styles.primaryBrown }}>Av. Supplier Rating</th>
+                    <th style={{ color: styles.primaryBrown }}>Status</th>
+                  </>
+                )}
+                {selectedCategory === "Funders" && (
+                  <>
+                    <th style={{ color: styles.primaryBrown }}>Funder Name</th>
+                    <th style={{ color: styles.primaryBrown }}>Investment Type</th>
+                    <th style={{ color: styles.primaryBrown }}>% Match</th>
+                    <th style={{ color: styles.primaryBrown }}>Location</th>
+                    <th style={{ color: styles.primaryBrown }}>Stage/Focus</th>
+                    <th style={{ color: styles.primaryBrown }}>Status</th>
+                  </>
+                )}
+                {selectedCategory === "Support" && (
+                  <>
+                    <th style={{ color: styles.primaryBrown }}>Program Name</th>
+                    <th style={{ color: styles.primaryBrown }}>Program Type</th>
+                    <th style={{ color: styles.primaryBrown }}>% Match</th>
+                    <th style={{ color: styles.primaryBrown }}>Location</th>
+                    <th style={{ color: styles.primaryBrown }}>Focus Area</th>
+                    <th style={{ color: styles.primaryBrown }}>Status</th>
+                  </>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {categoryData[selectedCategory].map((item, index) => (
+                <tr 
+                  key={index} 
+                  className="match-row"
+                  style={{ 
+                    backgroundColor: index % 2 === 0 ? 'white' : styles.backgroundBrown,
+                    borderBottom: `1px solid ${styles.paleBrown}`
+                  }}
+                >
+                  {selectedCategory === "Customers" && (
+                    <>
+                      <td className="investor-name" style={{ color: styles.darkBrown }}>{item.name}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.serviceCategory}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.serviceNeeded}</td>
+                      <td className="match-score-cell">
+                        <div className="match-score-wrapper">
+                          <div
+                            className="match-bar"
+                            style={{
+                              width: `${item.match}%`,
+                              background: `linear-gradient(90deg, ${styles.accentBrown}, ${styles.paleBrown})`,
+                            }}
+                          ></div>
+                          <span className="match-percent" style={{ color: styles.primaryBrown }}>
+                            {item.match}%
+                          </span>
+                        </div>
+                      </td>
+                      <td style={{ color: styles.primaryBrown }}>{item.location}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.dealSize}</td>
+                      <td>
+                        <span 
+                          className="status-badge"
+                          style={{ 
+                            backgroundColor: styles.paleBrown,
+                            color: styles.primaryBrown
+                          }}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+                    </>
+                  )}
+                  {selectedCategory === "Suppliers" && (
+                    <>
+                      <td className="investor-name" style={{ color: styles.darkBrown }}>{item.name}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.serviceCategory}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.serviceOffered}</td>
+                      <td className="match-score-cell">
+                        <div className="match-score-wrapper">
+                          <div
+                            className="match-bar"
+                            style={{
+                              width: `${item.match}%`,
+                              background: `linear-gradient(90deg, ${styles.accentBrown}, ${styles.paleBrown})`,
+                            }}
+                          ></div>
+                          <span className="match-percent" style={{ color: styles.primaryBrown }}>
+                            {item.match}%
+                          </span>
+                        </div>
+                      </td>
+                      <td style={{ color: styles.primaryBrown }}>{item.location}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.rating}</td>
+                      <td>
+                        <span 
+                          className="status-badge"
+                          style={{ 
+                            backgroundColor: styles.paleBrown,
+                            color: styles.primaryBrown
+                          }}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+                    </>
+                  )}
+                  {selectedCategory === "Funders" && (
+                    <>
+                      <td className="investor-name" style={{ color: styles.darkBrown }}>{item.name}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.investmentType}</td>
+                      <td className="match-score-cell">
+                        <div className="match-score-wrapper">
+                          <div
+                            className="match-bar"
+                            style={{
+                              width: `${item.match}%`,
+                              background: `linear-gradient(90deg, ${styles.accentBrown}, ${styles.paleBrown})`,
+                            }}
+                          ></div>
+                          <span className="match-percent" style={{ color: styles.primaryBrown }}>
+                            {item.match}%
+                          </span>
+                        </div>
+                      </td>
+                      <td style={{ color: styles.primaryBrown }}>{item.location}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.stageFocus}</td>
+                      <td>
+                        <span 
+                          className="status-badge"
+                          style={{ 
+                            backgroundColor: styles.paleBrown,
+                            color: styles.primaryBrown
+                          }}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+                    </>
+                  )}
+                  {selectedCategory === "Support" && (
+                    <>
+                      <td className="investor-name" style={{ color: styles.darkBrown }}>{item.name}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.programType}</td>
+                      <td className="match-score-cell">
+                        <div className="match-score-wrapper">
+                          <div
+                            className="match-bar"
+                            style={{
+                              width: `${item.match}%`,
+                              background: `linear-gradient(90deg, ${styles.accentBrown}, ${styles.paleBrown})`,
+                            }}
+                          ></div>
+                          <span className="match-percent" style={{ color: styles.primaryBrown }}>
+                            {item.match}%
+                          </span>
+                        </div>
+                      </td>
+                      <td style={{ color: styles.primaryBrown }}>{item.location}</td>
+                      <td style={{ color: styles.primaryBrown }}>{item.focusArea}</td>
+                      <td>
+                        <span 
+                          className="status-badge"
+                          style={{ 
+                            backgroundColor: styles.paleBrown,
+                            color: styles.primaryBrown
+                          }}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+                    </>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container" style={{ backgroundColor: styles.backgroundBrown }}>
       <div className="content">
         <main className="dashboard-main">
           {/* Written Tracker */}
-          <div className="tracker-card">
+          <div className="tracker-card" style={{ borderColor: styles.lightBrown }}>
             <div className="tracker-header">
-              <h3 className="card-title">Application Tracker</h3>
+              <h3 className="card-title" style={{ color: styles.primaryBrown }}>Application Tracker</h3>
             </div>
             <div className="tracker-content">
               <div className="tracker-steps">
@@ -990,20 +1432,19 @@ const Dashboard = () => {
                   <div
                     key={index}
                     className={`tracker-step ${step.completed ? "completed" : step.active ? "active" : ""}`}
-                    onClick={() => toggleStepDetails(index)}
-                    style={{ backgroundColor: "#fafafa", borderColor: "#e5e5e5" }}
+                    data-tooltip={`${expectedActions[step.label]}`}
                   >
                     <div className="step-marker">
                       {step.completed ? (
-                        <CheckCircle size={16} />
+                        <CheckCircle size={16} color={styles.primaryBrown} />
                       ) : step.active ? (
-                        <div className="active-dot"></div>
+                        <div className="active-dot" style={{ backgroundColor: styles.accentBrown }}></div>
                       ) : (
-                        <div className="inactive-dot"></div>
+                        <div className="inactive-dot" style={{ backgroundColor: styles.paleBrown }}></div>
                       )}
                     </div>
                     <div className="step-info">
-                      <span className="step-label" style={{ fontWeight: "500", color: "#555" }}>
+                      <span className="step-label" style={{ color: styles.primaryBrown }}>
                         {step.label.split("\n").map((line, i) => (
                           <span key={i} className="step-label-line">
                             {line}
@@ -1013,189 +1454,28 @@ const Dashboard = () => {
                       </span>
                       {step.description && <span className="step-description">{step.description}</span>}
                     </div>
-                    {index < trackerSteps.length - 1 && <ChevronRight size={16} className="step-arrow" />}
+                    {index < trackerSteps.length - 1 && (
+                      <ChevronRight size={16} className="step-arrow" color={styles.lightBrown} />
+                    )}
                   </div>
                 ))}
-              </div>
-              <div className="tracker-details">
-                {trackerSteps.map(
-                  (step, index) =>
-                    step.showDetails && (
-                      <div key={`details-${index}`} className="step-details-panel">
-                        <h4>{step.label}</h4>
-
-                        {/* Expected Actions */}
-                        <div className="step-expectations">
-                          <h5>Expected Actions:</h5>
-                          <p>{expectedActions[step.label]}</p>
-                        </div>
-
-                        {/* Required Documents */}
-                        <div className="step-documents">
-                          <h5>Required Documents:</h5>
-                          <ul className="document-list">
-                            {requiredDocuments[step.label].map((doc, i) => (
-                              <li key={i}>{doc}</li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        {/* Status Information */}
-                        {step.completed && (
-                          <div className="step-complete-info">
-                            <p>
-                              Completed on: <strong>May 10, 2023</strong>
-                            </p>
-                            <p>
-                              Approved by: <strong>System Verification</strong>
-                            </p>
-                          </div>
-                        )}
-
-                        {step.active && (
-                          <div className="step-pending-info">
-                            <p>
-                              Current status: <strong>In Progress</strong>
-                            </p>
-                            <p>
-                              Expected completion: <strong>June 15, 2023</strong>
-                            </p>
-                          </div>
-                        )}
-
-                        {!step.completed && !step.active && (
-                          <div className="step-pending-info">
-                            <p>
-                              Estimated start: <strong>July 1, 2023</strong>
-                            </p>
-                            <p>
-                              Required documents: <strong>{requiredDocuments[step.label].join(", ")}</strong>
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    ),
-                )}
               </div>
             </div>
           </div>
 
-          {/* First Content Row - Legitimacy Score, Customer Reviews, Fundability Score, Upcoming Events */}
+          {/* First Content Row */}
           <div className="main-stats-row">
-            {/* Big Legitimacy Score */}
-            <div className="readiness-card compact">
-              <div className="card-header single-line-header">
-                <h3 style={{ fontWeight: "500", color: "#555" }}>BIG Legitimacy Score</h3>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0 10px" }}>
-                <div
-                  style={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "#f8f5f2",
-                    border: "1px solid #e8e0da",
-                    color: "#555",
-                    fontWeight: "500",
-                    fontSize: "1.5rem",
-                    marginBottom: "15px",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-                  }}
-                >
-                  {legitimacyScore}%
-                </div>
-
-                <div style={{ width: "100%" }}>
-                  <p style={{ fontSize: "0.8rem", color: "#666", marginBottom: "8px", textAlign: "center" }}>
-                    Legitimacy Verification:
-                  </p>
-                  <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                    <li
-                      style={{
-                        fontSize: "0.75rem",
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "6px",
-                        color: "#555",
-                        backgroundColor: "white",
-                        padding: "6px 10px",
-                        borderRadius: "4px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "6px",
-                          height: "6px",
-                          borderRadius: "50%",
-                          backgroundColor: "#8D6E63",
-                          marginRight: "8px",
-                        }}
-                      ></div>
-                      Business registration verified
-                    </li>
-                    <li
-                      style={{
-                        fontSize: "0.75rem",
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "6px",
-                        color: "#555",
-                        backgroundColor: "white",
-                        padding: "6px 10px",
-                        borderRadius: "4px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "6px",
-                          height: "6px",
-                          borderRadius: "50%",
-                          backgroundColor: "#8D6E63",
-                          marginRight: "8px",
-                        }}
-                      ></div>
-                      Tax compliance confirmed
-                    </li>
-                    <li
-                      style={{
-                        fontSize: "0.75rem",
-                        display: "flex",
-                        alignItems: "center",
-                        color: "#555",
-                        backgroundColor: "white",
-                        padding: "6px 10px",
-                        borderRadius: "4px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "6px",
-                          height: "6px",
-                          borderRadius: "50%",
-                          backgroundColor: "#8D6E63",
-                          marginRight: "8px",
-                        }}
-                      ></div>
-                      Industry certifications valid
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
+            <LegitimacyScoreCard />
+            
             {/* Customer Reviews & Ratings */}
-            <div className="ratings-card compact">
-              <div className="card-header single-line-header">
-                <h3 style={{ fontWeight: "500", color: "#555" }}>Customer Reviews & Ratings</h3>
+            <div className="ratings-card compact" style={{ borderColor: styles.lightBrown }}>
+              <div className="card-header">
+                <h3 style={{ fontWeight: "500", color: styles.primaryBrown }}>Customer Reviews & Ratings</h3>
               </div>
               <div className="ratings-summary">
                 <div className="ratings-count">
-                  <span className="text-2xl font-bold text-brown-800">25</span>
-                  <span className="text-sm text-brown-600">Reviews</span>
+                  <span className="text-2xl font-bold" style={{ color: styles.primaryBrown }}>25</span>
+                  <span className="text-sm" style={{ color: styles.lightBrown }}>Reviews</span>
                 </div>
                 <div className="average-rating">
                   <div className="stars">
@@ -1203,418 +1483,136 @@ const Dashboard = () => {
                       <Star
                         key={i}
                         size={16}
-                        fill={i < 4 ? "#C69C6D" : "#E5E7EB"}
-                        color={i < 4 ? "#C69C6D" : "#E5E7EB"}
+                        fill={i < 4 ? styles.accentBrown : styles.paleBrown}
+                        color={i < 4 ? styles.accentBrown : styles.paleBrown}
                       />
                     ))}
                   </div>
-                  <span className="text-sm text-brown-600">4.0 Average</span>
+                  <span className="text-sm" style={{ color: styles.lightBrown }}>4.0 Average</span>
                 </div>
               </div>
-              <div
-                className="ratings-list"
-                style={{
-                  maxHeight:
-                    visibleReviewDetails[0] || visibleReviewDetails[1] || visibleReviewDetails[2] ? "250px" : "180px",
-                }}
+
+              <button
+                className="view-summary-btn centered-btn"
+                onClick={() => setShowDetailedReviews(!showDetailedReviews)}
+                style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
               >
-                {ratings.slice(0, 3).map((rating, index) => (
-                  <div
-                    key={index}
-                    className="rating-item-with-details"
-                    style={{
-                      backgroundColor: "#fafafa",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    <div className="rating-header">
-                      <div className="rating-info">
-                        <div className="rating-name-actions">
-                          <h4 style={{ fontWeight: "500" }}>{rating.name}</h4>
-                          <button
-                            className="view-details-btn"
-                            style={{ backgroundColor: "#f5f5f5", color: "#666" }}
-                            onClick={() => {
-                              setSelectedReview(rating)
-                              setShowReviewModal(true)
-                            }}
-                          >
-                            View Details
-                          </button>
-                        </div>
-                        <div className="stars">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              size={14}
-                              fill={i < rating.rating ? "#C69C6D" : "#E5E7EB"}
-                              color={i < rating.rating ? "#C69C6D" : "#E5E7EB"}
-                            />
-                          ))}
+                View More
+                <ChevronDown className={`summary-icon ${showDetailedReviews ? "rotate" : ""}`} size={16} />
+              </button>
+
+              {showDetailedReviews && (
+                <div className="ratings-list">
+                  {ratings.slice(0, 3).map((rating, index) => (
+                    <div
+                      key={index}
+                      className="rating-item-with-details"
+                      onMouseEnter={() => setVisibleReviewDetails({ ...visibleReviewDetails, [index]: true })}
+                      onMouseLeave={() => setVisibleReviewDetails({ ...visibleReviewDetails, [index]: false })}
+                    >
+                      <div className="rating-header">
+                        <div className="rating-info">
+                          <div className="rating-name-actions">
+                            <h4 style={{ color: styles.primaryBrown }}>{rating.name}</h4>
+                            <button
+                              className="view-details-btn"
+                              onClick={() => {
+                                setSelectedReview(rating)
+                                setShowReviewModal(true)
+                              }}
+                              style={{ color: styles.accentBrown }}
+                            >
+                              View Details
+                            </button>
+                          </div>
+                          <div className="stars">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                size={14}
+                                fill={i < rating.rating ? styles.accentBrown : styles.paleBrown}
+                                color={i < rating.rating ? styles.accentBrown : styles.paleBrown}
+                              />
+                            ))}
+                          </div>
                         </div>
                       </div>
+                      {visibleReviewDetails[index] && (
+                        <div className="rating-comment">
+                          <p style={{ color: styles.primaryBrown }}>{rating.comment.substring(0, 100)}...</p>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Big Fundability Score */}
-            <div className="readiness-card compact">
-              <div className="card-header single-line-header">
-                <h3 style={{ fontWeight: "500", color: "#555" }}>BIG Fundability Score</h3>
+            <div className="readiness-card compact" style={{ borderColor: styles.lightBrown }}>
+              <div className="card-header">
+                <h3 style={{ fontWeight: "500", color: styles.primaryBrown }}>BIG Fundability Score</h3>
               </div>
-              <button className="view-summary-btn centered-btn" onClick={toggleBigScoreSummary}>
-                View Summary
-                <ChevronDown className="summary-icon" size={16} />
-              </button>
 
-              <div className="score-donut">
-                <ResponsiveContainer width="100%" height={90}>
-                  <PieChart>
-                    <Pie
-                      data={fundabilityScoreData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={30}
-                      outerRadius={40}
-                      paddingAngle={2}
-                      dataKey="value"
-                    >
-                      {fundabilityScoreData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <text
-                      x="50%"
-                      y="50%"
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      className="donut-score"
-                      style={{ fontWeight: "500", fill: "#555" }}
-                    >
-                      {totalFundabilityScore}
-                    </text>
-                  </PieChart>
-                </ResponsiveContainer>
+              <div style={{ display: "flex", justifyContent: "center", padding: "10px" }}>
+                <div 
+                  className="score-circle"
+                  style={{ 
+                    backgroundColor: styles.backgroundBrown,
+                    color: styles.primaryBrown,
+                    borderColor: styles.accentBrown
+                  }}
+                >
+                  {totalFundabilityScore}
+                </div>
               </div>
-              <div className="score-legend">
-                {fundabilityScoreData.map((item, index) => (
-                  <div key={index} className="legend-item">
-                    <div className="legend-color" style={{ backgroundColor: item.color }}></div>
-                    <span>{item.name}</span>
-                    <span className="legend-value">{item.value}%</span>
-                  </div>
-                ))}
-              </div>
+
+              <button 
+                className="view-summary-btn centered-btn"
+                onClick={toggleBigScoreSummary}
+                style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+              >
+                View More
+                <ChevronDown className={`summary-icon ${showScoreSummaryModal ? "rotate" : ""}`} size={16} />
+              </button>
             </div>
 
-            {/* Upcoming Events */}
-            <div className="events-card compact">
-              <div className="card-header single-line-header">
-                <h3 style={{ fontWeight: "500", color: "#555" }}>Upcoming Events</h3>
-                <button className="add-event-btn" onClick={() => setShowDeadlineModal(true)}>
-                  <Plus size={14} /> Add
-                </button>
+            {/* Compact Calendar */}
+            <div className="ios-calendar-card compact" style={{ borderColor: styles.lightBrown }}>
+              <div className="card-header">
+                <h3 style={{ fontWeight: "500", color: styles.primaryBrown }}>Calendar & Events</h3>
               </div>
-              <div className="events-list scrollable">
-                {upcomingEvents.map((event, index) => (
-                  <div key={index} className="event-item">
-                    <div className={`event-icon ${event.type}`}>
-                      {event.type === "meeting" && <Users size={12} />}
-                      {event.type === "workshop" && <TrendingUp size={12} />}
-                      {event.type === "deadline" && <Award size={12} />}
+              <CompactCalendar />
+              <div className="upcoming-events">
+                <h4 className="events-title" style={{ color: styles.primaryBrown }}>Upcoming</h4>
+                <div className="events-list">
+                  {upcomingEvents.slice(0, 2).map((event, index) => (
+                    <div key={index} className="ios-event-item">
+                      <div 
+                        className={`event-color-indicator ${event.type}`}
+                        style={{ backgroundColor: styles.accentBrown }}
+                      ></div>
+                      <div className="event-details">
+                        <span className="event-title" style={{ color: styles.primaryBrown }}>{event.title}</span>
+                        <span className="event-date" style={{ color: styles.lightBrown }}>{event.date}</span>
+                      </div>
                     </div>
-                    <div className="event-details">
-                      <h5>{event.title}</h5>
-                      <p>{event.date}</p>
-                    </div>
-                  </div>
-                ))}
-                {deadlines.map((deadline, index) => (
-                  <div key={`deadline-${index}`} className="event-item">
-                    <div className="event-icon deadline">
-                      <Award size={12} />
-                    </div>
-                    <div className="event-details">
-                      <h5>{deadline.title}</h5>
-                      <p>
-                        {currentDate.toLocaleString("default", { month: "long" })} {deadline.date}
-                      </p>
-                      <button
-                        className="remove-deadline"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          removeDeadline(index)
-                        }}
-                      >
-                        <X size={12} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <button 
+                  className="add-event-btn" 
+                  onClick={() => setShowDeadlineModal(true)}
+                  style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+                >
+                  <Plus size={14} color={styles.primaryBrown} /> Add Event
+                </button>
               </div>
             </div>
           </div>
 
-          {/* Second Row - Top Matches and Calendar */}
+          {/* Second Row - Top Matches */}
           <div className="second-row">
-            {/* Matches Table */}
-            <div className="matches-table-card">
-              <div className="card-header">
-                <h3 style={{ fontWeight: "500", color: "#555" }}>Top Matches</h3>
-                <div className="category-tabs">
-                  {Object.keys(categoryData).map((category) => (
-                    <button
-                      key={category}
-                      className={`category-tab ${selectedCategory === category ? "active" : ""}`}
-                      style={{
-                        borderColor: selectedCategory === category ? getCategoryColor(category) : "transparent",
-                        color: selectedCategory === category ? getCategoryColor(category) : "#6b7280",
-                      }}
-                      onClick={() => setSelectedCategory(category)}
-                    >
-                      {category}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="matches-table">
-                <table>
-                  <thead>
-                    <tr style={{ backgroundColor: `${getCategoryBgColor(selectedCategory)}` }}>
-                      {selectedCategory === "Customers" && (
-                        <>
-                          <th className={getCategoryTextColor(selectedCategory)}>Customer Name</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Service Category</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Service Needed</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>% Match</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Location</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Deal Size</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Status</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Action</th>
-                        </>
-                      )}
-                      {selectedCategory === "Suppliers" && (
-                        <>
-                          <th className={getCategoryTextColor(selectedCategory)}>Supplier Name</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Service Category</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Service Offered</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>% Match</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Location</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Av. Supplier Rating</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Status</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Action</th>
-                        </>
-                      )}
-                      {selectedCategory === "Funders" && (
-                        <>
-                          <th className={getCategoryTextColor(selectedCategory)}>Funder Name</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Investment Type</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>% Match</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Location</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Stage/Focus</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Status</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Action</th>
-                        </>
-                      )}
-                      {selectedCategory === "Support" && (
-                        <>
-                          <th className={getCategoryTextColor(selectedCategory)}>Program Name</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Program Type</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>% Match</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Location</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Focus Area</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Status</th>
-                          <th className={getCategoryTextColor(selectedCategory)}>Action</th>
-                        </>
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {categoryData[selectedCategory].map((item, index) => (
-                      <tr key={index} className="match-row">
-                        {selectedCategory === "Customers" && (
-                          <>
-                            <td className="investor-name">{item.name}</td>
-                            <td>{item.serviceCategory}</td>
-                            <td>{item.serviceNeeded}</td>
-                            <td className="match-score-cell">
-                              <div className="match-score-wrapper">
-                                <div
-                                  className="match-bar"
-                                  style={{
-                                    width: `${item.match}%`,
-                                    background: `linear-gradient(90deg, ${getCategoryColor(
-                                      selectedCategory,
-                                    )}, rgba(107, 114, 128, 0.3))`,
-                                  }}
-                                ></div>
-                                <span className="match-percent">{item.match}%</span>
-                              </div>
-                            </td>
-                            <td>{item.location}</td>
-                            <td>{item.dealSize}</td>
-                            <td>
-                              <span className="status-badge">{item.status}</span>
-                            </td>
-                            <td className="match-action">
-                              <button className="view-investor-btn">View</button>
-                            </td>
-                          </>
-                        )}
-                        {selectedCategory === "Suppliers" && (
-                          <>
-                            <td className="investor-name">{item.name}</td>
-                            <td>{item.serviceCategory}</td>
-                            <td>{item.serviceOffered}</td>
-                            <td className="match-score-cell">
-                              <div className="match-score-wrapper">
-                                <div
-                                  className="match-bar"
-                                  style={{
-                                    width: `${item.match}%`,
-                                    background: `linear-gradient(90deg, ${getCategoryColor(
-                                      selectedCategory,
-                                    )}, rgba(107, 114, 128, 0.3))`,
-                                  }}
-                                ></div>
-                                <span className="match-percent">{item.match}%</span>
-                              </div>
-                            </td>
-                            <td>{item.location}</td>
-                            <td>{item.rating}</td>
-                            <td>
-                              <span className="status-badge">{item.status}</span>
-                            </td>
-                            <td className="match-action">
-                              <button className="view-investor-btn">View</button>
-                            </td>
-                          </>
-                        )}
-                        {selectedCategory === "Funders" && (
-                          <>
-                            <td className="investor-name">{item.name}</td>
-                            <td>{item.investmentType}</td>
-                            <td className="match-score-cell">
-                              <div className="match-score-wrapper">
-                                <div
-                                  className="match-bar"
-                                  style={{
-                                    width: `${item.match}%`,
-                                    background: `linear-gradient(90deg, ${getCategoryColor(
-                                      selectedCategory,
-                                    )}, rgba(107, 114, 128, 0.3))`,
-                                  }}
-                                ></div>
-                                <span className="match-percent">{item.match}%</span>
-                              </div>
-                            </td>
-                            <td>{item.location}</td>
-                            <td>{item.stageFocus}</td>
-                            <td>
-                              <span className="status-badge">{item.status}</span>
-                            </td>
-                            <td className="match-action">
-                              <button className="view-investor-btn">View</button>
-                            </td>
-                          </>
-                        )}
-                        {selectedCategory === "Support" && (
-                          <>
-                            <td className="investor-name">{item.name}</td>
-                            <td>{item.programType}</td>
-                            <td className="match-score-cell">
-                              <div className="match-score-wrapper">
-                                <div
-                                  className="match-bar"
-                                  style={{
-                                    width: `${item.match}%`,
-                                    background: `linear-gradient(90deg, ${getCategoryColor(
-                                      selectedCategory,
-                                    )}, rgba(107, 114, 128, 0.3))`,
-                                  }}
-                                ></div>
-                                <span className="match-percent">{item.match}%</span>
-                              </div>
-                            </td>
-                            <td>{item.location}</td>
-                            <td>{item.focusArea}</td>
-                            <td>
-                              <span className="status-badge">{item.status}</span>
-                            </td>
-                            <td className="match-action">
-                              <button className="view-investor-btn">View</button>
-                            </td>
-                          </>
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Calendar */}
-            <div className="calendar-card">
-              <div className="card-header">
-                <h3 style={{ fontWeight: "500", color: "#555" }}>My Calendar</h3>
-                <div className="calendar-actions">
-                  <a
-                    href="https://outlook.office.com/calendar/addcalendar"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="outlook-btn"
-                    style={{ textDecoration: "none", display: "flex", justifyContent: "center" }}
-                  >
-                    <Mail size={14} className="mr-1" /> Integrate with Outlook
-                  </a>
-                  <div className="month-navigation">
-                    <button onClick={() => navigateMonth("prev")}>
-                      <ChevronLeft size={14} />
-                    </button>
-                    <span>{currentDate.toLocaleString("default", { month: "long", year: "numeric" })}</span>
-                    <button onClick={() => navigateMonth("next")}>
-                      <ChevronRight size={14} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="mini-calendar">
-                <div className="calendar-header">
-                  {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
-                    <div key={day} className="day-header">
-                      {day}
-                    </div>
-                  ))}
-                </div>
-                <div className="calendar-days">
-                  {Array.from({ length: firstDayOfMonth }).map((_, i) => (
-                    <div key={`empty-${i}`} className="empty-day"></div>
-                  ))}
-                  {Array.from({ length: daysInMonth }).map((_, i) => {
-                    const day = i + 1
-                    const isDeadline = deadlines.some((d) => d.date === day)
-                    const isToday =
-                      day === new Date().getDate() &&
-                      currentDate.getMonth() === new Date().getMonth() &&
-                      currentDate.getFullYear() === new Date().getFullYear()
-
-                    return (
-                      <div
-                        key={`day-${day}`}
-                        className={`calendar-day ${isDeadline ? "deadline" : ""} ${isToday ? "today" : ""}`}
-                        onClick={() => handleDayClick(day)}
-                      >
-                        {day}
-                        {isDeadline && <div className="deadline-dot"></div>}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
+            <TopMatchesTable />
           </div>
 
           {/* Detailed Reviews Modal */}
@@ -1630,8 +1628,8 @@ const Dashboard = () => {
                 <div className="modal-body">
                   <div className="reviews-summary">
                     <div className="ratings-count">
-                      <span className="text-3xl font-bold text-brown-800">25</span>
-                      <span className="text-sm text-brown-600">Total Reviews</span>
+                      <span className="text-3xl font-bold" style={{ color: styles.primaryBrown }}>25</span>
+                      <span className="text-sm" style={{ color: styles.lightBrown }}>Total Reviews</span>
                     </div>
                     <div className="average-rating">
                       <div className="stars">
@@ -1639,12 +1637,12 @@ const Dashboard = () => {
                           <Star
                             key={i}
                             size={20}
-                            fill={i < 4 ? "#C69C6D" : "#E5E7EB"}
-                            color={i < 4 ? "#C69C6D" : "#E5E7EB"}
+                            fill={i < 4 ? styles.accentBrown : styles.paleBrown}
+                            color={i < 4 ? styles.accentBrown : styles.paleBrown}
                           />
                         ))}
                       </div>
-                      <span className="text-lg font-semibold text-brown-800">4.0 Average</span>
+                      <span className="text-lg font-semibold" style={{ color: styles.primaryBrown }}>4.0 Average</span>
                     </div>
                   </div>
                   <div className="reviews-list-detailed">
@@ -1652,32 +1650,36 @@ const Dashboard = () => {
                       <div key={index} className="review-item-detailed">
                         <div className="review-header">
                           <div className="reviewer-info">
-                            <h4>{rating.name}</h4>
-                            <p className="reviewer-company">
+                            <h4 style={{ color: styles.primaryBrown }}>{rating.name}</h4>
+                            <p className="reviewer-company" style={{ color: styles.lightBrown }}>
                               {rating.company} • {rating.position}
                             </p>
-                            <p>{rating.date}</p>
+                            <p style={{ color: styles.lightBrown }}>{rating.date}</p>
                           </div>
                           <div className="stars">
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
                                 size={16}
-                                fill={i < rating.rating ? "#C69C6D" : "#E5E7EB"}
-                                color={i < rating.rating ? "#C69C6D" : "#E5E7EB"}
+                                fill={i < rating.rating ? styles.accentBrown : styles.paleBrown}
+                                color={i < rating.rating ? styles.accentBrown : styles.paleBrown}
                               />
                             ))}
                           </div>
                         </div>
                         <div className="review-comment">
-                          <p>{rating.comment}</p>
+                          <p style={{ color: styles.primaryBrown }}>{rating.comment}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
                 <div className="modal-footer">
-                  <button className="cancel-btn" onClick={() => setShowDetailedReviews(false)}>
+                  <button 
+                    className="cancel-btn" 
+                    onClick={() => setShowDetailedReviews(false)}
+                    style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+                  >
                     Close
                   </button>
                 </div>
@@ -1688,9 +1690,9 @@ const Dashboard = () => {
           {/* Deadline Modal */}
           {showDeadlineModal && (
             <div className="modal-overlay">
-              <div className="deadline-modal">
+              <div className="ios-modal">
                 <div className="modal-header">
-                  <h3 style={{ fontWeight: "500", color: "#555" }}>Add New Deadline</h3>
+                  <h3>New Event</h3>
                   <button onClick={() => setShowDeadlineModal(false)}>
                     <X size={20} />
                   </button>
@@ -1702,7 +1704,8 @@ const Dashboard = () => {
                       type="text"
                       value={newDeadline.title}
                       onChange={(e) => setNewDeadline({ ...newDeadline, title: e.target.value })}
-                      placeholder="Enter deadline title"
+                      placeholder="Enter event title"
+                      className="ios-input"
                     />
                   </div>
                   <div className="form-group">
@@ -1711,15 +1714,32 @@ const Dashboard = () => {
                       type="date"
                       value={newDeadline.date}
                       onChange={(e) => setNewDeadline({ ...newDeadline, date: e.target.value })}
+                      className="ios-input"
                     />
+                  </div>
+                  <div className="form-group">
+                    <label>Event Type</label>
+                    <select className="ios-select" defaultValue="meeting">
+                      <option value="meeting">Meeting</option>
+                      <option value="deadline">Deadline</option>
+                      <option value="workshop">Workshop</option>
+                    </select>
                   </div>
                 </div>
                 <div className="modal-footer">
-                  <button className="cancel-btn" onClick={() => setShowDeadlineModal(false)}>
+                  <button 
+                    className="ios-button cancel" 
+                    onClick={() => setShowDeadlineModal(false)}
+                    style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+                  >
                     Cancel
                   </button>
-                  <button className="add-btn" onClick={addDeadline}>
-                    <Plus size={16} /> Add Deadline
+                  <button 
+                    className="ios-button add" 
+                    onClick={addDeadline}
+                    style={{ backgroundColor: styles.primaryBrown, color: 'white' }}
+                  >
+                    Add Event
                   </button>
                 </div>
               </div>
@@ -1776,7 +1796,11 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className="modal-footer">
-                  <button className="cancel-btn" onClick={() => setShowCompanySummary(false)}>
+                  <button 
+                    className="cancel-btn" 
+                    onClick={() => setShowCompanySummary(false)}
+                    style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+                  >
                     Close
                   </button>
                   <button
@@ -1785,6 +1809,7 @@ const Dashboard = () => {
                       handleSendApplication(selectedCompany.id)
                       setShowCompanySummary(false)
                     }}
+                    style={{ backgroundColor: styles.primaryBrown, color: 'white' }}
                   >
                     Send Application
                   </button>
@@ -1846,13 +1871,18 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className="modal-footer">
-                  <button className="cancel-btn" onClick={() => setShowDocumentModal(false)}>
+                  <button 
+                    className="cancel-btn" 
+                    onClick={() => setShowDocumentModal(false)}
+                    style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+                  >
                     Cancel
                   </button>
                   <button
                     className="add-btn"
                     onClick={submitSelectedDocuments}
                     disabled={!documents.some((doc) => doc.selected)}
+                    style={{ backgroundColor: styles.primaryBrown, color: 'white' }}
                   >
                     <Check size={16} /> Submit Selected Documents
                   </button>
@@ -1905,19 +1935,23 @@ const Dashboard = () => {
                     </div>
 
                     <div style={{ flex: 1 }}>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginBottom: '8px'
-                      }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginBottom: "8px",
+                        }}
+                      >
                         <span style={{ fontSize: "0.9rem", color: "#666" }}>Operation Stage:</span>
-                        <span style={{
-                          fontWeight: '600',
-                          color: '#555',
-                          textTransform: 'uppercase'
-                        }}>
-                          {profileData?.entityOverview?.operationStage || 'ideation'}
+                        <span
+                          style={{
+                            fontWeight: "600",
+                            color: "#555",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          {profileData?.entityOverview?.operationStage || "ideation"}
                         </span>
                       </div>
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px" }}>
@@ -1963,114 +1997,130 @@ const Dashboard = () => {
                   </div>
 
                   {/* New Compliance Document Status Section */}
-                  <div style={{
-                    backgroundColor: "white",
-                    padding: "15px",
-                    borderRadius: "8px",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                    marginBottom: "20px"
-                  }}>
+                  <div
+                    style={{
+                      backgroundColor: "white",
+                      padding: "15px",
+                      borderRadius: "8px",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                      marginBottom: "20px",
+                    }}
+                  >
                     <h4 style={{ fontWeight: "500", color: "#555", marginBottom: "15px" }}>
                       Compliance Document Status ({complianceScore}%)
                     </h4>
 
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px" }}>
                       {[
-                        'Company Registration Certificate',
-                        'Proof of Operating Address',
-                        'Certified IDs',
-                        'Share Register',
-                        'Proof of Address',
-                        'Tax Clearance Certificate',
-                        'B-BBEE Certificate',
-                        'Signed Declaration/Consent Form'
+                        "Company Registration Certificate",
+                        "Proof of Operating Address",
+                        "Certified IDs",
+                        "Share Register",
+                        "Proof of Address",
+                        "Tax Clearance Certificate",
+                        "B-BBEE Certificate",
+                        "Signed Declaration/Consent Form",
                       ].map((doc, index) => {
-                        const docKey = doc.toLowerCase()
-                          .replace(/\s+/g, '')
-                          .replace(/-/g, '')
-                          .replace(/\//g, '');
-                        const isPresent = !missingDocuments.includes(docKey);
+                        const docKey = doc.toLowerCase().replace(/\s+/g, "").replace(/-/g, "").replace(/\//g, "")
+                        const isPresent = !missingDocuments.includes(docKey)
 
                         return (
-                          <div key={index} style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px",
-                            backgroundColor: "white",
-                            padding: "8px 12px",
-                            borderRadius: "6px",
-                            boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                            borderLeft: `3px solid ${isPresent ? '#4CAF50' : '#F44336'}`
-                          }}>
-                            <div style={{
-                              width: "12px",
-                              height: "12px",
-                              borderRadius: "50%",
-                              backgroundColor: isPresent ? '#4CAF50' : '#F44336'
-                            }}></div>
+                          <div
+                            key={index}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                              backgroundColor: "white",
+                              padding: "8px 12px",
+                              borderRadius: "6px",
+                              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                              borderLeft: `3px solid ${isPresent ? "#4CAF50" : "#F44336"}`,
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: "12px",
+                                height: "12px",
+                                borderRadius: "50%",
+                                backgroundColor: isPresent ? "#4CAF50" : "#F44336",
+                              }}
+                            ></div>
                             <span style={{ fontSize: "0.85rem", color: "#555" }}>{doc}</span>
-                            <span style={{
-                              marginLeft: "auto",
-                              fontSize: "0.75rem",
-                              color: isPresent ? '#4CAF50' : '#F44336',
-                              fontWeight: "500"
-                            }}>
-                              {isPresent ? 'Uploaded' : 'Missing'}
+                            <span
+                              style={{
+                                marginLeft: "auto",
+                                fontSize: "0.75rem",
+                                color: isPresent ? "#4CAF50" : "#F44336",
+                                fontWeight: "500",
+                              }}
+                            >
+                              {isPresent ? "Uploaded" : "Missing"}
                             </span>
                           </div>
-                        );
+                        )
                       })}
                     </div>
                   </div>
 
                   {/* Score Categories Section */}
-                  <div style={{
-                    backgroundColor: "white",
-                    padding: "15px",
-                    borderRadius: "8px",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                    marginBottom: "20px"
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                  <div
+                    style={{
+                      backgroundColor: "white",
+                      padding: "15px",
+                      borderRadius: "8px",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "15px",
+                      }}
+                    >
                       <h4 style={{ fontWeight: "500", color: "#555", marginBottom: "15px" }}>
                         Score Breakdown by Category
                       </h4>
-                      <div style={{
-                        backgroundColor: '#f0f0f0',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        fontSize: '0.85rem',
-                        fontWeight: '500'
-                      }}>
-                        Current Stage: {profileData?.entityOverview?.operationStage?.toUpperCase() || 'IDEATION'}
+                      <div
+                        style={{
+                          backgroundColor: "#f0f0f0",
+                          padding: "4px 8px",
+                          borderRadius: "4px",
+                          fontSize: "0.85rem",
+                          fontWeight: "500",
+                        }}
+                      >
+                        Current Stage: {profileData?.entityOverview?.operationStage?.toUpperCase() || "IDEATION"}
                       </div>
                     </div>
                     <div className="score-categories">
-                      {fundabilityScoreData.filter(cat => cat.name !== "Stage Weighting Profile").map((category, index) => (
-                        <div key={index} className="category-item">
-                          <div className="category-header">
-                            <div
-                              className="category-color"
-                              style={{ backgroundColor: category.color }}
-                            ></div>
-                            <h4>{category.name}</h4>
-                            <span className="category-weight">Weight: {category.weight}</span>
-                          </div>
-                          <div className="category-details">
-                            <p>{category.description}</p>
-                            <div className="score-bar">
-                              <div
-                                className="score-progress"
-                                style={{
-                                  width: `${category.value}%`,
-                                  backgroundColor: category.color
-                                }}
-                              ></div>
-                              <span className="score-value">{category.value}%</span>
+                      {fundabilityScoreData
+                        .filter((cat) => cat.name !== "Stage Weighting Profile")
+                        .map((category, index) => (
+                          <div key={index} className="category-item">
+                            <div className="category-header">
+                              <div className="category-color" style={{ backgroundColor: category.color }}></div>
+                              <h4>{category.name}</h4>
+                              <span className="category-weight">Weight: {category.weight}</span>
+                            </div>
+                            <div className="category-details">
+                              <p>{category.description}</p>
+                              <div className="score-bar">
+                                <div
+                                  className="score-progress"
+                                  style={{
+                                    width: `${category.value}%`,
+                                    backgroundColor: category.color,
+                                  }}
+                                ></div>
+                                <span className="score-value">{category.value}%</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   </div>
 
@@ -2162,11 +2212,11 @@ const Dashboard = () => {
                     className="cancel-btn"
                     onClick={() => setShowScoreSummaryModal(false)}
                     style={{
-                      backgroundColor: "#f5f5f5",
+                      backgroundColor: styles.paleBrown,
+                      color: styles.primaryBrown,
                       border: "none",
                       padding: "8px 16px",
                       borderRadius: "6px",
-                      color: "#555",
                       fontWeight: "500",
                       cursor: "pointer",
                     }}
@@ -2219,8 +2269,8 @@ const Dashboard = () => {
                           <Star
                             key={i}
                             size={18}
-                            fill={i < selectedReview.rating ? "#C69C6D" : "#E5E7EB"}
-                            color={i < selectedReview.rating ? "#C69C6D" : "#E5E7EB"}
+                            fill={i < selectedReview.rating ? styles.accentBrown : styles.paleBrown}
+                            color={i < selectedReview.rating ? styles.accentBrown : styles.paleBrown}
                           />
                         ))}
                       </div>
@@ -2245,11 +2295,11 @@ const Dashboard = () => {
                     className="cancel-btn"
                     onClick={() => setShowReviewModal(false)}
                     style={{
-                      backgroundColor: "#f5f5f5",
+                      backgroundColor: styles.paleBrown,
+                      color: styles.primaryBrown,
                       border: "none",
                       padding: "8px 16px",
                       borderRadius: "6px",
-                      color: "#555",
                       fontWeight: "500",
                       cursor: "pointer",
                     }}
