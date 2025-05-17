@@ -8,23 +8,19 @@ import RequestOverview from "./RequestOverview"
 import ProductsServices from "./ProductsServices"
 import MatchingPreferences from "./MatchingPreferences"
 import ContactSubmission from "./ContactSubmission"
+import ApplicationSummary from "./application-summary"
 import "./ProductApplication.css"
-import {
-  getFirestore,
-  doc,
-  setDoc,
-} from "firebase/firestore";
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-} from "firebase/storage";
-import { auth, db, storage } from "../../firebaseConfig";
+import { doc, setDoc } from "firebase/firestore"
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import { auth, db, storage } from "../../firebaseConfig"
 
 const ProductApplication = () => {
   const { section: urlSection } = useParams()
   const navigate = useNavigate()
+
+  // State to track if application is submitted
+  const [applicationSubmitted, setApplicationSubmitted] = useState(false)
+  const [showSummary, setShowSummary] = useState(false)
 
   // Initialize active section from URL
   const [activeSection, setActiveSection] = useState(() => {
@@ -81,6 +77,15 @@ const ProductApplication = () => {
     }
   })
 
+  // Load submission status from localStorage
+  useEffect(() => {
+    const savedSubmissionStatus = localStorage.getItem("applicationSubmitted")
+    if (savedSubmissionStatus === "true") {
+      setApplicationSubmitted(true)
+      setShowSummary(true)
+    }
+  }, [])
+
   // Save to localStorage whenever data changes
   useEffect(() => {
     localStorage.setItem("productApplicationData", JSON.stringify(formData))
@@ -90,13 +95,17 @@ const ProductApplication = () => {
     localStorage.setItem("productApplicationCompletedSections", JSON.stringify(completedSections))
   }, [completedSections])
 
+  useEffect(() => {
+    localStorage.setItem("applicationSubmitted", applicationSubmitted.toString())
+  }, [applicationSubmitted])
+
   // Update URL when active section changes
   useEffect(() => {
     const section = sections.find((s) => s.id === activeSection)
-    if (section) {
+    if (section && !showSummary) {
       navigate(`/applications/product/${section.path}`, { replace: true })
     }
-  }, [activeSection, navigate])
+  }, [activeSection, navigate, showSummary])
 
   // Navigation handler
   const goToSection = (sectionId) => {
@@ -107,6 +116,12 @@ const ProductApplication = () => {
     }
   }
 
+  // Handle editing the application after submission
+  const handleEditApplication = () => {
+    setShowSummary(false)
+    setActiveSection(sections[0].id)
+    window.scrollTo(0, 0)
+  }
 
   // Data handling functions
   const updateFormData = (section, newData) => {
@@ -135,7 +150,6 @@ const ProductApplication = () => {
     }
   }
 
-
   // Navigate to previous section
   const goToPreviousSection = () => {
     const currentIndex = sections.findIndex((s) => s.id === activeSection)
@@ -144,18 +158,84 @@ const ProductApplication = () => {
     }
   }
 
-  // Submit the application
-const submitApplication = async () => {
-  try {
-    await saveDataToFirebase(); // Save entire form to Firebase
-    setCompletedSections((prev) => ({ ...prev, [activeSection]: true }));
-    alert("Application submitted successfully!");
-  } catch (err) {
-    console.error("Failed to submit application:", err);
-    alert("Failed to submit application.");
-  }
-};
+  const uploadFilesAndReplaceWithURLs = async (data, section) => {
+    const uploadRecursive = async (item, pathPrefix) => {
+      if (item instanceof File) {
+        const fileRef = ref(storage, `productApplication/${auth.currentUser?.uid}/${pathPrefix}`)
+        await uploadBytes(fileRef, item)
+        return await getDownloadURL(fileRef)
+      } else if (Array.isArray(item)) {
+        return await Promise.all(item.map((entry, idx) => uploadRecursive(entry, `${pathPrefix}/${idx}`)))
+      } else if (typeof item === "object" && item !== null) {
+        const updated = {}
+        for (const key in item) {
+          updated[key] = await uploadRecursive(item[key], `${pathPrefix}/${key}`)
+        }
+        return updated
+      } else {
+        return item
+      }
+    }
 
+    return await uploadRecursive(data, section)
+  }
+
+  const saveDataToFirebase = async (section = null) => {
+    try {
+      const userId = auth.currentUser?.uid
+      if (!userId) throw new Error("User not logged in.")
+
+      const docRef = doc(db, "productApplications", userId)
+      const sectionData = section ? formData[section] : formData
+
+      const uploaded = section
+        ? { [section]: await uploadFilesAndReplaceWithURLs(sectionData, section) }
+        : await uploadFilesAndReplaceWithURLs(formData, "full")
+
+      await setDoc(docRef, uploaded, { merge: true })
+    } catch (err) {
+      console.error("Error saving to Firebase:", err)
+      alert("Failed to save to Firebase.")
+    }
+  }
+
+  const handleSaveSection = async () => {
+    await saveDataToFirebase(activeSection)
+    setCompletedSections((prev) => ({ ...prev, [activeSection]: true }))
+    alert("Section saved successfully!")
+  }
+
+  const handleSaveAndContinue = async () => {
+    await saveDataToFirebase(activeSection)
+    goToNextSection()
+  }
+
+  // Submit the application
+  const submitApplication = async () => {
+    try {
+      // Mark the current section as completed
+      setCompletedSections((prev) => ({ ...prev, [activeSection]: true }))
+
+      // Set application as submitted and show summary immediately
+      setApplicationSubmitted(true)
+      setShowSummary(true)
+
+      // Scroll to top for better user experience
+      window.scrollTo(0, 0)
+
+      // Then try to save to Firebase (but don't block showing the summary)
+      try {
+        await saveDataToFirebase() // Save entire form to Firebase
+        alert("Application submitted successfully!")
+      } catch (firebaseErr) {
+        console.error("Failed to save to Firebase:", firebaseErr)
+        alert("Application submitted, but there was an issue saving to the database. Your data is saved locally.")
+      }
+    } catch (err) {
+      console.error("Failed to submit application:", err)
+      alert("Failed to submit application.")
+    }
+  }
 
   // Render current section
   const renderActiveSection = () => {
@@ -184,65 +264,13 @@ const submitApplication = async () => {
   const isLastSection = activeSection === sections[sections.length - 1].id
   const isFirstSection = activeSection === sections[0].id
 
+  // Add this before the conditional rendering
+  console.log("Render state:", { showSummary, applicationSubmitted })
 
-  
-    
-    const uploadFilesAndReplaceWithURLs = async (data, section) => {
-      const uploadRecursive = async (item, pathPrefix) => {
-        if (item instanceof File) {
-          const fileRef = ref(storage, `universalProfile/${auth.currentUser?.uid}/${pathPrefix}`);
-          await uploadBytes(fileRef, item);
-          return await getDownloadURL(fileRef);
-        } else if (Array.isArray(item)) {
-          return await Promise.all(
-            item.map((entry, idx) => uploadRecursive(entry, `${pathPrefix}/${idx}`))
-          );
-        } else if (typeof item === "object" && item !== null) {
-          const updated = {};
-          for (const key in item) {
-            updated[key] = await uploadRecursive(item[key], `${pathPrefix}/${key}`);
-          }
-          return updated;
-        } else {
-          return item;
-        }
-      };
-  
-      return await uploadRecursive(data, section);
-    };
-  
-    const saveDataToFirebase = async (section = null) => {
-      try {
-        const userId = auth.currentUser?.uid;
-        if (!userId) throw new Error("User not logged in.");
-  
-        const docRef = doc(db, "universalProfiles", userId);
-        let sectionData = section ? formData[section] : formData;
-  
-        const uploaded = section
-          ? { [section]: await uploadFilesAndReplaceWithURLs(sectionData, section) }
-          : await uploadFilesAndReplaceWithURLs(formData, "full");
-  
-        await setDoc(docRef, uploaded, { merge: true });
-      } catch (err) {
-        console.error("Error saving to Firebase:", err);
-        alert("Failed to save to Firebase.");
-      }
-    };
-  
-    const handleSaveSection = async () => {
-
-      await saveDataToFirebase(activeSection);
-       setCompletedSections((prev) => ({ ...prev, [activeSection]: true }))
-    alert("Section saved successfully!")
-    };
-  
-    const handleSaveAndContinue = async () => {
-    
-      await saveDataToFirebase(activeSection);
-     goToNextSection();
-    };
-  
+  // If application is submitted and we're showing the summary
+  if (showSummary) {
+    return <ApplicationSummary data={formData} onEdit={handleEditApplication} />
+  }
 
   return (
     <div className="product-application-container">
@@ -287,7 +315,7 @@ const submitApplication = async () => {
           </button>
 
           {!isLastSection ? (
-            <button type="button" onClick={goToNextSection} className="btn btn-primary">
+            <button type="button" onClick={handleSaveAndContinue} className="btn btn-primary">
               Save & Continue <ChevronRight size={16} />
             </button>
           ) : (

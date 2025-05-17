@@ -1,11 +1,10 @@
 "use client"
-import {  getDoc } from "firebase/firestore";
-import { ref, getDownloadURL } from "firebase/storage";
+
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { CheckCircle, ChevronRight, ChevronLeft, Save } from "lucide-react"
-import { doc, setDoc } from "firebase/firestore"
-import { uploadBytes } from "firebase/storage"
+import { doc, setDoc, getDoc } from "firebase/firestore"
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { auth, db, storage } from "../../firebaseConfig" // adjust based on your setup
 import "./UniversalProfile.css"
 import Instructions from "./instructions"
@@ -16,8 +15,7 @@ import LegalCompliance from "./legal-compliance"
 import ProductsServices from "./products-services"
 import HowDidYouHear from "./how-did-you-hear"
 import DeclarationConsent from "./declaration-consent"
-import RegistrationSummary from "./registration-summary"
-
+import ProfileSummary from "./ProfileSummary"
 
 const sections = [
   { id: "instructions", label: "Instructions" },
@@ -31,10 +29,14 @@ const sections = [
 ]
 
 export default function UniversalProfile() {
-   const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const navigate = useNavigate()
   const [activeSection, setActiveSection] = useState("instructions")
+  const [profileSubmitted, setProfileSubmitted] = useState(false)
+  const [showSummary, setShowSummary] = useState(false)
+  const [profileData, setProfileData] = useState(null)
+
   const [completedSections, setCompletedSections] = useState({
     instructions: true,
     entityOverview: false,
@@ -45,8 +47,7 @@ export default function UniversalProfile() {
     howDidYouHear: false,
     declarationConsent: false,
   })
-  const [showSummary, setShowSummary] = useState(false)
-const [profileData, setProfileData] = useState(null);
+
   const [formData, setFormData] = useState({
     entityOverview: {},
     ownershipManagement: {
@@ -98,16 +99,22 @@ const [profileData, setProfileData] = useState(null);
   useEffect(() => {
     const savedData = localStorage.getItem("universalProfileData")
     const savedCompletedSections = localStorage.getItem("universalProfileCompletedSections")
+    const savedSubmissionStatus = localStorage.getItem("profileSubmitted")
 
     if (savedData) setFormData(JSON.parse(savedData))
     if (savedCompletedSections) setCompletedSections(JSON.parse(savedCompletedSections))
+    if (savedSubmissionStatus === "true") {
+      setProfileSubmitted(true)
+      setShowSummary(true)
+    }
   }, [])
 
   // Save to localStorage
   useEffect(() => {
     localStorage.setItem("universalProfileData", JSON.stringify(formData))
     localStorage.setItem("universalProfileCompletedSections", JSON.stringify(completedSections))
-  }, [formData, completedSections])
+    localStorage.setItem("profileSubmitted", profileSubmitted.toString())
+  }, [formData, completedSections, profileSubmitted])
 
   const updateFormData = (section, data) => {
     setFormData((prev) => ({
@@ -140,6 +147,12 @@ const [profileData, setProfileData] = useState(null);
       setActiveSection(sections[index - 1].id)
       window.scrollTo(0, 0)
     }
+  }
+
+  const handleEditProfile = () => {
+    setShowSummary(false)
+    setActiveSection("entityOverview")
+    window.scrollTo(0, 0)
   }
 
   const uploadFilesAndReplaceWithURLs = async (data, section) => {
@@ -195,10 +208,11 @@ const [profileData, setProfileData] = useState(null);
   }
 
   const handleSubmitProfile = async () => {
-   
-    // await saveDataToFirebase() // save full form
-     markSectionAsCompleted("declarationConsent")
+    markSectionAsCompleted("declarationConsent")
+    await saveDataToFirebase() // save full form
+    setProfileSubmitted(true)
     setShowSummary(true) // Show the summary after submission
+    window.scrollTo(0, 0)
     console.log("Submitted:", formData)
   }
 
@@ -245,31 +259,36 @@ const [profileData, setProfileData] = useState(null);
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        setLoading(true);
-        const userId = auth.currentUser?.uid;
-        
+        setLoading(true)
+        const userId = auth.currentUser?.uid
+
         if (!userId) {
-          throw new Error("User not logged in");
+          throw new Error("User not logged in")
         }
 
-        const docRef = doc(db, "universalProfiles", userId);
-        const docSnap = await getDoc(docRef);
-        
+        const docRef = doc(db, "universalProfiles", userId)
+        const docSnap = await getDoc(docRef)
+
         if (docSnap.exists()) {
-          setProfileData(docSnap.data());
+          setProfileData(docSnap.data())
         } else {
-          setError("No profile found. Please complete your Universal Profile first.");
+          setError("No profile found. Please complete your Universal Profile first.")
         }
       } catch (err) {
-        console.error("Error fetching profile data:", err);
-        setError("Failed to load profile data. Please try again later.");
+        console.error("Error fetching profile data:", err)
+        setError("Failed to load profile data. Please try again later.")
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchProfileData();
-  }, []);
+    fetchProfileData()
+  }, [])
+
+  // If profile is submitted and we're showing the summary
+  if (showSummary) {
+    return <ProfileSummary data={profileData || formData} onEdit={handleEditProfile} />
+  }
 
   return (
     <div className="universal-profile-container">
@@ -330,14 +349,6 @@ const [profileData, setProfileData] = useState(null);
           )}
         </div>
       </div>
-
-      {/* Registration Summary Modal */}
-      <RegistrationSummary
-        data={profileData || formData}
-        open={showSummary}
-        onClose={() => setShowSummary(false)}
-        onComplete={handleRegistrationComplete}
-      />
     </div>
   )
 }
