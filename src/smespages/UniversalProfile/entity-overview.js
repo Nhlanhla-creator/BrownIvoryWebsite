@@ -51,7 +51,7 @@ const economicSectors = [
   { value: "education", label: "Education" },
   { value: "health", label: "Health & Social Services" },
   { value: "arts", label: "Arts & Entertainment" },
-  { value: "other", label: "Other Services" },
+
 ]
 
 const africanCountries = [

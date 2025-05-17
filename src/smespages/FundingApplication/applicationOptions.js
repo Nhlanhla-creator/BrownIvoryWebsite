@@ -8,7 +8,7 @@ export const applicationType = [
   { value: "marketAccess", label: "Market Access" },
   { value: "businessMentorship", label: "Business Mentorship" },
   { value: "technicalSupport", label: "Technical Support" },
-  { value: "other", label: "Other" },
+ 
 ];
 
 export const businessFundingStage = [
@@ -35,11 +35,19 @@ export const supportFormatOptions = [
 ];
 
 export const fundingInstrumentOptions = [
-  { value: "equity", label: "Equity" },
-  { value: "grant", label: "Grant" },
-  { value: "debt", label: "Debt" },
-  { value: "convertible", label: "Convertible" },
-  { value: "other", label: "Other" },
+  { value: "workingCapital", label: "Working Capital Loans" },
+  { value: "ventureCapital", label: "Venture Capital" },
+  { value: "invoiceDiscounting", label: "Invoice Discounting" },
+  { value: "mezzanine", label: "Mezzanine Finance" },
+  { value: "common_shares", label: "Common Shares" },
+  { value: "preferred_shares", label: "Preferred Shares" },
+  { value: "safe", label: "SAFE (Simple Agreement for Future Equity)" },
+  { value: "convertible_note", label: "Convertible Note" },
+  { value: "equity_warrant", label: "Equity Warrant" },
+  { value: "innovation_grant", label: "Innovation Grant" },
+  { value: "matching_grant", label: "Matching Grant" },
+  { value: "milestone_grant", label: "Milestone-Based Grant" },
+  { value: "technical_assistance", label: "Technical Assistance Grant" }
 ];
 
 export const fundingCategoryOptions = [
@@ -81,7 +89,7 @@ export const barrierOptions = [
   { value: "accessToCapital", label: "Access to Capital" },
   { value: "marketAccess", label: "Market Access" },
   { value: "systems", label: "Systems" },
-  { value: "other", label: "Other" },
+
 ];
 
 export const profitabilityOptions = [

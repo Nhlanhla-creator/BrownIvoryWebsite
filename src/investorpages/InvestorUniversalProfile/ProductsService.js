@@ -18,52 +18,67 @@ const fundTypeOptions = [
   { value: "specialized", label: "Specialized Funders" },
 ]
 
-// Funder Type options
+
 const funderTypeOptions = [
-  { value: "angel", label: "Angel Investors (Early-stage, high-risk)" },
-  { value: "vc", label: "Venture Capital (VC) Firms (Startups/growth-stage)" },
-  { value: "pe", label: "Private Equity (PE) Firms (Mature businesses, buyouts)" },
+  // Equity-based
+  { value: "angelInvestors", label: "Angel Investors (Early-stage, high-risk)" },
+  { value: "vcFirms", label: "Venture Capital (VC) Firms (Startups/growth-stage)" },
+  { value: "peFirms", label: "Private Equity (PE) Firms (Mature businesses, buyouts)" },
   { value: "cvc", label: "Corporate Venture Capital (CVC) (Strategic investments)" },
-  { value: "family", label: "Family Offices (Wealthy families investing directly)" },
+  { value: "familyOffices", label: "Family Offices (Wealthy families investing directly)" },
   { value: "crowdfunding", label: "Crowdfunding Platforms (Equity-based)" },
-  { value: "banks", label: "Commercial Banks (Term loans, overdrafts)" },
-  { value: "nbfc", label: "Non-Banking Financial Companies (NBFCs) (Flexible debt)" },
-  { value: "mfi", label: "Microfinance Institutions (MFIs) (Small-ticket loans)" },
-  { value: "p2p", label: "Peer-to-Peer (P2P) Lenders (Marketplace lending)" },
-  { value: "development", label: "Development Banks (SME-focused, low-interest)" },
-  { value: "revenue", label: "Revenue-Based Financing (Repay via % revenue)" },
-  { value: "convertible", label: "Convertible Note Investors (Debt → equity)" },
+
+  // Debt-based
+  { value: "commercialBanks", label: "Commercial Banks (Term loans, overdrafts)" },
+  { value: "nbfcs", label: "Non-Banking Financial Companies (NBFCs) (Flexible debt)" },
+  { value: "mfis", label: "Microfinance Institutions (MFIs) (Small-ticket loans)" },
+  { value: "p2pLenders", label: "Peer-to-Peer (P2P) Lenders (Marketplace lending)" },
+  { value: "developmentBanks", label: "Development Banks (SME-focused, low-interest)" },
+
+  // Alternative financing
+  { value: "revenueBased", label: "Revenue-Based Financing (Repay via % revenue)" },
+  { value: "convertibleNote", label: "Convertible Note Investors (Debt → equity)" },
   { value: "mezzanine", label: "Mezzanine Financing (Hybrid debt/equity)" },
   { value: "factoring", label: "Factoring Companies (Invoice-based advances)" },
-  { value: "supply", label: "Supply Chain Financiers (Supplier/vendor credit)" },
-  { value: "gov_grants", label: "Government Grants (Non-repayable, sector-specific)" },
-  { value: "corp_grants", label: "Corporate Grants (CSR/foundation funding)" },
-  { value: "intl_aid", label: "International Aid Agencies (UNDP, World Bank)" },
-  { value: "impact", label: "Impact Investors (ESG/social impact focus)" },
-  { value: "real_estate", label: "Real Estate Financiers (Property-backed loans)" },
-  { value: "equipment", label: "Equipment Lessors (Hardware/tech leasing)" },
-  { value: "franchise", label: "Franchise Financiers (Franchise-specific capital)" },
-  { value: "other", label: "Other (specify)" },
+  { value: "supplyChain", label: "Supply Chain Financiers (Supplier/vendor credit)" },
+
+  // Grants
+  { value: "governmentGrants", label: "Government Grants (Non-repayable, sector-specific)" },
+  { value: "corporateGrants", label: "Corporate Grants (CSR/foundation funding)" },
+  { value: "aidAgencies", label: "International Aid Agencies (UNDP, World Bank)" },
+
+  // Specialized
+  { value: "impactInvestors", label: "Impact Investors (ESG/social impact focus)" },
+  { value: "realEstateFinanciers", label: "Real Estate Financiers (Property-backed loans)" },
+  { value: "equipmentLessors", label: "Equipment Lessors (Hardware/tech leasing)" },
+  { value: "franchiseFinanciers", label: "Franchise Financiers (Franchise-specific capital)" },
+
+  
+
 ]
 
 // Program Type options
 const programTypeOptions = [
-  { value: "accelerator", label: "Accelerator" },
-  { value: "incubator", label: "Incubator" },
-  { value: "mentorship", label: "Mentorship Program" },
-  { value: "fellowship", label: "Fellowship" },
-  { value: "bootcamp", label: "Bootcamp" },
-  { value: "other", label: "Other" },
+  { value: "funding", label: "Funding" },
+  { value: "incubation", label: "Incubation" },
+  { value: "acceleration", label: "Acceleration" },
+  { value: "esd", label: "ESD" },
+  { value: "marketAccess", label: "Market Access" },
+  { value: "businessMentorship", label: "Business Mentorship" },
+  { value: "technicalSupport", label: "Technical Support" },
+
 ]
 
 // Target Enterprise Type options
 const targetEnterpriseOptions = [
+  { value: "ideation", label: "Idea" },
+  { value: "prototype", label: "Prototype" },
   { value: "startup", label: "Startup" },
-  { value: "early_growth", label: "Early Growth" },
-  { value: "scale_up", label: "Scale-up" },
-  { value: "mature", label: "Mature Business" },
-  { value: "turnaround", label: "Turnaround" },
-  { value: "other", label: "Other" },
+  { value: "early-growth", label: "Early-Growth" },
+  { value: "growth", label: "Growth" },
+  { value: "scale-up", label: "Scale-up" },
+  { value: "mature", label: "Mature" },
+
 ]
 
 // Support Offered options
@@ -73,7 +88,7 @@ const supportOfferedOptions = [
   { value: "technical", label: "Technical Assistance" },
   { value: "network", label: "Network Access" },
   { value: "market", label: "Market Access" },
-  { value: "other", label: "Other" },
+
 ]
 
 // Follow-On Funding options
@@ -96,7 +111,7 @@ const decisionMakingOptions = [
   { value: "board", label: "Board Approval" },
   { value: "founder", label: "Founder Decision" },
   { value: "multi_stage", label: "Multi-stage Process" },
-  { value: "other", label: "Other" },
+
 ]
 
 // Required Documents options
@@ -108,6 +123,8 @@ const requiredDocumentsOptions = [
   { value: "business_plan", label: "Business Plan" },
   { value: "market_analysis", label: "Market Analysis" },
   { value: "team_bios", label: "Team Bios" },
+  { value: "compliance_cert", label: "Compliance Certificate" },
+  { value: "financial_statements", label: "Financial Statements" },
   { value: "other", label: "Other" },
 ]
 
@@ -117,21 +134,31 @@ const investmentInstrumentOptions = [
   { value: "ventureCapital", label: "Venture Capital" },
   { value: "invoiceDiscounting", label: "Invoice Discounting" },
   { value: "mezzanine", label: "Mezzanine Finance" },
+  { value: "common_shares", label: "Common Shares" },
+  { value: "preferred_shares", label: "Preferred Shares" },
+  { value: "safe", label: "SAFE (Simple Agreement for Future Equity)" },
+  { value: "convertible_note", label: "Convertible Note" },
+  { value: "equity_warrant", label: "Equity Warrant" },
+  { value: "innovation_grant", label: "Innovation Grant" },
+  { value: "matching_grant", label: "Matching Grant" },
+  { value: "milestone_grant", label: "Milestone-Based Grant" },
+  { value: "technical_assistance", label: "Technical Assistance Grant" }
 ]
 
 // Enterprise Stage options
 const enterpriseStageOptions = [
+  { value: "ideation", label: "Idea" },
+  { value: "prototype", label: "Prototype" },
   { value: "startup", label: "Startup" },
+  { value: "early-growth", label: "Early-Growth" },
   { value: "growth", label: "Growth" },
-  { value: "maturity", label: "Maturity" },
-  { value: "turnaround", label: "Turnaround" },
+  { value: "scale-up", label: "Scale-up" },
+  { value: "mature", label: "Mature" },
 ]
 
 // Sector Focus options
 const sectorFocusOptions = [
   { value: "agriculture", label: "Agriculture" },
-  { value: "ict", label: "ICT" },
-  { value: "greenEnergy", label: "Green Energy" },
   { value: "mining", label: "Mining" },
   { value: "manufacturing", label: "Manufacturing" },
   { value: "energy", label: "Energy" },
@@ -140,11 +167,12 @@ const sectorFocusOptions = [
   { value: "transport", label: "Transport & Logistics" },
   { value: "finance", label: "Finance & Insurance" },
   { value: "realestate", label: "Real Estate" },
+  { value: "ict", label: "ICT" },
   { value: "tourism", label: "Tourism & Hospitality" },
   { value: "education", label: "Education" },
   { value: "health", label: "Health & Social Services" },
   { value: "arts", label: "Arts & Entertainment" },
-  { value: "other", label: "Other Services" },
+
 ]
 
 // Support Beyond Capital options
@@ -159,10 +187,21 @@ const supportOptions = [
 
 // Sector Experts options
 const sectorExpertsOptions = [
-  { value: "aquaculture", label: "Aquaculture" },
-  { value: "agritech", label: "Agritech" },
-  { value: "horticulture", label: "Horticulture" },
-  { value: "all", label: "All of the above" },
+  { value: "agriculture", label: "Agriculture" },
+  { value: "mining", label: "Mining" },
+  { value: "manufacturing", label: "Manufacturing" },
+  { value: "energy", label: "Energy" },
+  { value: "construction", label: "Construction" },
+  { value: "retail", label: "Retail & Wholesale" },
+  { value: "transport", label: "Transport & Logistics" },
+  { value: "finance", label: "Finance & Insurance" },
+  { value: "realestate", label: "Real Estate" },
+  { value: "ict", label: "ICT" },
+  { value: "tourism", label: "Tourism & Hospitality" },
+  { value: "education", label: "Education" },
+  { value: "health", label: "Health & Social Services" },
+  { value: "arts", label: "Arts & Entertainment" },
+
 ]
 
 // Preferred Engagement Method options
@@ -174,33 +213,73 @@ const preferredEngagementOptions = [
 
 // Add countries array after the other option arrays
 const countries = [
-  { value: "southAfrica", label: "South Africa" },
-  { value: "namibia", label: "Namibia" },
-  { value: "botswana", label: "Botswana" },
-  { value: "zimbabwe", label: "Zimbabwe" },
-  { value: "mozambique", label: "Mozambique" },
-  { value: "lesotho", label: "Lesotho" },
-  { value: "eswatini", label: "Eswatini" },
-  { value: "zambia", label: "Zambia" },
-  { value: "malawi", label: "Malawi" },
+  { value: "algeria", label: "Algeria" },
   { value: "angola", label: "Angola" },
-  { value: "drc", label: "Democratic Republic of Congo" },
-  { value: "tanzania", label: "Tanzania" },
-  { value: "kenya", label: "Kenya" },
-  { value: "uganda", label: "Uganda" },
-  { value: "rwanda", label: "Rwanda" },
+  { value: "benin", label: "Benin" },
+  { value: "botswana", label: "Botswana" },
+  { value: "burkina_faso", label: "Burkina Faso" },
   { value: "burundi", label: "Burundi" },
+  { value: "cabo_verde", label: "Cabo Verde" },
+  { value: "cameroon", label: "Cameroon" },
+  { value: "central_african_republic", label: "Central African Republic" },
+  { value: "chad", label: "Chad" },
+  { value: "comoros", label: "Comoros" },
+  { value: "congo", label: "Congo" },
+  { value: "cote_d_ivoire", label: "Côte d'Ivoire" },
+  { value: "djibouti", label: "Djibouti" },
+  { value: "drc", label: "DR Congo" },
+  { value: "egypt", label: "Egypt" },
+  { value: "equatorial_guinea", label: "Equatorial Guinea" },
+  { value: "eritrea", label: "Eritrea" },
+  { value: "eswatini", label: "Eswatini" },
   { value: "ethiopia", label: "Ethiopia" },
-  { value: "nigeria", label: "Nigeria" },
+  { value: "gabon", label: "Gabon" },
+  { value: "gambia", label: "Gambia" },
   { value: "ghana", label: "Ghana" },
-  { value: "sadc", label: "SADC Region" },
-  { value: "eastAfrica", label: "East Africa" },
-  { value: "westAfrica", label: "West Africa" },
-  { value: "northAfrica", label: "North Africa" },
-  { value: "subSaharan", label: "Sub-Saharan Africa" },
-  { value: "africa", label: "Africa (All)" },
-  { value: "global", label: "Global" },
-  { value: "other", label: "Other" },
+  { value: "guinea", label: "Guinea" },
+  { value: "guinea_bissau", label: "Guinea-Bissau" },
+  { value: "kenya", label: "Kenya" },
+  { value: "lesotho", label: "Lesotho" },
+  { value: "liberia", label: "Liberia" },
+  { value: "libya", label: "Libya" },
+  { value: "madagascar", label: "Madagascar" },
+  { value: "malawi", label: "Malawi" },
+  { value: "mali", label: "Mali" },
+  { value: "mauritania", label: "Mauritania" },
+  { value: "mauritius", label: "Mauritius" },
+  { value: "morocco", label: "Morocco" },
+  { value: "mozambique", label: "Mozambique" },
+  { value: "namibia", label: "Namibia" },
+  { value: "niger", label: "Niger" },
+  { value: "nigeria", label: "Nigeria" },
+  { value: "rwanda", label: "Rwanda" },
+  { value: "sao_tome_and_principe", label: "São Tomé and Príncipe" },
+  { value: "senegal", label: "Senegal" },
+  { value: "seychelles", label: "Seychelles" },
+  { value: "sierra_leone", label: "Sierra Leone" },
+  { value: "somalia", label: "Somalia" },
+  { value: "south_africa", label: "South Africa" },
+  { value: "south_sudan", label: "South Sudan" },
+  { value: "sudan", label: "Sudan" },
+  { value: "tanzania", label: "Tanzania" },
+  { value: "togo", label: "Togo" },
+  { value: "tunisia", label: "Tunisia" },
+  { value: "uganda", label: "Uganda" },
+  { value: "zambia", label: "Zambia" },
+  { value: "zimbabwe", label: "Zimbabwe" },
+]
+
+// South African provinces array
+const saProvinces = [
+  { value: "gauteng", label: "Gauteng" },
+  { value: "westernCape", label: "Western Cape" },
+  { value: "easternCape", label: "Eastern Cape" },
+  { value: "kwazuluNatal", label: "KwaZulu-Natal" },
+  { value: "freeState", label: "Free State" },
+  { value: "northWest", label: "North West" },
+  { value: "mpumalanga", label: "Mpumalanga" },
+  { value: "limpopo", label: "Limpopo" },
+  { value: "northernCape", label: "Northern Cape" },
 ]
 
 // MultiSelect component for dropdown selections
@@ -503,6 +582,16 @@ export default function ProductsServices({ data = {}, updateData }) {
                 />
               </FormField>
             </div>
+            {fund.geographicFocus && fund.geographicFocus.includes("southAfrica") && (
+              <FormField label="South African Provinces">
+                <MultiSelect
+                  options={saProvinces}
+                  selected={fund.saProvinces || []}
+                  onChange={(value) => updateFund(fundIndex, "saProvinces", value)}
+                  label="Provinces"
+                />
+              </FormField>
+            )}
             <div className={styles.gridContainer}>
               <FormField label="Support Offered Beyond Capital">
                 <MultiSelect
@@ -535,8 +624,6 @@ export default function ProductsServices({ data = {}, updateData }) {
                 />
               </FormField>
             </div>
-
-          
 
             <div className={styles.sectionDivider}>
               <h5 className={styles.subSectionHeading}>Program Details</h5>
@@ -688,6 +775,15 @@ export default function ProductsServices({ data = {}, updateData }) {
                     label="Documents"
                   />
                 </FormField>
+                {fund.requiredDocuments && fund.requiredDocuments.includes("other") && (
+                  <input
+                    type="text"
+                    value={fund.otherDocuments || ""}
+                    onChange={(e) => updateFund(fundIndex, "otherDocuments", e.target.value)}
+                    className={`${styles.formInput} mt-2`}
+                    placeholder="Please specify which documents are needed"
+                  />
+                )}
 
                 <FormField label="Due Diligence Timeline">
                   <select
@@ -769,8 +865,6 @@ export default function ProductsServices({ data = {}, updateData }) {
             </div>
 
             <div className={styles.sectionDivider}>
-          
-
               <div className={styles.gridContainer}>
                 <FormField label="Preferred Matching Criteria">
                   <input
@@ -798,8 +892,6 @@ export default function ProductsServices({ data = {}, updateData }) {
                 </FormField>
               </div>
             </div>
-
-           
           </div>
         ))}
 

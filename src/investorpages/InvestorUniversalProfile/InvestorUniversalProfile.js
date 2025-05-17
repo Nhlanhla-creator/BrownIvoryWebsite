@@ -12,20 +12,9 @@ import LegalCompliance from "./LegalCompliance"
 import ProductsServices from "./ProductsService"
 import HowDidYouHear from "./HowDidYouHear"
 import DeclarationConsent from "./DeclarationConsent"
-
-import { getAuth } from "firebase/auth"
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-} from "firebase/firestore"
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-} from "firebase/storage"
+import InvestorProfileSummary from "./investor-profile-summary"
+import { doc, getDoc, setDoc } from "firebase/firestore"
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { auth, db, storage } from "../../firebaseConfig"
 
 const sections = [
@@ -41,6 +30,9 @@ const sections = [
 
 export default function UniversalProfile() {
   const [activeSection, setActiveSection] = useState("instructions")
+  const [profileSubmitted, setProfileSubmitted] = useState(false)
+  const [showSummary, setShowSummary] = useState(false)
+
   const [completedSections, setCompletedSections] = useState({
     instructions: true,
     entityOverview: false,
@@ -88,29 +80,66 @@ export default function UniversalProfile() {
     },
   })
 
+  // Load saved data and submission status from localStorage
   useEffect(() => {
     const fetchData = async () => {
       const user = auth.currentUser
       if (!user) return
 
-      const docRef = doc(db, "MyuniversalProfiles", user.uid)
-      const docSnap = await getDoc(docRef)
+      // Load from localStorage first
+      const savedData = localStorage.getItem("investorProfileData")
+      const savedCompletedSections = localStorage.getItem("investorProfileCompletedSections")
+      const savedSubmissionStatus = localStorage.getItem("profileSubmitted")
 
-      if (docSnap.exists()) {
-        const data = docSnap.data()
-        setFormData(prev => ({
-          ...prev,
-          ...data.formData
-        }))
-        setCompletedSections(prev => ({
-          ...prev,
-          ...data.completedSections
-        }))
+      if (savedData) setFormData(JSON.parse(savedData))
+      if (savedCompletedSections) setCompletedSections(JSON.parse(savedCompletedSections))
+      if (savedSubmissionStatus === "true") {
+        setProfileSubmitted(true)
+        setShowSummary(true)
+      }
+
+      // Then try to fetch from Firebase
+      try {
+        const docRef = doc(db, "MyuniversalProfiles", user.uid)
+        const docSnap = await getDoc(docRef)
+
+        if (docSnap.exists()) {
+          const data = docSnap.data()
+          setFormData((prev) => ({
+            ...prev,
+            ...data.formData,
+          }))
+          setCompletedSections((prev) => ({
+            ...prev,
+            ...data.completedSections,
+          }))
+
+          // If profile is marked as submitted in Firebase, show summary
+          if (data.profileSubmitted) {
+            setProfileSubmitted(true)
+            setShowSummary(true)
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error)
       }
     }
 
     fetchData()
   }, [])
+
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    localStorage.setItem("investorProfileData", JSON.stringify(formData))
+  }, [formData])
+
+  useEffect(() => {
+    localStorage.setItem("investorProfileCompletedSections", JSON.stringify(completedSections))
+  }, [completedSections])
+
+  useEffect(() => {
+    localStorage.setItem("profileSubmitted", profileSubmitted.toString())
+  }, [profileSubmitted])
 
   const updateFormData = (section, data) => {
     setFormData((prev) => ({
@@ -145,6 +174,12 @@ export default function UniversalProfile() {
     }
   }
 
+  const handleEditProfile = () => {
+    setShowSummary(false)
+    setActiveSection("entityOverview")
+    window.scrollTo(0, 0)
+  }
+
   const renderActiveSection = () => {
     const sectionData = formData[activeSection] || {}
     const updateData = (data) => updateFormData(activeSection, data)
@@ -176,42 +211,46 @@ export default function UniversalProfile() {
   const uploadFilesAndReplaceWithURLs = async (data, section) => {
     const uploadRecursive = async (item, pathPrefix) => {
       if (item instanceof File) {
-        const fileRef = ref(storage, `MyuniversalProfile/${auth.currentUser?.uid}/${pathPrefix}`);
-        await uploadBytes(fileRef, item);
-        return await getDownloadURL(fileRef);
+        const fileRef = ref(storage, `MyuniversalProfile/${auth.currentUser?.uid}/${pathPrefix}`)
+        await uploadBytes(fileRef, item)
+        return await getDownloadURL(fileRef)
       } else if (Array.isArray(item)) {
-        return await Promise.all(
-          item.map((entry, idx) => uploadRecursive(entry, `${pathPrefix}/${idx}`))
-        );
+        return await Promise.all(item.map((entry, idx) => uploadRecursive(entry, `${pathPrefix}/${idx}`)))
       } else if (typeof item === "object" && item !== null) {
-        const updated = {};
+        const updated = {}
         for (const key in item) {
-          updated[key] = await uploadRecursive(item[key], `${pathPrefix}/${key}`);
+          updated[key] = await uploadRecursive(item[key], `${pathPrefix}/${key}`)
         }
-        return updated;
+        return updated
       } else {
-        return item;
+        return item
       }
-    };
-  
-    return await uploadRecursive(data, section);
-  };
+    }
+
+    return await uploadRecursive(data, section)
+  }
+
   const saveDataToFirebase = async (section = null) => {
     try {
       const userId = auth.currentUser?.uid
       if (!userId) throw new Error("User not logged in.")
 
       const docRef = doc(db, "MyuniversalProfiles", userId)
-      let sectionData = section ? formData[section] : formData
+      const sectionData = section ? formData[section] : formData
 
       const uploaded = section
         ? { [section]: await uploadFilesAndReplaceWithURLs(sectionData, section) }
         : await uploadFilesAndReplaceWithURLs(formData, "full")
 
-      await setDoc(docRef, {
-        formData: uploaded,
-        completedSections
-      }, { merge: true })
+      await setDoc(
+        docRef,
+        {
+          formData: uploaded,
+          completedSections,
+          profileSubmitted,
+        },
+        { merge: true },
+      )
     } catch (err) {
       console.error("Error saving to Firebase:", err)
       alert("Failed to save to Firebase.")
@@ -224,17 +263,40 @@ export default function UniversalProfile() {
   }
 
   const handleSaveAndContinue = async () => {
-    await saveDataToFirebase(activeSection)
-    alert("Section saved to Firebase!")
     markSectionAsCompleted(activeSection)
+    await saveDataToFirebase(activeSection)
     navigateToNextSection()
   }
 
   const handleSubmitProfile = async () => {
-    markSectionAsCompleted("declarationConsent")
-    await saveDataToFirebase()
-    alert("Profile submitted successfully!")
-    console.log("Submitted:", formData)
+    try {
+      // Mark the current section as completed
+      markSectionAsCompleted("declarationConsent")
+
+      // Set profile as submitted and show summary immediately
+      setProfileSubmitted(true)
+      setShowSummary(true)
+
+      // Scroll to top for better user experience
+      window.scrollTo(0, 0)
+
+      // Then try to save to Firebase (but don't block showing the summary)
+      try {
+        await saveDataToFirebase() // Save entire form to Firebase
+        alert("Profile submitted successfully!")
+      } catch (firebaseErr) {
+        console.error("Failed to save to Firebase:", firebaseErr)
+        alert("Profile submitted, but there was an issue saving to the database. Your data is saved locally.")
+      }
+    } catch (err) {
+      console.error("Failed to submit profile:", err)
+      alert("Failed to submit profile.")
+    }
+  }
+
+  // If profile is submitted and we're showing the summary
+  if (showSummary) {
+    return <InvestorProfileSummary data={formData} onEdit={handleEditProfile} />
   }
 
   return (
