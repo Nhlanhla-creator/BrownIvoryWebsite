@@ -42,6 +42,7 @@ export function CustomerReviewsCard({ styles }) {
   return (
     <>
       <div className={`ratings-card compact rounded-lg ${showReviewsModal ? "blurred" : ""}`}>
+      <div className="ratings-wrapper">
         <div className="card-header">
           <h3>Customer Reviews & Ratings</h3>
         </div>
@@ -73,6 +74,7 @@ export function CustomerReviewsCard({ styles }) {
           View More
           <ChevronDown className="ml-1 inline-block" size={16} />
         </button>
+      </div>
       </div>
 
       {/* Full Reviews Modal */}

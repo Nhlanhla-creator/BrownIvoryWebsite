@@ -3,8 +3,11 @@
 import { useState, useEffect } from "react"
 import { DashboardHeader } from "./dashboard-header"
 import { ApplicationTracker } from "./application-tracker"
-import { StatsRow } from "./stats-row"
 import { TopMatchesTable } from "./top-matches-table"
+import { LegitimacyScoreCard } from "./legitimacy-score-card"
+import { FundabilityScoreCard } from "./fundability-score-card"
+import { CalendarCard } from "./calendar-card"
+import { CustomerReviewsCard } from "./customer-reviews-card"
 import { doc, getDoc } from "firebase/firestore"
 import { auth, db } from "../../firebaseConfig"
 import "./Dashboard.css"
@@ -54,6 +57,45 @@ export function Dashboard() {
     fetchProfileData()
   }, [])
 
+  // Enable resizable cards
+  useEffect(() => {
+    const resizableContainers = document.querySelectorAll(".resizable-card-container")
+
+    // Save card sizes to localStorage
+    const saveCardSizes = () => {
+      resizableContainers.forEach((container, index) => {
+        const width = container.style.width
+        const height = container.style.height
+        if (width && height) {
+          localStorage.setItem(`card-${index}-size`, JSON.stringify({ width, height }))
+        }
+      })
+    }
+
+    // Load card sizes from localStorage
+    resizableContainers.forEach((container, index) => {
+      const savedSize = localStorage.getItem(`card-${index}-size`)
+      if (savedSize) {
+        const { width, height } = JSON.parse(savedSize)
+        container.style.width = width
+        container.style.height = height
+      }
+    })
+
+    // Add event listener to save sizes when resizing stops
+    let resizeTimeout
+    const handleResize = () => {
+      clearTimeout(resizeTimeout)
+      resizeTimeout = setTimeout(saveCardSizes, 500)
+    }
+
+    window.addEventListener("resize", handleResize)
+
+    return () => {
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [loading])
+
   if (loading) {
     return <div className="flex h-screen items-center justify-center">Loading dashboard...</div>
   }
@@ -61,23 +103,45 @@ export function Dashboard() {
   return (
     <div className="dashboard-container bg-[#EFEBE9]">
       <div className="content">
-        <main className="dashboard-main p-4 md:p-6">
+        <main className="dashboard-main">
           <DashboardHeader userName={userName} />
-          
+
           {/* Application Tracker */}
-          <ApplicationTracker styles={styles} />
-          
-          {/* Stats Row */}
-          <StatsRow styles={styles} profileData={profileData} />
-          
-          {/* Top Matches */}
-          <div className="second-row mt-6">
-            <TopMatchesTable 
-              styles={styles} 
-              selectedCategory={selectedCategory} 
-              setSelectedCategory={setSelectedCategory} 
+          <section className="tracker-section">
+            <ApplicationTracker styles={styles} />
+          </section>
+
+          {/* Stats Cards Row */}
+          <section className="stats-cards-row">
+            {/* Legitimacy Score Card */}
+            <div className="resizable-card-container">
+              <LegitimacyScoreCard styles={styles} profileData={profileData} />
+            </div>
+
+            {/* Customer Reviews Card */}
+            <div className="resizable-card-container">
+              <CustomerReviewsCard styles={styles} />
+            </div>
+
+            {/* Fundability Score Card */}
+            <div className="resizable-card-container">
+              <FundabilityScoreCard profileData={profileData} />
+            </div>
+
+            {/* Calendar Card */}
+            <div className="resizable-card-container">
+              <CalendarCard />
+            </div>
+          </section>
+
+          {/* Top Matches - Full Width */}
+          <section className="top-matches-section">
+            <TopMatchesTable
+              styles={styles}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
             />
-          </div>
+          </section>
         </main>
       </div>
     </div>

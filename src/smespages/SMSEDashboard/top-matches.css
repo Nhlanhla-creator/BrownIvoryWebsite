@@ -10,8 +10,8 @@
     --pale-brown: #f0e6d9;
   
     /* Status colors with brown tints */
-    --status-positive: #cdbab4;
-    --status-pending: #f4d2c6;
+    --status-positive: #8d6e63;
+    --status-pending: #bcaaa4;
     --status-neutral: #d7ccc8;
   
     /* Match percentage colors */
@@ -27,11 +27,27 @@
     background-color: white;
     box-shadow: 0 4px 12px rgba(77, 52, 46, 0.08);
     overflow: hidden;
+    width: 100%;
+    animation: fadeIn 0.5s ease-out forwards;
+    animation-delay: 0.5s;
+    opacity: 0;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   
   /* Header styles */
   .top-matches-header {
     padding: 1.25rem 1.5rem 0;
+    background-color: rgba(245, 240, 225, 0.3);
   }
   
   .top-matches-header h3 {
@@ -50,6 +66,17 @@
     border-bottom: 1px solid var(--medium-brown);
     margin: 0 -1.5rem;
     padding: 0 1.5rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  
+  .category-tabs::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  .category-tabs::-webkit-scrollbar-thumb {
+    background-color: var(--accent-brown);
+    border-radius: 4px;
   }
   
   .category-tab {
@@ -64,6 +91,7 @@
     transition: all 0.2s ease;
     position: relative;
     top: 1px;
+    white-space: nowrap;
   }
   
   .category-tab:hover {
@@ -80,6 +108,7 @@
   .table-container {
     padding: 1.25rem;
     overflow-x: auto;
+    max-width: 100%;
   }
   
   /* Table styles */
@@ -87,6 +116,7 @@
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
+    min-width: 800px; /* Ensure table doesn't get too narrow */
   }
   
   .matches-table th {
@@ -99,6 +129,7 @@
     white-space: nowrap;
     position: sticky;
     top: 0;
+    z-index: 10;
   }
   
   .matches-table th:first-child {
@@ -133,6 +164,10 @@
   .name-cell {
     font-weight: 500;
     color: var(--dark-brown);
+    position: sticky;
+    left: 0;
+    background: inherit; /* Keep background when scrolling horizontally */
+    z-index: 5;
   }
   
   .match-cell {
@@ -178,11 +213,12 @@
   /* Responsive adjustments */
   @media (max-width: 768px) {
     .category-tabs {
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      overflow-x: auto;
     }
   
     .category-tab {
-      flex: 1;
+      flex: 0 0 auto;
       text-align: center;
       padding: 0.5rem 0.75rem;
       font-size: 0.85rem;
@@ -213,5 +249,23 @@
   
   .table-container::-webkit-scrollbar-thumb:hover {
     background: var(--primary-brown);
+  }
+  
+  /* Table loading skeleton */
+  .table-loading-skeleton {
+    width: 100%;
+    height: 300px;
+    background: linear-gradient(90deg, var(--pale-brown) 25%, var(--light-brown) 37%, var(--pale-brown) 63%);
+    background-size: 400% 100%;
+    animation: skeleton-loading 1.4s ease infinite;
+  }
+  
+  @keyframes skeleton-loading {
+    0% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0 50%;
+    }
   }
   

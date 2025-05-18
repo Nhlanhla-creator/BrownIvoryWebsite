@@ -1,6 +1,8 @@
+"use client"
+
 import { useState } from "react"
 import { CheckCircle, ChevronRight } from "lucide-react"
-import "./Dashboard.css"
+import "./application-tracker.css"
 
 export function ApplicationTracker({ styles }) {
   const [trackerSteps, setTrackerSteps] = useState([
@@ -41,16 +43,21 @@ export function ApplicationTracker({ styles }) {
             <div
               key={index}
               className={`tracker-step flex items-center ${step.completed ? "completed" : step.active ? "active" : ""}`}
-              data-tooltip={`${expectedActions[step.label]}`}
               onClick={() => toggleStepDetails(index)}
             >
               <div className="step-marker mr-2">
                 {step.completed ? (
                   <CheckCircle size={16} color={styles.primaryBrown} />
                 ) : step.active ? (
-                  <div className="active-dot h-4 w-4 rounded-full" style={{ backgroundColor: styles.accentBrown }}></div>
+                  <div
+                    className="active-dot h-4 w-4 rounded-full"
+                    style={{ backgroundColor: styles.accentBrown }}
+                  ></div>
                 ) : (
-                  <div className="inactive-dot h-4 w-4 rounded-full" style={{ backgroundColor: styles.paleBrown }}></div>
+                  <div
+                    className="inactive-dot h-4 w-4 rounded-full"
+                    style={{ backgroundColor: styles.paleBrown }}
+                  ></div>
                 )}
               </div>
               <div className="step-info">
@@ -67,6 +74,9 @@ export function ApplicationTracker({ styles }) {
               {index < trackerSteps.length - 1 && (
                 <ChevronRight size={16} className="step-arrow mx-1" color={styles.lightBrown} />
               )}
+
+              {/* Tooltip as a child element instead of pseudo-element */}
+              <div className="tooltip">{expectedActions[step.label]}</div>
             </div>
           ))}
         </div>

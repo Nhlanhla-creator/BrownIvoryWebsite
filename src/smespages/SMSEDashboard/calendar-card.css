@@ -10,28 +10,15 @@
     --pale-brown: #f0e6d9;
   }
   
-  /* Calendar Card - Super Compact Version */
+  /* Calendar Card */
   .calendar-card {
-    max-width: 380px;
-    border: 1px solid var(--accent-brown);
     background: white;
-    padding: 1.25rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(77, 52, 46, 0.08);
-    margin: 0 auto;
-    position: relative;
-  }
-  
-  /* Top brown border accent */
-  .calendar-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 6px;
-    background-color: var(--accent-brown);
-    border-radius: 1rem 1rem 0 0;
+    border-radius: 0.75rem;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
   }
   
   /* Card header */
@@ -39,7 +26,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
+    padding: 1.25rem 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--light-brown);
+    background-color: rgba(245, 240, 225, 0.3);
   }
   
   .card-header h3 {
@@ -82,7 +71,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
+    padding: 0.75rem 1.25rem;
     border-bottom: 1px solid var(--light-brown);
   }
   
@@ -97,7 +86,7 @@
     border: none;
     color: var(--primary-brown);
     cursor: pointer;
-    padding: 0.25rem;
+    padding: 0.6rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -129,21 +118,26 @@
   /* Upcoming section */
   .upcoming-section {
     margin-bottom: 1rem;
+    padding: 0 1.25rem;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
   
   .upcoming-section h4 {
     font-size: 0.9rem;
     font-weight: 500;
     color: var(--dark-brown);
-    margin: 0 0 0.75rem 0;
+    margin: 0.75rem 0;
   }
   
   .events-list {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    max-height: 200px;
     overflow-y: auto;
+    flex: 1;
   }
   
   .event-item {
@@ -187,7 +181,7 @@
   
   /* Add Event button */
   .add-event-btn {
-    width: 100%;
+    width: calc(100% - 2.5rem);
     background-color: var(--pale-brown);
     color: var(--dark-brown);
     border: none;
@@ -201,7 +195,7 @@
     justify-content: center;
     gap: 0.5rem;
     transition: all 0.2s ease;
-    margin-top: 0.5rem;
+    margin: 0.75rem 1.25rem 1.25rem;
   }
   
   .add-event-btn:hover {
