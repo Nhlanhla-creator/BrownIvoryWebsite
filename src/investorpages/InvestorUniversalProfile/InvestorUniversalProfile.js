@@ -32,6 +32,37 @@ export default function UniversalProfile() {
   const [activeSection, setActiveSection] = useState("instructions")
   const [profileSubmitted, setProfileSubmitted] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [profileData, setProfileData] = useState(null)
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true)
+        const userId = auth.currentUser?.uid
+
+        if (!userId) {
+          throw new Error("User not logged in")
+        }
+
+        const docRef = doc(db, "universalProfiles", userId)
+        const docSnap = await getDoc(docRef)
+
+        if (docSnap.exists()) {
+          setProfileData(docSnap.data())
+        } else {
+          setError("No profile found. Please complete your Universal Profile first.")
+        }
+      } catch (err) {
+        console.error("Error fetching profile data:", err)
+        setError("Failed to load profile data. Please try again later.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProfileData()
+  }, [])
 
   const [completedSections, setCompletedSections] = useState({
     instructions: true,
@@ -296,7 +327,7 @@ export default function UniversalProfile() {
 
   // If profile is submitted and we're showing the summary
   if (showSummary) {
-    return <InvestorProfileSummary data={formData} onEdit={handleEditProfile} />
+    return <InvestorProfileSummary data={profileData.formData || formData} onEdit={handleEditProfile} />
   }
 
   return (

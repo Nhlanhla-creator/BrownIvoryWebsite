@@ -8,7 +8,7 @@ import {
   Search
 } from "lucide-react";
 import styles from "./InvestorHeader.module.css";
-
+import {auth} from "../../firebaseConfig"
 function InvestorHeader({ companyName, profileImage, setProfileImage }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -35,7 +35,7 @@ function InvestorHeader({ companyName, profileImage, setProfileImage }) {
       read: true
     }
   ]);
-
+const user = auth.currentUser
   const fileInputRef = useRef(null);
   const dropdownRef = useRef(null);
   const notificationRef = useRef(null);
@@ -92,7 +92,7 @@ function InvestorHeader({ companyName, profileImage, setProfileImage }) {
   return (
     <header className={styles["investor-header"]}>
       <div className={styles["header-left"]}>
-        <h1>Investor X</h1>
+        <h1>Investor {user.email || "x"}</h1>
       </div>
 
       <div className={styles["header-right"]}>
