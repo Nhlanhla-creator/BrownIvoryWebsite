@@ -1,60 +1,14 @@
-import { useState } from "react"
+"use client"
+
+import { useState, useEffect } from "react"
 import { Eye, Check, X, CalendarCheck2, FileText, Send, AlertTriangle } from 'lucide-react'
 import styles from "./investor-funding.module.css"
-
-const demoSMEs = [
-  {
-    id: "1",
-    name: "TechNova Ltd",
-    investmentType: "Equity",
-    matchPercentage: 85,
-    location: "Cape Town",
-    stage: "Seed",
-    sector: "ICT",
-    fundingNeeded: "R1,500,000",
-    applicationDate: "2025-05-10",
-    status: "Application Received",
-    teamSize: "10-15",
-    revenue: "R850,000",
-    focusArea: "AI-driven education tools",
-    documents: ["TechNova_PitchDeck.pdf", "TechNova_Financials.xlsx"]
-  },
-  {
-    id: "2",
-    name: "GreenHarvest",
-    investmentType: "Debt",
-    matchPercentage: 78,
-    location: "Johannesburg",
-    stage: "Growth",
-    sector: "Agriculture",
-    fundingNeeded: "R950,000",
-    applicationDate: "2025-05-12",
-    status: "Application Received",
-    teamSize: "20-25",
-    revenue: "R1,200,000",
-    focusArea: "Vertical farming innovation",
-    documents: ["GreenHarvest_BusinessPlan.pdf"]
-  },
-  {
-    id: "3",
-    name: "MediSure Health",
-    investmentType: "Equity",
-    matchPercentage: 92,
-    location: "Durban",
-    stage: "Early Growth",
-    sector: "Healthcare",
-    fundingNeeded: "R2,200,000",
-    applicationDate: "2025-05-08",
-    status: "Application Received",
-    teamSize: "15-20",
-    revenue: "R1,500,000",
-    focusArea: "Telemedicine solutions",
-    documents: ["MediSure_BusinessPlan.pdf", "MediSure_MarketAnalysis.pdf"]
-  }
-]
+import { db } from "../../firebaseConfig"
+import { collection, query, where, onSnapshot, updateDoc, doc } from "firebase/firestore"
+import { getAuth } from "firebase/auth"
 
 export function InvestorSMETable() {
-  const [smes, setSmes] = useState(demoSMEs)
+  const [smes, setSmes] = useState([])
   const [selectedSME, setSelectedSME] = useState(null)
   const [modalType, setModalType] = useState(null)
   const [message, setMessage] = useState("")
@@ -64,8 +18,50 @@ export function InvestorSMETable() {
   const [formErrors, setFormErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [notification, setNotification] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-  const handleUpdateStatus = (id, status) => {
+  useEffect(() => {
+    const auth = getAuth()
+    const user = auth.currentUser
+    
+    if (!user) {
+      setLoading(false)
+      return
+    }
+    
+    setLoading(true)
+    
+    const q = query(
+      collection(db, "investorApplications"),
+      where("funderId", "==", user.uid)
+    )
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const applications = []
+      querySnapshot.forEach((doc) => {
+        applications.push({
+          id: doc.id,
+          ...doc.data()
+        })
+      })
+      
+      // Sort by application date (newest first)
+      applications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      setSmes(applications)
+      setLoading(false)
+    }, (error) => {
+      console.error("Error fetching applications:", error)
+      setNotification({
+        type: "error",
+        message: "Failed to load applications"
+      })
+      setLoading(false)
+    })
+    
+    return () => unsubscribe()
+  }, [])
+
+  const handleUpdateStatus = async (id, status) => {
     // Validate form if approving or declining
     if (modalType !== "view") {
       const errors = {}
@@ -94,25 +90,37 @@ export function InvestorSMETable() {
     
     setIsSubmitting(true)
     
-    // Simulate API call with timeout
-    setTimeout(() => {
-      const updated = smes.map((sme) =>
-        sme.id === id ? { ...sme, status } : sme
-      )
-      setSmes(updated)
+    try {
+      const updateData = {
+        status: status,
+        responseMessage: message,
+        updatedAt: new Date().toISOString()
+      }
       
-      // Show notification
+      if (status === "Approved") {
+        updateData.meetingTime = meetingTime
+        updateData.meetingLocation = meetingLocation
+        updateData.meetingPurpose = meetingPurpose
+      }
+      
+      await updateDoc(doc(db, "investorApplications", id), updateData)
+      
       setNotification({
-        type: status === "Approved" ? "success" : "info",
+        type: "success",
         message: `Application ${status.toLowerCase()} successfully`
       })
       
-      // Hide notification after 3 seconds
       setTimeout(() => setNotification(null), 3000)
-      
       resetModal()
+    } catch (error) {
+      console.error("Error updating application:", error)
+      setNotification({
+        type: "error",
+        message: "Failed to update application"
+      })
+    } finally {
       setIsSubmitting(false)
-    }, 800)
+    }
   }
 
   const resetModal = () => {
@@ -133,12 +141,14 @@ export function InvestorSMETable() {
         return `${baseClass} ${styles.statusApproved}`
       case "Declined":
         return `${baseClass} ${styles.statusDeclined}`
+      case "Application Received":
+        return `${baseClass} ${styles.statusPending}`
       default:
         return baseClass
     }
   }
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!message.trim()) {
       setFormErrors({...formErrors, message: "Please provide a message to the SME"})
       return
@@ -146,19 +156,25 @@ export function InvestorSMETable() {
     
     setIsSubmitting(true)
     
-    // Simulate sending message
-    setTimeout(() => {
+    try {
+      // In a real app, you might send this via email or store it separately
       setNotification({
         type: "success",
         message: "Message sent successfully"
       })
       
       setTimeout(() => setNotification(null), 3000)
+    } catch (error) {
+      setNotification({
+        type: "error",
+        message: "Failed to send message"
+      })
+    } finally {
       setIsSubmitting(false)
-    }, 800)
+    }
   }
 
-  const handleScheduleMeeting = () => {
+  const handleScheduleMeeting = async () => {
     const errors = {}
     
     if (!meetingTime) {
@@ -180,21 +196,31 @@ export function InvestorSMETable() {
     
     setIsSubmitting(true)
     
-    // Simulate scheduling meeting
-    setTimeout(() => {
+    try {
+      // In a real app, you would integrate with a calendar API
       setNotification({
         type: "success",
         message: "Meeting scheduled successfully"
       })
       
       setTimeout(() => setNotification(null), 3000)
+    } catch (error) {
+      setNotification({
+        type: "error",
+        message: "Failed to schedule meeting"
+      })
+    } finally {
       setIsSubmitting(false)
-    }, 800)
+    }
+  }
+
+  if (loading) {
+    return <div className={styles.loadingContainer}>Loading applications...</div>
   }
 
   return (
     <div className={styles.tableSection}>
-      <h2 className={styles.sectionTitle}>SMEs Applications</h2>
+      <h2 className={styles.sectionTitle}>SME Applications</h2>
 
       {notification && (
         <div className={`${styles.notification} ${styles[notification.type]}`}>
@@ -219,52 +245,64 @@ export function InvestorSMETable() {
             </tr>
           </thead>
           <tbody>
-            {smes.map((sme) => (
-              <tr key={sme.id}>
-                <td>{sme.name}</td>
-                <td>{sme.investmentType}</td>
-                <td>
-                  <div className={styles.matchPercentage}>
-                    <div 
-                      className={styles.matchBar} 
-                      style={{ width: `${sme.matchPercentage}%` }}
-                    ></div>
-                    <span>{sme.matchPercentage}%</span>
-                  </div>
-                </td>
-                <td>{sme.location}</td>
-                <td>{sme.stage} / {sme.focusArea}</td>
-                <td>{sme.sector}</td>
-                <td>{sme.fundingNeeded}</td>
-                <td>{sme.applicationDate}</td>
-                <td><span className={getStatusBadgeClass(sme.status)}>{sme.status}</span></td>
-                <td style={{ whiteSpace: "nowrap" }}>
-                  <button 
-                    className={styles.actionBtn} 
-                    title="View details"
-                    onClick={() => { setSelectedSME(sme); setModalType("view") }}
-                  >
-                    <Eye size={16} />
-                  </button>
-                  <button 
-                    className={styles.actionBtn} 
-                    title="Approve application"
-                    onClick={() => { setSelectedSME(sme); setModalType("approve") }}
-                    disabled={sme.status !== "Application Received"}
-                  >
-                    <Check size={16} />
-                  </button>
-                  <button 
-                    className={styles.actionBtn} 
-                    title="Decline application"
-                    onClick={() => { setSelectedSME(sme); setModalType("decline") }}
-                    disabled={sme.status !== "Application Received"}
-                  >
-                    <X size={16} />
-                  </button>
+            {smes.length === 0 ? (
+              <tr>
+                <td colSpan="10" className={styles.noApplications}>
+                  No applications received yet
                 </td>
               </tr>
-            ))}
+            ) : (
+              smes.map((sme) => (
+                <tr key={sme.id}>
+                  <td>{sme.smeName}</td>
+                  <td>{sme.investmentType}</td>
+                  <td>
+                    <div className={styles.matchPercentage}>
+                      <div 
+                        className={styles.matchBar} 
+                        style={{ width: `${sme.matchPercentage}%` }}
+                      ></div>
+                      <span>{sme.matchPercentage}%</span>
+                    </div>
+                  </td>
+                  <td>{sme.location}</td>
+                  <td>{sme.stage} / {sme.focusArea}</td>
+                  <td>{sme.sector}</td>
+                  <td>R{Number(sme.fundingNeeded).toLocaleString()}</td>
+                  <td>{sme.applicationDate}</td>
+                  <td>
+                    <span className={getStatusBadgeClass(sme.status)}>
+                      {sme.status}
+                    </span>
+                  </td>
+                  <td style={{ whiteSpace: "nowrap" }}>
+                    <button 
+                      className={styles.actionBtn} 
+                      title="View details"
+                      onClick={() => { setSelectedSME(sme); setModalType("view") }}
+                    >
+                      <Eye size={16} />
+                    </button>
+                    <button 
+                      className={styles.actionBtn} 
+                      title="Approve application"
+                      onClick={() => { setSelectedSME(sme); setModalType("approve") }}
+                      disabled={sme.status !== "Application Received"}
+                    >
+                      <Check size={16} />
+                    </button>
+                    <button 
+                      className={styles.actionBtn} 
+                      title="Decline application"
+                      onClick={() => { setSelectedSME(sme); setModalType("decline") }}
+                      disabled={sme.status !== "Application Received"}
+                    >
+                      <X size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -279,7 +317,7 @@ export function InvestorSMETable() {
                   ? "Decline Application" 
                   : "View SME Application"}
             </h3>
-            <p className={styles.modalSMEName}><strong>{selectedSME.name}</strong></p>
+            <p className={styles.modalSMEName}><strong>{selectedSME.smeName}</strong></p>
 
             <div className={styles.profileDetails}>
               <div className={styles.profileGrid}>
@@ -294,13 +332,14 @@ export function InvestorSMETable() {
                   <p><strong>Team Size:</strong> {selectedSME.teamSize}</p>
                 </div>
               </div>
-              <p><strong>Funding Needed:</strong> {selectedSME.fundingNeeded}</p>
+              <p><strong>Funding Needed:</strong> R{Number(selectedSME.fundingNeeded).toLocaleString()}</p>
+              <p><strong>Match Percentage:</strong> {selectedSME.matchPercentage}%</p>
               <p><strong>Documents:</strong></p>
               <ul className={styles.documentList}>
-                {selectedSME.documents.map((doc, idx) => (
+                {selectedSME.documents?.map((doc, idx) => (
                   <li key={idx}>
                     <FileText size={14} className={styles.docIcon} />
-                    <a href={`/${doc}`} download>{doc}</a>
+                    <span>{doc}</span>
                   </li>
                 ))}
               </ul>
@@ -419,7 +458,7 @@ export function InvestorSMETable() {
                   )}
                   
                   <button
-                    className={styles.approveBtn}
+                    className={modalType === "approve" ? styles.approveBtn : styles.declineBtn}
                     onClick={() => handleUpdateStatus(
                       selectedSME.id, 
                       modalType === "approve" ? "Approved" : "Declined"

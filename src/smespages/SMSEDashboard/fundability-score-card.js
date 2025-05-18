@@ -123,10 +123,10 @@ export function FundabilityScoreCard({ profileData }) {
   const totalFundabilityScore =
     Math.round(
       complianceScore +
-        categoryScores.financialHealth +
-        categoryScores.operationalStrength +
-        categoryScores.pitchQuality +
-        categoryScores.impactProof,
+      categoryScores.financialHealth +
+      categoryScores.operationalStrength +
+      categoryScores.pitchQuality +
+      categoryScores.impactProof,
     ) || 75 // Default value if calculation fails
 
   // Monthly score data
@@ -209,6 +209,22 @@ export function FundabilityScoreCard({ profileData }) {
     }
   }
 
+  // Document checking functions
+  const checkDocumentExists = (data, path) => {
+    const parts = path.split('.')
+    let value = data
+    for (const part of parts) {
+      value = value?.[part]
+      if (value === undefined || value === null || value === "") {
+        return false
+      }
+      if (typeof value === 'object' && (value.url || value.fileName)) {
+        return true
+      }
+    }
+    return true
+  }
+
   // Score calculation functions
   const calculateComplianceScore = (profileData) => {
     if (!profileData) return 0.8 // Default value
@@ -223,40 +239,59 @@ export function FundabilityScoreCard({ profileData }) {
       "declarationConsent.signedDocument",
     ]
 
-    const presentCount = requiredDocuments.filter((path) => {
-      const parts = path.split(".")
-      let value = profileData
-      for (const part of parts) {
-        value = value?.[part]
-        if (value === undefined || value === null || value === "") {
-          return false
-        }
-        if (typeof value === "object" && value.url) {
-          return true
-        }
-      }
-      return true
-    }).length
+    const presentCount = requiredDocuments.filter(path =>
+      checkDocumentExists(profileData, path)
+    ).length
 
     return presentCount / requiredDocuments.length
   }
 
   const calculateMissingDocuments = (profileData) => {
-    const requiredDocuments = [
-      "companyregistrationcertificate",
-      "proofofoperatingaddress",
-      "certifiedids",
-      "shareregister",
-      "proofofaddress",
-      "taxclearancecertificate",
-      "bbbeecertificate",
-      "signeddeclarationconsentform",
+    if (!profileData) return []
+
+    const documentMapping = [
+      {
+        key: "companyregistrationcertificate",
+        path: "entityOverview.registrationCertificate",
+        displayName: "Company Registration Certificate"
+      },
+      {
+        key: "proofofoperatingaddress",
+        path: "entityOverview.proofOfAddress",
+        displayName: "Proof of Operating Address"
+      },
+      {
+        key: "certifiedids",
+        path: "ownershipManagement.certifiedIds",
+        displayName: "Certified IDs"
+      },
+      {
+        key: "shareregister",
+        path: "ownershipManagement.shareRegister",
+        displayName: "Share Register"
+      },
+      {
+        key: "taxclearancecertificate",
+        path: "legalCompliance.taxClearanceCert",
+        displayName: "Tax Clearance Certificate"
+      },
+      {
+        key: "bbbeecertificate",
+        path: "legalCompliance.bbbeeCert",
+        displayName: "B-BBEE Certificate"
+      },
+      {
+        key: "signeddeclarationconsentform",
+        path: "declarationConsent.signedDocument",
+        displayName: "Signed Declaration/Consent Form"
+      }
     ]
 
-    return requiredDocuments.filter((docKey) => {
-      return ["proofofaddress", "bbbeecertificate"].includes(docKey)
-    })
+    return documentMapping
+      .filter(({ path }) => !checkDocumentExists(profileData, path))
+      .map(({ key, displayName }) => ({ key, displayName }))
   }
+
 
   const calculateFinancialHealth = (profileData) => {
     if (!profileData) return 70 // Default value
@@ -510,22 +545,23 @@ export function FundabilityScoreCard({ profileData }) {
                     "Proof of Operating Address",
                     "Certified IDs",
                     "Share Register",
-                    "Proof of Address",
                     "Tax Clearance Certificate",
                     "B-BBEE Certificate",
-                    "Signed Declaration/Consent Form",
+                    "Signed Declaration/Consent Form"
                   ].map((doc, index) => {
                     const docKey = doc.toLowerCase().replace(/\s+/g, "").replace(/-/g, "").replace(/\//g, "")
-                    const isPresent = !missingDocuments.includes(docKey)
+                    const isMissing = missingDocuments.some(missingDoc => missingDoc.key === docKey)
 
                     return (
                       <div
                         key={index}
-                        className={`document-item ${isPresent ? "document-present" : "document-missing"}`}
+                        className={`document-item ${!isMissing ? "document-present" : "document-missing"}`}
                       >
                         <div className="document-status-indicator"></div>
                         <span className="document-name">{doc}</span>
-                        <span className="document-status-text">{isPresent ? "Uploaded" : "Missing"}</span>
+                        <span className="document-status-text">
+                          {!isMissing ? "Uploaded" : "Missing"}
+                        </span>
                       </div>
                     )
                   })}

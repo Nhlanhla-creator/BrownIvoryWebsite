@@ -8,7 +8,9 @@ import {
   Search
 } from "lucide-react";
 import styles from "./InvestorHeader.module.css";
-import {auth} from "../../firebaseConfig"
+import { auth } from "../../firebaseConfig";
+import { onAuthStateChanged } from "firebase/auth";
+
 function InvestorHeader({ companyName, profileImage, setProfileImage }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -35,10 +37,21 @@ function InvestorHeader({ companyName, profileImage, setProfileImage }) {
       read: true
     }
   ]);
-const user = auth.currentUser
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const fileInputRef = useRef(null);
   const dropdownRef = useRef(null);
   const notificationRef = useRef(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -89,10 +102,18 @@ const user = auth.currentUser
     }
   };
 
+  if (loading) {
+    return <div className={styles.loading}>Loading user data...</div>;
+  }
+
+  if (!user) {
+    return <div className={styles.notSignedIn}>Please sign in</div>;
+  }
+
   return (
     <header className={styles["investor-header"]}>
       <div className={styles["header-left"]}>
-        <h1>Investor {user.email || "x"}</h1>
+        <h1>Investor {user.email || "User"}</h1>
       </div>
 
       <div className={styles["header-right"]}>
