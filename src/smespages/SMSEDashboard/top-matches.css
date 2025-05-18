@@ -1,0 +1,217 @@
+/* Brown color palette */
+:root {
+    --light-brown: #f5f0e1;
+    --medium-brown: #e6d7c3;
+    --accent-brown: #c8b6a6;
+    --primary-brown: #a67c52;
+    --dark-brown: #7d5a50;
+    --text-brown: #4a352f;
+    --background-brown: #faf7f2;
+    --pale-brown: #f0e6d9;
+  
+    /* Status colors with brown tints */
+    --status-positive: #cdbab4;
+    --status-pending: #f4d2c6;
+    --status-neutral: #d7ccc8;
+  
+    /* Match percentage colors */
+    --match-excellent: #5d4037;
+    --match-good: #8d6e63;
+    --match-average: #a1887f;
+  }
+  
+  /* Container styles */
+  .top-matches-container {
+    border-radius: 0.75rem;
+    border: 1px solid var(--accent-brown);
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(77, 52, 46, 0.08);
+    overflow: hidden;
+  }
+  
+  /* Header styles */
+  .top-matches-header {
+    padding: 1.25rem 1.5rem 0;
+  }
+  
+  .top-matches-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--dark-brown);
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--light-brown);
+  }
+  
+  /* Category tabs */
+  .category-tabs {
+    display: flex;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--medium-brown);
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem;
+  }
+  
+  .category-tab {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-brown);
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    top: 1px;
+  }
+  
+  .category-tab:hover {
+    color: var(--primary-brown);
+  }
+  
+  .category-tab.active {
+    color: var(--primary-brown);
+    border-bottom-color: var(--primary-brown);
+    font-weight: 600;
+  }
+  
+  /* Table container */
+  .table-container {
+    padding: 1.25rem;
+    overflow-x: auto;
+  }
+  
+  /* Table styles */
+  .matches-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .matches-table th {
+    background-color: var(--pale-brown);
+    color: var(--dark-brown);
+    font-weight: 600;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+  }
+  
+  .matches-table th:first-child {
+    border-top-left-radius: 0.5rem;
+  }
+  
+  .matches-table th:last-child {
+    border-top-right-radius: 0.5rem;
+  }
+  
+  .matches-table td {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: var(--text-brown);
+    border-bottom: 1px solid var(--light-brown);
+  }
+  
+  /* Row styles */
+  .matches-table tr.row-even {
+    background-color: white;
+  }
+  
+  .matches-table tr.row-odd {
+    background-color: var(--background-brown);
+  }
+  
+  .matches-table tr:hover {
+    background-color: var(--light-brown);
+  }
+  
+  /* Cell styles */
+  .name-cell {
+    font-weight: 500;
+    color: var(--dark-brown);
+  }
+  
+  .match-cell {
+    font-weight: 600;
+    position: relative;
+  }
+  
+  .match-cell.match-excellent {
+    color: var(--match-excellent);
+  }
+  
+  .match-cell.match-good {
+    color: var(--match-good);
+  }
+  
+  .match-cell.match-average {
+    color: var(--match-average);
+  }
+  
+  /* Status badge */
+  .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: white;
+  }
+  
+  .status-badge.status-positive {
+    background-color: var(--status-positive);
+  }
+  
+  .status-badge.status-pending {
+    background-color: var(--status-pending);
+  }
+  
+  .status-badge.status-neutral {
+    background-color: var(--status-neutral);
+    color: var(--text-brown);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .category-tabs {
+      flex-wrap: wrap;
+    }
+  
+    .category-tab {
+      flex: 1;
+      text-align: center;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+    }
+  
+    .matches-table th,
+    .matches-table td {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+    }
+  }
+  
+  /* Custom scrollbar for the table container */
+  .table-container::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+  
+  .table-container::-webkit-scrollbar-track {
+    background: var(--light-brown);
+    border-radius: 4px;
+  }
+  
+  .table-container::-webkit-scrollbar-thumb {
+    background: var(--accent-brown);
+    border-radius: 4px;
+  }
+  
+  .table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-brown);
+  }
+  

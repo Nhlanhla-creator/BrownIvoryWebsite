@@ -1,0 +1,516 @@
+/* Brown color palette */
+:root {
+    --light-brown: #f5f0e1;
+    --medium-brown: #e6d7c3;
+    --accent-brown: #c8b6a6;
+    --primary-brown: #a67c52;
+    --dark-brown: #7d5a50;
+    --text-brown: #4a352f;
+    --background-brown: #faf7f2;
+    --pale-brown: #f0e6d9;
+  }
+  
+  /* Calendar Card - Super Compact Version */
+  .calendar-card {
+    max-width: 380px;
+    border: 1px solid var(--accent-brown);
+    background: white;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(77, 52, 46, 0.08);
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  /* Top brown border accent */
+  .calendar-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background-color: var(--accent-brown);
+    border-radius: 1rem 1rem 0 0;
+  }
+  
+  /* Card header */
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+  
+  .card-header h3 {
+    font-size: 1.1rem;
+    color: var(--dark-brown);
+    font-weight: 600;
+    margin: 0;
+    position: relative;
+  }
+  
+  .card-header h3::after {
+    content: "";
+    position: absolute;
+    bottom: -0.25rem;
+    left: 0;
+    width: 2.5rem;
+    height: 2px;
+    background-color: var(--accent-brown);
+  }
+  
+  .connect-outlook-btn {
+    background-color: var(--dark-brown);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .connect-outlook-btn:hover {
+    background-color: var(--text-brown);
+  }
+  
+  /* Month header */
+  .month-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--light-brown);
+  }
+  
+  .current-month {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--dark-brown);
+  }
+  
+  .view-calendar-btn {
+    background: none;
+    border: none;
+    color: var(--primary-brown);
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  
+  .view-calendar-btn:hover {
+    background-color: var(--light-brown);
+    transform: scale(1.1);
+  }
+  
+  /* Bouncing animation for calendar icon */
+  @keyframes bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+  
+  .view-calendar-btn.bounce {
+    animation: bounce 1s ease infinite;
+  }
+  
+  /* Upcoming section */
+  .upcoming-section {
+    margin-bottom: 1rem;
+  }
+  
+  .upcoming-section h4 {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--dark-brown);
+    margin: 0 0 0.75rem 0;
+  }
+  
+  .events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .event-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: var(--light-brown);
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+  }
+  
+  .event-item:hover {
+    background-color: var(--medium-brown);
+    transform: translateX(3px);
+  }
+  
+  .event-indicator {
+    width: 0.25rem;
+    height: 2rem;
+    background-color: var(--primary-brown);
+    border-radius: 0.125rem;
+    margin-right: 0.75rem;
+  }
+  
+  .event-details {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .event-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--dark-brown);
+  }
+  
+  .event-date {
+    font-size: 0.8rem;
+    color: var(--text-brown);
+    margin-top: 0.25rem;
+  }
+  
+  /* Add Event button */
+  .add-event-btn {
+    width: 100%;
+    background-color: var(--pale-brown);
+    color: var(--dark-brown);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+  }
+  
+  .add-event-btn:hover {
+    background-color: var(--medium-brown);
+  }
+  
+  /* Modal styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(74, 53, 47, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    overflow: hidden;
+  }
+  
+  .modal-container {
+    background: white;
+    border-radius: 1rem;
+    width: 90%;
+    max-width: 600px;
+    max-height: 85vh;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    border-top: 5px solid var(--accent-brown);
+    position: relative;
+    overflow: hidden;
+    animation: modalFadeIn 0.3s ease-out;
+  }
+  
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--medium-brown);
+    background-color: var(--background-brown);
+  }
+  
+  .modal-header h3 {
+    margin: 0;
+    color: var(--dark-brown);
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    color: var(--dark-brown);
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+  }
+  
+  .close-btn:hover {
+    background-color: var(--light-brown);
+  }
+  
+  .modal-body {
+    padding: 1.25rem;
+    overflow-y: auto;
+    max-height: calc(85vh - 120px);
+  }
+  
+  .modal-footer {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--medium-brown);
+    display: flex;
+    justify-content: flex-end;
+    background-color: var(--background-brown);
+  }
+  
+  /* Full calendar styles */
+  .full-calendar {
+    margin-bottom: 1.5rem;
+  }
+  
+  .month-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .current-month-full {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark-brown);
+  }
+  
+  .full-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.4rem;
+  }
+  
+  .day-header-full {
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-brown);
+    padding-bottom: 0.5rem;
+  }
+  
+  .calendar-day-full {
+    min-height: 4rem;
+    border: 1px solid var(--light-brown);
+    border-radius: 0.4rem;
+    padding: 0.4rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .calendar-day-full:hover {
+    background-color: var(--light-brown);
+  }
+  
+  .calendar-day-full.today {
+    background-color: var(--background-brown);
+    border-color: var(--primary-brown);
+  }
+  
+  .calendar-day-full.has-event {
+    border-left: 3px solid var(--primary-brown);
+  }
+  
+  .day-number {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--dark-brown);
+    margin-bottom: 0.4rem;
+  }
+  
+  .day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  
+  .day-event-indicator {
+    font-size: 0.7rem;
+    background-color: var(--light-brown);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.2rem;
+    color: var(--text-brown);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Add event button in modal */
+  .add-event-btn-full {
+    background-color: var(--primary-brown);
+    color: white;
+    border: none;
+    border-radius: 0.4rem;
+    padding: 0.6rem 1rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+  }
+  
+  .add-event-btn-full:hover {
+    background-color: var(--dark-brown);
+  }
+  
+  /* Event modal styles */
+  .event-modal {
+    max-width: 450px;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--dark-brown);
+    margin-bottom: 0.4rem;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid var(--medium-brown);
+    border-radius: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--text-brown);
+    background-color: white;
+  }
+  
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: var(--primary-brown);
+    box-shadow: 0 0 0 2px rgba(166, 124, 82, 0.2);
+  }
+  
+  /* Modal footer buttons */
+  .cancel-btn {
+    background-color: var(--light-brown);
+    color: var(--dark-brown);
+    border: none;
+    border-radius: 0.4rem;
+    padding: 0.6rem 1rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: 0.6rem;
+  }
+  
+  .cancel-btn:hover {
+    background-color: var(--medium-brown);
+  }
+  
+  .save-btn {
+    background-color: var(--primary-brown);
+    color: white;
+    border: none;
+    border-radius: 0.4rem;
+    padding: 0.6rem 1rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .save-btn:hover {
+    background-color: var(--dark-brown);
+  }
+  
+  /* Custom scrollbar for events list */
+  .events-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .events-list::-webkit-scrollbar-track {
+    background: var(--light-brown);
+    border-radius: 4px;
+  }
+  
+  .events-list::-webkit-scrollbar-thumb {
+    background: var(--accent-brown);
+    border-radius: 4px;
+  }
+  
+  .events-list::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-brown);
+  }
+  
+  /* When modal is open, prevent scrolling on the body */
+  body.modal-open {
+    overflow: hidden;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .full-calendar-grid {
+      gap: 0.2rem;
+    }
+  
+    .calendar-day-full {
+      min-height: 3.5rem;
+      padding: 0.2rem;
+    }
+  
+    .day-number {
+      font-size: 0.8rem;
+    }
+  
+    .day-event-indicator {
+      font-size: 0.65rem;
+      padding: 0.1rem 0.3rem;
+    }
+  }
+  

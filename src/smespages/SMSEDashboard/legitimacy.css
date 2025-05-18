@@ -1,0 +1,197 @@
+:root {
+    --light-brown: #f5f0e1;
+    --medium-brown: #e6d7c3;
+    --accent-brown: #c8b6a6;
+    --primary-brown: #a67c52;
+    --dark-brown: #7d5a50;
+    --text-brown: #4a352f;
+  }
+  
+  /* Compact professional card - reduced height */
+  .readiness-card.fun-card {
+    max-width: 235px;
+    border: 1px solid var(--accent-brown);
+    background: white;
+    padding: 1rem 1.25rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(77, 52, 46, 0.08);
+    margin-bottom: 250px;
+    position: relative;
+  }
+  
+  /* Top brown border accent */
+  .readiness-card.fun-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background-color: var(--accent-brown);
+    border-radius: 1rem 1rem 0 0;
+  }
+  
+  /* Header with target icon */
+  .fun-card-header {
+    margin-bottom: 0.5rem;
+  }
+  
+  .fun-card-header h2 {
+    font-size: 1.2rem;
+    color: var(--dark-brown);
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  /* Score circle - REDUCED SIZE */
+  .score-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 0.75rem 0;
+  }
+  
+  .score-circle {
+    height: 80px;
+    width: 80px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-brown);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--dark-brown);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+  }
+  
+  /* View more button */
+  .text-center {
+    text-align: center;
+  }
+  
+  .fun-button {
+    background-color: var(--medium-brown);
+    color: var(--dark-brown);
+    border: none;
+    border-radius: 1rem;
+    padding: 0.4rem 1.25rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(77, 52, 46, 0.1);
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .fun-button:hover {
+    background-color: var(--accent-brown);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(77, 52, 46, 0.15);
+  }
+  
+  /* Modal overlay */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(78, 52, 46, 0.3);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+  }
+  
+  /* Modal popup */
+  .modal-content.fun-popup {
+    background: white;
+    border-top: 5px solid var(--accent-brown);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    font-size: 1.2rem;
+    background: var(--dark-brown);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .close-btn:hover {
+    background-color: var(--text-brown);
+  }
+  
+  .popup-title {
+    font-size: 1.25rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--dark-brown);
+  }
+  
+  /* Summary List */
+  .summary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0;
+    list-style: none;
+  }
+  
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--light-brown);
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    transition: background 0.2s ease;
+  }
+  
+  .summary-item:hover {
+    background: var(--medium-brown);
+  }
+  
+  .summary-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .summary-bullet {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  
+  .status-indicator {
+    font-weight: bold;
+    font-size: 1.25rem;
+  }
+  
+  /* Blurred background effect */
+  .blurred {
+    filter: blur(4px);
+    pointer-events: none;
+    user-select: none;
+  }

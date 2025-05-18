@@ -29,7 +29,7 @@ import InvestorDashboard from "./investorpages/InvestorDashboard/InvestorDashboa
 import SupportProgramDashboard from "./supportprogram/SupportProgramDashboard/SupportProgramDashboard"
 
 // Protected Pages
-import Dashboard from "./smespages/SMSEDashboard/Dashboard"
+import { Dashboard } from "./smespages/SMSEDashboard/Dashboard" 
 import Profile from "./smespages/UniversalProfile/UniversalProfile"
 import FindMatches from "./smespages/MyMatches/FindMatches"
 import Investor from "./smespages/MyDocuments/Investor"

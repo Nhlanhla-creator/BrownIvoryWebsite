@@ -1,0 +1,169 @@
+"use client"
+
+import { useState } from "react"
+import { ChevronDown, Star, X } from "lucide-react"
+import "./reviews.css"
+
+export function CustomerReviewsCard({ styles }) {
+  const [showReviewsModal, setShowReviewsModal] = useState(false)
+  const [selectedReview, setSelectedReview] = useState(null)
+  const [showDetailModal, setShowDetailModal] = useState(false)
+
+  const ratings = [
+    {
+      name: "Michael Thompson",
+      rating: 4,
+      date: "Apr 15, 2023",
+      comment:
+        "Great service and support! The team was very responsive to our needs and provided excellent guidance throughout the entire process.",
+      company: "Thompson Enterprises",
+      position: "CEO",
+    },
+    {
+      name: "Priya Patel",
+      rating: 4,
+      date: "Apr 2, 2023",
+      comment:
+        "Very responsive team. They addressed all our concerns promptly and provided valuable insights for our business growth.",
+      company: "Patel Innovations",
+      position: "COO",
+    },
+    {
+      name: "James Wilson",
+      rating: 5,
+      date: "Mar 28, 2023",
+      comment:
+        "Excellent service from start to finish. The team understood our requirements perfectly and delivered beyond our expectations.",
+      company: "Wilson Technologies",
+      position: "Director",
+    },
+  ]
+
+  return (
+    <>
+      <div className={`ratings-card compact rounded-lg ${showReviewsModal ? "blurred" : ""}`}>
+        <div className="card-header">
+          <h3>Customer Reviews & Ratings</h3>
+        </div>
+
+        <div className="ratings-summary flex items-center justify-between">
+          <div className="ratings-count flex flex-col items-center">
+            <span className="text-2xl font-bold">25</span>
+            <span className="text-sm">Reviews</span>
+          </div>
+          <div className="average-rating flex flex-col items-center">
+            <div className="stars flex">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  size={16}
+                  fill={i < 4 ? styles.accentBrown : styles.paleBrown}
+                  color={i < 4 ? styles.accentBrown : styles.paleBrown}
+                />
+              ))}
+            </div>
+            <span className="text-sm">4.0 Average</span>
+          </div>
+        </div>
+
+        <button
+          className="view-summary-btn centered-btn w-full"
+          onClick={() => setShowReviewsModal(true)}
+        >
+          View More
+          <ChevronDown className="ml-1 inline-block" size={16} />
+        </button>
+      </div>
+
+      {/* Full Reviews Modal */}
+      {showReviewsModal && (
+        <div className="reviews-modal-overlay">
+          <div className="reviews-popup">
+            <div className="reviews-popup-header">
+              <h3>Customer Reviews</h3>
+              <button 
+                className="reviews-popup-close"
+                onClick={() => setShowReviewsModal(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="reviews-popup-body">
+              <div className="reviews-list">
+                {ratings.map((review, index) => (
+                  <div key={index} className="review-item">
+                    <div className="review-header">
+                      <div className="reviewer-info">
+                        <h4>{review.name}</h4>
+                        <p className="reviewer-company">
+                          {review.company} • {review.position}
+                        </p>
+                        <p className="review-date">{review.date}</p>
+                      </div>
+                      <div className="review-stars">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            size={16}
+                            fill={i < review.rating ? styles.accentBrown : styles.paleBrown}
+                            color={i < review.rating ? styles.accentBrown : styles.paleBrown}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="review-comment">
+                      {review.comment}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Individual Review Detail Modal (if you still need it) */}
+      {showDetailModal && selectedReview && (
+        <div className="reviews-modal-overlay">
+          <div className="reviews-popup">
+            <div className="reviews-popup-header">
+              <h3>Review Details</h3>
+              <button 
+                className="reviews-popup-close"
+                onClick={() => setShowDetailModal(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="reviews-popup-body">
+              <div className="review-item">
+                <div className="review-header">
+                  <div className="reviewer-info">
+                    <h4>{selectedReview.name}</h4>
+                    <p className="reviewer-company">
+                      {selectedReview.company} • {selectedReview.position}
+                    </p>
+                    <p className="review-date">{selectedReview.date}</p>
+                  </div>
+                  <div className="review-stars">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={16}
+                        fill={i < selectedReview.rating ? styles.accentBrown : styles.paleBrown}
+                        color={i < selectedReview.rating ? styles.accentBrown : styles.paleBrown}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="review-comment">
+                  {selectedReview.comment}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
