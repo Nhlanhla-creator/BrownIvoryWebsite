@@ -327,7 +327,7 @@ export default function UniversalProfile() {
 
   // If profile is submitted and we're showing the summary
   if (showSummary) {
-    return <InvestorProfileSummary data={profileData.formData || formData} onEdit={handleEditProfile} />
+    return <InvestorProfileSummary data={formData || profileData.formData } onEdit={handleEditProfile} />
   }
 
   return (
