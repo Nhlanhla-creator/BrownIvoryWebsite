@@ -138,7 +138,7 @@ const requiredDocumentsOptions = [
   { value: "financial_statements", label: "Financial Statements" },
   { value: "scope", label: "Scope of Work" },
   { value: "letters", label: "Support Letters / Endorsements" },
-  { value: "compliance", label: "Compliance Certificate" }
+  { value: "compliance", label: "Compliance Certificate" },
 
   { value: "other", label: "Other" },
 
