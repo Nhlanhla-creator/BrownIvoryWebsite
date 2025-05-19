@@ -117,15 +117,37 @@ const decisionMakingOptions = [
 // Required Documents options
 const requiredDocumentsOptions = [
   { value: "pitch_deck", label: "Pitch Deck" },
-  { value: "cap_table", label: "Cap Table" },
-  { value: "env_impact", label: "Environmental Impact Plan" },
-  { value: "financials", label: "3-year Financials" },
+  { value: "cap_table", label: "Company Registration Certificate " },
+  { value: "env_impact", label: "Certified IDs of Directors & Shareholders" },
+  { value: "financials", label: "Share Register" },
   { value: "business_plan", label: "Business Plan" },
-  { value: "market_analysis", label: "Market Analysis" },
-  { value: "team_bios", label: "Team Bios" },
-  { value: "compliance_cert", label: "Compliance Certificate" },
+  { value: "market_analysis", label: "Proof of Address (Utility Bill, Lease Agreement)" },
+  { value: "team_bios", label: "Tax Clearance Certificate" },
+  { value: "compliance_cert", label: "B-BBEE Certificate" },
+  { value: "company-profile", label: "Company Profile / Brochure" },
+  { value: "certificates", label: "VAT/UIF/PAYE/COIDA Certificates" },
+  { value:"industry", label: "Industry Accreditations" },
+  { value: "statements", label: "5 Year Budget (Income Statement, Cashflows, Balance Sheet)" },
+  { value: "reports", label: "Previous Program Reports" },
+  { value: "bank-details", label: "Bank Details Confirmation Letter" },
+  { value: "loan", label: "Loan Agreements " },
   { value: "financial_statements", label: "Financial Statements" },
+  { value: "scope", label: "Scope of Work" },
+  { value: "letters", label: "Support Letters / Endorsements" },
+
   { value: "other", label: "Other" },
+
+ 
+  
+
+ 
+ 
+
+
+
+
+
+
 ]
 
 // Investment Instruments options

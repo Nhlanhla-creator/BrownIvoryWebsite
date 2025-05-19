@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { Eye, ExternalLink, Search, Check, FileText } from "lucide-react"
 import styles from "./funding.module.css"
@@ -54,23 +52,15 @@ export function FundingTable({ filters }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("[DEBUG] Starting data fetch...")
         const auth = getAuth()
         const user = auth.currentUser
 
-        if (!user) {
-          console.error("[DEBUG] No authenticated user")
-          throw new Error("User not authenticated")
-        }
+        if (!user) throw new Error("User not authenticated")
 
-        // Fetch business profile
         const businessRef = doc(db, "universalProfiles", user.uid)
         const businessSnap = await getDoc(businessRef)
 
-        if (!businessSnap.exists()) {
-          console.error("[DEBUG] Business profile doesn't exist")
-          throw new Error("Business profile not found")
-        }
+        if (!businessSnap.exists()) throw new Error("Business profile not found")
 
         const businessData = {
           ...(businessSnap.data().entityOverview || {}),
@@ -78,22 +68,18 @@ export function FundingTable({ filters }) {
           useOfFunds: businessSnap.data().useOfFunds || {},
           smeId: user.uid
         }
-        console.log("[DEBUG] Business data loaded:", businessData)
 
-        // Fetch investors and funds
+        setCurrentBusiness(businessData)
+
         const investorsSnapshot = await getDocs(collection(db, "MyuniversalProfiles"))
-        console.log(`[DEBUG] Found ${investorsSnapshot.size} investors`)
-
         const matchedFunds = []
 
         investorsSnapshot.forEach(investorDoc => {
           const investorData = investorDoc.data()
           const funds = investorData.productsServices?.funds || []
-          console.log(`[DEBUG] Investor ${investorDoc.id} has ${funds.length} funds`)
 
           funds.forEach(fund => {
             const matchScore = calculateMatchScore(businessData, fund)
-            console.log(`[DEBUG] Fund ${fund.name} match score: ${matchScore}`)
 
             if (matchScore >= 60) {
               matchedFunds.push({
@@ -115,14 +101,12 @@ export function FundingTable({ filters }) {
           })
         })
 
-        console.log(`[DEBUG] Found ${matchedFunds.length} matching funds`)
         setFunders(matchedFunds.sort((a, b) =>
           b.matchPercentage - a.matchPercentage ||
           a.minInvestment - b.minInvestment
         ))
 
       } catch (error) {
-        console.error("[ERROR] Failed to fetch data:", error)
         setNotification({
           type: "error",
           message: "Failed to load funder data. Please try again later."
@@ -142,7 +126,6 @@ export function FundingTable({ filters }) {
     const businessLocation = (business.location || "").toLowerCase().trim()
     const requestedAmount = parseFloat(business.useOfFunds?.amountRequested || 0)
 
-    // Sector Match (30%)
     if (fund.sectorFocus?.some(s => s.toLowerCase() === businessSector)) {
       score += 30
     } else if (ADJACENT_INDUSTRIES[businessSector]?.some(ai =>
@@ -150,7 +133,6 @@ export function FundingTable({ filters }) {
       score += 20
     }
 
-    // Stage Match (30%)
     const stageIndex = FUNDING_STAGES.indexOf(business.operationStage)
     const fundStageIndex = FUNDING_STAGES.indexOf(fund.stages?.[0])
     if (stageIndex === fundStageIndex) {
@@ -159,7 +141,6 @@ export function FundingTable({ filters }) {
       score += 15
     }
 
-    // Financial Match (25%)
     const min = parseFloat(fund.ticketMin || 0)
     const max = parseFloat(fund.ticketMax || Infinity)
     if (requestedAmount >= min && requestedAmount <= max) {
@@ -170,7 +151,6 @@ export function FundingTable({ filters }) {
       score += Math.max(0, 25 - penalty)
     }
 
-    // Location Match (15%)
     if (fund.geographicFocus?.some(l => l.toLowerCase() === businessLocation)) {
       score += 15
     }
@@ -185,7 +165,6 @@ export function FundingTable({ filters }) {
 
   const submitApplication = async (funderId) => {
     try {
-      console.log("[DEBUG] Starting application submission...")
       const auth = getAuth()
       const user = auth.currentUser
 
@@ -215,7 +194,6 @@ export function FundingTable({ filters }) {
         createdAt: new Date().toISOString()
       }
 
-      console.log("[DEBUG] Submitting application:", applicationData)
       await addDoc(collection(db, "investorApplications"), applicationData)
 
       setStatuses(prev => ({ ...prev, [funderId]: "Application Sent" }))
@@ -227,7 +205,6 @@ export function FundingTable({ filters }) {
       })
 
     } catch (error) {
-      console.error("[ERROR] Submission failed:", error)
       setNotification({
         type: "error",
         message: `Failed to submit application: ${error.message}`
@@ -324,7 +301,6 @@ export function FundingTable({ filters }) {
         </table>
       )}
 
-      {/* View Profile Modal */}
       {modalFunder && (
         <div className={styles.modalOverlay} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -346,7 +322,6 @@ export function FundingTable({ filters }) {
         </div>
       )}
 
-      {/* Application Modal */}
       {applyingFunder && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
@@ -355,7 +330,17 @@ export function FundingTable({ filters }) {
               <button onClick={() => setApplyingFunder(null)}>✖</button>
             </div>
             <div className={styles.documentsList}>
-              <p>Select documents to include in your application:</p>
+              {/* Required Documents Section */}
+              <div className={styles.requiredDocuments}>
+                <p><strong>Required Documents by Funder:</strong></p>
+                <ul>
+                  <li>Business Plan</li>
+                  <li>Pitch Deck</li>
+                </ul>
+              </div>
+
+              {/* Document Checklist */}
+              <p><strong>Select the relevant ones to include in your application:</strong></p>
               {DOCUMENTS.map(doc => (
                 <label key={doc} className={styles.documentItem}>
                   <input
