@@ -37,7 +37,7 @@ import SupportProgramDashboard from "./supportprogram/SupportProgramDashboard/Su
 import { Dashboard } from "./smespages/SMSEDashboard/Dashboard"
 import Profile from "./smespages/UniversalProfile/UniversalProfile"
 import FindMatches from "./smespages/MyMatches/FindMatches"
-import MyDocuments from "./smespages/MyDocuments/myDocuments";
+import MyDocuments from "./smespages/MyDocuments/myDocuments"
 import GrowthEnabler from "./smespages/MyGrowthTools/GrowthEnabler"
 import Messages from "./smespages/Messages/Messages"
 import Settings from "./smespages/Settings/Settings"

@@ -54,6 +54,7 @@ export function FundingTable({ filters }) {
   const [applyingFunder, setApplyingFunder] = useState(null)
   const [selectedDocs, setSelectedDocs] = useState([])
   const [notification, setNotification] = useState(null)
+  const [submittedDocuments, setSubmittedDocuments] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -125,6 +126,54 @@ export function FundingTable({ filters }) {
     fetchData()
   }, [])
 
+  useEffect(() => {
+    const fetchUserDocuments = async () => {
+      try {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const profileRef = doc(db, "universalProfiles", user.uid);
+        const profileSnap = await getDoc(profileRef);
+        if (!profileSnap.exists()) return;
+
+        const profileData = profileSnap.data();
+        const submitted = new Set();
+
+        const extractDocs = (obj) => {
+          if (Array.isArray(obj)) {
+            obj.forEach((item) => {
+              if (typeof item === "string" && item.startsWith("http")) {
+                DOCUMENTS.forEach((doc) => {
+                  const normalized = doc.toLowerCase().replace(/[^a-z]/g, "");
+                  if (item.toLowerCase().includes(normalized.slice(0, 6))) {
+                    submitted.add(doc);
+                  }
+                });
+              } else if (typeof item === "object" && item !== null) {
+                extractDocs(item);
+              }
+            });
+          } else if (typeof obj === "object" && obj !== null) {
+            Object.values(obj).forEach((value) => extractDocs(value));
+          }
+        };
+
+        extractDocs(profileData);
+        setSubmittedDocuments(Array.from(submitted));
+      } catch (err) {
+        console.error("Failed to load documents:", err);
+      }
+    };
+
+    fetchUserDocuments();
+  }, []);
+
+  const handleUpload = (doc) => {
+    setSubmittedDocuments((prev) => [...prev, doc]);
+  };
+
+
   const handleViewClick = async (funder) => {
     const funderId = funder.funderId;
     const profileId = funderId.split("_")[0];
@@ -135,14 +184,17 @@ export function FundingTable({ filters }) {
 
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setModalFunder({ name: funder.name, data: data.formData }); // pass formData into summary
+        const funderWithProfile = { ...funder, formData: data.formData };
+        setModalFunder({ name: funder.name, data: data.formData });
+        // Save full funder for potential "Apply" modal later
+        funder.fullProfile = data.formData;
       } else {
         console.warn("Profile not found for funder:", funderId);
       }
     } catch (error) {
       console.error("Error loading profile:", error);
     }
-  }
+  };
 
   const calculateMatchScore = (business, fund) => {
     let score = 0
@@ -321,7 +373,7 @@ export function FundingTable({ filters }) {
                   ) : (
                     <button
                       className={styles.applyButton}
-                      onClick={() => setApplyingFunder(funder.id)}
+                      onClick={() => setApplyingFunder(funder)}
                     >
                       Apply
                     </button>
@@ -370,28 +422,31 @@ export function FundingTable({ filters }) {
               <div className={styles.requiredDocuments}>
                 <p><strong>Required Documents by Funder:</strong></p>
                 <ul>
-                  <li>Business Plan</li>
-                  <li>Pitch Deck</li>
+                  {(applyingFunder.fullProfile?.productsServices?.funds?.find(f => f.name === applyingFunder.name)?.requiredDocuments || []).map((doc) => (
+                    <li key={doc}>{doc}</li>
+                  ))}
                 </ul>
               </div>
 
               {/* Document Checklist */}
-              <p><strong>Select the relevant ones to include in your application:</strong></p>
-              {DOCUMENTS.map(doc => (
-                <label key={doc} className={styles.documentItem}>
-                  <input
-                    type="checkbox"
-                    checked={selectedDocs.includes(doc)}
-                    onChange={() => toggleDoc(doc)}
-                  />
-                  <span>{doc}</span>
-                </label>
-              ))}
+              <p><strong>Check your submitted documents:</strong></p>
+              {(applyingFunder.fullProfile?.productsServices?.funds?.find(f => f.name === applyingFunder.name)?.requiredDocuments || []).map((doc) => {
+                const isSubmitted = submittedDocuments.includes(doc);
+                return (
+                  <label key={doc} className={styles.documentItem}>
+                    <input type="checkbox" checked={isSubmitted} readOnly />
+                    <span>{doc}</span>
+                    {!isSubmitted && (
+                      <button onClick={() => handleUpload(doc)}>Upload</button>
+                    )}
+                  </label>
+                );
+              })}
             </div>
             <div className={styles.modalActions}>
               <button
                 onClick={() => submitApplication(applyingFunder)}
-                disabled={selectedDocs.length === 0}
+                disabled={applyingFunder.requiredDocuments?.every(doc => !submittedDocuments.includes(doc))}
                 className={styles.submitButton}
               >
                 Submit Application
