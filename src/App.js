@@ -11,6 +11,11 @@ import SupportProgramSidebar from "./supportprogram/SupportSidebar/SupportSideba
 import DashboardHeader from "./smespages/DashboardHeader/DashboardHeader"
 import InvestorHeader from "./investorpages/Header/InvestorHeader"
 import SupportProgramHeader from "./supportprogram/Header/SupportHeader"
+import Documents from "./investorpages/Documents"
+
+
+
+
 
 // Public Pages
 import LandingPage from "./mainpages/LandingPage"
@@ -307,6 +312,7 @@ function App() {
         <Route path="/settings" element={renderSMERoute(Settings)} />
 
         {/* Protected Investor Dashboard Routes */}
+        <Route path="/investor-documents" element={renderInvestorRoute(Documents)} />
         <Route path="/investor-dashboard" element={renderInvestorRoute(InvestorDashboard)} />
         <Route path="/investor-profile" element={renderInvestorRoute(InvestorUniversalProfile)} />
         <Route path="/investor-opportunities" element={renderInvestorRoute(FindMatches)} />
