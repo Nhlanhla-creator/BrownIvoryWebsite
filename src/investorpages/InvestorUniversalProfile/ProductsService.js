@@ -18,7 +18,6 @@ const fundTypeOptions = [
   { value: "specialized", label: "Specialized Funders" },
 ]
 
-
 const funderTypeOptions = [
   // Equity-based
   { value: "angelInvestors", label: "Angel Investors (Early-stage, high-risk)" },
@@ -52,9 +51,6 @@ const funderTypeOptions = [
   { value: "realEstateFinanciers", label: "Real Estate Financiers (Property-backed loans)" },
   { value: "equipmentLessors", label: "Equipment Lessors (Hardware/tech leasing)" },
   { value: "franchiseFinanciers", label: "Franchise Financiers (Franchise-specific capital)" },
-
-  
-
 ]
 
 // Program Type options
@@ -67,7 +63,6 @@ const programTypeOptions = [
   { value: "businessMentorship", label: "Business Mentorship" },
   { value: "technicalSupport", label: "Technical Support" },
    { value: "development", label: "Development" }
-
 ]
 
 // Target Enterprise Type options
@@ -79,7 +74,6 @@ const targetEnterpriseOptions = [
   { value: "growth", label: "Growth" },
   { value: "scale-up", label: "Scale-up" },
   { value: "mature", label: "Mature" },
-
 ]
 
 // Support Offered options
@@ -92,7 +86,6 @@ const supportOfferedOptions = [
   { value: "development", label: "Market Development" },
   { value: "supply", label: "Supply Access" },
   { value: "training", label: "Training" }
-
 ]
 
 // Follow-On Funding options
@@ -115,7 +108,6 @@ const decisionMakingOptions = [
   { value: "board", label: "Board Approval" },
   { value: "founder", label: "Founder Decision" },
   { value: "multi_stage", label: "Multi-stage Process" },
-
 ]
 
 // Required Documents options
@@ -138,21 +130,7 @@ const requiredDocumentsOptions = [
   { value: "financial_statements", label: "Financial Statements" },
   { value: "scope", label: "Scope of Work" },
   { value: "letters", label: "Support Letters / Endorsements" },
-  { value: "compliance", label: "Compliance Certificate" },
-
   { value: "other", label: "Other" },
-
- 
-  
-
- 
- 
-
-
-
-
-
-
 ]
 
 // Investment Instruments options
@@ -199,7 +177,6 @@ const sectorFocusOptions = [
   { value: "education", label: "Education" },
   { value: "health", label: "Health & Social Services" },
   { value: "arts", label: "Arts & Entertainment" },
-
 ]
 
 // Support Beyond Capital options
@@ -207,13 +184,11 @@ const supportOptions = [
   { value: "technicalAssistance", label: "Technical Assistance" },
   { value: "mentorship", label: "Mentorship" },
   { value: "esgReporting", label: "ESG Reporting Help" },
+  { value: "governance", label: "Governance Support" },
   { value: "networkAccess", label: "Network Access" },
   { value: "marketAccess", label: "Market Access" },
-  { value: "governance", label: "Governance Support" },
   { value: "development", label: "Market Development" },
   { value: "supply", label: "Supply Access" },
-  { value: "business", label: "Business Development" }
-
 ]
 
 // Sector Experts options
@@ -232,7 +207,6 @@ const sectorExpertsOptions = [
   { value: "education", label: "Education" },
   { value: "health", label: "Health & Social Services" },
   { value: "arts", label: "Arts & Entertainment" },
-
 ]
 
 // Preferred Engagement Method options
@@ -242,7 +216,7 @@ const preferredEngagementOptions = [
   { value: "referral", label: "Referral-based introductions" },
 ]
 
-// Add countries array after the other option arrays
+// Countries array
 const countries = [
   { value: "algeria", label: "Algeria" },
   { value: "angola", label: "Angola" },
@@ -303,14 +277,14 @@ const countries = [
 // South African provinces array
 const saProvinces = [
   { value: "gauteng", label: "Gauteng" },
-  { value: "westernCape", label: "Western Cape" },
-  { value: "easternCape", label: "Eastern Cape" },
-  { value: "kwazuluNatal", label: "KwaZulu-Natal" },
-  { value: "freeState", label: "Free State" },
-  { value: "northWest", label: "North West" },
+  { value: "western_cape", label: "Western Cape" },
+  { value: "eastern_cape", label: "Eastern Cape" },
+  { value: "kwazulu_natal", label: "KwaZulu-Natal" },
+  { value: "free_state", label: "Free State" },
+  { value: "north_west", label: "North West" },
   { value: "mpumalanga", label: "Mpumalanga" },
   { value: "limpopo", label: "Limpopo" },
-  { value: "northernCape", label: "Northern Cape" },
+  { value: "northern_cape", label: "Northern Cape" },
 ]
 
 // MultiSelect component for dropdown selections
@@ -394,7 +368,6 @@ function MultiSelect({ options, selected, onChange, label }) {
   )
 }
 
-// Update the fund card layout to be more compact with two columns
 export default function ProductsServices({ data = {}, updateData }) {
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -421,6 +394,7 @@ export default function ProductsServices({ data = {}, updateData }) {
           ticketMin: "",
           ticketMax: "",
           geographicFocus: [],
+          saProvinces: [],
           roi: "",
           exitYear: "",
           support: [],
@@ -613,16 +587,21 @@ export default function ProductsServices({ data = {}, updateData }) {
                 />
               </FormField>
             </div>
-            {fund.geographicFocus && fund.geographicFocus.includes("southAfrica") && (
-              <FormField label="South African Provinces">
-                <MultiSelect
-                  options={saProvinces}
-                  selected={fund.saProvinces || []}
-                  onChange={(value) => updateFund(fundIndex, "saProvinces", value)}
-                  label="Provinces"
-                />
-              </FormField>
+
+            {/* Show South African provinces only if South Africa is selected */}
+            {fund.geographicFocus && fund.geographicFocus.includes("south_africa") && (
+              <div className={styles.gridContainer}>
+                <FormField label="South African Provinces">
+                  <MultiSelect
+                    options={saProvinces}
+                    selected={fund.saProvinces || []}
+                    onChange={(value) => updateFund(fundIndex, "saProvinces", value)}
+                    label="Provinces"
+                  />
+                </FormField>
+              </div>
             )}
+
             <div className={styles.gridContainer}>
               <FormField label="Support Offered Beyond Capital">
                 <MultiSelect
