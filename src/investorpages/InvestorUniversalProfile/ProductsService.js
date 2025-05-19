@@ -66,6 +66,7 @@ const programTypeOptions = [
   { value: "marketAccess", label: "Market Access" },
   { value: "businessMentorship", label: "Business Mentorship" },
   { value: "technicalSupport", label: "Technical Support" },
+   { value: "development", label: "Development" }
 
 ]
 
@@ -88,6 +89,9 @@ const supportOfferedOptions = [
   { value: "technical", label: "Technical Assistance" },
   { value: "network", label: "Network Access" },
   { value: "market", label: "Market Access" },
+  { value: "development", label: "Market Development" },
+  { value: "supply", label: "Supply Access" },
+  { value: "training", label: "Training" }
 
 ]
 
@@ -205,6 +209,9 @@ const supportOptions = [
   { value: "networkAccess", label: "Network Access" },
   { value: "marketAccess", label: "Market Access" },
   { value: "governance", label: "Governance Support" },
+  { value: "development", label: "Market Development" },
+  { value: "supply", label: "Supply Access" },
+
 ]
 
 // Sector Experts options
