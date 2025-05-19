@@ -29,10 +29,10 @@ import InvestorDashboard from "./investorpages/InvestorDashboard/InvestorDashboa
 import SupportProgramDashboard from "./supportprogram/SupportProgramDashboard/SupportProgramDashboard"
 
 // Protected Pages
-import { Dashboard } from "./smespages/SMSEDashboard/Dashboard" 
+import { Dashboard } from "./smespages/SMSEDashboard/Dashboard"
 import Profile from "./smespages/UniversalProfile/UniversalProfile"
 import FindMatches from "./smespages/MyMatches/FindMatches"
-import Investor from "./smespages/MyDocuments/Investor"
+import MyDocuments from "./smespages/MyDocuments/myDocuments";
 import GrowthEnabler from "./smespages/MyGrowthTools/GrowthEnabler"
 import Messages from "./smespages/Messages/Messages"
 import Settings from "./smespages/Settings/Settings"
@@ -173,12 +173,12 @@ function App() {
           <DashboardHeader companyName={companyName} profileImage={profileImage} setProfileImage={setProfileImage} />
           <div className="page-content">{children}</div>
         </div>
-        
+
         {/* Registration Summary Modal - will only show when showSummary is true */}
-        <RegistrationSummary 
-          data={formData} 
-          open={showSummary} 
-          onClose={() => setShowSummary(false)} 
+        <RegistrationSummary
+          data={formData}
+          open={showSummary}
+          onClose={() => setShowSummary(false)}
         />
       </div>
     )
@@ -242,9 +242,9 @@ function App() {
       <SMEProfileTracker activeSection={section} />
       <div className="bg-white rounded-lg shadow-md p-6 mt-6">
         {formData[section] ? (
-          <Component 
-            data={formData[section]} 
-            updateData={(data) => updateFormData(section, data)} 
+          <Component
+            data={formData[section]}
+            updateData={(data) => updateFormData(section, data)}
             onSubmit={section === "declarationConsent" ? handleFormSubmit : undefined}
           />
         ) : (
@@ -301,7 +301,7 @@ function App() {
         <Route path="/dashboard" element={renderSMERoute(Dashboard)} />
         <Route path="/profile" element={renderSMERoute(Profile)} />
         <Route path="/find-matches" element={renderSMERoute(FindMatches)} />
-        <Route path="/investor" element={renderSMERoute(Investor)} />
+        <Route path="/my-documents" element={renderSMERoute(MyDocuments)} />
         <Route path="/growth" element={renderSMERoute(GrowthEnabler)} />
         <Route path="/messages" element={renderSMERoute(Messages)} />
         <Route path="/settings" element={renderSMERoute(Settings)} />
@@ -310,7 +310,7 @@ function App() {
         <Route path="/investor-dashboard" element={renderInvestorRoute(InvestorDashboard)} />
         <Route path="/investor-profile" element={renderInvestorRoute(InvestorUniversalProfile)} />
         <Route path="/investor-opportunities" element={renderInvestorRoute(FindMatches)} />
-        <Route path="/investor-portfolio" element={renderInvestorRoute(Investor)} />
+        <Route path="/investor-portfolio" element={<div>Coming Soon</div>} />
         <Route path="/investor-messages" element={renderInvestorRoute(Messages)} />
         <Route path="/investor-settings" element={renderInvestorRoute(Settings)} />
 
@@ -319,8 +319,6 @@ function App() {
         <Route path="/support-profile" element={renderSupportProgramRoute(SupportUniversalProfile)} />
         <Route path="/support-beneficiaries" element={renderSupportProgramRoute(FindMatches)} />
         <Route path="/support-matches" element={renderSupportProgramRoute(FindMatches)} />
-        <Route path="/support-programs" element={renderSupportProgramRoute(Investor)} />
-        <Route path="/support-documents" element={renderSupportProgramRoute(Investor)} />
         <Route path="/support-analytics" element={renderSupportProgramRoute(GrowthEnabler)} />
         <Route path="/support-messages" element={renderSupportProgramRoute(Messages)} />
         <Route path="/support-settings" element={renderSupportProgramRoute(Settings)} />
@@ -434,7 +432,7 @@ function App() {
         <Route path="/support-universal-profile" element={<Navigate to="/support-profile/instructions" replace />} />
         <Route path="/applications/funding-application" element={<Navigate to="/applications/funding" replace />} />
         <Route path="/applications/product-application" element={<Navigate to="/applications/product" replace />} />
-        
+
       </Routes>
     </Router>
   )

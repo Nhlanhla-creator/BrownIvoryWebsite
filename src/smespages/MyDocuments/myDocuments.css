@@ -1,0 +1,139 @@
+/* My Documents Page Styles */
+.my-documents-page {
+  background-color: #F2F0E6;
+  padding: 24px;
+  min-height: 100vh;
+  margin-left: 250px;
+  margin-top: 80px;
+  box-sizing: border-box;
+}
+
+
+
+.my-documents-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.my-documents-header h1 {
+  color: #754A2D;
+  font-size: 2rem;
+  margin: 0;
+}
+
+.my-documents-header p {
+  color: #372C27;
+  margin-top: 4px;
+}
+
+.upload-button {
+  background-color: #9E6E3C;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.upload-button:hover {
+  background-color: #754A2D;
+}
+
+/* Filter + Search Section */
+.document-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filter-btn {
+  padding: 6px 12px;
+  border: 1px solid #D3D2CE;
+  border-radius: 6px;
+  background-color: white;
+  color: #372C27;
+  cursor: pointer;
+}
+
+.filter-btn.active {
+  background-color: #9E6E3C;
+  color: white;
+}
+
+.search-box {
+  padding: 8px 12px;
+  border: 1px solid #D3D2CE;
+  border-radius: 6px;
+  width: 260px;
+}
+
+/* Table Styles */
+.documents-table-container {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  overflow-x: auto;
+}
+
+.documents-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.documents-table th {
+  background-color: #F2F0E6;
+  color: #754A2D;
+  padding: 12px;
+  text-align: left;
+}
+
+.documents-table td {
+  padding: 14px 12px;
+  border-top: 1px solid #D3D2CE;
+  color: #372C27;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-submitted {
+  background-color: #B8D9BA;
+  color: #226D3C;
+}
+
+.status-pending {
+  background-color: #F5D8B0;
+  color: #9E6E3C;
+}
+
+.document-actions button {
+  background: none;
+  border: none;
+  color: #9E6E3C;
+  cursor: pointer;
+  margin-right: 12px;
+  font-size: 0.85rem;
+}
+
+.document-actions button:hover {
+  text-decoration: underline;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #9E6E3C;
+  font-size: 1rem;
+}

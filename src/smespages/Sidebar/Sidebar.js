@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { BarChart, Home, User, FileText, Search, MessageSquare, Settings, LogOut, ChevronDown, ChevronRight, PenToolIcon as Tool, Shield, Users, Building, HelpCircle ,Book} from "lucide-react";
+import { BarChart, Home, User, FileText, Search, MessageSquare, Settings, LogOut, ChevronDown, ChevronRight, PenToolIcon as Tool, Shield, Users, Building, HelpCircle, Book } from "lucide-react";
 
 import "./Sidebar.css";
 
@@ -75,7 +75,7 @@ const Sidebar = ({ companyName = "Company Name" }) => {
       route: "/applications",
       hasSubmenu: true,
       subItems: [
-     
+
         {
           id: "for-funders",
           label: "Funding & Support",
@@ -130,12 +130,12 @@ const Sidebar = ({ companyName = "Company Name" }) => {
       route: "/Growth",
     },
     {
-      id: "tools",
+      id: "my-documents",
       label: "My Documents",
       icon: <Book size={18} />,
-      route: "/tools",
+      route: "/my-documents",
     },
-    
+
     {
       id: "messages",
       label: "Messages",
@@ -169,7 +169,7 @@ const Sidebar = ({ companyName = "Company Name" }) => {
         },
       ],
     },
-    
+
     {
       id: "settings",
       label: "Settings",

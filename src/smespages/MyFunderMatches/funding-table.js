@@ -4,6 +4,10 @@ import styles from "./funding.module.css"
 import { db } from "../../firebaseConfig"
 import { doc, getDoc, collection, getDocs, addDoc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
+import InvestorProfileSummary from "../../investorpages/InvestorUniversalProfile/investor-profile-summary";
+
+
+
 
 const ADJACENT_INDUSTRIES = {
   ict: ["technology", "software", "digital services"],
@@ -11,6 +15,8 @@ const ADJACENT_INDUSTRIES = {
   manufacturing: ["construction", "engineering", "industrial"],
   healthcare: ["medtech", "biotech", "pharmaceuticals"]
 }
+
+
 
 const FUNDING_STAGES = ["Pre-Seed", "Seed", "Series A", "Series B", "Growth"]
 
@@ -76,12 +82,12 @@ export function FundingTable({ filters }) {
 
         investorsSnapshot.forEach(investorDoc => {
           const investorData = investorDoc.data()
-          const funds = investorData.productsServices?.funds || []
+          const funds = investorData.formData?.productsServices?.funds || []
 
           funds.forEach(fund => {
             const matchScore = calculateMatchScore(businessData, fund)
 
-            if (matchScore >= 60) {
+            if (matchScore >= 30) {
               matchedFunds.push({
                 id: `${investorDoc.id}_${fund.name}`,
                 funderId: investorDoc.id,
@@ -92,8 +98,8 @@ export function FundingTable({ filters }) {
                 ticketSize: formatTicketSize(fund.ticketMin, fund.ticketMax),
                 sectorFocus: (fund.sectorFocus || []).join(", ") || "Various",
                 geographicFocus: (fund.geographicFocus || []).join(", ") || "Various",
-                supportOffered: (fund.support || []).join(", ") || "Not specified",
-                website: fund.website || "#",
+                supportOffered: (fund.supportOffered || []).join(", ") || "Not specified",
+                website: investorData.formData?.contactDetails?.website || "#",
                 minInvestment: Number(fund.ticketMin) || 0,
                 maxInvestment: Number(fund.ticketMax) || 0
               })
@@ -118,6 +124,25 @@ export function FundingTable({ filters }) {
 
     fetchData()
   }, [])
+
+  const handleViewClick = async (funder) => {
+    const funderId = funder.funderId;
+    const profileId = funderId.split("_")[0];
+
+    try {
+      const docRef = doc(db, "MyuniversalProfiles", profileId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setModalFunder({ name: funder.name, data: data.formData }); // pass formData into summary
+      } else {
+        console.warn("Profile not found for funder:", funderId);
+      }
+    } catch (error) {
+      console.error("Error loading profile:", error);
+    }
+  }
 
   const calculateMatchScore = (business, fund) => {
     let score = 0
@@ -227,6 +252,13 @@ export function FundingTable({ filters }) {
     </div>
   }
 
+  const Info = ({ label, value }) => (
+    <div className="info-item p-2 rounded">
+      <p className="text-xs text-gray-500">{label}</p>
+      <p className="text-sm font-medium">{value}</p>
+    </div>
+  )
+
   return (
     <div className={modalFunder || applyingFunder ? styles.blurredContainer : ""}>
       <h2 className={styles.sectionTitle}>Funding Matches</h2>
@@ -278,7 +310,7 @@ export function FundingTable({ filters }) {
                 <td>
                   <button
                     className={styles.viewButton}
-                    onClick={() => setModalFunder(funder)}
+                    onClick={() => handleViewClick(funder)}
                   >
                     <Eye size={16} /> View
                   </button>
@@ -301,22 +333,26 @@ export function FundingTable({ filters }) {
         </table>
       )}
 
-      {modalFunder && (
-        <div className={styles.modalOverlay} onClick={closeModal}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+      {modalFunder && modalFunder.data && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
             <div className={styles.modalHeader}>
-              <h3>{modalFunder.name}</h3>
-              <button onClick={closeModal}>✖</button>
+              <h3>{modalFunder.name} Profile Summary</h3>
+              <button onClick={() => setModalFunder(null)}>✖</button>
             </div>
-            <div className={styles.modalContent}>
-              <p><strong>Match Score:</strong> {modalFunder.matchPercentage}%</p>
-              <p><strong>Investment Type:</strong> {modalFunder.investmentType}</p>
-              <p><strong>Target Stage:</strong> {modalFunder.targetStage}</p>
-              <p><strong>Sector Focus:</strong> {modalFunder.sectorFocus}</p>
-              <p><strong>Ticket Size:</strong> {modalFunder.ticketSize}</p>
-              <p><strong>Geographic Focus:</strong> {modalFunder.geographicFocus}</p>
-              <p><strong>Support Offered:</strong> {modalFunder.supportOffered}</p>
-              <p><strong>Website:</strong> <a href={modalFunder.website} target="_blank" rel="noreferrer">{modalFunder.website}</a></p>
+
+            <div className={styles.modalBody}>
+              <InvestorProfileSummary data={modalFunder.data} onEdit={() => { }} />
+            </div>
+
+            <div className={styles.modalActions}>
+              <p className="text-sm text-gray-500">Last updated: {new Date().toLocaleString()}</p>
+              <button
+                onClick={() => setModalFunder(null)}
+                className={styles.cancelButton}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
