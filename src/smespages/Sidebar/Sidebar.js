@@ -133,7 +133,7 @@ const Sidebar = ({ companyName = "Company Name" }) => {
       id: "my-documents",
       label: "My Documents",
       icon: <Book size={18} />,
-      route: "/my-documents",
+      route: "/tools",
     },
 
     {

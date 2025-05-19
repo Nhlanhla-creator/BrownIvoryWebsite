@@ -369,13 +369,20 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                       />
                     </td>
                     <td className="px-4 py-2 border-b">
-                      <input
-                        type="text"
-                        value={item.nationality}
-                        onChange={(e) => updateItem(index, "nationality", e.target.value)}
-                        className={inputStyle}
-                      />
-                    </td>
+  <select
+    value={item.nationality || ""}
+    onChange={(e) => updateItem(index, "nationality", e.target.value)}
+    className={inputStyle}
+  >
+    <option value="">Select</option>
+    {africanCountries.map(({ value, label }) => (
+      <option key={value} value={value}>
+        {label}
+      </option>
+    ))}
+  </select>
+</td>
+
                     <td className="px-4 py-2 border-b">
                       <select
                         value={item.execType || ""}

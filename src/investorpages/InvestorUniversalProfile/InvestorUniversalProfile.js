@@ -35,46 +35,8 @@ export default function UniversalProfile() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [profileData, setProfileData] = useState(null)
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        setLoading(true)
-        const userId = auth.currentUser?.uid
 
-        if (!userId) {
-          throw new Error("User not logged in")
-        }
-
-        const docRef = doc(db, "universalProfiles", userId)
-        const docSnap = await getDoc(docRef)
-
-        if (docSnap.exists()) {
-          setProfileData(docSnap.data())
-        } else {
-          setError("No profile found. Please complete your Universal Profile first.")
-        }
-      } catch (err) {
-        console.error("Error fetching profile data:", err)
-        setError("Failed to load profile data. Please try again later.")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchProfileData()
-  }, [])
-
-  const [completedSections, setCompletedSections] = useState({
-    instructions: true,
-    entityOverview: false,
-    ownershipManagement: false,
-    contactDetails: false,
-    legalCompliance: false,
-    productsServices: false,
-    howDidYouHear: false,
-    declarationConsent: false,
-  })
-
+  // Initial data structure for formData
   const [formData, setFormData] = useState({
     instructions: {},
     entityOverview: {},
@@ -111,48 +73,95 @@ export default function UniversalProfile() {
     },
   })
 
-  // Load saved data and submission status from localStorage
+  const [completedSections, setCompletedSections] = useState({
+    instructions: true,
+    entityOverview: false,
+    ownershipManagement: false,
+    contactDetails: false,
+    legalCompliance: false,
+    productsServices: false,
+    howDidYouHear: false,
+    declarationConsent: false,
+  })
+
+  // Load profile data from Firebase first, then fall back to localStorage
   useEffect(() => {
     const fetchData = async () => {
       const user = auth.currentUser
       if (!user) return
 
-      // Load from localStorage first
-      const savedData = localStorage.getItem("investorProfileData")
-      const savedCompletedSections = localStorage.getItem("investorProfileCompletedSections")
-      const savedSubmissionStatus = localStorage.getItem("profileSubmitted")
-
-      if (savedData) setFormData(JSON.parse(savedData))
-      if (savedCompletedSections) setCompletedSections(JSON.parse(savedCompletedSections))
-      if (savedSubmissionStatus === "true") {
-        setProfileSubmitted(true)
-        setShowSummary(true)
-      }
-
-      // Then try to fetch from Firebase
       try {
+        setLoading(true)
+        
+        // First try to fetch from Firebase
         const docRef = doc(db, "MyuniversalProfiles", user.uid)
         const docSnap = await getDoc(docRef)
-
+        
+        let firebaseData = null
+        let firebaseCompletedSections = null
+        let firebaseSubmissionStatus = false
+        
         if (docSnap.exists()) {
           const data = docSnap.data()
-          setFormData((prev) => ({
-            ...prev,
-            ...data.formData,
-          }))
-          setCompletedSections((prev) => ({
-            ...prev,
-            ...data.completedSections,
-          }))
-
+          firebaseData = data.formData
+          firebaseCompletedSections = data.completedSections
+          firebaseSubmissionStatus = data.profileSubmitted === true
+          
+          // Set data from Firebase
+          if (firebaseData) setFormData(prev => ({ ...prev, ...firebaseData }))
+          if (firebaseCompletedSections) setCompletedSections(prev => ({ ...prev, ...firebaseCompletedSections }))
+          
           // If profile is marked as submitted in Firebase, show summary
-          if (data.profileSubmitted) {
+          if (firebaseSubmissionStatus) {
             setProfileSubmitted(true)
             setShowSummary(true)
           }
         }
+        
+        // If no Firebase data or incomplete, try loading from localStorage as backup
+        if (!firebaseData || !firebaseSubmissionStatus) {
+          const savedData = localStorage.getItem("investorProfileData")
+          const savedCompletedSections = localStorage.getItem("investorProfileCompletedSections")
+          const savedSubmissionStatus = localStorage.getItem("investorProfileSubmitted")
+          
+          // Only use localStorage data if we don't have Firebase data
+          if (savedData && !firebaseData) setFormData(JSON.parse(savedData))
+          if (savedCompletedSections && !firebaseCompletedSections) setCompletedSections(JSON.parse(savedCompletedSections))
+          
+          // Only use localStorage submission status if Firebase didn't have it marked as submitted
+          if (savedSubmissionStatus === "true" && !firebaseSubmissionStatus) {
+            setProfileSubmitted(true)
+            setShowSummary(true)
+            
+            // If we found submission status in localStorage but not Firebase, sync to Firebase
+            if (!firebaseSubmissionStatus) {
+              try {
+                await setDoc(docRef, {
+                  profileSubmitted: true
+                }, { merge: true })
+              } catch (syncError) {
+                console.error("Error syncing submission status to Firebase:", syncError)
+              }
+            }
+          }
+        }
       } catch (error) {
         console.error("Error fetching profile data:", error)
+        setError("Failed to load profile data. Please try again later.")
+        
+        // Fall back to localStorage if Firebase fails
+        const savedData = localStorage.getItem("investorProfileData")
+        const savedCompletedSections = localStorage.getItem("investorProfileCompletedSections")
+        const savedSubmissionStatus = localStorage.getItem("investorProfileSubmitted")
+        
+        if (savedData) setFormData(JSON.parse(savedData))
+        if (savedCompletedSections) setCompletedSections(JSON.parse(savedCompletedSections))
+        if (savedSubmissionStatus === "true") {
+          setProfileSubmitted(true)
+          setShowSummary(true)
+        }
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -169,7 +178,7 @@ export default function UniversalProfile() {
   }, [completedSections])
 
   useEffect(() => {
-    localStorage.setItem("profileSubmitted", profileSubmitted.toString())
+    localStorage.setItem("investorProfileSubmitted", profileSubmitted.toString())
   }, [profileSubmitted])
 
   const updateFormData = (section, data) => {
@@ -261,7 +270,7 @@ export default function UniversalProfile() {
     return await uploadRecursive(data, section)
   }
 
-  const saveDataToFirebase = async (section = null) => {
+  const saveDataToFirebase = async (section = null, includingSubmissionStatus = false) => {
     try {
       const userId = auth.currentUser?.uid
       if (!userId) throw new Error("User not logged in.")
@@ -273,30 +282,46 @@ export default function UniversalProfile() {
         ? { [section]: await uploadFilesAndReplaceWithURLs(sectionData, section) }
         : await uploadFilesAndReplaceWithURLs(formData, "full")
 
+      const dataToSave = {
+        formData: section ? { ...uploaded } : uploaded,
+        completedSections,
+      }
+      
+      // Only include submission status if specifically requested
+      if (includingSubmissionStatus) {
+        dataToSave.profileSubmitted = profileSubmitted
+      }
+
       await setDoc(
         docRef,
-        {
-          formData: uploaded,
-          completedSections,
-          profileSubmitted,
-        },
+        dataToSave,
         { merge: true },
       )
+      
+      return true
     } catch (err) {
       console.error("Error saving to Firebase:", err)
-      alert("Failed to save to Firebase.")
+      throw err
     }
   }
 
   const handleSaveSection = async () => {
-    await saveDataToFirebase(activeSection)
-    alert("Section saved to Firebase!")
+    try {
+      await saveDataToFirebase(activeSection)
+      alert("Section saved to Firebase!")
+    } catch (err) {
+      alert("Failed to save to Firebase.")
+    }
   }
 
   const handleSaveAndContinue = async () => {
-    markSectionAsCompleted(activeSection)
-    await saveDataToFirebase(activeSection)
-    navigateToNextSection()
+    try {
+      markSectionAsCompleted(activeSection)
+      await saveDataToFirebase(activeSection)
+      navigateToNextSection()
+    } catch (err) {
+      alert("Failed to save. Please try again.")
+    }
   }
 
   const handleSubmitProfile = async () => {
@@ -304,30 +329,41 @@ export default function UniversalProfile() {
       // Mark the current section as completed
       markSectionAsCompleted("declarationConsent")
 
-      // Set profile as submitted and show summary immediately
+      // Set profile as submitted
       setProfileSubmitted(true)
+      
+      // First save everything to Firebase including the submission status
+      await saveDataToFirebase(null, true)
+      
+      // Then show the summary
       setShowSummary(true)
-
+      
       // Scroll to top for better user experience
       window.scrollTo(0, 0)
-
-      // Then try to save to Firebase (but don't block showing the summary)
-      try {
-        await saveDataToFirebase() // Save entire form to Firebase
-        alert("Profile submitted successfully!")
-      } catch (firebaseErr) {
-        console.error("Failed to save to Firebase:", firebaseErr)
-        alert("Profile submitted, but there was an issue saving to the database. Your data is saved locally.")
-      }
+      
+      alert("Profile submitted successfully!")
     } catch (err) {
       console.error("Failed to submit profile:", err)
-      alert("Failed to submit profile.")
+      alert("Failed to submit profile. Please try again.")
+      
+      // Revert the submission status if Firebase save failed
+      setProfileSubmitted(false)
     }
+  }
+
+  // If still loading, show a loading message
+  if (loading) {
+    return <div className="loading">Loading profile data...</div>
+  }
+
+  // If there's an error, show an error message
+  if (error) {
+    return <div className="error">{error}</div>
   }
 
   // If profile is submitted and we're showing the summary
   if (showSummary) {
-    return <InvestorProfileSummary data={formData || profileData.formData } onEdit={handleEditProfile} />
+    return <InvestorProfileSummary data={formData} onEdit={handleEditProfile} />
   }
 
   return (
