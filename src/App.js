@@ -53,7 +53,7 @@ import SMEProductsServices from "./smespages/UniversalProfile/products-services"
 import SMEHowDidYouHear from "./smespages/UniversalProfile/how-did-you-hear"
 import SMEDeclarationConsent from "./smespages/UniversalProfile/declaration-consent"
 import RegistrationSummary from "./smespages/UniversalProfile/registration-summary" // Import the registration summary component
-
+import ProfileSummary from "./smespages/Documents"
 // Investor Universal Profile Components
 import InvestorUniversalProfile from "./investorpages/InvestorUniversalProfile/InvestorUniversalProfile"
 import InvestorProfileTracker from "./investorpages/InvestorUniversalProfile/ProfileTracker"
@@ -310,7 +310,7 @@ function App() {
         <Route path="/growth" element={renderSMERoute(GrowthEnabler)} />
         <Route path="/messages" element={renderSMERoute(Messages)} />
         <Route path="/settings" element={renderSMERoute(Settings)} />
-
+        <Route path="/documents" element={renderSMERoute(ProfileSummary)} />
         {/* Protected Investor Dashboard Routes */}
         <Route path="/investor-documents" element={renderInvestorRoute(Documents)} />
         <Route path="/investor-dashboard" element={renderInvestorRoute(InvestorDashboard)} />
