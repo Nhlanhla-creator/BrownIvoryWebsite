@@ -1,4 +1,4 @@
-/* Application Tracker Styles */
+/* application-tracker.module.css */
 
 /* Color Variables */
 :root {
@@ -13,10 +13,10 @@
   }
   
   /* Tracker Card */
-  .tracker-card {
+  .trackerCard {
     position: relative;
     transition: all 0.3s ease;
-    overflow: visible; /* Allow tooltips to overflow */
+    overflow: visible;
     border-radius: 0.75rem;
     border: 1px solid var(--accent-brown);
     background-color: white;
@@ -38,7 +38,7 @@
     }
   }
   
-  .tracker-card::before {
+  .trackerCard::before {
     content: "";
     position: absolute;
     top: 0;
@@ -50,7 +50,7 @@
   }
   
   /* Tracker Header */
-  .tracker-header {
+  .trackerHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -59,7 +59,7 @@
     border-bottom: 1px solid var(--light-brown);
   }
   
-  .tracker-header h3 {
+  .cardTitle {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--dark-brown);
@@ -67,7 +67,7 @@
     position: relative;
   }
   
-  .tracker-header h3::after {
+  .cardTitle::after {
     content: "";
     position: absolute;
     bottom: -0.25rem;
@@ -78,10 +78,10 @@
   }
   
   /* Tracker Steps Container */
-  .tracker-steps {
+  .trackerSteps {
     position: relative;
     padding: 0.75rem 0;
-    overflow: visible; /* Allow tooltips to overflow */
+    overflow: visible;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -90,13 +90,13 @@
   }
   
   @media (min-width: 768px) {
-    .tracker-steps {
+    .trackerSteps {
       flex-wrap: nowrap;
     }
   }
   
   /* Individual Tracker Step */
-  .tracker-step {
+  .trackerStep {
     position: relative;
     cursor: pointer;
     padding: 0.75rem;
@@ -106,43 +106,43 @@
     min-width: 120px;
     display: flex;
     align-items: center;
-    overflow: visible; /* Allow tooltips to overflow */
+    overflow: visible;
     background-color: var(--background-brown);
   }
   
-  .tracker-step:hover {
+  .trackerStep:hover {
     background-color: var(--medium-brown);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(77, 52, 46, 0.1);
   }
-
-  /* Step Marker (Icons and Dots) */
-  .step-marker {
+  
+  /* Step Marker */
+  .stepMarker {
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 0.75rem;
   }
   
-  .active-dot,
-  .inactive-dot {
+  .activeDot,
+  .inactiveDot {
     height: 1rem;
     width: 1rem;
     border-radius: 50%;
     transition: transform 0.2s ease;
   }
   
-  .tracker-step:hover .active-dot,
-  .tracker-step:hover .inactive-dot {
+  .trackerStep:hover .activeDot,
+  .trackerStep:hover .inactiveDot {
     transform: scale(1.2);
   }
   
-  /* Step Info Section */
-  .step-info {
+  /* Step Info */
+  .stepInfo {
     flex: 1;
   }
   
-  .step-label {
+  .stepLabel {
     display: block;
     line-height: 1.2;
     font-size: 0.75rem;
@@ -150,11 +150,11 @@
     color: #5d4037;
   }
   
-  .step-label-line {
+  .stepLabelLine {
     white-space: nowrap;
   }
   
-  .step-description {
+  .stepDescription {
     display: block;
     color: var(--text-brown);
     opacity: 0.8;
@@ -163,40 +163,40 @@
   }
   
   /* Step Arrow */
-  .step-arrow {
+  .stepArrow {
     flex-shrink: 0;
     margin: 0 0.25rem;
     transition: transform 0.2s ease;
   }
   
-  .tracker-step:hover .step-arrow {
+  .trackerStep:hover .stepArrow {
     transform: translateX(2px);
   }
   
   /* Completed and Active States */
-  .tracker-step.completed {
+  .completed {
     background-color: rgba(166, 124, 82, 0.1);
   }
   
-  .tracker-step.completed .step-label {
+  .completed .stepLabel {
     color: #5d4037;
     font-weight: 600;
   }
   
-  .tracker-step.active {
+  .active {
     background-color: rgba(125, 90, 80, 0.1);
     border-left: 3px solid var(--primary-brown);
   }
   
-  .tracker-step.active .step-label {
+  .active .stepLabel {
     color: #8d6e63;
     font-weight: 600;
   }
   
-  /* Tooltip Styles */
-  .tracker-step .tooltip {
+  /* Tooltip */
+  .tooltip {
     position: absolute;
-    bottom: calc(100% + 15px); /* Position above with extra space */
+    bottom: calc(100% + 15px);
     left: 50%;
     transform: translateX(-50%);
     background-color: #5d4037;
@@ -215,7 +215,7 @@
     z-index: 1000;
   }
   
-  .tracker-step .tooltip::after {
+  .tooltip::after {
     content: "";
     position: absolute;
     top: 100%;
@@ -226,73 +226,52 @@
     border-color: #5d4037 transparent transparent transparent;
   }
   
-  .tracker-step:hover .tooltip {
+  .trackerStep:hover .tooltip {
     opacity: 1;
     visibility: visible;
   }
   
-  /* Progress Bar */
-  .tracker-progress {
-    height: 4px;
-    background-color: var(--pale-brown);
-    border-radius: 2px;
-    margin: 1rem 0;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .progress-fill {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    background-color: var(--primary-brown);
-    border-radius: 2px;
-    transition: width 0.5s ease;
-  }
-  
-  /* Responsive Adjustments */
+  /* Responsive */
   @media (max-width: 768px) {
-    .tracker-step {
+    .trackerStep {
       min-width: 100px;
       padding: 0.5rem;
     }
   
-    .tracker-step .tooltip {
+    .tooltip {
       max-width: 180px;
       font-size: 0.7rem;
       padding: 0.375rem 0.5rem;
     }
   
-    .step-label {
+    .stepLabel {
       font-size: 0.7rem;
     }
   
-    .step-arrow {
+    .stepArrow {
       display: none;
     }
   }
   
-  /* For very small screens */
   @media (max-width: 480px) {
-    .tracker-steps {
+    .trackerSteps {
       flex-direction: column;
       align-items: flex-start;
     }
   
-    .tracker-step {
+    .trackerStep {
       width: 100%;
       margin-bottom: 0.5rem;
     }
   
-    .tracker-step .tooltip {
+    .tooltip {
       bottom: auto;
       left: calc(100% + 15px);
       top: 50%;
       transform: translateY(-50%);
     }
   
-    .tracker-step .tooltip::after {
+    .tooltip::after {
       top: 50%;
       left: -12px;
       transform: translateY(-50%);

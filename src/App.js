@@ -30,7 +30,7 @@ import HowItWorksInvestors from "./mainpages/HowItWorksInvestor"
 // Auth Components
 import AuthForm from "./smespages/LoginRegister"
 import LoginRegister from "./smespages/LoginRegister"
-import InvestorDashboard from "./investorpages/InvestorDashboard/InvestorDashboard"
+import { Dashboard as InvestorDashboard } from "./investorpages/InvestorDashboard/InvestorDashboard"
 import SupportProgramDashboard from "./supportprogram/SupportProgramDashboard/SupportProgramDashboard"
 
 // Protected Pages

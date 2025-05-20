@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { Bell, Mail, ChevronDown, ChevronUp } from 'lucide-react';
+import { Bell, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './DashboardHeader.css';
-import { auth } from "../../firebaseConfig"
+import { auth } from "../../firebaseConfig";
 
 const Header = ({ companyName, profileImage, setProfileImage }) => {
   const navigate = useNavigate();
-  const user = auth.currentUser
-    const userName = user ? user.email : "User"
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const user = auth.currentUser;
+  const userName = user ? user.email : "User";
+
   const [unreadNotifications] = useState(3);
   const [unreadMessages] = useState(2);
+  const [hoverNotifications, setHoverNotifications] = useState(false);
+  const [hoverMessages, setHoverMessages] = useState(false);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -23,128 +25,72 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
     }
   };
 
-  const handleNotificationClick = () => {
-    navigate('/notifications');
-    setIsDropdownOpen(false);
-  };
-
-  const handleMessagesClick = () => {
-    navigate('/messages');
-    setIsDropdownOpen(false);
-  };
-
-  const handleProfileUpdate = () => {
-    navigate('/profile');
-    setIsDropdownOpen(false);
-  };
-
-  const handleSettingsClick = () => {
-    navigate('/settings');
-    setIsDropdownOpen(false);
-  };
-
-  const handleLogout = () => {
-    // In a real app, you would handle logout logic here
-    navigate('/login');
-    setIsDropdownOpen(false);
-  };
-
   return (
     <header className="header">
-    <h1 className="welcome-text">Welcome back, {userName}!</h1>
-      
+      <h1 className="welcome-text">Welcome back, {userName}!</h1>
       <div className="header-right">
         <div className="icon-buttons">
-          <button 
+          <button
             className="icon-button notification-button"
-            onClick={handleNotificationClick}
+            onClick={() => navigate('/notifications')}
+            onMouseEnter={() => setHoverNotifications(true)}
+            onMouseLeave={() => setHoverNotifications(false)}
           >
             <Bell size={20} />
             {unreadNotifications > 0 && (
               <span className="notification-badge">{unreadNotifications}</span>
             )}
+            {hoverNotifications && (
+              <div className="dropdown-preview">
+                <p>You have {unreadNotifications} new notifications.</p>
+                <ul>
+                  <li>Notification placeholder 1</li>
+                  <li>Notification placeholder 2</li>
+                  <li>Notification placeholder 3</li>
+                </ul>
+              </div>
+            )}
           </button>
-          
-          <button 
+
+          <button
             className="icon-button message-button"
-            onClick={handleMessagesClick}
+            onClick={() => navigate('/messages')}
+            onMouseEnter={() => setHoverMessages(true)}
+            onMouseLeave={() => setHoverMessages(false)}
           >
             <Mail size={20} />
             {unreadMessages > 0 && (
               <span className="message-badge">{unreadMessages}</span>
             )}
+            {hoverMessages && (
+              <div className="dropdown-preview">
+                <p>You have {unreadMessages} new messages.</p>
+                <ul>
+                  <li>Message placeholder 1</li>
+                  <li>Message placeholder 2</li>
+                </ul>
+              </div>
+            )}
           </button>
         </div>
 
         <div className="profile-section">
-          <div className="profile-dropdown-container">
-            <label htmlFor="profile-upload" className="profile-image-container">
-              {profileImage ? (
-                <img src={profileImage} alt="Profile" className="profile-image" />
-              ) : (
-                <div className="profile-placeholder">
-                  {companyName?.charAt(0)?.toUpperCase() || '?'}
-                </div>
-              )}
-              <input
-                id="profile-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                style={{ display: 'none' }}
-              />
-            </label>
-
-            <button 
-              className="dropdown-chevron"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              aria-expanded={isDropdownOpen}
-              aria-label="Toggle profile menu"
-            >
-              {isDropdownOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-            </button>
-
-            {isDropdownOpen && (
-              <div className="profile-dropdown">
-                <div className="dropdown-header">
-                  <div className="dropdown-profile-image">
-                    {profileImage ? (
-                      <img src={profileImage} alt="Profile" />
-                    ) : (
-                      <div className="dropdown-placeholder">
-                        {companyName?.charAt(0)?.toUpperCase() || '?'}
-                      </div>
-                    )}
-                  </div>
-                  <div className="dropdown-profile-info">
-                    <h3>{companyName || 'Your Company'}</h3>
-                    <p>contact@company.com</p>
-                  </div>
-                </div>
-                
-                <div className="dropdown-menu">
-                  <button 
-                    className="dropdown-item"
-                    onClick={handleProfileUpdate}
-                  >
-                    Update Profile
-                  </button>
-                  <button 
-                    className="dropdown-item"
-                    onClick={handleSettingsClick}
-                  >
-                    Notification Settings
-                  </button>
-                  <button 
-                    className="dropdown-item"
-                    onClick={handleLogout}
-                  >
-                    Log Out
-                  </button>
-                </div>
+          <label htmlFor="profile-upload" className="profile-image-container">
+            {profileImage ? (
+              <img src={profileImage} alt="Profile" className="profile-image" />
+            ) : (
+              <div className="profile-placeholder">
+                {companyName?.charAt(0)?.toUpperCase() || '?'}
               </div>
             )}
-          </div>
+            <input
+              id="profile-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              style={{ display: 'none' }}
+            />
+          </label>
         </div>
       </div>
     </header>

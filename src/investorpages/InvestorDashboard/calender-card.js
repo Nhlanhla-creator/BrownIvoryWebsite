@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { CalendarIcon, Plus, X, ChevronLeft, ChevronRight, Mail } from "lucide-react"
-import "./calendar-card.css"
+import styles from "./calender-card.module.css"
 
 export function CalendarCard() {
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -16,41 +16,34 @@ export function CalendarCard() {
   ])
   const [upcomingEvents, setUpcomingEvents] = useState([
     { title: "Investor Meetup", date: "May 15, 2023", type: "meeting" },
-    { title: "Pitch Workshop", date: "May 20, 2023", type: "workshop" },
   ])
   const [isOutlookConnected, setIsOutlookConnected] = useState(false)
   const [isIconBouncing, setIsIconBouncing] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
-  const [showEventList, setShowEventList] = useState(true) // For showing events before the form
+  const [showEventList, setShowEventList] = useState(true)
 
   const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate()
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay()
 
-  // Handle client-side rendering for createPortal
   useEffect(() => {
     setIsMounted(true)
     return () => setIsMounted(false)
   }, [])
 
-  // Bounce the calendar icon periodically
   useEffect(() => {
     const bounceInterval = setInterval(() => {
       setIsIconBouncing(true)
       setTimeout(() => setIsIconBouncing(false), 1000)
     }, 5000)
-
     return () => clearInterval(bounceInterval)
   }, [])
 
-  // Add body class when modal is open to prevent background scrolling
   useEffect(() => {
     if (showFullCalendar || showDeadlineModal) {
       document.body.classList.add("modal-open")
     } else {
       document.body.classList.remove("modal-open")
     }
-
-    // Cleanup function
     return () => {
       document.body.classList.remove("modal-open")
     }
@@ -66,7 +59,7 @@ export function CalendarCard() {
       type: "meeting",
     })
     setShowDeadlineModal(true)
-    setShowEventList(false) // Show form directly when clicking on a day
+    setShowEventList(false)
     setShowFullCalendar(false)
   }
 
@@ -74,13 +67,11 @@ export function CalendarCard() {
     if (newDeadline.title.trim() && newDeadline.date) {
       const day = new Date(newDeadline.date).getDate()
       setDeadlines([...deadlines, { date: day, title: newDeadline.title, type: newDeadline.type }])
-
       const formattedDate = new Date(newDeadline.date).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
         year: "numeric",
       })
-
       setUpcomingEvents([
         ...upcomingEvents,
         {
@@ -89,18 +80,16 @@ export function CalendarCard() {
           type: newDeadline.type,
         },
       ])
-
       setShowDeadlineModal(false)
       setNewDeadline({ title: "", date: "", type: "meeting" })
-      setShowEventList(true) // Reset for next time
+      setShowEventList(true)
     }
   }
 
   const handleOutlookConnect = () => {
-    setIsOutlookConnected(!isOutlookConnected) // Toggle connection status
+    setIsOutlookConnected(!isOutlookConnected)
   }
 
-  // Navigation between months
   const goToPreviousMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))
   }
@@ -109,41 +98,39 @@ export function CalendarCard() {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))
   }
 
-  // Full Calendar Modal
   const renderFullCalendarModal = () => {
     if (!showFullCalendar) return null
 
     return (
-      <div className="modal-overlay">
-        <div className="modal-container">
-          <div className="modal-header">
+      <div className={styles.modalOverlay}>
+        <div className={styles.modalContainer}>
+          <div className={styles.modalHeader}>
             <h3>Calendar</h3>
-            <button className="close-btn" onClick={() => setShowFullCalendar(false)}>
+            <button className={styles.closeBtn} onClick={() => setShowFullCalendar(false)}>
               <X size={20} />
             </button>
           </div>
-          <div className="modal-body">
-            <div className="full-calendar">
-              <div className="month-navigation">
-                <button className="month-nav-btn" onClick={goToPreviousMonth}>
+          <div className={styles.modalBody}>
+            <div className={styles.fullCalendar}>
+              <div className={styles.monthNavigation}>
+                <button className={styles.monthNavBtn} onClick={goToPreviousMonth}>
                   <ChevronLeft size={20} />
                 </button>
-                <span className="current-month-full">
+                <span className={styles.currentMonthFull}>
                   {currentDate.toLocaleString("default", { month: "long", year: "numeric" })}
                 </span>
-                <button className="month-nav-btn" onClick={goToNextMonth}>
+                <button className={styles.monthNavBtn} onClick={goToNextMonth}>
                   <ChevronRight size={20} />
                 </button>
               </div>
-
-              <div className="full-calendar-grid">
+              <div className={styles.fullCalendarGrid}>
                 {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day) => (
-                  <div key={day} className="day-header-full">
+                  <div key={day} className={styles.dayHeaderFull}>
                     {day.substring(0, 3)}
                   </div>
                 ))}
                 {Array.from({ length: firstDayOfMonth }).map((_, i) => (
-                  <div key={`empty-${i}`} className="empty-day-full"></div>
+                  <div key={`empty-${i}`} className={styles.emptyDayFull}></div>
                 ))}
                 {Array.from({ length: daysInMonth }).map((_, i) => {
                   const day = i + 1
@@ -152,20 +139,21 @@ export function CalendarCard() {
                     day === new Date().getDate() &&
                     currentDate.getMonth() === new Date().getMonth() &&
                     currentDate.getFullYear() === new Date().getFullYear()
-
                   return (
                     <div
                       key={`day-${day}`}
-                      className={`calendar-day-full ${isDeadline ? "has-event" : ""} ${isToday ? "today" : ""}`}
+                      className={`${styles.calendarDayFull} ${isDeadline ? styles.hasEvent : ""} ${
+                        isToday ? styles.today : ""
+                      }`}
                       onClick={() => handleDayClick(day)}
                     >
-                      <span className="day-number">{day}</span>
+                      <span className={styles.dayNumber}>{day}</span>
                       {isDeadline && (
-                        <div className="day-events">
+                        <div className={styles.dayEvents}>
                           {deadlines
                             .filter((d) => d.date === day)
                             .map((deadline, idx) => (
-                              <div key={idx} className="day-event-indicator">
+                              <div key={idx} className={styles.dayEventIndicator}>
                                 {deadline.title}
                               </div>
                             ))}
@@ -177,9 +165,9 @@ export function CalendarCard() {
               </div>
             </div>
           </div>
-          <div className="modal-footer">
+          <div className={styles.modalFooter}>
             <button
-              className="add-event-btn-full"
+              className={styles.addEventBtnFull}
               onClick={() => {
                 setShowDeadlineModal(true)
                 setShowEventList(true)
@@ -194,53 +182,52 @@ export function CalendarCard() {
     )
   }
 
-  // Add Event Modal - Now with events list first
   const renderAddEventModal = () => {
     if (!showDeadlineModal) return null
 
     return (
-      <div className="modal-overlay">
-        <div className="modal-container event-modal">
-          <div className="modal-header">
+      <div className={styles.modalOverlay}>
+        <div className={`${styles.modalContainer} ${styles.eventModal}`}>
+          <div className={styles.modalHeader}>
             <h3>{showEventList ? "Upcoming Events" : "New Event"}</h3>
             <button
-              className="close-btn"
+              className={styles.closeBtn}
               onClick={() => {
                 setShowDeadlineModal(false)
-                setShowEventList(true) // Reset for next time
+                setShowEventList(true)
               }}
             >
               <X size={20} />
             </button>
           </div>
-          <div className="modal-body">
+          <div className={styles.modalBody}>
             {showEventList ? (
               <>
-                <div className="events-list-modal">
+                <div className={styles.eventsListModal}>
                   <h4>Upcoming Events</h4>
                   {upcomingEvents.length > 0 ? (
                     upcomingEvents.map((event, index) => (
-                      <div key={index} className={`event-item-modal ${event.type}`}>
-                        <div className="event-indicator"></div>
-                        <div className="event-details">
-                          <span className="event-title">{event.title}</span>
-                          <span className="event-date">{event.date}</span>
+                      <div key={index} className={`${styles.eventItemModal} ${styles[event.type]}`}>
+                        <div className={styles.eventIndicator}></div>
+                        <div className={styles.eventDetails}>
+                          <span className={styles.eventTitle}>{event.title}</span>
+                          <span className={styles.eventDate}>{event.date}</span>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="no-events">No upcoming events</p>
+                    <p className={styles.noEvents}>No upcoming events</p>
                   )}
                 </div>
-                <div className="modal-footer events-footer">
-                  <button className="continue-btn" onClick={() => setShowEventList(false)}>
+                <div className={styles.modalFooter}>
+                  <button className={styles.continueBtn} onClick={() => setShowEventList(false)}>
                     Add New Event
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <div className="form-group">
+                <div className={styles.formGroup}>
                   <label>Title</label>
                   <input
                     type="text"
@@ -249,7 +236,7 @@ export function CalendarCard() {
                     placeholder="Enter event title"
                   />
                 </div>
-                <div className="form-group">
+                <div className={styles.formGroup}>
                   <label>Date</label>
                   <input
                     type="date"
@@ -257,7 +244,7 @@ export function CalendarCard() {
                     onChange={(e) => setNewDeadline({ ...newDeadline, date: e.target.value })}
                   />
                 </div>
-                <div className="form-group">
+                <div className={styles.formGroup}>
                   <label>Event Type</label>
                   <select
                     value={newDeadline.type}
@@ -268,16 +255,11 @@ export function CalendarCard() {
                     <option value="workshop">Workshop</option>
                   </select>
                 </div>
-                <div className="modal-footer">
-                  <button
-                    className="cancel-btn"
-                    onClick={() => {
-                      setShowEventList(true) // Go back to events list
-                    }}
-                  >
+                <div className={styles.modalFooter}>
+                  <button className={styles.cancelBtn} onClick={() => setShowEventList(true)}>
                     Back
                   </button>
-                  <button className="save-btn" onClick={addDeadline}>
+                  <button className={styles.saveBtn} onClick={addDeadline}>
                     Add Event
                   </button>
                 </div>
@@ -291,31 +273,31 @@ export function CalendarCard() {
 
   return (
     <>
-      <div className="calendar-card">
-        <div className="card-header">
+      <div className={styles.calendarCard}>
+        <div className={styles.cardHeader}>
           <h3>Calendar & Events</h3>
           <button
-            className={`outlook-btn ${isOutlookConnected ? "connected" : ""}`}
+            className={`${styles.outlookBtn} ${isOutlookConnected ? styles.connected : ""}`}
             onClick={handleOutlookConnect}
             title={isOutlookConnected ? "Connected to Outlook" : "Connect to Outlook"}
           >
             <Mail size={20} />
-            {isOutlookConnected && <span className="connected-indicator"></span>}
+            {isOutlookConnected && <span className={styles.connectedIndicator}></span>}
           </button>
         </div>
 
-        <div className="month-header">
-          <button className="month-nav-btn" onClick={goToPreviousMonth}>
+        <div className={styles.monthHeader}>
+          <button className={styles.monthNavBtn} onClick={goToPreviousMonth}>
             <ChevronLeft size={16} />
           </button>
-          <span className="current-month">
+          <span className={styles.currentMonth}>
             {currentDate.toLocaleString("default", { month: "long", year: "numeric" })}
           </span>
-          <button className="month-nav-btn" onClick={goToNextMonth}>
+          <button className={styles.monthNavBtn} onClick={goToNextMonth}>
             <ChevronRight size={16} />
           </button>
           <button
-            className={`view-calendar-btn ${isIconBouncing ? "bounce" : ""}`}
+            className={`${styles.viewCalendarBtn} ${isIconBouncing ? styles.bounce : ""}`}
             onClick={() => setShowFullCalendar(true)}
             onMouseEnter={() => setIsIconBouncing(true)}
             onMouseLeave={() => setIsIconBouncing(false)}
@@ -324,15 +306,15 @@ export function CalendarCard() {
           </button>
         </div>
 
-        <div className="upcoming-section">
+        <div className={styles.upcomingSection}>
           <h4>Upcoming</h4>
-          <div className="events-list">
+          <div className={styles.eventsList}>
             {upcomingEvents.map((event, index) => (
-              <div key={index} className={`event-item ${event.type}`}>
-                <div className="event-indicator"></div>
-                <div className="event-details">
-                  <span className="event-title">{event.title}</span>
-                  <span className="event-date">{event.date}</span>
+              <div key={index} className={`${styles.eventItem} ${styles[event.type]}`}>
+                <div className={styles.eventIndicator}></div>
+                <div className={styles.eventDetails}>
+                  <span className={styles.eventTitle}>{event.title}</span>
+                  <span className={styles.eventDate}>{event.date}</span>
                 </div>
               </div>
             ))}
@@ -340,17 +322,16 @@ export function CalendarCard() {
         </div>
 
         <button
-          className="add-event-btn"
+          className={styles.addEventBtn}
           onClick={() => {
             setShowDeadlineModal(true)
-            setShowEventList(true) // Show events list first
+            setShowEventList(true)
           }}
         >
           <Plus size={14} /> Add Event
         </button>
       </div>
 
-      {/* Render modals using createPortal to ensure they're at the document root */}
       {isMounted && (
         <>
           {showFullCalendar && createPortal(renderFullCalendarModal(), document.body)}

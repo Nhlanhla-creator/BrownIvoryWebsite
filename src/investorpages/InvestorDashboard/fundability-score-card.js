@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { ChevronDown, X } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
-import styles from "./fundability-score-card.module.css"
+import styles from "./fundability.module.css"
 
 export function FundabilityScoreCard({ profileData }) {
   const [showScoreSummaryModal, setShowScoreSummaryModal] = useState(false)

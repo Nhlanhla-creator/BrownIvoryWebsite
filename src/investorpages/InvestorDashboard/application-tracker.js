@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import { CheckCircle, ChevronRight } from "lucide-react"
-import styles from "./InvestorDashboard.module.css"
+import styles from "./application-tracker.module.css"
 
-const ApplicationTracker = () => {
+export function ApplicationTracker() {
   const [trackerSteps, setTrackerSteps] = useState([
     { label: "Universal Business\nProfile", description: "", completed: true, showDetails: false },
     { label: "Compliance &\nLegitimacy Check", description: "", completed: true, showDetails: false },
@@ -42,15 +42,14 @@ const ApplicationTracker = () => {
           {trackerSteps.map((step, index) => (
             <div
               key={index}
-              className={`${styles.trackerStep} ${step.completed ? styles.completed : ""} ${
-                step.active ? styles.active : ""
+              className={`${styles.trackerStep} ${
+                step.completed ? styles.completed : step.active ? styles.active : ""
               }`}
-              data-tooltip={`${expectedActions[step.label]}`}
               onClick={() => toggleStepDetails(index)}
             >
               <div className={styles.stepMarker}>
                 {step.completed ? (
-                  <CheckCircle size={16} className={styles.checkIcon} />
+                  <CheckCircle size={16} color="var(--primary-brown)" />
                 ) : step.active ? (
                   <div className={styles.activeDot}></div>
                 ) : (
@@ -66,9 +65,14 @@ const ApplicationTracker = () => {
                     </span>
                   ))}
                 </span>
-                {step.description && <span className={styles.stepDescription}>{step.description}</span>}
+                {step.description && (
+                  <span className={styles.stepDescription}>{step.description}</span>
+                )}
               </div>
-              {index < trackerSteps.length - 1 && <ChevronRight size={16} className={styles.stepArrow} />}
+              {index < trackerSteps.length - 1 && (
+                <ChevronRight size={16} className={styles.stepArrow} color="var(--light-brown)" />
+              )}
+              <div className={styles.tooltip}>{expectedActions[step.label]}</div>
             </div>
           ))}
         </div>
@@ -76,5 +80,3 @@ const ApplicationTracker = () => {
     </div>
   )
 }
-
-export default ApplicationTracker
