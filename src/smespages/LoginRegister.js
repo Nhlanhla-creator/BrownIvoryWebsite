@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './LoginRegister.css';
 import { Mail, Lock, CheckCircle, Rocket, Smile, User, Briefcase, HeartHandshake } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +7,6 @@ import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import NDASignupPopup from '../NDAsign';
 
 export default function LoginRegister() {
   const navigate = useNavigate();
@@ -19,14 +18,9 @@ export default function LoginRegister() {
   const [verificationCode, setVerificationCode] = useState('');
   const [errors, setErrors] = useState({});
   const [role, setRole] = useState('');
-  const [company, setCompany] = useState(''); // Added company field
   const [isHovering, setIsHovering] = useState(false);
   const [authError, setAuthError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
-  const [showNDA, setShowNDA] = useState(false);
-  const [ndaComplete, setNdaComplete] = useState(false);
-  const [registrationData, setRegistrationData] = useState(null);
-
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
   const handleRegister = async () => {
@@ -35,7 +29,6 @@ export default function LoginRegister() {
     if (password.length < 6) newErrors.password = 'Make it longer (at least 6 characters)';
     if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords don\'t match!';
     if (!role) newErrors.role = 'What\'s your superpower?';
-    if (!company) newErrors.company = 'Please enter your company name'; // Validate company
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -50,82 +43,18 @@ export default function LoginRegister() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       
-      // Prepare complete data for NDA
-      const ndaData = {
-        email: email,
+      // Create user document in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        email: user.email,
         role: role,
-        company: company,
-        password: password, // Include password for the NDA component
-        uid: user.uid
-      };
-      
-      // Set registration data and show NDA
-      setRegistrationData(ndaData);
-      setShowNDA(true);
-      
+        createdAt: new Date()
+      });
+
+     setIsRegistering(false);
+     setIsVerifying(true);
     } catch (error) {
       console.error('Registration error:', error);
       setAuthError(error.message);
-    }
-  };
- 
-  // Handle NDA completion
-  const handleRegistrationComplete = async (ndaData) => {
-    // Check if the process was cancelled
-    if (ndaData.cancelled) {
-      setShowNDA(false);
-      // Optionally delete the user account if they cancel
-      if (auth.currentUser) {
-        try {
-          await auth.currentUser.delete();
-          setAuthError('Registration cancelled');
-        } catch (error) {
-          console.error('Error deleting user account:', error);
-        }
-      }
-      return;
-    }
-
-    try {
-      // Make sure we have user data
-      if (!auth.currentUser) {
-        setAuthError('User authentication lost. Please try again.');
-        return;
-      }
-
-      // Create user document in Firestore with NDA status and all returned data
-      await setDoc(doc(db, 'users', auth.currentUser.uid), {
-        email: email,
-        role: role,
-        company: company,
-        ndaSigned: true,
-        ndaSignedDate: new Date().toISOString(),
-        createdAt: new Date(),
-        // Include data from NDA signing
-        ndaInfo: {
-          pdfUrl: ndaData.pdfUrl || null,
-          signatureUrl: ndaData.signatureUrl || null,
-          userId: ndaData.userId || auth.currentUser.uid
-        }
-      });
-
-      setNdaComplete(true);
-      setShowNDA(false);
-      
-      // Redirect based on role after NDA completion
-      if (role === 'Investor') {
-        navigate('/investor-dashboard');
-      } else if (role === 'SME/BUSINESS') {
-        navigate('/dashboard');
-      } else if (role === 'Support Program') {
-        navigate('/support-dashboard');
-      } else {
-        navigate('/dashboard');
-      }
-      
-    } catch (error) {
-      console.error('Error saving user data:', error);
-      setAuthError('Failed to complete registration. Please try again.');
     }
   };
 
@@ -135,17 +64,7 @@ export default function LoginRegister() {
       return;
     }
     setErrors({});
-    
-    // Redirect based on role after verification
-    if (role === 'Investor') {
-      navigate('/investor-dashboard');
-    } else if (role === 'SME/BUSINESS') {
-      navigate('/dashboard');
-    } else if (role === 'Support Program') {
-      navigate('/support-dashboard');
-    } else {
-      navigate('/dashboard');
-    }
+    navigate('/dashboard');
   };
 
   const handleLogin = async () => {
@@ -162,44 +81,28 @@ export default function LoginRegister() {
     setAuthError('');
 
     try {
+    
       await signInWithEmailAndPassword(auth, email, password);
       const userDocRef = doc(db, 'users', auth.currentUser.uid);
-      
       const userDocSnap = await getDoc(userDocRef);
       if (userDocSnap.exists()) {
-        const userRole = userDocSnap.data().role || 'No role set';
-        setRole(userRole);
-        
-        // Check if user has completed NDA
-        const hasSignedNDA = userDocSnap.data().ndaSigned === true;
-        
-        if (!hasSignedNDA) {
-          // If NDA not signed, prepare data and show NDA
-          const ndaData = {
-            email: userDocSnap.data().email || email,
-            role: userRole,
-            company: userDocSnap.data().company || '',
-            uid: auth.currentUser.uid
-          };
-          setRegistrationData(ndaData);
-          setShowNDA(true);
-          return;
-        }
-        
-        // If NDA is signed, redirect based on role
-        if (userRole === 'Investor') {
+        setRole(userDocSnap.data().role || 'No role set');
+        if(role === 'Investor') {
           navigate('/investor-dashboard');
-        } else if (userRole === 'SME/BUSINESS') {
-          navigate('/dashboard');
-        } else if (userRole === 'Support Program') {
-          navigate('/support-dashboard');
-        } else {
+        }
+
+        else if(role === 'SME/BUSINESS') {
           navigate('/dashboard');
         }
+         else if(role === 'Support Program') {
+          navigate('/support-dashboard');
+        }
+        
+       
       } else {
-        console.log('User document not found!');
-        setAuthError('User profile not found. Please contact support.');
+        console.log('Not Registered!');
       }
+      
     } catch (error) {
       console.error('Login error:', error);
       setAuthError(error.message);
@@ -295,20 +198,6 @@ export default function LoginRegister() {
                   </div>
                   {errors.confirmPassword && <p className="error-text">{errors.confirmPassword}</p>}
 
-                  {/* Added company input field */}
-                  <div className={`input-group ${errors.company ? 'input-error' : ''}`}>
-                    <div className="input-icon">
-                      <Briefcase size={18} />
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Your company name"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                    />
-                  </div>
-                  {errors.company && <p className="error-text">{errors.company}</p>}
-
                   <div className={`input-group select-group ${errors.role ? 'input-error' : ''}`}>
                     <div className="input-icon">
                       {getRoleIcon(role)}
@@ -319,9 +208,10 @@ export default function LoginRegister() {
                       className={role ? 'has-value' : ''}
                     >
                       <option value="">I am a </option>
-                      <option value="SME/BUSINESS">SME</option>
+                      <option value="SME/BUSINESS">SMSE</option>
                       <option value="Investor">Investor</option>
                       <option value="Support Program">Support Program</option>
+                     
                     </select>
                   </div>
                   {errors.role && <p className="error-text">{errors.role}</p>}
@@ -411,15 +301,6 @@ export default function LoginRegister() {
           </div>
         </div>
       </div>
-
-      {/* NDA Popup Component - Fixed the prop name typo */}
-      {showNDA && registrationData && (
-        <NDASignupPopup
-          registrationData={registrationData}
-          onRegistrationComplete={handleRegistrationComplete}
-        />
-      )}
-      
     </div>
   );
 }
