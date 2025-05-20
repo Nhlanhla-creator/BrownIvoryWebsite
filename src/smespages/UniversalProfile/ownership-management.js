@@ -253,7 +253,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                   </td>
                   <td className="px-4 py-2 border-b">
                     <input
-                      type="text"
+                      type="number"
                       value={shareholder.idRegNo}
                       onChange={(e) => updateShareholder(index, "idRegNo", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
@@ -405,7 +405,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                   </td>
                   <td className="px-4 py-2 border-b">
                     <input
-                      type="text"
+                      type="number"
                       value={director.id}
                       onChange={(e) => updateDirector(index, "id", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"

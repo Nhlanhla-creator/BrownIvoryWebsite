@@ -8,7 +8,6 @@ const raceOptions = [
   { value: "coloured", label: "Coloured" },
   { value: "indian", label: "Indian/Asian" },
   { value: "white", label: "White" },
-
 ]
 
 const genderOptions = [
@@ -83,6 +82,16 @@ const africanCountries = [
 
 const inputStyle = `${styles.input} w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500`
 const buttonStyle = `${styles.button} flex items-center px-3 py-1 bg-brown-100 text-brown-700 rounded-md hover:bg-brown-200`
+
+const columnStyles = {
+  name: "min-w-[200px] w-[25%]", // Wider column for names
+  id: "min-w-[180px] w-[20%]", // Wider column for IDs
+  shareholding: "min-w-[120px] w-[15%]", // Wider column for shareholding percentage
+  narrow: "w-[80px]", // Narrow column for Gender, Exec/Non-Exec
+  medium: "w-[100px]", // Medium width for other columns
+  checkbox: "w-[60px]", // Very narrow for checkboxes
+  actions: "w-[60px]", // Very narrow for action buttons
+}
 
 export default function OwnershipManagement({ data = { shareholders: [], directors: [] }, updateData }) {
   const addShareholder = () => {
@@ -232,22 +241,36 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
           <thead>
             <tr className="bg-brown-50">
               {(isShareholder
-                ? ["Name", "ID/Reg No.", "Country", "% Shareholding", "Race", "Gender", "Youth", "Disabled", "Actions"]
+                ? [
+                    { label: "Name", style: { width: "28%", minWidth: "200px" } },
+                    { label: "ID/Reg No.", style: { width: "22%", minWidth: "180px" } },
+                    { label: "Country", style: { width: "12%" } },
+                    { label: "% Shareholding", style: { width: "10%", minWidth: "90px" } },
+                    { label: "Race", style: { width: "10%" } },
+                    { label: "Gender", style: { width: "80px" } },
+                    { label: "Youth", style: { width: "60px" } },
+                    { label: "Disabled", style: { width: "60px" } },
+                    { label: "Actions", style: { width: "60px" } },
+                  ]
                 : [
-                    "Name",
-                    "ID",
-                    "Position",
-                    "Nationality",
-                    "Exec/Non-Exec",
-                    "Race",
-                    "Gender",
-                    "Is Youth",
-                    "Is Disabled",
-                    "Actions",
+                    { label: "Name", style: { width: "25%", minWidth: "200px" } },
+                    { label: "ID", style: { width: "20%", minWidth: "180px" } },
+                    { label: "Position", style: { width: "18%", minWidth: "150px" } },
+                    { label: "Nationality", style: { width: "12%" } },
+                    { label: "Exec/Non-Exec", style: { width: "80px" } },
+                    { label: "Race", style: { width: "10%" } },
+                    { label: "Gender", style: { width: "80px" } },
+                    { label: "Is Youth", style: { width: "60px" } },
+                    { label: "Is Disabled", style: { width: "60px" } },
+                    { label: "Actions", style: { width: "60px" } },
                   ]
               ).map((header, i) => (
-                <th key={i} className="px-4 py-2 border-b font-semibold uppercase text-sm text-brown-600">
-                  {header}
+                <th
+                  key={i}
+                  className="px-4 py-2 border-b font-semibold uppercase text-sm text-brown-600"
+                  style={header.style}
+                >
+                  {header.label}
                 </th>
               ))}
             </tr>
@@ -257,7 +280,7 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
               <tr key={index} className={`${index % 2 === 0 ? "bg-white" : "bg-brown-50"} hover:bg-brown-100`}>
                 {isShareholder ? (
                   <>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "28%", minWidth: "200px" }}>
                       <input
                         type="text"
                         value={item.name}
@@ -265,7 +288,7 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                         className={inputStyle}
                       />
                     </td>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "22%", minWidth: "180px" }}>
                       <input
                         type="text"
                         value={item.idRegNo}
@@ -273,7 +296,7 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                         className={inputStyle}
                       />
                     </td>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "12%" }}>
                       <select
                         value={item.country}
                         onChange={(e) => updateItem(index, "country", e.target.value)}
@@ -287,7 +310,7 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                         ))}
                       </select>
                     </td>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "10%", minWidth: "90px" }}>
                       <input
                         type="number"
                         value={item.shareholding}
@@ -295,7 +318,7 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                         className={inputStyle}
                       />
                     </td>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "10%" }}>
                       <select
                         value={item.race}
                         onChange={(e) => updateItem(index, "race", e.target.value)}
@@ -309,7 +332,7 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                         ))}
                       </select>
                     </td>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "80px" }}>
                       <select
                         value={item.gender}
                         onChange={(e) => updateItem(index, "gender", e.target.value)}
@@ -323,7 +346,7 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                         ))}
                       </select>
                     </td>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "60px" }}>
                       <div className="flex justify-center items-center">
                         <input
                           type="checkbox"
@@ -332,7 +355,7 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                         />
                       </div>
                     </td>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "60px" }}>
                       <div className="flex justify-center items-center">
                         <input
                           type="checkbox"
@@ -344,7 +367,7 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                   </>
                 ) : (
                   <>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "25%", minWidth: "200px" }}>
                       <input
                         type="text"
                         value={item.name}
@@ -352,15 +375,15 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                         className={inputStyle}
                       />
                     </td>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "20%", minWidth: "180px" }}>
                       <input
-                        type="text"
+                        type="number"
                         value={item.id}
                         onChange={(e) => updateItem(index, "id", e.target.value)}
                         className={inputStyle}
                       />
                     </td>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "18%", minWidth: "150px" }}>
                       <input
                         type="text"
                         value={item.position}
@@ -368,22 +391,22 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                         className={inputStyle}
                       />
                     </td>
-                    <td className="px-4 py-2 border-b">
-  <select
-    value={item.nationality || ""}
-    onChange={(e) => updateItem(index, "nationality", e.target.value)}
-    className={inputStyle}
-  >
-    <option value="">Select</option>
-    {africanCountries.map(({ value, label }) => (
-      <option key={value} value={value}>
-        {label}
-      </option>
-    ))}
-  </select>
-</td>
+                    <td className={`px-4 py-2 border-b`} style={{ width: "12%" }}>
+                      <select
+                        value={item.nationality || ""}
+                        onChange={(e) => updateItem(index, "nationality", e.target.value)}
+                        className={inputStyle}
+                      >
+                        <option value="">Select</option>
+                        {africanCountries.map(({ value, label }) => (
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
 
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "80px" }}>
                       <select
                         value={item.execType || ""}
                         onChange={(e) => updateItem(index, "execType", e.target.value)}
@@ -397,7 +420,7 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                         ))}
                       </select>
                     </td>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "10%" }}>
                       <select
                         value={item.race || ""}
                         onChange={(e) => updateItem(index, "race", e.target.value)}
@@ -411,7 +434,7 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                         ))}
                       </select>
                     </td>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "80px" }}>
                       <select
                         value={item.gender || ""}
                         onChange={(e) => updateItem(index, "gender", e.target.value)}
@@ -425,7 +448,7 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                         ))}
                       </select>
                     </td>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "60px" }}>
                       <div className="flex justify-center items-center">
                         <input
                           type="checkbox"
@@ -434,7 +457,7 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                         />
                       </div>
                     </td>
-                    <td className="px-4 py-2 border-b">
+                    <td className={`px-4 py-2 border-b`} style={{ width: "60px" }}>
                       <div className="flex justify-center items-center">
                         <input
                           type="checkbox"
@@ -445,7 +468,7 @@ function Section({ title, addItem, dataList, updateItem, removeItem, isSharehold
                     </td>
                   </>
                 )}
-                <td className="px-4 py-2 border-b text-center">
+                <td className={`px-4 py-2 border-b text-center ${columnStyles.actions}`}>
                   <button onClick={() => removeItem(index)} className="text-red-500 hover:text-red-700">
                     <Trash2 className="h-4 w-4" />
                   </button>

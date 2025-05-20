@@ -53,7 +53,7 @@ export default function ContactDetails({ data = {}, updateData }) {
 
           <FormField label="ID Number" required>
             <input
-              type="text"
+              type="number"
               name="contactId"
               value={data.contactId || ""}
               onChange={handleChange}
@@ -64,7 +64,7 @@ export default function ContactDetails({ data = {}, updateData }) {
 
           <FormField label="Business Phone" required>
             <input
-              type="tel"
+              type="number"
               name="businessPhone"
               value={data.businessPhone || ""}
               onChange={handleChange}
@@ -75,7 +75,7 @@ export default function ContactDetails({ data = {}, updateData }) {
 
           <FormField label="Mobile" required>
             <input
-              type="tel"
+              type="number"
               name="mobile"
               value={data.mobile || ""}
               onChange={handleChange}

@@ -57,7 +57,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Tax Clearance Number" required>
               <input
-                type="text"
+                type="number"
                 name="taxClearanceNumber"
                 value={data.taxClearanceNumber || ""}
                 onChange={handleChange}
@@ -80,7 +80,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
 
           <FormField label="VAT Number">
             <input
-              type="text"
+              type="number"
               name="vatNumber"
               value={data.vatNumber || ""}
               onChange={handleChange}
@@ -90,7 +90,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
 
           <FormField label="RSC Number (if any)">
             <input
-              type="text"
+              type="number"
               name="rscNumber"
               value={data.rscNumber || ""}
               onChange={handleChange}
@@ -103,7 +103,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
           <div className="grid grid-cols-2 gap-4">
             <FormField label="UIF Number">
               <input
-                type="text"
+                type="number"
                 name="uifNumber"
                 value={data.uifNumber || ""}
                 onChange={handleChange}
@@ -113,7 +113,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
 
             <FormField label="PAYE Number">
               <input
-                type="text"
+                type="number"
                 name="payeNumber"
                 value={data.payeNumber || ""}
                 onChange={handleChange}
@@ -228,7 +228,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
 
           <FormField label="COIDA No. (if applicable)">
             <input
-              type="text"
+              type="number"
               name="coidaNumber"
               value={data.coidaNumber || ""}
               onChange={handleChange}

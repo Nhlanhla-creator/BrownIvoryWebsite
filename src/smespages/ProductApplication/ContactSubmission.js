@@ -30,7 +30,7 @@ const ContactSubmission = ({ data = {}, updateData }) => {
       <div className="grid-container">
         <FormField label="Contact Person Name" required>
           <input
-            type="text"
+            type="number"
             name="contactName"
             value={formData.contactName || ''}
             onChange={handleChange}
@@ -70,7 +70,7 @@ const ContactSubmission = ({ data = {}, updateData }) => {
 
         <FormField label="Phone Number" required>
           <input
-            type="tel"
+            type="number"
             name="phone"
             value={formData.phone || ''}
             onChange={handleChange}

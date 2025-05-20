@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react"
 import FormField from "./FormField"
 import FileUpload from "./FileUpload"
@@ -62,7 +62,7 @@ const programTypeOptions = [
   { value: "marketAccess", label: "Market Access" },
   { value: "businessMentorship", label: "Business Mentorship" },
   { value: "technicalSupport", label: "Technical Support" },
-   { value: "development", label: "Development" }
+  { value: "development", label: "Development" },
 ]
 
 // Target Enterprise Type options
@@ -85,7 +85,7 @@ const supportOfferedOptions = [
   { value: "market", label: "Market Access" },
   { value: "development", label: "Market Development" },
   { value: "supply", label: "Supply Access" },
-  { value: "training", label: "Training" }
+  { value: "training", label: "Training" },
 ]
 
 // Follow-On Funding options
@@ -122,7 +122,7 @@ const requiredDocumentsOptions = [
   { value: "compliance_cert", label: "B-BBEE Certificate" },
   { value: "company-profile", label: "Company Profile / Brochure" },
   { value: "certificates", label: "VAT/UIF/PAYE/COIDA Certificates" },
-  { value:"industry", label: "Industry Accreditations" },
+  { value: "industry", label: "Industry Accreditations" },
   { value: "statements", label: "5 Year Budget (Income Statement, Cashflows, Balance Sheet)" },
   { value: "reports", label: "Previous Program Reports" },
   { value: "bank-details", label: "Bank Details Confirmation Letter" },
@@ -147,7 +147,7 @@ const investmentInstrumentOptions = [
   { value: "innovation_grant", label: "Innovation Grant" },
   { value: "matching_grant", label: "Matching Grant" },
   { value: "milestone_grant", label: "Milestone-Based Grant" },
-  { value: "technical_assistance", label: "Technical Assistance Grant" }
+  { value: "technical_assistance", label: "Technical Assistance Grant" },
 ]
 
 // Enterprise Stage options
@@ -368,7 +368,59 @@ function MultiSelect({ options, selected, onChange, label }) {
   )
 }
 
+// Default empty fund template
+const emptyFund = {
+  name: "",
+  size: "",
+  type: [],
+  funderType: [],
+  instruments: [],
+  stages: [],
+  sectors: [],
+  ticketMin: "",
+  ticketMax: "",
+  geographicFocus: [],
+  saProvinces: [],
+  roi: "",
+  exitYear: "",
+  support: [],
+  // Team and Management
+  investmentCommittee: "",
+  sectorExperts: [],
+  diStatement: "",
+  // Program details
+  programType: "",
+  sectorFocus: [],
+  targetEnterpriseType: [],
+  supportOffered: [],
+  // Investment preferences
+  preferredFounderProfile: "",
+  investmentPhilosophy: "",
+  followOnFunding: "",
+  dealBreakers: "",
+  // Track record
+  portfolioCompanies: "",
+  successStory: "",
+  investmentsToDate: "",
+  // Due diligence
+  requiredDocuments: [],
+  dueDiligenceTimeline: "",
+  decisionMakingProcess: "",
+  // Matching criteria
+  preferredMatchingCriteria: "",
+  preferredEngagementMethod: "",
+}
+
 export default function ProductsServices({ data = {}, updateData }) {
+  // Initialize with at least one fund by default
+  useEffect(() => {
+    if (!data.funds || data.funds.length === 0) {
+      updateData({
+        funds: [{ ...emptyFund }],
+      })
+    }
+  }, [data, updateData])
+
   const handleChange = (e) => {
     const { name, value } = e.target
     updateData({ [name]: value })
@@ -381,50 +433,7 @@ export default function ProductsServices({ data = {}, updateData }) {
   const addFund = () => {
     const funds = data.funds || []
     updateData({
-      funds: [
-        ...funds,
-        {
-          name: "",
-          size: "",
-          type: [],
-          funderType: [],
-          instruments: [],
-          stages: [],
-          sectors: [],
-          ticketMin: "",
-          ticketMax: "",
-          geographicFocus: [],
-          saProvinces: [],
-          roi: "",
-          exitYear: "",
-          support: [],
-          // Team and Management
-          investmentCommittee: "",
-          sectorExperts: [],
-          diStatement: "",
-          // Program details
-          programType: "",
-          sectorFocus: [],
-          targetEnterpriseType: [],
-          supportOffered: [],
-          // Investment preferences
-          preferredFounderProfile: "",
-          investmentPhilosophy: "",
-          followOnFunding: "",
-          dealBreakers: "",
-          // Track record
-          portfolioCompanies: "",
-          successStory: "",
-          investmentsToDate: "",
-          // Due diligence
-          requiredDocuments: [],
-          dueDiligenceTimeline: "",
-          decisionMakingProcess: "",
-          // Matching criteria
-          preferredMatchingCriteria: "",
-          preferredEngagementMethod: "",
-        },
-      ],
+      funds: [...funds, { ...emptyFund }],
     })
   }
 
@@ -471,13 +480,17 @@ export default function ProductsServices({ data = {}, updateData }) {
           </button>
         </div>
 
+        {/* Always display funds, even if empty array */}
         {(data.funds || []).map((fund, fundIndex) => (
           <div key={fundIndex} className={styles.fundCard}>
             <div className={styles.fundHeader}>
               <h5 className={styles.fundTitle}>Fund {fundIndex + 1}</h5>
-              <button type="button" onClick={() => removeFund(fundIndex)} className={styles.deleteButton}>
-                <Trash2 className={styles.icon} />
-              </button>
+              {/* Only show delete button if there's more than one fund */}
+              {(data.funds || []).length > 1 && (
+                <button type="button" onClick={() => removeFund(fundIndex)} className={styles.deleteButton}>
+                  <Trash2 className={styles.icon} />
+                </button>
+              )}
             </div>
 
             <div className={styles.gridContainer}>
@@ -494,7 +507,7 @@ export default function ProductsServices({ data = {}, updateData }) {
 
               <FormField label="Fund Size" required>
                 <input
-                  type="text"
+                  type="number"
                   value={fund.size || ""}
                   onChange={(e) => updateFund(fundIndex, "size", e.target.value)}
                   className={styles.formInput}
@@ -556,7 +569,7 @@ export default function ProductsServices({ data = {}, updateData }) {
 
               <FormField label="Ticket Size Minimum" required>
                 <input
-                  type="text"
+                  type="number"
                   value={fund.ticketMin || ""}
                   onChange={(e) => updateFund(fundIndex, "ticketMin", e.target.value)}
                   className={styles.formInput}
@@ -569,7 +582,7 @@ export default function ProductsServices({ data = {}, updateData }) {
             <div className={styles.gridContainer}>
               <FormField label="Ticket Size Maximum" required>
                 <input
-                  type="text"
+                  type="number"
                   value={fund.ticketMax || ""}
                   onChange={(e) => updateFund(fundIndex, "ticketMax", e.target.value)}
                   className={styles.formInput}
@@ -614,7 +627,7 @@ export default function ProductsServices({ data = {}, updateData }) {
 
               <FormField label="ROI">
                 <input
-                  type="text"
+                  type="number"
                   value={fund.roi || ""}
                   onChange={(e) => updateFund(fundIndex, "roi", e.target.value)}
                   className={styles.formInput}
@@ -626,7 +639,7 @@ export default function ProductsServices({ data = {}, updateData }) {
             <div className={styles.gridContainer}>
               <FormField label="Exit Year">
                 <input
-                  type="text"
+                  type="number"
                   value={fund.exitYear || ""}
                   onChange={(e) => updateFund(fundIndex, "exitYear", e.target.value)}
                   className={styles.formInput}

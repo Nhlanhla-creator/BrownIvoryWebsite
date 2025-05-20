@@ -318,7 +318,7 @@ export default function EntityOverview({ data = {}, updateData }) {
           <FormField label="Entity Size" required>
             <select
               name="entitySize"
-              value={data.entitySize || ""}
+              value={data.entitySize || "number"}
               onChange={handleChange}
               className={styles.formSelect}
               required
