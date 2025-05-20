@@ -3,7 +3,9 @@ import "./myDocuments.css";
 import { getAuth } from "firebase/auth"
 import { doc, getDoc } from "firebase/firestore"
 import { db } from "../../firebaseConfig"
+ import { ChevronDown, ChevronUp, FileText, ExternalLink, Loader } from "lucide-react";
 
+ 
 const MyDocuments = () => {
   const DOCUMENTS = [
     "Pitch Deck",
@@ -28,6 +30,19 @@ const MyDocuments = () => {
     "Support Letters / Endorsements",
     "Scope of Work"
   ];
+
+    const renderDocumentLink = (url, label = "View Document") => {
+    if (!url) return "No document uploaded";
+    
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer" className="document-link">
+        <FileText size={16} />
+        <span>{label}</span>
+        <ExternalLink size={14} />
+      </a>
+    );
+  };
+
 
   const [submittedDocuments, setSubmittedDocuments] = useState([]);
   const [filter, setFilter] = useState("all");

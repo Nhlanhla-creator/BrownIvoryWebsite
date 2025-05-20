@@ -144,7 +144,9 @@ export default function ProfileView() {
                 <td>{director.position || "N/A"}</td>
                 <td>{director.nationality || "N/A"}</td>
                 <td>{director.isExec ? "Yes" : "No"}</td>
-                <td>{renderDocumentLink(director.doc, "Document")}</td>
+                <td>{renderDocumentLink(director.doc, "Document")}
+                  
+                </td>
               </tr>
             ))}
           </tbody>

@@ -1,11 +1,27 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown, ChevronUp, Edit } from 'lucide-react'
+import { ChevronDown, ChevronUp, Edit ,FileText,ExternalLink} from 'lucide-react'
 import "./UniversalProfile.css"
 
 const ProfileSummary = ({ data, onEdit }) => {
+
+     const renderDocumentLink = (url, label = "View Document") => {
+      if (!url) return "No document uploaded";
+      
+      return (
+        <a href={url} target="_blank" rel="noopener noreferrer" className="document-link">
+          <FileText size={16} />
+          <span>{label}</span>
+          <ExternalLink size={14} />
+        </a>
+      );
+    };
+  
+  
   const [expandedSections, setExpandedSections] = useState({
+
+    
     entityOverview: true,
     ownershipManagement: false,
     contactDetails: false,
@@ -131,7 +147,7 @@ const ProfileSummary = ({ data, onEdit }) => {
               <div className="summary-item">
                 <span className="summary-label">Registration Certificate:</span>
                 <span className="summary-value">
-                  {data.entityOverview?.registrationCertificate ? "Uploaded" : "Not provided"}
+                 {renderDocumentLink(data.entityOverview?.registrationCertificate, "Document")}
                 </span>
               </div>
             </div>
