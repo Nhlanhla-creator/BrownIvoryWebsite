@@ -99,7 +99,8 @@ export function LegitimacyScoreCard({ styles, profileData }) {
             className="score-circle"
             style={{
               backgroundColor: styles.backgroundBrown,
-              color: styles.primaryBrown,
+              color: "black",
+              fontWeight: "bold",
               borderColor: styles.accentBrown
             }}
           >

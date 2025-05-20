@@ -598,7 +598,7 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
               <div className="nda-title">
                 <h3>CONFIDENTIALITY AND NON-DISCLOSURE AGREEMENT</h3>
                 <p>Between</p>
-                <p className="company-name">KELE MINING SOLUTIONS PROPRIETARY LIMITED</p>
+                <p className="company-name">Brown Ivory Group</p>
                 <p>(Registration Number: 2013/124544/07)</p>
                 <p>AND</p>
                 <p className="company-name">{userInfo.company || '[Company Name]'}</p>

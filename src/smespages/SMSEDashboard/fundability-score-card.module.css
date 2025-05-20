@@ -74,9 +74,9 @@
     align-items: center;
     font-size: 32px;
     font-weight: 700;
-    border: 4px solid var(--accent-brown);
-    background-color: var(--background-brown);
-    color: var(--dark-brown) !important; /* Force dark text color */
+    border: 4px solid #a67c52;
+    background-color: var(#7d5a50);
+    color: #7d5a50 !important; /* Force dark text color */
     box-shadow: 0 4px 12px rgba(166, 124, 82, 0.15);
     transition: all 0.3s ease;
     position: relative;
@@ -112,8 +112,9 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(246, 224, 208, 0.871) 0%, rgba(246, 224, 208, 0.871) 70%);
+    background: radial-gradient(circle, rgba(246, 224, 208, 0.871) 0%, rgba(246, 224, 208, 0.871) 0%);
     pointer-events: none;
+    
   }
   
   .scoreCircle:hover {

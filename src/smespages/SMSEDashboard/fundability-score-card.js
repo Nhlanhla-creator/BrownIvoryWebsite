@@ -448,6 +448,7 @@ export function FundabilityScoreCard({ profileData }) {
 
         <div className={styles.scoreContainer}>
           <div className={styles.scoreCircle}>
+            
             <span className={styles.scoreValue}>{totalFundabilityScore}%</span>
           </div>
         </div>
