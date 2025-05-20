@@ -72,7 +72,8 @@
   justify-content: center;
   align-items: center;
   font-size: 30px;
-  font-weight: 700;
+  font-weight: 800;
+  color: var(--text-brown);
   border: 4px solid;
   box-shadow: 0 4px 12px rgba(166, 124, 82, 0.15);
   transition: all 0.3s ease;
@@ -87,7 +88,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(245,240,225,0) 70%);
+  background: radial-gradient(circle, rgba(246, 224, 208, 0.871) 0%, rgba(246, 224, 208, 0.871) 70%);
   pointer-events: none;
 }
 

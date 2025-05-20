@@ -112,7 +112,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(245, 240, 225, 0) 70%);
+    background: radial-gradient(circle, rgba(246, 224, 208, 0.871) 0%, rgba(246, 224, 208, 0.871) 70%);
     pointer-events: none;
   }
   
