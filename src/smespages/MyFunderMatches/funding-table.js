@@ -240,16 +240,13 @@ export function FundingTable({ filters }) {
     return `R${Number(min).toLocaleString()} - R${Number(max).toLocaleString()}`
   }
 
-  const submitApplication = async (funderId) => {
+  const submitApplication = async (funder) => {
     try {
-      const auth = getAuth()
-      const user = auth.currentUser
+      const auth = getAuth();
+      const user = auth.currentUser;
 
-      if (!user) throw new Error("User not authenticated")
-      if (!currentBusiness) throw new Error("Business data not loaded")
-
-      const funder = funders.find(f => f.id === funderId)
-      if (!funder) throw new Error("Funder not found")
+      if (!user) throw new Error("User not authenticated");
+      if (!currentBusiness) throw new Error("Business data not loaded");
 
       const applicationData = {
         smeId: user.uid,
@@ -269,25 +266,29 @@ export function FundingTable({ filters }) {
         focusArea: currentBusiness.businessDescription || "Not specified",
         documents: selectedDocs,
         createdAt: new Date().toISOString()
-      }
+      };
 
-      await addDoc(collection(db, "investorApplications"), applicationData)
+      // Write to investorApplications (for investor dashboard)
+      await addDoc(collection(db, "investorApplications"), applicationData);
 
-      setStatuses(prev => ({ ...prev, [funderId]: "Application Sent" }))
-      setApplyingFunder(null)
+      // Write to smeApplications (for SME dashboard)
+      await addDoc(collection(db, "smeApplications"), applicationData);
+
+      setStatuses(prev => ({ ...prev, [funder.id]: "Application Sent" }));
+      setApplyingFunder(null);
 
       setNotification({
         type: "success",
         message: "Application submitted successfully!"
-      })
+      });
 
     } catch (error) {
       setNotification({
         type: "error",
         message: `Failed to submit application: ${error.message}`
-      })
+      });
     }
-  }
+  };
 
   const toggleDoc = (doc) => {
     setSelectedDocs(prev =>
