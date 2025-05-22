@@ -180,7 +180,7 @@ function InvestorSidebar({ companyName }) {
         
         {/* Header */}
         <div className={styles.companyHeader}>
-          <div className={styles.logoCircle}>{companyName.charAt(0)}</div>
+
           {!isCollapsed && (
             <div className={styles.companyInfo}>
               <div className={styles.companyName}>{companyName}</div>

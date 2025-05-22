@@ -497,7 +497,7 @@ export default function EntityOverview({ data = {}, updateData }) {
             value={data.companyLogo || []}
           />
         </div>
-        <ViewUniversalProfile />
+      
       </div>
     </div>
   )

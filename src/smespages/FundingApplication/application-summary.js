@@ -1,10 +1,24 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown, ChevronUp, Edit } from "lucide-react"
+import { ChevronDown, ChevronUp, Edit,ExternalLink ,FileText} from "lucide-react"
 import "./application-summary.css";  
 
 const ApplicationSummary = ({ formData, onEdit }) => {
+
+  
+     const renderDocumentLink = (url, label = "View Document") => {
+      if (!url) return "No document uploaded";
+      
+      return (
+        <a href={url} target="_blank" rel="noopener noreferrer" className="document-link">
+          <FileText size={16} />
+          <span>{label}</span>
+          <ExternalLink size={14} />
+        </a>
+      );
+    };
+  
   const [expandedSections, setExpandedSections] = useState({
     applicationOverview: true,
     useOfFunds: false,
@@ -158,7 +172,7 @@ const ApplicationSummary = ({ formData, onEdit }) => {
             <div className="summary-item">
               <span className="summary-label">Documents:</span>
               <span className="summary-value">
-                <div>Budget Documents: {formatFiles(formData.useOfFunds?.budgetDocuments)}</div>
+                <div>Budget Documents: {renderDocumentLink(formData.useOfFunds?.budgetDocuments, "Document")} </div>
               </span>
             </div>
           </div>
@@ -282,10 +296,10 @@ const ApplicationSummary = ({ formData, onEdit }) => {
               <div className="summary-item">
                 <span className="summary-label">Documents:</span>
                 <span className="summary-value">
-                  <div>Bank Statements: {formatFiles(formData.financialOverview?.bankStatements)}</div>
-                  <div>Bank Confirmation: {formatFiles(formData.financialOverview?.bankConfirmation)}</div>
-                  <div>Loan Agreements: {formatFiles(formData.financialOverview?.loanAgreements)}</div>
-                  <div>Financial Statements: {formatFiles(formData.financialOverview?.financialStatements)}</div>
+                  <div>Bank Statements:  {renderDocumentLink(formData.financialOverview?.bankStatements, "Document")} </div>
+                  <div>Bank Confirmation: {renderDocumentLink(formData.financialOverview?.bankConfirmation, "Document")} </div>
+                  <div>Loan Agreements:  {renderDocumentLink(formData.financialOverview?.loanAgreements, "Document")} </div>
+                  <div>Financial Statements:  {renderDocumentLink(formData.financialOverview?.financialStatements, "Document")} </div>
                 </span>
               </div>
             </div>
@@ -363,7 +377,7 @@ const ApplicationSummary = ({ formData, onEdit }) => {
               </div>
               <div className="summary-item">
                 <span className="summary-label">Support Letters:</span>
-                <span className="summary-value">{formatFiles(formData.growthPotential?.supportLetters)}</span>
+                <span className="summary-value">{renderDocumentLink(formData.growthPotential?.supportLetters, "Document")}</span>
               </div>
             </div>
           </div>
@@ -405,7 +419,7 @@ const ApplicationSummary = ({ formData, onEdit }) => {
               </div>
               <div className="summary-item">
                 <span className="summary-label">Impact Statement:</span>
-                <span className="summary-value">{formatFiles(formData.socialImpact?.impactStatement)}</span>
+                <span className="summary-value">{renderDocumentLink(formData.socialImpact?.impactStatement, "Document")}</span>
               </div>
             </div>
           </div>

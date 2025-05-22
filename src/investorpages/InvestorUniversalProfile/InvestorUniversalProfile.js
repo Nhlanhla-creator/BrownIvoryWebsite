@@ -84,6 +84,18 @@ export default function UniversalProfile() {
     declarationConsent: false,
   })
 
+  // Function to check if declaration consent is complete
+  const checkDeclarationConsent = (data) => {
+    const declarationConsent = data?.formData?.declarationConsent || data?.declarationConsent
+    if (!declarationConsent) return false
+    
+    return (
+      declarationConsent.accuracy === true &&
+      declarationConsent.dataProcessing === true &&
+      declarationConsent.termsConditions === true
+    )
+  }
+
   // Load profile data from Firebase first, then fall back to localStorage
   useEffect(() => {
     const fetchData = async () => {
@@ -105,7 +117,12 @@ export default function UniversalProfile() {
           const data = docSnap.data()
           firebaseData = data.formData
           firebaseCompletedSections = data.completedSections
-          firebaseSubmissionStatus = data.profileSubmitted === true
+          
+          // Check if declaration consent is complete in Firebase
+          const declarationConsentComplete = checkDeclarationConsent(data)
+          
+          // Profile is considered submitted if declaration consent is complete OR profileSubmitted is true
+          firebaseSubmissionStatus = declarationConsentComplete || data.profileSubmitted === true
           
           // Set data from Firebase
           if (firebaseData) setFormData(prev => ({ ...prev, ...firebaseData }))
@@ -216,6 +233,7 @@ export default function UniversalProfile() {
 
   const handleEditProfile = () => {
     setShowSummary(false)
+    setProfileSubmitted(false) // Allow editing by setting to false
     setActiveSection("entityOverview")
     window.scrollTo(0, 0)
   }

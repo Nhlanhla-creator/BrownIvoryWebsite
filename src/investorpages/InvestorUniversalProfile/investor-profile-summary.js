@@ -1,10 +1,23 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown, ChevronUp, Edit, Printer } from "lucide-react"
+import { ChevronDown, ChevronUp, Edit, Printer,ExternalLink,FileText } from "lucide-react"
 import "./investor-profile-summary.css"   
 
 const InvestorProfileSummary = ({ data, onEdit }) => {
+
+  const renderDocumentLink = (url, label = "View Document") => {
+      if (!url) return "No document uploaded";
+      
+      return (
+        <a href={url} target="_blank" rel="noopener noreferrer" className="document-link">
+          <FileText size={16} />
+          <span>{label}</span>
+          <ExternalLink size={14} />
+        </a>
+      );
+    };
+
   const [expandedSections, setExpandedSections] = useState({
     entityOverview: true,
     ownershipManagement: false,
@@ -230,9 +243,9 @@ const InvestorProfileSummary = ({ data, onEdit }) => {
             <div className="summary-item mt-6">
               <span className="summary-label">Documents:</span>
               <span className="summary-value">
-                <div>Certified IDs: {formatFiles(data.ownershipManagement?.certifiedIDs)}</div>
-                <div>Share Register: {formatFiles(data.ownershipManagement?.shareRegister)}</div>
-                <div>Registration Documents: {formatFiles(data.ownershipManagement?.registrationDocs)}</div>
+                <div>Certified IDs:  {renderDocumentLink(data.ownershipManagement?.certifiedIDs, "Document")}</div>
+                <div>Share Register: {renderDocumentLink(data.ownershipManagement?.shareRegister, "Document")} </div>
+                <div>Registration Documents:{renderDocumentLink(data.ownershipManagement?.registrationDocs, "Document")}</div>
               </span>
             </div>
           </div>
@@ -299,18 +312,18 @@ const InvestorProfileSummary = ({ data, onEdit }) => {
             <div className="summary-grid">
               <div className="summary-item">
                 <span className="summary-label">LinkedIn:</span>
-                <span className="summary-value">{data.contactDetails?.linkedin || "Not provided"}</span>
+                <span className="summary-value"> {renderDocumentLink(data.contactDetails?.linkedin, "Link")}</span>
               </div>
               <div className="summary-item">
                 <span className="summary-label">Other Social Media:</span>
-                <span className="summary-value">{data.contactDetails?.otherSocial || "Not provided"}</span>
+                <span className="summary-value">{renderDocumentLink(data.contactDetails?.otherSocial, "Link")}</span>
               </div>
             </div>
 
             <div className="summary-item mt-6">
               <span className="summary-label">Documents:</span>
               <span className="summary-value">
-                <div>Proof of Address: {formatFiles(data.contactDetails?.proofOfAddress)}</div>
+                <div>Proof of Address: {renderDocumentLink(data.contactDetails?.proofOfAddress, "Link")} </div>
               </span>
             </div>
           </div>
@@ -387,10 +400,11 @@ const InvestorProfileSummary = ({ data, onEdit }) => {
             <div className="summary-item mt-6">
               <span className="summary-label">Documents:</span>
               <span className="summary-value">
-                <div>Tax Clearance Certificate: {formatFiles(data.legalCompliance?.taxClearanceCert)}</div>
-                <div>B-BBEE Certificate: {formatFiles(data.legalCompliance?.bbbeeCert)}</div>
-                <div>Other Certificates: {formatFiles(data.legalCompliance?.otherCerts)}</div>
-                <div>Industry Accreditations: {formatFiles(data.legalCompliance?.industryAccreditationDocs)}</div>
+                
+                <div>Tax Clearance Certificate: {renderDocumentLink(data.legalCompliance?.taxClearanceCert, "Document")}</div>
+                <div>B-BBEE Certificate: {renderDocumentLink(data.legalCompliance?.bbbeeCert, "Document")}</div>
+                <div>Other Certificates:  {renderDocumentLink(data.legalCompliance?.otherCerts, "Document")}</div>
+                <div>Industry Accreditations: {renderDocumentLink(data.legalCompliance?.industryAccreditationDocs, "Document")}</div>
               </span>
             </div>
           </div>
@@ -573,8 +587,8 @@ const InvestorProfileSummary = ({ data, onEdit }) => {
             <div className="summary-item mt-6">
               <span className="summary-label">Documents:</span>
               <span className="summary-value">
-                <div>Fund Mandate: {formatFiles(data.productsServices?.fundMandate)}</div>
-                <div>Prospectus: {formatFiles(data.productsServices?.fundProspectus)}</div>
+                <div>Fund Mandate: {renderDocumentLink(data.productsServices?.fundMandate, "Document")}</div>
+                <div>Prospectus:  {renderDocumentLink(data.productsServices?.fundProspectus, "Document")}</div>
               </span>
             </div>
           </div>

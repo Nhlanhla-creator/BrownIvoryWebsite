@@ -10,7 +10,7 @@ import { InvestorSMETable } from "./investor-sme-table"
 import styles from "./investor-funding.module.css"
 
 export default function InvestorDashboardPage() {
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState({ 
     location: "",
     matchScore: 50,
     minValue: "",

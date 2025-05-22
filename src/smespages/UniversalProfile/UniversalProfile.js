@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { CheckCircle, ChevronRight, ChevronLeft, Save } from "lucide-react"
+import { CheckCircle, ChevronRight, ChevronLeft, Save, X, ArrowRight } from "lucide-react"
 import { doc, setDoc, getDoc } from "firebase/firestore"
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { auth, db, storage } from "../../firebaseConfig" // adjust based on your setup
@@ -28,6 +28,30 @@ const sections = [
   { id: "declarationConsent", label: "Declaration &\nConsent" },
 ]
 
+// Onboarding steps for the welcome popup
+const onboardingSteps = [
+  {
+    title: "Welcome to Universal Profile",
+    content: "This profile will help us understand your business better and provide you with tailored services.",
+    icon: "👋",
+  },
+  {
+    title: "Step 1: Read Instructions",
+    content: "Start by reading the instructions carefully to understand what information you'll need to provide.",
+    icon: "📝",
+  },
+  {
+    title: "Step 2: Fill in Your Details",
+    content: "Complete each section with accurate information about your business entity, ownership, and operations.",
+    icon: "📋",
+  },
+  {
+    title: "Step 3: Review & Submit",
+    content: "Review your information in the summary page and submit when you're ready. You can always edit later.",
+    icon: "✅",
+  },
+]
+
 export default function UniversalProfile() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -37,6 +61,11 @@ export default function UniversalProfile() {
   const [showSummary, setShowSummary] = useState(false)
   const [profileData, setProfileData] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
+
+  // New state for popups
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false)
+  const [showCongratulationsPopup, setShowCongratulationsPopup] = useState(false)
+  const [currentOnboardingStep, setCurrentOnboardingStep] = useState(0)
 
   const [completedSections, setCompletedSections] = useState({
     instructions: true,
@@ -96,11 +125,26 @@ export default function UniversalProfile() {
     },
   })
 
+  // Helper function to get user-specific localStorage key
+  const getUserSpecificKey = (baseKey) => {
+    const userId = auth.currentUser?.uid
+    return userId ? `${baseKey}_${userId}` : baseKey
+  }
+
   // Load saved data from localStorage
   useEffect(() => {
-    const savedData = localStorage.getItem("universalProfileData")
-    const savedCompletedSections = localStorage.getItem("universalProfileCompletedSections")
-    const savedSubmissionStatus = localStorage.getItem("profileSubmitted")
+    const userId = auth.currentUser?.uid
+    if (!userId) {
+      setLoading(false)
+      return
+    }
+
+    const savedData = localStorage.getItem(getUserSpecificKey("universalProfileData"))
+    const savedCompletedSections = localStorage.getItem(getUserSpecificKey("universalProfileCompletedSections"))
+    const savedSubmissionStatus = localStorage.getItem(getUserSpecificKey("profileSubmitted"))
+    const hasSeenWelcomePopup = localStorage.getItem(getUserSpecificKey("hasSeenWelcomePopup")) === "true"
+    const hasSeenCongratulationsPopup =
+      localStorage.getItem(getUserSpecificKey("hasSeenCongratulationsPopup")) === "true"
 
     if (savedData) setFormData(JSON.parse(savedData))
     if (savedCompletedSections) setCompletedSections(JSON.parse(savedCompletedSections))
@@ -108,13 +152,24 @@ export default function UniversalProfile() {
       setProfileSubmitted(true)
       setShowSummary(true)
     }
+
+    // Show welcome popup only for first-time users
+    if (!hasSeenWelcomePopup) {
+      setShowWelcomePopup(true)
+      localStorage.setItem(getUserSpecificKey("hasSeenWelcomePopup"), "true")
+    }
+
+    setLoading(false)
   }, [])
 
   // Save to localStorage
   useEffect(() => {
-    localStorage.setItem("universalProfileData", JSON.stringify(formData))
-    localStorage.setItem("universalProfileCompletedSections", JSON.stringify(completedSections))
-    localStorage.setItem("profileSubmitted", profileSubmitted.toString())
+    const userId = auth.currentUser?.uid
+    if (!userId) return
+
+    localStorage.setItem(getUserSpecificKey("universalProfileData"), JSON.stringify(formData))
+    localStorage.setItem(getUserSpecificKey("universalProfileCompletedSections"), JSON.stringify(completedSections))
+    localStorage.setItem(getUserSpecificKey("profileSubmitted"), profileSubmitted.toString())
   }, [formData, completedSections, profileSubmitted])
 
   const updateFormData = (section, data) => {
@@ -196,8 +251,9 @@ export default function UniversalProfile() {
     } catch (err) {
       console.error("Error saving to Firebase:", err)
       alert("Failed to save to Firebase.")
+    } finally {
+      setLoading(false)
     }
-    finally {setLoading(false)}
   }
 
   const handleSaveSection = async () => {
@@ -212,11 +268,20 @@ export default function UniversalProfile() {
   }
 
   const handleSubmitProfile = async () => {
-
     await saveDataToFirebase()
     markSectionAsCompleted("declarationConsent") // save full form
     setProfileSubmitted(true)
-    setShowSummary(true) // Show the summary after submission
+
+    // Show congratulations popup only if user hasn't seen it before
+    const hasSeenCongratulationsPopup =
+      localStorage.getItem(getUserSpecificKey("hasSeenCongratulationsPopup")) === "true"
+    if (!hasSeenCongratulationsPopup) {
+      setShowCongratulationsPopup(true)
+      localStorage.setItem(getUserSpecificKey("hasSeenCongratulationsPopup"), "true")
+    } else {
+      setShowSummary(true) // Show the summary immediately if they've seen the popup before
+    }
+
     setIsEditing(false) // Reset editing state
     window.scrollTo(0, 0)
     console.log("Submitted:", formData)
@@ -231,6 +296,27 @@ export default function UniversalProfile() {
 
     // Redirect to dashboard
     navigate("/dashboard")
+  }
+
+  const handleNextOnboardingStep = () => {
+    if (currentOnboardingStep < onboardingSteps.length - 1) {
+      setCurrentOnboardingStep(currentOnboardingStep + 1)
+    } else {
+      setShowWelcomePopup(false)
+    }
+  }
+
+  const handleCloseWelcomePopup = () => {
+    setShowWelcomePopup(false)
+  }
+
+  const handleCloseCongratulationsPopup = () => {
+    setShowCongratulationsPopup(false)
+    setShowSummary(true) // Show the summary after closing the congratulations popup
+  }
+
+  const handleNavigateToFunding = () => {
+    navigate("/applications/funding")
   }
 
   const renderActiveSection = () => {
@@ -277,9 +363,9 @@ export default function UniversalProfile() {
 
         if (docSnap.exists()) {
           setProfileData(docSnap.data())
-          
+
           // Check if profile is complete and show summary only on first load (not editing)
-          const isProfileComplete = 
+          const isProfileComplete =
             docSnap.data()?.declarationCommitment?.commitReporting &&
             docSnap.data()?.declarationCommitment?.confirmIntent &&
             docSnap.data()?.declarationCommitment?.consentShare
@@ -302,15 +388,14 @@ export default function UniversalProfile() {
     fetchProfileData()
   }, [isEditing])
 
-if (loading) {
-  return (
-    <div className="loading">
-      <div className="spinner"></div>
-      <div className="loading-message">Fetching your Universal Profile...</div>
-    </div>
-  )
-}
-
+  if (loading) {
+    return (
+      <div className="loading">
+        <div className="spinner"></div>
+        <div className="loading-message">Fetching your Universal Profile...</div>
+      </div>
+    )
+  }
 
   // If profile is submitted and we're showing the summary (and not editing)
   if (showSummary && !isEditing) {
@@ -319,6 +404,66 @@ if (loading) {
 
   return (
     <div className="universal-profile-container">
+      {/* Welcome Popup for first-time users */}
+      {showWelcomePopup && (
+        <div className="popup-overlay">
+          <div className="welcome-popup">
+            <button className="close-popup" onClick={handleCloseWelcomePopup}>
+              <X size={24} />
+            </button>
+            <div className="popup-content">
+              <div className="popup-icon">{onboardingSteps[currentOnboardingStep].icon}</div>
+              <h2>{onboardingSteps[currentOnboardingStep].title}</h2>
+              <p>{onboardingSteps[currentOnboardingStep].content}</p>
+
+              <div className="popup-progress">
+                {onboardingSteps.map((_, index) => (
+                  <div key={index} className={`progress-dot ${index === currentOnboardingStep ? "active" : ""}`} />
+                ))}
+              </div>
+
+              <div className="popup-buttons">
+                <button className="btn btn-secondary" onClick={handleCloseWelcomePopup}>
+                  Skip
+                </button>
+                <button className="btn btn-primary" onClick={handleNextOnboardingStep}>
+                  {currentOnboardingStep < onboardingSteps.length - 1 ? "Next" : "Get Started"}
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Congratulations Popup */}
+      {showCongratulationsPopup && (
+        <div className="popup-overlay">
+          <div className="congratulations-popup">
+            <button className="close-popup" onClick={handleCloseCongratulationsPopup}>
+              <X size={24} />
+            </button>
+            <div className="popup-content">
+              <div className="confetti-animation">🎉</div>
+              <h2>Congratulations!</h2>
+              <p>You've successfully completed your Universal Profile!</p>
+              <p>
+                You can now view your profile summary and make any necessary edits, or proceed to the Funding
+                Application to apply for business funding.
+              </p>
+              <div className="popup-buttons-group">
+                <button className="btn btn-secondary" onClick={handleCloseCongratulationsPopup}>
+                  View Summary
+                </button>
+                <button className="btn btn-primary" onClick={handleNavigateToFunding}>
+                  Go to Funding Application
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <h1>My Universal Profile</h1>
 
       <div className="profile-tracker">

@@ -81,11 +81,7 @@ export const renderDeclarationCommitment = (data, updateFormData) => {
         </div>
       </div>
 
-      <div className="section-divider">
-        <h3>Required Documents</h3>
-
-      
-      </div>
+    
     </>
   );
 };
