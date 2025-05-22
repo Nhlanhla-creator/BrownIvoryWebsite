@@ -311,6 +311,13 @@ export default function FundingApplication() {
   const handleNavigateToProductApplication = () => {
     navigate("/applications/product-application")
   }
+    const handleNavigateToDashboard = () => {
+    navigate("/dashboard")
+  }
+
+  const handleViewMatches = () => {
+    navigate("/funding-matches")
+  }
 
   const handleSubmitApplication = async () => {
     try {
@@ -505,15 +512,20 @@ export default function FundingApplication() {
               <h2>Congratulations!</h2>
               <p>You've successfully completed your Funding Application!</p>
               <p>
-                You can now view your application summary or proceed to the Products and Services application form to
-                complete your business profile.
+                You can now view your application summary or proceed to the Dashboard or view Your matches 
               </p>
               <div className="popup-buttons-group">
                 <button className="btn btn-secondary" onClick={handleCloseCongratulationsPopup}>
                   View Summary
                 </button>
-                <button className="btn btn-primary" onClick={handleNavigateToProductApplication}>
+                {/* <button className="btn btn-primary" onClick={handleNavigateToProductApplication}>
                   Go to Product Application
+                </button> */}
+                 <button className="btn btn-primary" onClick={handleViewMatches}>
+                  View Matches
+                </button>
+                <button className="btn btn-secondary" onClick={handleNavigateToDashboard}>
+                  Go to Dashboard
                 </button>
               </div>
             </div>

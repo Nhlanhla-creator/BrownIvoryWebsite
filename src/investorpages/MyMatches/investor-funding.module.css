@@ -2443,7 +2443,7 @@
   }
 }
 /* Popup Overlay */
-.popupOverlay {
+.popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -2467,7 +2467,7 @@
 }
 
 /* Base Popup Styles */
-.welcomePopup {
+.welcome-popup {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -2489,7 +2489,7 @@
   }
 }
 
-.closePopup {
+.close-popup {
   position: absolute;
   top: 15px;
   right: 15px;
@@ -2501,21 +2501,21 @@
   transition: color 0.2s;
 }
 
-.closePopup:hover {
+.close-popup:hover {
   color: #333;
 }
 
-.popupContent {
+.popup-content {
   padding: 40px 30px;
   text-align: center;
 }
 
-/* Dashboard Popup Specific */
-.dashboardPopup .popupContent {
+/* Investor Popup Specific */
+.investor-popup .popup-content {
   background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
 }
 
-.popupIcon {
+.popup-icon {
   font-size: 48px;
   margin-bottom: 20px;
   animation: bounce 1s ease infinite alternate;
@@ -2530,14 +2530,14 @@
   }
 }
 
-.popupProgress {
+.popup-progress {
   display: flex;
   justify-content: center;
   margin: 30px 0;
   gap: 8px;
 }
 
-.progressDot {
+.progress-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -2545,24 +2545,24 @@
   transition: background-color 0.3s, transform 0.3s;
 }
 
-.progressDot.active {
+.progress-dot.active {
   background-color: #8d6e63;
   transform: scale(1.3);
 }
 
-.popupButtons {
+.popup-buttons {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
 }
 
-.dashboardPopup h2 {
+.investor-popup h2 {
   color: #5d4037;
   font-size: 24px;
   margin-bottom: 15px;
 }
 
-.dashboardPopup p {
+.investor-popup p {
   margin-bottom: 15px;
   color: #3e2723;
   line-height: 1.6;
@@ -2581,46 +2581,46 @@
   transition: all 0.2s ease;
 }
 
-.btnPrimary {
+.btn-primary {
   background-color: #5d4037;
   color: white;
   border: none;
 }
 
-.btnPrimary:hover {
+.btn-primary:hover {
   background-color: #3e2723;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.btnSecondary {
+.btn-secondary {
   background-color: transparent;
   color: #5d4037;
   border: 1px solid #5d4037;
 }
 
-.btnSecondary:hover {
+.btn-secondary:hover {
   background-color: rgba(93, 64, 55, 0.1);
 }
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
-  .welcomePopup {
+  .welcome-popup {
     width: 95%;
     max-height: 90vh;
     overflow-y: auto;
   }
 
-  .popupContent {
+  .popup-content {
     padding: 30px 20px;
   }
 
-  .popupButtons {
+  .popup-buttons {
     flex-direction: column;
     gap: 10px;
   }
 
-  .popupButtons button {
+  .popup-buttons button {
     width: 100%;
   }
 }

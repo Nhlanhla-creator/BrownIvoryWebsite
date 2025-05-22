@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { CheckCircle, ChevronRight, ChevronLeft, Save } from "lucide-react"
+import { CheckCircle, ChevronRight, ChevronLeft, Save, X, ArrowRight } from 'lucide-react'
 import styles from "./InvestorUniversalProfile.module.css"
 
 import Instructions from "./Instructions"
@@ -16,6 +16,8 @@ import InvestorProfileSummary from "./investor-profile-summary"
 import { doc, getDoc, setDoc } from "firebase/firestore"
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { auth, db, storage } from "../../firebaseConfig"
+import { useNavigate } from "react-router-dom"
+// Make sure this CSS file exists
 
 const sections = [
   { id: "instructions", label: "Instructions" },
@@ -28,13 +30,43 @@ const sections = [
   { id: "declarationConsent", label: "Declaration &\nConsent" },
 ]
 
+// Onboarding steps for the welcome popup
+const onboardingSteps = [
+  {
+    title: "Welcome to Investor Universal Profile",
+    content: "This profile will help us understand your investment preferences and match you with suitable opportunities.",
+    icon: "👋",
+  },
+  {
+    title: "Step 1: Read Instructions",
+    content: "Start by reading the instructions carefully to understand what information you'll need to provide.",
+    icon: "📝",
+  },
+  {
+    title: "Step 2: Fill in Your Details",
+    content: "Complete each section with accurate information about your entity, investment criteria, and preferences.",
+    icon: "📋",
+  },
+  {
+    title: "Step 3: Review & Submit",
+    content: "Review your information in the summary page and submit when you're ready. You can always edit later.",
+    icon: "✅",
+  },
+]
+
 export default function UniversalProfile() {
+  const navigate = useNavigate()
   const [activeSection, setActiveSection] = useState("instructions")
   const [profileSubmitted, setProfileSubmitted] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [profileData, setProfileData] = useState(null)
+
+  // Initialize popup states to false - we'll set them based on user status
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false)
+  const [showCongratulationsPopup, setShowCongratulationsPopup] = useState(false)
+  const [currentOnboardingStep, setCurrentOnboardingStep] = useState(0)
 
   // Initial data structure for formData
   const [formData, setFormData] = useState({
@@ -84,6 +116,12 @@ export default function UniversalProfile() {
     declarationConsent: false,
   })
 
+  // Helper function to get user-specific localStorage key
+  const getUserSpecificKey = (baseKey) => {
+    const userId = auth.currentUser?.uid
+    return userId ? `${baseKey}_${userId}` : baseKey
+  }
+
   // Function to check if declaration consent is complete
   const checkDeclarationConsent = (data) => {
     const declarationConsent = data?.formData?.declarationConsent || data?.declarationConsent
@@ -100,7 +138,10 @@ export default function UniversalProfile() {
   useEffect(() => {
     const fetchData = async () => {
       const user = auth.currentUser
-      if (!user) return
+      if (!user) {
+        setLoading(false)
+        return
+      }
 
       try {
         setLoading(true)
@@ -162,6 +203,14 @@ export default function UniversalProfile() {
             }
           }
         }
+
+        // Check if this is the first time visiting - only show welcome popup for new users
+        const hasSeenWelcomePopup = localStorage.getItem(getUserSpecificKey("hasSeenInvestorWelcomePopup")) === "true"
+        if (!hasSeenWelcomePopup) {
+          setShowWelcomePopup(true)
+          localStorage.setItem(getUserSpecificKey("hasSeenInvestorWelcomePopup"), "true")
+        }
+        
       } catch (error) {
         console.error("Error fetching profile data:", error)
         setError("Failed to load profile data. Please try again later.")
@@ -353,13 +402,21 @@ export default function UniversalProfile() {
       // First save everything to Firebase including the submission status
       await saveDataToFirebase(null, true)
       
-      // Then show the summary
-      setShowSummary(true)
+      // Check if user has seen the congratulations popup before
+      const hasSeenCongratulationsPopup = 
+        localStorage.getItem(getUserSpecificKey("hasSeenInvestorCongratulationsPopup")) === "true"
+      
+      if (!hasSeenCongratulationsPopup) {
+        // Show congratulations popup only for first-time completion
+        setShowCongratulationsPopup(true)
+        localStorage.setItem(getUserSpecificKey("hasSeenInvestorCongratulationsPopup"), "true")
+      } else {
+        // If they've seen it before, just show the summary
+        setShowSummary(true)
+      }
       
       // Scroll to top for better user experience
       window.scrollTo(0, 0)
-      
-      alert("Profile submitted successfully!")
     } catch (err) {
       console.error("Failed to submit profile:", err)
       alert("Failed to submit profile. Please try again.")
@@ -367,6 +424,32 @@ export default function UniversalProfile() {
       // Revert the submission status if Firebase save failed
       setProfileSubmitted(false)
     }
+  }
+
+  // Popup handlers
+  const handleNextOnboardingStep = () => {
+    if (currentOnboardingStep < onboardingSteps.length - 1) {
+      setCurrentOnboardingStep(currentOnboardingStep + 1)
+    } else {
+      setShowWelcomePopup(false)
+    }
+  }
+
+  const handleCloseWelcomePopup = () => {
+    setShowWelcomePopup(false)
+  }
+
+  const handleCloseCongratulationsPopup = () => {
+    setShowCongratulationsPopup(false)
+    setShowSummary(true) // Show the summary after closing the congratulations popup
+  }
+
+  const handleNavigateToDashboard = () => {
+    navigate("/investor-dashboard")
+  }
+
+  const handleNavigateToSMSEApplications = () => {
+    navigate("/investor-matches")
   }
 
   // If still loading, show a loading message
@@ -380,12 +463,74 @@ export default function UniversalProfile() {
   }
 
   // If profile is submitted and we're showing the summary
-  if (showSummary) {
+  if (showSummary && !showCongratulationsPopup) {
     return <InvestorProfileSummary data={formData} onEdit={handleEditProfile} />
   }
 
   return (
     <div className="universal-profile-container">
+      {/* Welcome Popup for first-time users */}
+      {showWelcomePopup && (
+        <div className="popup-overlay">
+          <div className="welcome-popup">
+            <button className="close-popup" onClick={handleCloseWelcomePopup}>
+              <X size={24} />
+            </button>
+            <div className="popup-content">
+              <div className="popup-icon">{onboardingSteps[currentOnboardingStep].icon}</div>
+              <h2>{onboardingSteps[currentOnboardingStep].title}</h2>
+              <p>{onboardingSteps[currentOnboardingStep].content}</p>
+
+              <div className="popup-progress">
+                {onboardingSteps.map((_, index) => (
+                  <div key={index} className={`progress-dot ${index === currentOnboardingStep ? "active" : ""}`} />
+                ))}
+              </div>
+
+              <div className="popup-buttons">
+                <button className="btn btn-secondary" onClick={handleCloseWelcomePopup}>
+                  Skip
+                </button>
+                <button className="btn btn-primary" onClick={handleNextOnboardingStep}>
+                  {currentOnboardingStep < onboardingSteps.length - 1 ? "Next" : "Get Started"}
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Congratulations Popup */}
+      {showCongratulationsPopup && (
+        <div className="popup-overlay">
+          <div className="congratulations-popup">
+            <button className="close-popup" onClick={handleCloseCongratulationsPopup}>
+              <X size={24} />
+            </button>
+            <div className="popup-content">
+              <div className="confetti-animation">🎉</div>
+              <h2>Congratulations!</h2>
+              <p>You've successfully completed your Investor Universal Profile!</p>
+              <p>
+                You can now view your profile summary, go to your dashboard to see potential matches, or proceed to the SMSE Applications section.
+              </p>
+              <div className="popup-buttons-group">
+                <button className="btn btn-secondary" onClick={handleCloseCongratulationsPopup}>
+                  View Summary
+                </button>
+                <button className="btn btn-primary" onClick={handleNavigateToDashboard}>
+                  Go to Dashboard
+                </button>
+                <button className="btn btn-secondary" onClick={handleNavigateToSMSEApplications}>
+                  Go to SMSE Applications
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <h1>My Universal Profile</h1>
 
       <div className={`${styles.profileTracker} profile-tracker`}>

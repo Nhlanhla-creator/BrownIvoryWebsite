@@ -1620,3 +1620,185 @@ a:hover {
   cursor: pointer;
 }
 
+/* Popup Overlay */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Base Popup Styles */
+.welcome-popup {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.close-popup {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  z-index: 10;
+  transition: color 0.2s;
+}
+
+.close-popup:hover {
+  color: #333;
+}
+
+.popup-content {
+  padding: 40px 30px;
+  text-align: center;
+}
+
+/* Funding Popup Specific */
+.funding-popup .popup-content {
+  background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
+}
+
+.popup-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  animation: bounce 1s ease infinite alternate;
+}
+
+@keyframes bounce {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-10px);
+  }
+}
+
+.popup-progress {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+  gap: 8px;
+}
+
+.progress-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.progress-dot.active {
+  background-color: #8d6e63;
+  transform: scale(1.3);
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.funding-popup h2 {
+  color: #5d4037;
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.funding-popup p {
+  margin-bottom: 15px;
+  color: #3e2723;
+  line-height: 1.6;
+}
+
+/* Brown theme buttons */
+.btn {
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #5d4037;
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #3e2723;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #5d4037;
+  border: 1px solid #5d4037;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(93, 64, 55, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .welcome-popup {
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .popup-content {
+    padding: 30px 20px;
+  }
+
+  .popup-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .popup-buttons button {
+    width: 100%;
+  }
+}
