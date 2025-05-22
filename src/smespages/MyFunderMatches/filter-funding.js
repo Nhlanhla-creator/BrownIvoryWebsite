@@ -7,7 +7,7 @@ import styles from "./funding.module.css"
 
 export function FilterFunding({ onFilterChange, filters }) {
   const [location, setLocation] = useState(filters.location || "")
-  const [matchScore, setMatchScore] = useState([filters.matchScore || 50])
+  const [matchScore, setMatchScore] = useState([filters.matchScore ?? 50])
   const [minValue, setMinValue] = useState(filters.minValue || "")
   const [maxValue, setMaxValue] = useState(filters.maxValue || "")
   const [instruments, setInstruments] = useState(filters.instruments || [])
@@ -39,17 +39,17 @@ export function FilterFunding({ onFilterChange, filters }) {
     })
 
     // Update active filters for display
-    const newActiveFilters = []
-    if (location) newActiveFilters.push({ type: "location", value: location })
-    if (matchScore[0] !== 50) newActiveFilters.push({ type: "matchScore", value: `${matchScore[0]}%+` })
-    if (minValue) newActiveFilters.push({ type: "minValue", value: `Min: R${minValue}` })
-    if (maxValue) newActiveFilters.push({ type: "maxValue", value: `Max: R${maxValue}` })
-    instruments.forEach((inst) => newActiveFilters.push({ type: "instrument", value: inst }))
-    stages.forEach((stage) => newActiveFilters.push({ type: "stage", value: stage }))
-    sectors.forEach((sector) => newActiveFilters.push({ type: "sector", value: sector }))
-    supportTypes.forEach((support) => newActiveFilters.push({ type: "support", value: support }))
-    if (funderType) newActiveFilters.push({ type: "funderType", value: funderType })
-    if (sortBy) newActiveFilters.push({ type: "sortBy", value: sortBy })
+    const newActiveFilters = [];
+    if (location) newActiveFilters.push({ type: "location", value: location });
+    if (matchScore[0] !== 50) newActiveFilters.push({ type: "matchScore", value: `${matchScore[0]}%+` });
+    if (minValue) newActiveFilters.push({ type: "minValue", value: `Min: R${minValue}` });
+    if (maxValue) newActiveFilters.push({ type: "maxValue", value: `Max: R${maxValue}` });
+    instruments.forEach((inst) => newActiveFilters.push({ type: "instrument", value: inst }));
+    stages.forEach((stage) => newActiveFilters.push({ type: "stage", value: stage }));
+    sectors.forEach((sector) => newActiveFilters.push({ type: "sector", value: sector }));
+    supportTypes.forEach((support) => newActiveFilters.push({ type: "support", value: support }));
+    if (funderType) newActiveFilters.push({ type: "funderType", value: funderType });
+    if (sortBy) newActiveFilters.push({ type: "sortBy", value: sortBy });
 
     setActiveFilters(newActiveFilters)
   }, [location, matchScore, minValue, maxValue, instruments, stages, sectors, supportTypes, funderType, sortBy])
@@ -186,6 +186,21 @@ export function FilterFunding({ onFilterChange, filters }) {
     setSortBy("")
   }
 
+  const handleApplyFilters = () => {
+    onFilterChange({
+      location,
+      matchScore: matchScore[0],
+      minValue,
+      maxValue,
+      instruments,
+      stages,
+      sectors,
+      supportTypes,
+      funderType,
+      sortBy,
+    });
+  };
+
   const toggleFilterVisibility = () => {
     setIsFilterVisible(!isFilterVisible)
   }
@@ -262,7 +277,7 @@ export function FilterFunding({ onFilterChange, filters }) {
               <div className={styles.inputWithPrefix}>
                 <span className={styles.inputPrefix}>R</span>
                 <input
-                  type="text"
+                  type="number"
                   placeholder="Min"
                   className={styles.filterInput}
                   value={minValue}
@@ -272,7 +287,7 @@ export function FilterFunding({ onFilterChange, filters }) {
               <div className={styles.inputWithPrefix}>
                 <span className={styles.inputPrefix}>R</span>
                 <input
-                  type="text"
+                  type="number"
                   placeholder="Max"
                   className={styles.filterInput}
                   value={maxValue}
@@ -455,7 +470,7 @@ export function FilterFunding({ onFilterChange, filters }) {
           <button className={styles.clearFiltersButton} onClick={handleClearFilters}>
             Clear All Filters
           </button>
-          <button className={styles.applyFiltersButton}>Apply Filters</button>
+          <button className={styles.applyFiltersButton} onClick={handleApplyFilters}>Apply Filters</button>
         </div>
       </div>
     </div>

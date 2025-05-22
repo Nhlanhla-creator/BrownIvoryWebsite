@@ -3,9 +3,10 @@ import "./myDocuments.css";
 import { getAuth } from "firebase/auth"
 import { doc, getDoc } from "firebase/firestore"
 import { db } from "../../firebaseConfig"
- import { ChevronDown, ChevronUp, FileText, ExternalLink, Loader } from "lucide-react";
+import get from "lodash.get"
+import { ChevronDown, ChevronUp, FileText, ExternalLink, Loader } from "lucide-react";
 
- 
+
 const MyDocuments = () => {
   const DOCUMENTS = [
     "Pitch Deck",
@@ -31,18 +32,61 @@ const MyDocuments = () => {
     "Scope of Work"
   ];
 
-    const renderDocumentLink = (url, label = "View Document") => {
+  const DOCUMENT_PATHS = {
+    "Pitch Deck": "enterpriseReadiness.pitchDeckFile",
+    "Business Plan": "enterpriseReadiness.businessPlanFile",
+    "Company Registration Certificate": "entityOverview.registrationCertificate",
+    "Certified IDs of Directors & Shareholders": "ownershipManagement.certifiedIds",
+    "Share Register": "ownershipManagement.shareRegister",
+    "Proof of Address (Utility Bill, Lease Agreement)": "contactDetails.proofOfAddress",
+    "Tax Clearance Certificate": "legalCompliance.taxClearanceCert",
+    "B-BBEE Certificate": "legalCompliance.bbbeeCert",
+    "VAT/UIF/PAYE/COIDA Certificates": [
+      "legalCompliance.vatNumber",
+      "legalCompliance.uifNumber",
+      "legalCompliance.coidaNumber",
+      "legalCompliance.payeNumber"
+    ],
+    "Industry Accreditations": "legalCompliance.industryAccreditationDocs",
+    "Company Profile / Brochure": "productsServices.companyProfile",
+    "Client References": "productsServices.clientReferences",
+    "5 Year Budget (Income Statement, Cashflows, Balance Sheet)": "useOfFunds.budgetDocuments",
+    "Previous Program Reports": "enterpriseReadiness.programReports",
+    "Bank Statements (6 months)": "financialOverview.bankStatements",
+    "Bank Details Confirmation Letter": "financialOverview.bankConfirmation",
+    "Loan Agreements": "financialOverview.loanAgreements",
+    "Financial Statements": "financialOverview.financialStatements",
+    "Support Letters / Endorsements": "growthPotential.supportLetters",
+    "Scope of Work": null // Placeholder if not available
+  };
+
+  const [profileData, setProfileData] = useState({});
+
+
+
+  const getDocumentURL = (label) => {
+    const path = DOCUMENT_PATHS[label];
+    if (!path) return null;
+
+    const value = Array.isArray(path)
+      ? path.map(p => get(profileData, p)).find(v => !!v)
+      : get(profileData, path);
+
+    return Array.isArray(value) ? value[0] : value;
+  };
+
+  const renderDocumentLink = (label) => {
+    const url = getDocumentURL(label);
     if (!url) return "No document uploaded";
-    
+
     return (
       <a href={url} target="_blank" rel="noopener noreferrer" className="document-link">
         <FileText size={16} />
-        <span>{label}</span>
+        <span>View Document</span>
         <ExternalLink size={14} />
       </a>
     );
   };
-
 
   const [submittedDocuments, setSubmittedDocuments] = useState([]);
   const [filter, setFilter] = useState("all");
@@ -58,48 +102,39 @@ const MyDocuments = () => {
   useEffect(() => {
     const fetchUserDocuments = async () => {
       try {
-        const auth = getAuth()
-        const user = auth.currentUser
-        if (!user) return
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (!user) return;
 
-        const profileRef = doc(db, "universalProfiles", user.uid)
-        const profileSnap = await getDoc(profileRef)
-        if (!profileSnap.exists()) return
+        const profileRef = doc(db, "universalProfiles", user.uid);
+        const profileSnap = await getDoc(profileRef);
+        if (!profileSnap.exists()) return;
 
-        const profileData = profileSnap.data()
+        const data = profileSnap.data();
+        setProfileData(data); // ✅ Save globally
 
-        const submitted = new Set()
+        const submitted = [];
 
-        // Recursively check all nested fields
-        const extractDocs = (obj) => {
-          if (Array.isArray(obj)) {
-            obj.forEach(item => {
-              if (typeof item === "string" && item.startsWith("http")) {
-                // Match known document names based on rough guess
-                DOCUMENTS.forEach(doc => {
-                  const normalized = doc.toLowerCase().replace(/[^a-z]/g, "")
-                  if (item.toLowerCase().includes(normalized.slice(0, 6))) {
-                    submitted.add(doc)
-                  }
-                })
-              } else if (typeof item === "object" && item !== null) {
-                extractDocs(item)
-              }
-            })
-          } else if (typeof obj === "object" && obj !== null) {
-            Object.values(obj).forEach(value => extractDocs(value))
+        for (const [label, path] of Object.entries(DOCUMENT_PATHS)) {
+          if (!path) continue;
+
+          const value = Array.isArray(path)
+            ? path.map(p => get(data, p)).find(v => !!v)
+            : get(data, path);
+
+          if (value && (Array.isArray(value) ? value.length > 0 : true)) {
+            submitted.push(label);
           }
         }
 
-        extractDocs(profileData)
-        setSubmittedDocuments(Array.from(submitted))
+        setSubmittedDocuments(submitted);
       } catch (err) {
-        console.error("Failed to load user documents:", err)
+        console.error("Failed to load user documents:", err);
       }
-    }
+    };
 
-    fetchUserDocuments()
-  }, [])
+    fetchUserDocuments();
+  }, []);
 
   const handleUpload = (doc) => {
     setSubmittedDocuments([...submittedDocuments, doc]);
@@ -177,7 +212,7 @@ const MyDocuments = () => {
                       <td className="document-actions">
                         {isSubmitted ? (
                           <>
-                            <button>View</button>
+                            {renderDocumentLink(doc)}
                             <button onClick={() => handleDelete(doc)}>Delete</button>
                           </>
                         ) : (

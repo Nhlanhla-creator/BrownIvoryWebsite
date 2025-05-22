@@ -1,17 +1,17 @@
 "use client"
 
-import { useState,useEffect } from "react"
-import { ChevronDown, ChevronUp, Edit, Printer,FileText,ExternalLink } from "lucide-react"
-import "./investor-profile-summary.css"   
+import { useState, useEffect } from "react"
+import { ChevronDown, ChevronUp, Edit, Printer, FileText, ExternalLink } from "lucide-react"
+import "./investor-profile-summary.css"
 import { doc, getDoc, setDoc } from "firebase/firestore"
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { auth, db, storage } from ".././firebaseConfig"
 
 const Documents = () => {
 
-    const renderDocumentLink = (url, label = "View Document") => {
+  const renderDocumentLink = (url, label = "View Document") => {
     if (!url) return "No document uploaded";
-    
+
     return (
       <a href={url} target="_blank" rel="noopener noreferrer" className="document-link">
         <FileText size={16} />
@@ -26,50 +26,50 @@ const Documents = () => {
   const [profileData, setProfileData] = useState(null)
 
   useEffect(() => {
-      const fetchData = async () => {
-        const user = auth.currentUser
-        if (!user) return
-  
-    
-          setLoading(true)
-          
-          // First try to fetch from Firebase
-          const docRef = doc(db, "MyuniversalProfiles", user.uid)
-          const docSnap = await getDoc(docRef)
-          
-          let firebaseData = null
-          let firebaseCompletedSections = null
-          let firebaseSubmissionStatus = false
-          
-          if (docSnap.exists()) {
-            const data = docSnap.data()
-       
-          
-         setData(data.formData)
-            
-         
-          }
-          
-          // If no Firebase data or incomplete, try loading from localStorage as backup
-          if (!firebaseData || !firebaseSubmissionStatus) {
-            const savedData = localStorage.getItem("investorProfileData")
-            const savedCompletedSections = localStorage.getItem("investorProfileCompletedSections")
-            const savedSubmissionStatus = localStorage.getItem("investorProfileSubmitted")
-            
-            // Only use localStorage data if we don't have Firebase data
+    const fetchData = async () => {
+      const user = auth.currentUser
+      if (!user) return
 
-            
-            // Only use localStorage submission status if Firebase didn't have it marked as submitted
-        
-          }
-        
+
+      setLoading(true)
+
+      // First try to fetch from Firebase
+      const docRef = doc(db, "MyuniversalProfiles", user.uid)
+      const docSnap = await getDoc(docRef)
+
+      let firebaseData = null
+      let firebaseCompletedSections = null
+      let firebaseSubmissionStatus = false
+
+      if (docSnap.exists()) {
+        const data = docSnap.data()
+
+
+        setData(data.formData)
+
+
       }
-  
-      fetchData()
-    }, [])
-  
-  
-  const [data,setData] = useState({})
+
+      // If no Firebase data or incomplete, try loading from localStorage as backup
+      if (!firebaseData || !firebaseSubmissionStatus) {
+        const savedData = localStorage.getItem("investorProfileData")
+        const savedCompletedSections = localStorage.getItem("investorProfileCompletedSections")
+        const savedSubmissionStatus = localStorage.getItem("investorProfileSubmitted")
+
+        // Only use localStorage data if we don't have Firebase data
+
+
+        // Only use localStorage submission status if Firebase didn't have it marked as submitted
+
+      }
+
+    }
+
+    fetchData()
+  }, [])
+
+
+  const [data, setData] = useState({})
 
   const [onEdit, setOnEdit] = useState(false)
   const [expandedSections, setExpandedSections] = useState({
@@ -136,70 +136,70 @@ const Documents = () => {
           {expandedSections.entityOverview ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </div>
         {expandedSections.entityOverview && (
-         
-              <div className="summary-item">
-                <span className="summary-label">Company Logo:</span>
-                <span className="summary-value">{renderDocumentLink(data.entityOverview?.companyLogo, "ID Document")}</span>
-              </div>
-            
-        
+
+          <div className="summary-item">
+            <span className="summary-label">Company Logo:</span>
+            <span className="summary-value">{renderDocumentLink(data.entityOverview?.companyLogo, "ID Document")}</span>
+          </div>
+
+
         )}
       </div>
 
       {/* Ownership & Management Section */}
       <div className="summary-section">
-       
-      
+
+
+      </div>
+      {expandedSections.ownershipManagement && (
+        <div className="summary-content">
+
+          <span className="summary-label">Documents:</span>
+          <span className="summary-value">
+            <div>Certified IDs:{renderDocumentLink(data.ownershipManagement?.certifiedIDs, "ID Document")} </div>
+            <div>Share Register: {renderDocumentLink(data.ownershipManagement?.shareRegister, "ID Document")}</div>
+            <div>Registration Documents:  {renderDocumentLink(data.ownershipManagement?.registrationDocs, "ID Document")}</div>
+          </span>
+
         </div>
-        {expandedSections.ownershipManagement && (
-          <div className="summary-content">
- 
-              <span className="summary-label">Documents:</span>
-              <span className="summary-value">
-                <div>Certified IDs:{renderDocumentLink(data.ownershipManagement?.certifiedIDs, "ID Document")} </div>
-                <div>Share Register: {renderDocumentLink(data.ownershipManagement?.shareRegister, "ID Document")}</div>
-                <div>Registration Documents:  {renderDocumentLink(data.ownershipManagement?.registrationDocs, "ID Document")}</div>
-              </span>
-           
-          </div>
-        )}
+      )}
 
 
       {/* Contact Details Section */}
       <div className="summary-section">
         <div className="summary-section-header" onClick={() => toggleSection("contactDetails")}>
           <h2>Contact Details</h2>
-       
-      
-            <div className="summary-item mt-6">
-              <span className="summary-label">Documents:</span>
-              <span className="summary-value">
-                <div>Proof of Address: {renderDocumentLink(data.contactDetails?.proofOfAddress, "ID Document")} </div>
-              </span>
-            </div>
+
+
+          <div className="summary-item mt-6">
+            <span className="summary-label">Documents:</span>
+            <span className="summary-value">
+              <div>Proof of Address: {renderDocumentLink(data.contactDetails?.proofOfAddress, "ID Document")} </div>
+            </span>
           </div>
-        
+        </div>
+
       </div>
 
       {/* Legal & Compliance Section */}
-    
-            <div className="summary-item mt-6">
-              <span className="summary-label">Documents:</span>
-              <span className="summary-value">
-                <div>Tax Clearance Certificate: {renderDocumentLink(data.legalCompliance?.taxClearanceCert, "ID Document")} </div>
-                <div>B-BBEE Certificate:  {renderDocumentLink(data.legalCompliance?.bbbeeCert, "ID Document")}</div>
-                <div>Other Certificates:  {renderDocumentLink(data.legalCompliance?.otherCerts, "ID Document")}</div>
-                <div>Industry Accreditations:  {renderDocumentLink(data.legalCompliance?.industryAccreditationDocs, "ID Document")}</div>
-              </span>
-            </div>
-      
+
+      <div className="summary-item mt-6">
+        <span className="summary-label">Documents:</span>
+        <span className="summary-value">
+          <div>Tax Clearance Certificate: {renderDocumentLink(data.legalCompliance?.taxClearanceCert, "ID Document")} </div>
+          <div>B-BBEE Certificate:  {renderDocumentLink(data.legalCompliance?.bbbeeCert, "ID Document")}</div>
+          <div>Other Certificates:  {renderDocumentLink(data.legalCompliance?.otherCerts, "ID Document")}</div>
+          <div>Industry Accreditations:  {renderDocumentLink(data.legalCompliance?.industryAccreditationDocs, "ID Document")}</div>
+        </span>
+      </div>
+
 
       {/* Products & Services Section */}
       <div className="summary-section">
-     
+
         {expandedSections.productsServices && (
           <div className="summary-content">
-          
+
             <div className="summary-item mt-6">
               <span className="summary-label">Documents:</span>
               <span className="summary-value">
