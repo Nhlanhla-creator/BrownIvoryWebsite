@@ -85,65 +85,167 @@ const africanCountries = [
   { value: "zimbabwe", label: "Zimbabwe" },
 ]
 
-const saveOwnershipManagement = async (formData) => {
-  try {
-    const user = auth.currentUser;
-    if (!user) throw new Error("User not authenticated");
+export default function OwnershipManagement({ data = { shareholders: [], directors: [] }, updateData }) {
+  const [formData, setFormData] = useState({ shareholders: [], directors: [] })
+  const [isLoading, setIsLoading] = useState(true)
 
-    const uid = user.uid;
-    const docRef = doc(db, "OwnershipManagement", uid);
+  // Load data from Firebase when component mounts
+  useEffect(() => {
+    const loadOwnershipManagement = async () => {
+      try {
+        setIsLoading(true)
+        const userId = auth.currentUser?.uid
+        
+        if (!userId) {
+          setIsLoading(false)
+          return
+        }
 
-    // Upload document files (if any) and collect URLs
-    const uploadedFiles = {};
-    for (const key in formData) {
-      if (Array.isArray(formData[key]) && formData[key][0] instanceof File) {
-        const file = formData[key][0];
-        const storageRef = ref(storage, `ownershipDocs/${uid}/${key}`);
-        await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(storageRef);
-        uploadedFiles[key] = url;
+        // Load from the universalProfiles collection (matching your main structure)
+        const docRef = doc(db, "universalProfiles", userId)
+        const docSnap = await getDoc(docRef)
+
+        if (docSnap.exists()) {
+          const profileData = docSnap.data()
+          
+          // Check if ownershipManagement data exists
+          if (profileData.ownershipManagement) {
+            const ownershipData = profileData.ownershipManagement
+            setFormData(ownershipData)
+            updateData(ownershipData)
+          } else {
+            // If no data exists, initialize with passed data or default structure
+            const initData = data.shareholders?.length > 0 || data.directors?.length > 0 ? data : {
+              shareholders: [
+                {
+                  name: "",
+                  idRegNo: "",
+                  country: "",
+                  shareholding: "",
+                  race: "",
+                  gender: "",
+                  isYouth: false,
+                  isDisabled: false,
+                  idDocument: null,
+                }
+              ],
+              directors: [
+                {
+                  name: "",
+                  id: "",
+                  position: "",
+                  nationality: "",
+                  isExec: false,
+                  doc: null,
+                }
+              ],
+            }
+            setFormData(initData)
+            updateData(initData)
+          }
+        } else {
+          // No profile exists yet, use passed data or default structure
+          const initData = data.shareholders?.length > 0 || data.directors?.length > 0 ? data : {
+            shareholders: [
+              {
+                name: "",
+                idRegNo: "",
+                country: "",
+                shareholding: "",
+                race: "",
+                gender: "",
+                isYouth: false,
+                isDisabled: false,
+                idDocument: null,
+              }
+            ],
+            directors: [
+              {
+                name: "",
+                id: "",
+                position: "",
+                nationality: "",
+                isExec: false,
+                doc: null,
+              }
+            ],
+          }
+          setFormData(initData)
+          updateData(initData)
+        }
+      } catch (error) {
+        console.error("Error loading ownership management:", error)
+        // Fallback to passed data on error
+        const fallbackData = data.shareholders?.length > 0 || data.directors?.length > 0 ? data : {
+          shareholders: [
+            {
+              name: "",
+              idRegNo: "",
+              country: "",
+              shareholding: "",
+              race: "",
+              gender: "",
+              isYouth: false,
+              isDisabled: false,
+              idDocument: null,
+            }
+          ],
+          directors: [
+            {
+              name: "",
+              id: "",
+              position: "",
+              nationality: "",
+              isExec: false,
+              doc: null,
+            }
+          ],
+        }
+        setFormData(fallbackData)
+        updateData(fallbackData)
+      } finally {
+        setIsLoading(false)
       }
     }
 
-    // Prepare final data to save
-    const fullData = {
-      ...formData,
-      ...uploadedFiles,
-      uid,
-      timestamp: new Date().toISOString()
-    };
+    loadOwnershipManagement()
+  }, []) // Remove data dependency to prevent infinite loops
 
-    await setDoc(docRef, fullData);
-    alert("Ownership & Management data saved successfully!");
-  } catch (error) {
-    console.error("Error saving OwnershipManagement:", error);
-    alert("Failed to save data. Please try again.");
-  }
-};
+  // Update form data when data prop changes (but only if not loading from Firebase)
+  useEffect(() => {
+    if (!isLoading && (!formData.shareholders?.length && !formData.directors?.length)) {
+      setFormData(data)
+    }
+  }, [data, isLoading])
 
-export default function OwnershipManagement({ data = { shareholders: [], directors: [] }, updateData }) {
   const addShareholder = () => {
     const newShareholders = [
-      ...data.shareholders,
+      ...formData.shareholders,
       { name: "", idRegNo: "", country: "", shareholding: "", race: "", gender: "", isYouth: false, isDisabled: false },
     ]
-    updateData({ shareholders: newShareholders })
+    const updatedData = { ...formData, shareholders: newShareholders }
+    setFormData(updatedData)
+    updateData(updatedData)
   }
 
   const updateShareholder = (index, field, value) => {
-    const newShareholders = [...data.shareholders]
+    const newShareholders = [...formData.shareholders]
     newShareholders[index] = { ...newShareholders[index], [field]: value }
-    updateData({ shareholders: newShareholders })
+    const updatedData = { ...formData, shareholders: newShareholders }
+    setFormData(updatedData)
+    updateData(updatedData)
   }
 
   const removeShareholder = (index) => {
-    const newShareholders = [...data.shareholders]
+    const newShareholders = [...formData.shareholders]
     newShareholders.splice(index, 1)
-    updateData({ shareholders: newShareholders })
+    const updatedData = { ...formData, shareholders: newShareholders }
+    setFormData(updatedData)
+    updateData(updatedData)
   }
 
   const addDirector = () => {
-    const newDirectors = [...data.directors, { 
+    const newDirectors = [...formData.directors, { 
       name: "", 
       id: "", 
       position: "", 
@@ -154,28 +256,48 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
       isYouth: false, 
       isDisabled: false 
     }]
-    updateData({ directors: newDirectors })
+    const updatedData = { ...formData, directors: newDirectors }
+    setFormData(updatedData)
+    updateData(updatedData)
   }
 
   const updateDirector = (index, field, value) => {
-    const newDirectors = [...data.directors]
+    const newDirectors = [...formData.directors]
     newDirectors[index] = { ...newDirectors[index], [field]: value }
-    updateData({ directors: newDirectors })
+    const updatedData = { ...formData, directors: newDirectors }
+    setFormData(updatedData)
+    updateData(updatedData)
   }
 
   const removeDirector = (index) => {
-    const newDirectors = [...data.directors]
+    const newDirectors = [...formData.directors]
     newDirectors.splice(index, 1)
-    updateData({ directors: newDirectors })
+    const updatedData = { ...formData, directors: newDirectors }
+    setFormData(updatedData)
+    updateData(updatedData)
   }
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    updateData({ [name]: value })
+    const updatedData = { ...formData, [name]: value }
+    setFormData(updatedData)
+    updateData(updatedData)
   }
 
   const handleFileChange = (name, files) => {
-    updateData({ [name]: files })
+    const updatedData = { ...formData, [name]: files }
+    setFormData(updatedData)
+    updateData(updatedData)
+  }
+
+  // Show loading state while fetching data
+  if (isLoading) {
+    return (
+      <div className="ownership-management-loading">
+        <h2 className="text-2xl font-bold text-brown-800 mb-6">Ownership & Management</h2>
+        <p>Loading your information...</p>
+      </div>
+    )
   }
 
   return (
@@ -187,7 +309,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
           <input
             type="number"
             name="totalShares"
-            value={data.totalShares || ""}
+            value={formData.totalShares || ""}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
             required
@@ -241,12 +363,12 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
               </tr>
             </thead>
             <tbody>
-              {data.shareholders.map((shareholder, index) => (
+              {formData.shareholders?.map((shareholder, index) => (
                 <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-brown-50"}>
                   <td className="px-4 py-2 border-b">
                     <input
                       type="text"
-                      value={shareholder.name}
+                      value={shareholder.name || ""}
                       onChange={(e) => updateShareholder(index, "name", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
                     />
@@ -254,14 +376,14 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                   <td className="px-4 py-2 border-b">
                     <input
                       type="number"
-                      value={shareholder.idRegNo}
+                      value={shareholder.idRegNo || ""}
                       onChange={(e) => updateShareholder(index, "idRegNo", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
                     />
                   </td>
                   <td className="px-4 py-2 border-b">
                     <select
-                      value={shareholder.country}
+                      value={shareholder.country || ""}
                       onChange={(e) => updateShareholder(index, "country", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
                     >
@@ -276,7 +398,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                   <td className="px-4 py-2 border-b">
                     <input
                       type="number"
-                      value={shareholder.shareholding}
+                      value={shareholder.shareholding || ""}
                       onChange={(e) => updateShareholder(index, "shareholding", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
                       min="0"
@@ -286,7 +408,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                   </td>
                   <td className="px-4 py-2 border-b">
                     <select
-                      value={shareholder.race}
+                      value={shareholder.race || ""}
                       onChange={(e) => updateShareholder(index, "race", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
                     >
@@ -300,7 +422,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                   </td>
                   <td className="px-4 py-2 border-b">
                     <select
-                      value={shareholder.gender}
+                      value={shareholder.gender || ""}
                       onChange={(e) => updateShareholder(index, "gender", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
                     >
@@ -315,7 +437,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                   <td className="px-4 py-2 border-b text-center">
                     <input
                       type="checkbox"
-                      checked={shareholder.isYouth}
+                      checked={shareholder.isYouth || false}
                       onChange={(e) => updateShareholder(index, "isYouth", e.target.checked)}
                       className="h-4 w-4 text-brown-600 focus:ring-brown-500 border-brown-300 rounded"
                     />
@@ -323,7 +445,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                   <td className="px-4 py-2 border-b text-center">
                     <input
                       type="checkbox"
-                      checked={shareholder.isDisabled}
+                      checked={shareholder.isDisabled || false}
                       onChange={(e) => updateShareholder(index, "isDisabled", e.target.checked)}
                       className="h-4 w-4 text-brown-600 focus:ring-brown-500 border-brown-300 rounded"
                     />
@@ -393,12 +515,12 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
               </tr>
             </thead>
             <tbody>
-              {data.directors.map((director, index) => (
+              {formData.directors?.map((director, index) => (
                 <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-brown-50"}>
                   <td className="px-4 py-2 border-b">
                     <input
                       type="text"
-                      value={director.name}
+                      value={director.name || ""}
                       onChange={(e) => updateDirector(index, "name", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
                     />
@@ -406,7 +528,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                   <td className="px-4 py-2 border-b">
                     <input
                       type="number"
-                      value={director.id}
+                      value={director.id || ""}
                       onChange={(e) => updateDirector(index, "id", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
                     />
@@ -414,14 +536,14 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                   <td className="px-4 py-2 border-b">
                     <input
                       type="text"
-                      value={director.position}
+                      value={director.position || ""}
                       onChange={(e) => updateDirector(index, "position", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
                     />
                   </td>
                   <td className="px-4 py-2 border-b">
                     <select
-                      value={director.nationality}
+                      value={director.nationality || ""}
                       onChange={(e) => updateDirector(index, "nationality", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
                     >
@@ -517,7 +639,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
             required
             multiple
             onChange={(files) => handleFileChange("certifiedIds", files)}
-            value={data.certifiedIds || []}
+            value={formData.certifiedIds || []}
           />
 
           <FileUpload
@@ -525,7 +647,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
             accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls"
             required
             onChange={(files) => handleFileChange("shareRegister", files)}
-            value={data.shareRegister || []}
+            value={formData.shareRegister || []}
           />
         </div>
       </div>

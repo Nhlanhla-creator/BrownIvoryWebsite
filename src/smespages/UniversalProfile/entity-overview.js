@@ -169,14 +169,61 @@ function MultiSelect({ options, selected, onChange, label }) {
     </div>
   )
 }
-
 export default function EntityOverview({ data = {}, updateData, onSave }) {
   const [formData, setFormData] = useState({})
-  const [isSaving, setIsSaving] = useState(false)
+  const [isSaving, setSaving] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
+  // Load data from Firebase when component mounts
   useEffect(() => {
-    setFormData(data)
-  }, [data])
+    const loadEntityOverview = async () => {
+      try {
+        setIsLoading(true)
+        const userId = auth.currentUser?.uid
+        
+        if (!userId) {
+          setIsLoading(false)
+          return
+        }
+
+        // Load from the universalProfiles collection (matching your main structure)
+        const docRef = doc(db, "universalProfiles", userId)
+        const docSnap = await getDoc(docRef)
+
+        if (docSnap.exists()) {
+          const profileData = docSnap.data()
+          
+          // Check if entityOverview data exists
+          if (profileData.entityOverview) {
+            const entityData = profileData.entityOverview
+            setFormData(entityData)
+            updateData(entityData)
+          } else {
+            // If no data exists, initialize with passed data
+            setFormData(data)
+          }
+        } else {
+          // No profile exists yet, use passed data
+          setFormData(data)
+        }
+      } catch (error) {
+        console.error("Error loading entity overview:", error)
+        // Fallback to passed data on error
+        setFormData(data)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadEntityOverview()
+  }, []) // Remove data dependency to prevent infinite loops
+
+  // Update form data when data prop changes (but only if not loading from Firebase)
+  useEffect(() => {
+    if (!isLoading && Object.keys(formData).length === 0) {
+      setFormData(data)
+    }
+  }, [data, isLoading])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -197,127 +244,28 @@ export default function EntityOverview({ data = {}, updateData, onSave }) {
     updateData(updatedData)
   }
 
+  // Remove the old Firebase save logic since it's handled by the parent component
+  // Keep this for backwards compatibility if needed
   const saveEntityOverview = async () => {
-    if (!auth.currentUser) {
-      throw new Error("User not authenticated")
-    }
-
-    setIsSaving(true)
-    try {
-      const userId = auth.currentUser.uid
-      const docRef = doc(db, `smes/${userId}/universalProfile/entityOverview`)
-
-      const { companyLogo, registrationCertificate, proofOfAddress, ...firestoreData } = formData
-
-      await setDoc(docRef, firestoreData, { merge: true })
-
-      const uploadPromises = []
-
-      if (companyLogo && companyLogo.length > 0) {
-        const logoRef = ref(
-          storage,
-          `smes/${userId}/universalProfile/entityOverview/companyLogo/${companyLogo[0].name}`,
-        )
-        uploadPromises.push(
-          uploadBytes(logoRef, companyLogo[0]).then(() =>
-            getDownloadURL(logoRef).then((url) => ({
-              field: "companyLogoUrl",
-              url,
-            })),
-          ),
-        )
-      }
-
-      if (registrationCertificate && registrationCertificate.length > 0) {
-        const certRef = ref(
-          storage,
-          `smes/${userId}/universalProfile/entityOverview/registrationCertificate/${registrationCertificate[0].name}`,
-        )
-        uploadPromises.push(
-          uploadBytes(certRef, registrationCertificate[0]).then(() =>
-            getDownloadURL(certRef).then((url) => ({
-              field: "registrationCertificateUrl",
-              url,
-            })),
-          ),
-        )
-      }
-
-      if (proofOfAddress && proofOfAddress.length > 0) {
-        const addressRef = ref(
-          storage,
-          `smes/${userId}/universalProfile/entityOverview/proofOfAddress/${proofOfAddress[0].name}`,
-        )
-        uploadPromises.push(
-          uploadBytes(addressRef, proofOfAddress[0]).then(() =>
-            getDownloadURL(addressRef).then((url) => ({
-              field: "proofOfAddressUrl",
-              url,
-            })),
-          ),
-        )
-      }
-
-      const uploadResults = await Promise.all(uploadPromises)
-
-      const urlUpdates = {}
-      uploadResults.forEach((result) => {
-        urlUpdates[result.field] = result.url
-      })
-
-      if (Object.keys(urlUpdates).length > 0) {
-        await setDoc(docRef, urlUpdates, { merge: true })
-      }
-
-      const docSnap = await getDoc(docRef)
-      if (docSnap.exists()) {
-        const savedData = docSnap.data()
-        setFormData(savedData)
-        updateData(savedData)
-      }
-
-      return { success: true }
-    } catch (error) {
-      console.error("Error saving entity overview:", error)
-      throw error
-    } finally {
-      setIsSaving(false)
-    }
+    // This can be removed since the parent component handles saving
+    return { success: true }
   }
-
-  const loadEntityOverview = async (userId) => {
-    try {
-      const docRef = doc(db, `smes/${userId}/universalProfile/entityOverview`)
-      const docSnap = await getDoc(docRef)
-
-      if (docSnap.exists()) {
-        const data = docSnap.data()
-        setFormData(data)
-        updateData(data)
-        return data
-      }
-      return null
-    } catch (error) {
-      console.error("Error loading entity overview:", error)
-      return null
-    }
-  }
-
-  useEffect(() => {
-    const loadData = async () => {
-      if (auth.currentUser) {
-        await loadEntityOverview(auth.currentUser.uid)
-      }
-    }
-
-    loadData()
-  }, [])
 
   useEffect(() => {
     if (onSave) {
       onSave.current = saveEntityOverview
     }
   }, [formData, onSave])
+
+  // Show loading state while fetching data
+  if (isLoading) {
+    return (
+      <div className="entity-overview-loading">
+        <h2 className="text-2xl font-bold text-brown-800 mb-6">Entity Overview</h2>
+        <p>Loading your information...</p>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -539,15 +487,7 @@ export default function EntityOverview({ data = {}, updateData, onSave }) {
             onChange={(files) => handleFileChange("registrationCertificate", files)}
             value={formData.registrationCertificate || []}
           />
-
-          {/* Removed Proof of Operating Address as requested */}
         </div>
-          {/* <RegistrationSummary
-                data={profileData}
-                // open={showSummary}
-                // onClose={() => setShowSummary(false)}
-                // onComplete={handleRegistrationComplete}
-              /> */}
       </div>
 
       <div className="mt-8 flex justify-end"></div>

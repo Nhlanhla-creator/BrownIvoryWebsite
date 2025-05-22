@@ -1,16 +1,136 @@
 "use client"
+import { useEffect, useState } from "react"
 import FormField from "./form-field"
 import FileUpload from "./file-upload"
 import './UniversalProfile.css';
+import { db, auth } from "../../firebaseConfig"
+import { doc, getDoc } from "firebase/firestore"
 
 export default function ContactDetails({ data = {}, updateData }) {
+  const [formData, setFormData] = useState({})
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Load data from Firebase when component mounts
+  useEffect(() => {
+    const loadContactDetails = async () => {
+      try {
+        setIsLoading(true)
+        const userId = auth.currentUser?.uid
+        
+        if (!userId) {
+          setIsLoading(false)
+          return
+        }
+
+        // Load from the universalProfiles collection (matching your main structure)
+        const docRef = doc(db, "universalProfiles", userId)
+        const docSnap = await getDoc(docRef)
+
+        if (docSnap.exists()) {
+          const profileData = docSnap.data()
+          
+          // Check if contactDetails data exists
+          if (profileData.contactDetails) {
+            const contactData = profileData.contactDetails
+            setFormData(contactData)
+            updateData(contactData)
+          } else {
+            // If no data exists, initialize with passed data or default structure
+            const initData = Object.keys(data).length > 0 ? data : {
+              contactTitle: "",
+              contactName: "",
+              contactId: "",
+              businessPhone: "",
+              mobile: "",
+              email: "",
+              website: "",
+              physicalAddress: "",
+              sameAsPhysical: false,
+              postalAddress: "",
+              linkedin: "",
+              otherSocial: "",
+              proofOfAddress: []
+            }
+            setFormData(initData)
+            updateData(initData)
+          }
+        } else {
+          // No profile exists yet, use passed data or default structure
+          const initData = Object.keys(data).length > 0 ? data : {
+            contactTitle: "",
+            contactName: "",
+            contactId: "",
+            businessPhone: "",
+            mobile: "",
+            email: "",
+            website: "",
+            physicalAddress: "",
+            sameAsPhysical: false,
+            postalAddress: "",
+            linkedin: "",
+            otherSocial: "",
+            proofOfAddress: []
+          }
+          setFormData(initData)
+          updateData(initData)
+        }
+      } catch (error) {
+        console.error("Error loading contact details:", error)
+        // Fallback to passed data on error
+        const fallbackData = Object.keys(data).length > 0 ? data : {
+          contactTitle: "",
+          contactName: "",
+          contactId: "",
+          businessPhone: "",
+          mobile: "",
+          email: "",
+          website: "",
+          physicalAddress: "",
+          sameAsPhysical: false,
+          postalAddress: "",
+          linkedin: "",
+          otherSocial: "",
+          proofOfAddress: []
+        }
+        setFormData(fallbackData)
+        updateData(fallbackData)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadContactDetails()
+  }, []) // Remove data dependency to prevent infinite loops
+
+  // Update form data when data prop changes (but only if not loading from Firebase)
+  useEffect(() => {
+    if (!isLoading && Object.keys(formData).length === 0) {
+      setFormData(data)
+    }
+  }, [data, isLoading])
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    updateData({ [name]: type === "checkbox" ? checked : value })
+    const updatedValue = type === "checkbox" ? checked : value
+    const updatedData = { ...formData, [name]: updatedValue }
+    setFormData(updatedData)
+    updateData(updatedData)
   }
 
   const handleFileChange = (name, files) => {
-    updateData({ [name]: files })
+    const updatedData = { ...formData, [name]: files }
+    setFormData(updatedData)
+    updateData(updatedData)
+  }
+
+  // Show loading state while fetching data
+  if (isLoading) {
+    return (
+      <div className="contact-details-loading">
+        <h2 className="text-2xl font-bold text-brown-800 mb-6">Contact Details</h2>
+        <p>Loading your information...</p>
+      </div>
+    )
   }
 
   return (
@@ -25,7 +145,7 @@ export default function ContactDetails({ data = {}, updateData }) {
             <FormField label="Title" required>
               <select
                 name="contactTitle"
-                value={data.contactTitle || ""}
+                value={formData.contactTitle || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
                 required
@@ -43,7 +163,7 @@ export default function ContactDetails({ data = {}, updateData }) {
               <input
                 type="text"
                 name="contactName"
-                value={data.contactName || ""}
+                value={formData.contactName || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
                 required
@@ -55,7 +175,7 @@ export default function ContactDetails({ data = {}, updateData }) {
             <input
               type="number"
               name="contactId"
-              value={data.contactId || ""}
+              value={formData.contactId || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               required
@@ -66,7 +186,7 @@ export default function ContactDetails({ data = {}, updateData }) {
             <input
               type="number"
               name="businessPhone"
-              value={data.businessPhone || ""}
+              value={formData.businessPhone || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               required
@@ -77,7 +197,7 @@ export default function ContactDetails({ data = {}, updateData }) {
             <input
               type="number"
               name="mobile"
-              value={data.mobile || ""}
+              value={formData.mobile || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               required
@@ -88,7 +208,7 @@ export default function ContactDetails({ data = {}, updateData }) {
             <input
               type="email"
               name="email"
-              value={data.email || ""}
+              value={formData.email || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               required
@@ -99,7 +219,7 @@ export default function ContactDetails({ data = {}, updateData }) {
             <input
               type="url"
               name="website"
-              value={data.website || ""}
+              value={formData.website || ""}
               onChange={handleChange}
               placeholder="https://"
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
@@ -113,7 +233,7 @@ export default function ContactDetails({ data = {}, updateData }) {
           <FormField label="Physical Address" required>
             <textarea
               name="physicalAddress"
-              value={data.physicalAddress || ""}
+              value={formData.physicalAddress || ""}
               onChange={handleChange}
               rows={3}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
@@ -126,7 +246,7 @@ export default function ContactDetails({ data = {}, updateData }) {
               <input
                 type="checkbox"
                 name="sameAsPhysical"
-                checked={data.sameAsPhysical || false}
+                checked={formData.sameAsPhysical || false}
                 onChange={handleChange}
                 className="h-4 w-4 text-brown-600 focus:ring-brown-500 border-brown-300 rounded"
               />
@@ -134,15 +254,15 @@ export default function ContactDetails({ data = {}, updateData }) {
             </label>
           </div>
 
-          {!data.sameAsPhysical && (
+          {!formData.sameAsPhysical && (
             <FormField label="Postal Address" required>
               <textarea
                 name="postalAddress"
-                value={data.postalAddress || ""}
+                value={formData.postalAddress || ""}
                 onChange={handleChange}
                 rows={3}
                 className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
-                required={!data.sameAsPhysical}
+                required={!formData.sameAsPhysical}
               ></textarea>
             </FormField>
           )}
@@ -153,7 +273,7 @@ export default function ContactDetails({ data = {}, updateData }) {
             <input
               type="url"
               name="linkedin"
-              value={data.linkedin || ""}
+              value={formData.linkedin || ""}
               onChange={handleChange}
               placeholder="https://linkedin.com/company/..."
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
@@ -164,7 +284,7 @@ export default function ContactDetails({ data = {}, updateData }) {
             <input
               type="url"
               name="otherSocial"
-              value={data.otherSocial || ""}
+              value={formData.otherSocial || ""}
               onChange={handleChange}
               placeholder="https://..."
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
@@ -181,7 +301,7 @@ export default function ContactDetails({ data = {}, updateData }) {
           accept=".pdf,.jpg,.jpeg,.png"
           required
           onChange={(files) => handleFileChange("proofOfAddress", files)}
-          value={data.proofOfAddress || []}
+          value={formData.proofOfAddress || []}
         />
       </div>
 

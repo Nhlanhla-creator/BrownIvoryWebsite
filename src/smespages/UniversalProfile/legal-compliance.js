@@ -1,7 +1,10 @@
 "use client"
+import { useEffect, useState } from "react"
 import FormField from "./form-field"
 import FileUpload from "./file-upload"
 import './UniversalProfile.css';
+import { db, auth } from "../../firebaseConfig"
+import { doc, getDoc } from "firebase/firestore"
 
 const bbbeeOptions = [
   { value: "1", label: "Level 1" },
@@ -24,18 +27,127 @@ const cipcStatusOptions = [
 ]
 
 export default function LegalCompliance({ data = {}, updateData }) {
+  const [formData, setFormData] = useState({})
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Load data from Firebase when component mounts
+  useEffect(() => {
+    const loadLegalCompliance = async () => {
+      try {
+        setIsLoading(true)
+        const userId = auth.currentUser?.uid
+        
+        if (!userId) {
+          setIsLoading(false)
+          return
+        }
+
+        // Load from the universalProfiles collection
+        const docRef = doc(db, "universalProfiles", userId)
+        const docSnap = await getDoc(docRef)
+
+        if (docSnap.exists()) {
+          const profileData = docSnap.data()
+          
+          // Check if legalCompliance data exists
+          if (profileData.legalCompliance) {
+            const legalData = profileData.legalCompliance
+            setFormData(legalData)
+            updateData(legalData)
+          } else {
+            // If no data exists, initialize with passed data or default structure
+            const initData = Object.keys(data).length > 0 ? data : {
+              taxNumber: "",
+              taxClearanceNumber: "",
+              taxClearanceDate: "",
+              vatNumber: "",
+              rscNumber: "",
+              uifNumber: "",
+              payeNumber: "",
+              bbbeeLevel: "",
+              bbbeeCertRenewalDate: "",
+              cipcStatus: "",
+              coidaNumber: "",
+              industryAccreditations: "",
+              taxClearanceCert: [],
+              bbbeeCert: [],
+              otherCerts: [],
+              industryAccreditationDocs: []
+            }
+            setFormData(initData)
+            updateData(initData)
+          }
+        } else {
+          // No profile exists yet, use passed data or default structure
+          const initData = Object.keys(data).length > 0 ? data : {
+            taxNumber: "",
+            taxClearanceNumber: "",
+            taxClearanceDate: "",
+            vatNumber: "",
+            rscNumber: "",
+            uifNumber: "",
+            payeNumber: "",
+            bbbeeLevel: "",
+            bbbeeCertRenewalDate: "",
+            cipcStatus: "",
+            coidaNumber: "",
+            industryAccreditations: "",
+            taxClearanceCert: [],
+            bbbeeCert: [],
+            otherCerts: [],
+            industryAccreditationDocs: []
+          }
+          setFormData(initData)
+          updateData(initData)
+        }
+      } catch (error) {
+        console.error("Error loading legal compliance details:", error)
+        // Fallback to passed data on error
+        setFormData(data)
+        updateData(data)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadLegalCompliance()
+  }, []) // Empty dependency array to run only once on mount
+
+  // Update form data when data prop changes (but only if not loading from Firebase)
+  useEffect(() => {
+    if (!isLoading && Object.keys(formData).length === 0) {
+      setFormData(data)
+    }
+  }, [data, isLoading])
+
   const handleChange = (e) => {
     const { name, value } = e.target
-    updateData({ [name]: value })
+    const updatedData = { ...formData, [name]: value }
+    setFormData(updatedData)
+    updateData(updatedData)
   }
 
   const handleFileChange = (name, files) => {
-    updateData({ [name]: files })
+    const updatedData = { ...formData, [name]: files }
+    setFormData(updatedData)
+    updateData(updatedData)
   }
 
   const handleDateChange = (e) => {
     const { name, value } = e.target
-    updateData({ [name]: value })
+    const updatedData = { ...formData, [name]: value }
+    setFormData(updatedData)
+    updateData(updatedData)
+  }
+
+  // Show loading state while fetching data
+  if (isLoading) {
+    return (
+      <div className="legal-compliance-loading">
+        <h2 className="text-2xl font-bold text-brown-800 mb-6">Legal & Compliance</h2>
+        <p>Loading your compliance information...</p>
+      </div>
+    )
   }
 
   return (
@@ -48,7 +160,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
             <input
               type="number"
               name="taxNumber"
-              value={data.taxNumber || ""}
+              value={formData.taxNumber || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               required
@@ -60,7 +172,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
               <input
                 type="number"
                 name="taxClearanceNumber"
-                value={data.taxClearanceNumber || ""}
+                value={formData.taxClearanceNumber || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
                 required
@@ -71,7 +183,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
               <input
                 type="date"
                 name="taxClearanceDate"
-                value={data.taxClearanceDate || ""}
+                value={formData.taxClearanceDate || ""}
                 onChange={handleDateChange}
                 className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
                 required
@@ -83,7 +195,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
             <input
               type="number"
               name="vatNumber"
-              value={data.vatNumber || ""}
+              value={formData.vatNumber || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
             />
@@ -93,7 +205,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
             <input
               type="number"
               name="rscNumber"
-              value={data.rscNumber || ""}
+              value={formData.rscNumber || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
             />
@@ -106,7 +218,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
               <input
                 type="number"
                 name="uifNumber"
-                value={data.uifNumber || ""}
+                value={formData.uifNumber || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               />
@@ -116,7 +228,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
               <input
                 type="number"
                 name="payeNumber"
-                value={data.payeNumber || ""}
+                value={formData.payeNumber || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               />
@@ -127,7 +239,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
             <FormField label="B-BBEE Level" required>
               <select
                 name="bbbeeLevel"
-                value={data.bbbeeLevel || ""}
+                value={formData.bbbeeLevel || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
                 required
@@ -143,15 +255,15 @@ export default function LegalCompliance({ data = {}, updateData }) {
 
             <FormField
               label="Certificate Renewal Date"
-              required={data.bbbeeLevel && data.bbbeeLevel !== "none" && data.bbbeeLevel !== "exempt"}
+              required={formData.bbbeeLevel && formData.bbbeeLevel !== "none" && formData.bbbeeLevel !== "exempt"}
             >
               <input
                 type="date"
                 name="bbbeeCertRenewalDate"
-                value={data.bbbeeCertRenewalDate || ""}
+                value={formData.bbbeeCertRenewalDate || ""}
                 onChange={handleDateChange}
                 className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
-                required={data.bbbeeLevel && data.bbbeeLevel !== "none" && data.bbbeeLevel !== "exempt"}
+                required={formData.bbbeeLevel && formData.bbbeeLevel !== "none" && formData.bbbeeLevel !== "exempt"}
               />
             </FormField>
           </div>
@@ -159,7 +271,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
           <FormField label="CIPC Returns Status" required>
             <select
               name="cipcStatus"
-              value={data.cipcStatus || ""}
+              value={formData.cipcStatus || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
               required
@@ -177,7 +289,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
             <input
               type="number"
               name="coidaNumber"
-              value={data.coidaNumber || ""}
+              value={formData.coidaNumber || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
             />
@@ -186,7 +298,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
           <FormField label="Industry Accreditations (optional)">
             <textarea
               name="industryAccreditations"
-              value={data.industryAccreditations || ""}
+              value={formData.industryAccreditations || ""}
               onChange={handleChange}
               rows={2}
               placeholder="List any industry-specific accreditations"
@@ -205,15 +317,15 @@ export default function LegalCompliance({ data = {}, updateData }) {
             accept=".pdf,.jpg,.jpeg,.png"
             required
             onChange={(files) => handleFileChange("taxClearanceCert", files)}
-            value={data.taxClearanceCert || []}
+            value={formData.taxClearanceCert || []}
           />
 
           <FileUpload
             label="B-BBEE Certificate"
             accept=".pdf,.jpg,.jpeg,.png"
-            required={data.bbbeeLevel && data.bbbeeLevel !== "none" && data.bbbeeLevel !== "exempt"}
+            required={formData.bbbeeLevel && formData.bbbeeLevel !== "none" && formData.bbbeeLevel !== "exempt"}
             onChange={(files) => handleFileChange("bbbeeCert", files)}
-            value={data.bbbeeCert || []}
+            value={formData.bbbeeCert || []}
           />
 
           <FileUpload
@@ -221,7 +333,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
             accept=".pdf,.jpg,.jpeg,.png"
             multiple
             onChange={(files) => handleFileChange("otherCerts", files)}
-            value={data.otherCerts || []}
+            value={formData.otherCerts || []}
           />
 
           <FileUpload
@@ -229,13 +341,9 @@ export default function LegalCompliance({ data = {}, updateData }) {
             accept=".pdf,.jpg,.jpeg,.png"
             multiple
             onChange={(files) => handleFileChange("industryAccreditationDocs", files)}
-            value={data.industryAccreditationDocs || []}
+            value={formData.industryAccreditationDocs || []}
           />
         </div>
-      </div>
-
-      <div className="mt-8 flex justify-end">
-      
       </div>
     </div>
   )

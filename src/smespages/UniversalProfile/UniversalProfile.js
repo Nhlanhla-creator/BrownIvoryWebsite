@@ -36,6 +36,7 @@ export default function UniversalProfile() {
   const [profileSubmitted, setProfileSubmitted] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
   const [profileData, setProfileData] = useState(null)
+  const [isEditing, setIsEditing] = useState(false)
 
   const [completedSections, setCompletedSections] = useState({
     instructions: true,
@@ -150,6 +151,7 @@ export default function UniversalProfile() {
   }
 
   const handleEditProfile = () => {
+    setIsEditing(true)
     setShowSummary(false)
     setActiveSection("entityOverview")
     window.scrollTo(0, 0)
@@ -179,6 +181,7 @@ export default function UniversalProfile() {
 
   const saveDataToFirebase = async (section = null) => {
     try {
+      setLoading(true)
       const userId = auth.currentUser?.uid
       if (!userId) throw new Error("User not logged in.")
 
@@ -194,6 +197,7 @@ export default function UniversalProfile() {
       console.error("Error saving to Firebase:", err)
       alert("Failed to save to Firebase.")
     }
+    finally {setLoading(false)}
   }
 
   const handleSaveSection = async () => {
@@ -208,10 +212,12 @@ export default function UniversalProfile() {
   }
 
   const handleSubmitProfile = async () => {
-    markSectionAsCompleted("declarationConsent")
-    await saveDataToFirebase() // save full form
+
+    await saveDataToFirebase()
+    markSectionAsCompleted("declarationConsent") // save full form
     setProfileSubmitted(true)
     setShowSummary(true) // Show the summary after submission
+    setIsEditing(false) // Reset editing state
     window.scrollTo(0, 0)
     console.log("Submitted:", formData)
   }
@@ -271,6 +277,17 @@ export default function UniversalProfile() {
 
         if (docSnap.exists()) {
           setProfileData(docSnap.data())
+          
+          // Check if profile is complete and show summary only on first load (not editing)
+          const isProfileComplete = 
+            docSnap.data()?.declarationCommitment?.commitReporting &&
+            docSnap.data()?.declarationCommitment?.confirmIntent &&
+            docSnap.data()?.declarationCommitment?.consentShare
+
+          if (isProfileComplete && !isEditing) {
+            setProfileSubmitted(true)
+            setShowSummary(true)
+          }
         } else {
           setError("No profile found. Please complete your Universal Profile first.")
         }
@@ -283,10 +300,20 @@ export default function UniversalProfile() {
     }
 
     fetchProfileData()
-  }, [])
+  }, [isEditing])
 
-  // If profile is submitted and we're showing the summary
-  if (showSummary) {
+if (loading) {
+  return (
+    <div className="loading">
+      <div className="spinner"></div>
+      <div className="loading-message">Fetching your Universal Profile...</div>
+    </div>
+  )
+}
+
+
+  // If profile is submitted and we're showing the summary (and not editing)
+  if (showSummary && !isEditing) {
     return <ProfileSummary data={profileData || formData} onEdit={handleEditProfile} />
   }
 
