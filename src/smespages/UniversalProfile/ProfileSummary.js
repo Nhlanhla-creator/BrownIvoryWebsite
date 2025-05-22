@@ -241,8 +241,8 @@ const ProfileSummary = ({ data, onEdit }) => {
             <div className="summary-item mt-6">
               <span className="summary-label">Documents:</span>
               <span className="summary-value">
-                <div>Certified IDs: {formatFiles(data.ownershipManagement?.certifiedIds)}</div>
-                <div>Share Register: {formatFiles(data.ownershipManagement?.shareRegister)}</div>
+                <div>Certified IDs: {renderDocumentLink(data.ownershipManagement?.certifiedIds, "Document")}</div>
+                <div>Share Register: {renderDocumentLink(data.ownershipManagement?.shareRegister, "Document")}</div>
               </span>
             </div>
           </div>
@@ -309,18 +309,18 @@ const ProfileSummary = ({ data, onEdit }) => {
             <div className="summary-grid">
               <div className="summary-item">
                 <span className="summary-label">LinkedIn:</span>
-                <span className="summary-value">{data.contactDetails?.linkedin || "Not provided"}</span>
+                <span className="summary-value">{renderDocumentLink(data.contactDetails?.linkedin, "Link")}</span>
               </div>
               <div className="summary-item">
                 <span className="summary-label">Other Social Media:</span>
-                <span className="summary-value">{data.contactDetails?.otherSocial || "Not provided"}</span>
+                <span className="summary-value"> {renderDocumentLink(data.contactDetails?.otherSocial, "Link")}</span>
               </div>
             </div>
 
             <div className="summary-item mt-6">
               <span className="summary-label">Documents:</span>
               <span className="summary-value">
-                <div>Proof of Address: {formatFiles(data.contactDetails?.proofOfAddress)}</div>
+                <div>Proof of Address:{renderDocumentLink(data.contactDetails?.proofOfAddress, "Document")}</div>
               </span>
             </div>
           </div>
@@ -389,10 +389,10 @@ const ProfileSummary = ({ data, onEdit }) => {
             <div className="summary-item mt-6">
               <span className="summary-label">Documents:</span>
               <span className="summary-value">
-                <div>Tax Clearance Certificate: {formatFiles(data.legalCompliance?.taxClearanceCert)}</div>
-                <div>B-BBEE Certificate: {formatFiles(data.legalCompliance?.bbbeeCert)}</div>
-                <div>Other Certificates: {formatFiles(data.legalCompliance?.otherCerts)}</div>
-                <div>Industry Accreditations: {formatFiles(data.legalCompliance?.industryAccreditationDocs)}</div>
+                <div>Tax Clearance Certificate: {renderDocumentLink(data.legalCompliance?.taxClearanceCert, "Document")}</div>
+                <div>B-BBEE Certificate: {renderDocumentLink(data.legalCompliance?.bbbeeCert, "Document")}</div>
+                <div>Other Certificates: {renderDocumentLink(data.legalCompliance?.otherCerts, "Document")}</div>
+                <div>Industry Accreditations: {renderDocumentLink(data.legalCompliance?.industryAccreditationDocs, "Document")}</div>
               </span>
             </div>
           </div>
@@ -499,8 +499,8 @@ const ProfileSummary = ({ data, onEdit }) => {
             <div className="summary-item mt-6">
               <span className="summary-label">Documents:</span>
               <span className="summary-value">
-                <div>Company Profile/Brochure: {formatFiles(data.productsServices?.companyProfile)}</div>
-                <div>Client References: {formatFiles(data.productsServices?.clientReferences)}</div>
+                <div>Company Profile/Brochure:  {renderDocumentLink(data.productsServices?.companyProfile, "Document")}</div>
+                <div>Client References:  {renderDocumentLink(data.productsServices?.clientReferences, "Document")}</div>
               </span>
             </div>
           </div>
