@@ -46,7 +46,7 @@ const ApplicationSummary = ({ formData, onEdit }) => {
         </button>
       </div>
 
-      {/* Application Overview Section */}
+    {/* Application Overview Section */}
       <div className="summary-section">
         <div className="summary-section-header" onClick={() => toggleSection("applicationOverview")}>
           <h2>Application Overview</h2>
@@ -56,64 +56,43 @@ const ApplicationSummary = ({ formData, onEdit }) => {
           <div className="summary-content">
             <div className="summary-grid">
               <div className="summary-item">
-                <span className="summary-label">Business Name:</span>
-                <span className="summary-value">{formData.applicationOverview?.businessName || "Not provided"}</span>
+                <span className="summary-label">Application Date:</span>
+                <span className="summary-value">{formData.applicationOverview?.applicationDate || "Not provided"}</span>
+
+              </div>
+         
+              <div className="summary-item">
+                <span className="summary-label">Application Type:</span>
+                <span className="summary-value">{formData.applicationOverview?.applicationType || "Not provided"}</span>
               </div>
               <div className="summary-item">
-                <span className="summary-label">Registration Number:</span>
+                <span className="summary-label">Funding Stage:</span>
+                <span className="summary-value">{formData.applicationOverview?.fundingStage || "Not provided"}</span>
+              </div>
+              <div className="summary-item">
+                <span className="summary-label">preferredStartDate:</span>
                 <span className="summary-value">
-                  {formData.applicationOverview?.registrationNumber || "Not provided"}
+                  {formData.applicationOverview?.preferredStartDate || "Not provided"}
                 </span>
               </div>
               <div className="summary-item">
-                <span className="summary-label">Business Type:</span>
-                <span className="summary-value">{formData.applicationOverview?.businessType || "Not provided"}</span>
+                <span className="summary-label">Submission Channel:</span>
+                <span className="summary-value">{formData.applicationOverview?.submissionChannel || "Not provided"}</span>
               </div>
               <div className="summary-item">
-                <span className="summary-label">Industry Sector:</span>
-                <span className="summary-value">{formData.applicationOverview?.industrySector || "Not provided"}</span>
+                <span className="summary-label">Support Format:</span>
+                <span className="summary-value">{formData.applicationOverview?.supportFormat || "Not provided"}</span>
               </div>
               <div className="summary-item">
-                <span className="summary-label">Years in Operation:</span>
-                <span className="summary-value">
-                  {formData.applicationOverview?.yearsInOperation || "Not provided"}
-                </span>
+                <span className="summary-label">Urgency:</span>
+                <span className="summary-value">{formData.applicationOverview?.urgency || "Not provided"}</span>
               </div>
-              <div className="summary-item">
-                <span className="summary-label">Business Stage:</span>
-                <span className="summary-value">{formData.applicationOverview?.businessStage || "Not provided"}</span>
-              </div>
-              <div className="summary-item">
-                <span className="summary-label">Contact Person:</span>
-                <span className="summary-value">{formData.applicationOverview?.contactPerson || "Not provided"}</span>
-              </div>
-              <div className="summary-item">
-                <span className="summary-label">Contact Email:</span>
-                <span className="summary-value">{formData.applicationOverview?.contactEmail || "Not provided"}</span>
-              </div>
-              <div className="summary-item">
-                <span className="summary-label">Contact Phone:</span>
-                <span className="summary-value">{formData.applicationOverview?.contactPhone || "Not provided"}</span>
-              </div>
-              <div className="summary-item">
-                <span className="summary-label">Business Description:</span>
-                <span className="summary-value">
-                  {formData.applicationOverview?.businessDescription || "Not provided"}
-                </span>
-              </div>
-              <div className="summary-item">
-                <span className="summary-label">Documents:</span>
-                <span className="summary-value">
-                  <div>Company Registration: {formatFiles(formData.applicationOverview?.companyRegistration)}</div>
-                  <div>Tax Clearance: {formatFiles(formData.applicationOverview?.taxClearance)}</div>
-                  <div>B-BBEE Certificate: {formatFiles(formData.applicationOverview?.bbbeeCertificate)}</div>
-                </span>
-              </div>
+              
+             
             </div>
           </div>
         )}
       </div>
-
       {/* Use of Funds Section */}
       <div className="summary-section">
         <div className="summary-section-header" onClick={() => toggleSection("useOfFunds")}>
