@@ -481,38 +481,28 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-brown-200 rounded-lg">
             <thead>
-              <tr className="bg-brown-50">
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Name
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  ID
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Position
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Nationality
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Exec/Non-Exec
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Race
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Gender
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Is Youth?
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Is Disabled?
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Actions
-                </th>
-              </tr>
+           <tr className="bg-brown-50">
+  {[
+    { label: "Name", style: { width: "25%", minWidth: "200px" } },
+    { label: "ID", style: { width: "20%", minWidth: "180px" } },
+    { label: "Position", style: { width: "18%", minWidth: "150px" } },
+    { label: "Nationality", style: { width: "12%" } },
+    { label: "Exec/Non-Exec", style: { width: "80px" } },
+    { label: "Race", style: { width: "10%" } },
+    { label: "Gender", style: { width: "80px" } },
+    { label: "Is Youth?", style: { width: "60px" } },
+    { label: "Is Disabled?", style: { width: "60px" } },
+    { label: "Actions", style: { width: "60px" } },
+  ].map((header, i) => (
+    <th
+      key={i}
+      className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b"
+      style={header.style}
+    >
+      {header.label}
+    </th>
+  ))}
+</tr>
             </thead>
             <tbody>
               {formData.directors?.map((director, index) => (
