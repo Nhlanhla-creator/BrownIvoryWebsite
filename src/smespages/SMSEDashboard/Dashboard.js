@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { DashboardHeader } from "./dashboard-header"
-import { ApplicationTracker } from "./application-tracker"
+import {ApplicationTracker}  from "./application-tracker"
 import { TopMatchesTable } from "./top-matches-table"
 import { LegitimacyScoreCard } from "./legitimacy-score-card"
 import { FundabilityScoreCard } from "./fundability-score-card"

@@ -43,9 +43,27 @@ export function CustomerReviewsCard() {
     <>
       <div className={`ratings-card compact rounded-lg ${showReviewsModal ? "blurred" : ""}`}>
         <div className="ratings-wrapper">
-          <div className="card-header">
-            <h3>Customer Reviews & Ratings</h3>
-          </div>
+   <  div
+  style={{
+    padding: '23px',
+    borderBottom: '1px solid var(--light-brown)',
+    backgroundColor: 'white',
+    display: 'flex',
+    alignItems: 'center' // vertically center the h3 if needed
+  }}
+  >
+  <h3
+    style={{
+      fontSize: '15px',
+      fontWeight: 600,
+      color: '#5d4037',
+      margin: 0,
+      position: 'relative'
+    }}
+  >
+    SMSES Reviews & Ratings
+  </h3>
+</div>
 
           <div className="ratings-summary flex items-center justify-between">
             <div className="ratings-count flex flex-col items-center">

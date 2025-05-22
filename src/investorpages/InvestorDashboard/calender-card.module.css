@@ -3,7 +3,7 @@
     background-color: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    padding: 10px;
+     padding: 24px;
     position: relative;
     overflow: hidden;
     border: 1px solid #e0d6c8;
@@ -11,14 +11,18 @@
   
   /* Card Header - Moved to top with no margin */
   .cardHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 35px;
+  display: flex;
+  color: #4a352f;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1px; /* Reduced from 35px */
+  margin-left: 0; /* Removed left margin */
+  padding: 0 0 10px 0; /* Added padding bottom for separation */
+  border-bottom: 1px solid #e0d6c8; /* Added border for visual separation */
   }
   
   .cardHeader h3 {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 600;
     color: #5d4037;
     margin: 10; /* Removed margin-top to align at the top */

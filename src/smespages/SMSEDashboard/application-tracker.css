@@ -18,13 +18,13 @@
     transition: all 0.3s ease;
     overflow: visible; /* Allow tooltips to overflow */
     border-radius: 0.75rem;
-    border: 1px solid var(--accent-brown);
+    border: 1px solid var(--medium-brown);
     background-color: white;
     box-shadow: 0 4px 12px rgba(77, 52, 46, 0.08);
-    padding: 1.25rem;
-    margin-bottom: 1.5rem;
+    padding: 0.20rem;
+    margin-bottom: 1rem;
     animation: trackerFadeIn 0.5s ease-out forwards;
-    margin-top: 70px;
+    margin-top: 45px;
   }
   
   @keyframes trackerFadeIn {
@@ -56,13 +56,13 @@
     align-items: center;
     margin-bottom: 1.25rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--light-brown);
+    border-bottom: 1px solid var(--medium-brown);
   }
   
   .tracker-header h3 {
     font-size: 1.25rem;
     font-weight: 600;
-    color: var(--dark-brown);
+    color: var(--medium-brown);
     margin: 0;
     position: relative;
   }
@@ -111,7 +111,7 @@
   }
   
   .tracker-step:hover {
-    background-color: var(--medium-brown);
+    background-color: var(--background-brown);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(77, 52, 46, 0.1);
   }

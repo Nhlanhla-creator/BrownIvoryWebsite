@@ -14,16 +14,16 @@
   
   /* Main Card Styles */
   .ratingsCard {
-    background-color: white;
-    border-radius: 0.75rem;
-    padding: 1.25rem;
-    box-shadow: 0 4px 6px rgba(77, 52, 46, 0.08);
-    border: 1px solid var(--accent-brown);
-    transition: all 0.3s ease;
-    width: 100%;
-    max-width: 340px;
-    margin: 0 auto;
-    position: relative;
+  background-color: white;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 4px 6px rgba(77, 52, 46, 0.08);
+  border: 1px solid var(--medium-brown);
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+  position: relative;
   }
   
   .ratingsCard.compact {
@@ -48,13 +48,13 @@
   }
   
   /* Card Header */
-  .ratingsCard .cardHeader {
+  .card-header {
     margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.9rem;
     border-bottom: 1px solid var(--light-brown);
   }
   
-  .ratingsCard .cardHeader h3 {
+  .ratingsCard .card-header h3 {
     font-size: 1.1rem;
     color: var(--dark-brown);
     font-weight: 600;
@@ -124,7 +124,7 @@
   }
   
   /* View More Button */
-  .viewSummaryBtn {
+ .view-summary-btn{
     width: 100%;
     padding: 0.75rem;
     border: none;
@@ -139,7 +139,7 @@
     justify-content: center;
     gap: 0.5rem;
     transition: all 0.2s ease;
-    margin-top: 2.2rem;
+    margin-top: 2.9rem;
   }
   
   .viewSummaryBtn:hover {

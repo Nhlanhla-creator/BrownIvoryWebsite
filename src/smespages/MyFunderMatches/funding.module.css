@@ -31,8 +31,8 @@
   max-width: 100%; /* Limit the maximum width */
   margin-left: 250px; /* Push content to the right */
   margin-right: 0;
-  background-color: var(--brown-50);
-  margin-top: 80px;
+  background-color: #f8f5f2;
+  margin-top: 55px;
 }
 
 .pageContainer {

@@ -23,7 +23,7 @@
   /* Container styles */
   .top-matches-container {
     border-radius: 0.75rem;
-    border: 1px solid var(--accent-brown);
+    border: 3px solid var(--medium-brown);
     background-color: white;
     box-shadow: 0 4px 12px rgba(77, 52, 46, 0.08);
     overflow: hidden;
@@ -31,7 +31,7 @@
     animation: fadeIn 0.5s ease-out forwards;
     animation-delay: 0.5s;
     opacity: 0;
-  margin-top: 60px;
+   margin-top: 60px;
   }
   
   @keyframes fadeIn {
@@ -51,14 +51,7 @@
     background-color: rgba(245, 240, 225, 0.3);
   }
   
-  .top-matches-header h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--dark-brown);
-    margin: 0 0 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--light-brown);
-  }
+
   
   /* Category tabs */
   .category-tabs {
@@ -96,7 +89,7 @@
   }
   
   .category-tab:hover {
-    color: var(--primary-brown);
+    color: var(--medium-brown);
   }
   
   .category-tab.active {

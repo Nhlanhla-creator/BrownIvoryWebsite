@@ -16,7 +16,7 @@ export function CalendarCard() {
   ])
   const [upcomingEvents, setUpcomingEvents] = useState([
     { title: "Investor Meetup", date: "May 15, 2023", type: "meeting" },
-    { title: "Pitch Workshop", date: "May 20, 2023", type: "workshop" },
+   
   ])
   const [isOutlookConnected, setIsOutlookConnected] = useState(false)
   const [isIconBouncing, setIsIconBouncing] = useState(false)
@@ -292,7 +292,7 @@ export function CalendarCard() {
   return (
     <>
       <div className="calendar-card">
-        <div className="card-header">
+        <div className="calender-card-header">
           <h3>Calendar & Events</h3>
           <button
             className={`outlook-btn ${isOutlookConnected ? "connected" : ""}`}

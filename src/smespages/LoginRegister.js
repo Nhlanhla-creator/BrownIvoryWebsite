@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './LoginRegister.css';
-import { Mail, Lock, CheckCircle, Rocket, Smile, User, Briefcase, HeartHandshake } from 'lucide-react';
+import { Mail, Lock, CheckCircle, Rocket, Smile, User, Briefcase, HeartHandshake, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '../firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
@@ -26,19 +26,22 @@ export default function LoginRegister() {
   const [showNDA, setShowNDA] = useState(false);
   const [ndaComplete, setNdaComplete] = useState(false);
   const [registrationData, setRegistrationData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // Loading state for buttons
 
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
   const handleRegister = async () => {
+    setIsLoading(true); // Start loading
     const newErrors = {};
     if (!validateEmail(email)) newErrors.email = 'Oops! Wrong email';
     if (password.length < 6) newErrors.password = 'Make it longer (at least 6 characters)';
     if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords don\'t match!';
-    if (!role) newErrors.role = 'What\'s your superpower?';
+    if (!role) newErrors.role = 'What\'s your role?';
     if (!company) newErrors.company = 'Please enter your company name'; // Validate company
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      setIsLoading(false); // Stop loading if validation fails
       return;
     }
 
@@ -66,6 +69,8 @@ export default function LoginRegister() {
     } catch (error) {
       console.error('Registration error:', error);
       setAuthError(error.message);
+    } finally {
+      setIsLoading(false); // Stop loading in any case
     }
   };
  
@@ -114,13 +119,13 @@ export default function LoginRegister() {
       
       // Redirect based on role after NDA completion
       if (role === 'Investor') {
-        navigate('/investor-dashboard');
+        navigate('/investor-profile');
       } else if (role === 'SME/BUSINESS') {
-        navigate('/dashboard');
+        navigate('/profile');
       } else if (role === 'Support Program') {
-        navigate('/support-dashboard');
+        navigate('/profile');
       } else {
-        navigate('/dashboard');
+        navigate('/profile');
       }
       
     } catch (error) {
@@ -138,23 +143,25 @@ export default function LoginRegister() {
     
     // Redirect based on role after verification
     if (role === 'Investor') {
-      navigate('/investor-dashboard');
+      navigate('/investor-profile');
     } else if (role === 'SME/BUSINESS') {
-      navigate('/dashboard');
+      navigate('/profile');
     } else if (role === 'Support Program') {
-      navigate('/support-dashboard');
+      navigate('/profile');
     } else {
-      navigate('/dashboard');
+      navigate('/profile');
     }
   };
 
   const handleLogin = async () => {
+    setIsLoading(true); // Start loading
     const newErrors = {};
     if (!validateEmail(email)) newErrors.email = 'Enter your email!';
     if (password === '') newErrors.password = 'Enter your password!';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      setIsLoading(false); // Stop loading if validation fails
       return;
     }
 
@@ -172,13 +179,13 @@ export default function LoginRegister() {
         
         // Redirect based on role - NDA check removed
         if (userRole === 'Investor') {
-          navigate('/investor-dashboard');
+          navigate('/investor-profile');
         } else if (userRole === 'SME/BUSINESS') {
-          navigate('/dashboard');
+          navigate('/profile');
         } else if (userRole === 'Support Program') {
-          navigate('/support-dashboard');
+          navigate('/profile');
         } else {
-          navigate('/dashboard');
+          navigate('/profile');
         }
       } else {
         console.log('User document not found!');
@@ -187,6 +194,8 @@ export default function LoginRegister() {
     } catch (error) {
       console.error('Login error:', error);
       setAuthError(error.message);
+    } finally {
+      setIsLoading(false); // Stop loading in any case
     }
   };
 
@@ -232,10 +241,20 @@ export default function LoginRegister() {
                     onClick={handleVerify}
                     onMouseEnter={() => setIsHovering(true)}
                     onMouseLeave={() => setIsHovering(false)}
+                    disabled={isLoading}
                   >
-                    <CheckCircle size={16} /> 
-                    {isHovering ? 'Open Sesame!' : 'Verify Email'}
-                    {isHovering && <span className="sparkle">✨</span>}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="animate-spin" size={16} />
+                        Verifying...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle size={16} /> 
+                        {isHovering ? 'Open Sesame!' : 'Verify Email'}
+                        {isHovering && <span className="sparkle">✨</span>}
+                      </>
+                    )}
                   </button>
                 </div>
               ) : (
@@ -313,8 +332,18 @@ export default function LoginRegister() {
                   <button 
                     className="primary-btn" 
                     onClick={handleRegister}
+                    disabled={isLoading}
                   >
-                    Create Account <Rocket size={16} />
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="animate-spin" size={16} />
+                        Creating Account...
+                      </>
+                    ) : (
+                      <>
+                        Create Account <Rocket size={16} />
+                      </>
+                    )}
                   </button>
                   <p className="switch-link">
                     Already part of us? <span onClick={() => setIsRegistering(false)}>Login</span>
@@ -353,8 +382,18 @@ export default function LoginRegister() {
                 <button 
                   className="primary-btn" 
                   onClick={handleLogin}
+                  disabled={isLoading}
                 >
-                  Login! <Smile size={16} />
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="animate-spin" size={16} />
+                      Logging in...
+                    </>
+                  ) : (
+                    <>
+                      Login! <Smile size={16} />
+                    </>
+                  )}
                 </button>
                 <p className="switch-link">
                   New to the family? <span onClick={() => setIsRegistering(true)}>Join us!</span>
@@ -407,4 +446,3 @@ export default function LoginRegister() {
     </div>
   );
 }
-

@@ -220,7 +220,7 @@ export function InvestorSMETable() {
 
   return (
     <div className={styles.tableSection}>
-      <h2 className={styles.sectionTitle}>SME Applications</h2>
+      <h2 className={styles.sectionTitle}>SMSE Applications</h2>
 
       {notification && (
         <div className={`${styles.notification} ${styles[notification.type]}`}>
@@ -232,7 +232,7 @@ export function InvestorSMETable() {
         <table className={styles.fundingTable}>
           <thead>
             <tr>
-              <th>SME Name</th>
+              <th>SMSE Name</th>
               <th>Investment Type</th>
               <th>% Match</th>
               <th>Location</th>

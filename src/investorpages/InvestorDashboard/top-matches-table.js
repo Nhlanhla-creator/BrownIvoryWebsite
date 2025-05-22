@@ -39,7 +39,7 @@ export function SMEApplicationsTable({ selectedCategory: initialCategory = "SME 
       }
     };
 
-    if (selectedCategory === "SME Applications") {
+    if (selectedCategory === "SMSE Applications") {
       fetchApplications();
     }
   }, [selectedCategory]);
@@ -63,13 +63,13 @@ export function SMEApplicationsTable({ selectedCategory: initialCategory = "SME 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h3>SME Applications</h3>
+        <h3>SMSE Applications</h3>
         <div className={styles.categoryTabs}>
           <button
-            className={`${styles.categoryTab} ${selectedCategory === "SME Applications" ? styles.active : ""}`}
-            onClick={() => setSelectedCategory("SME Applications")}
+            className={`${styles.categoryTab} ${selectedCategory === "SMSE Applications" ? styles.active : ""}`}
+            onClick={() => setSelectedCategory("SMSE Applications")}
           >
-            SME Applications
+            SMSE Applications
           </button>
         </div>
       </div>
@@ -78,7 +78,7 @@ export function SMEApplicationsTable({ selectedCategory: initialCategory = "SME 
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>SME Name</th>
+              <th>SMSE Name</th>
               <th>Investment Type</th>
               <th>% Match</th>
               <th>Location</th>

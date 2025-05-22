@@ -1,10 +1,10 @@
 /* My Documents Page Styles */
 .my-documents-page {
-  background-color: #F2F0E6;
+  background-color:  #f8f5f2;
   padding: 24px;
   min-height: 100vh;
   margin-left: 250px;
-  margin-top: 80px;
+  margin-top:55px;
   box-sizing: border-box;
 }
 
@@ -29,7 +29,7 @@
 }
 
 .upload-button {
-  background-color: #9E6E3C;
+  background-color:#4a352f;
   color: white;
   padding: 10px 16px;
   border-radius: 6px;
@@ -62,7 +62,7 @@
 }
 
 .filter-btn.active {
-  background-color: #9E6E3C;
+  background-color: #4a352f;
   color: white;
 }
 
@@ -88,8 +88,8 @@
 }
 
 .documents-table th {
-  background-color: #F2F0E6;
-  color: #754A2D;
+  background-color: #7d5a50;
+  color: white;
   padding: 12px;
   text-align: left;
 }

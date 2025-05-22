@@ -43,9 +43,21 @@ export function CustomerReviewsCard({ styles }) {
     <>
       <div className={`ratings-card compact rounded-lg ${showReviewsModal ? "blurred" : ""}`}>
       <div className="ratings-wrapper">
-        <div className="card-header">
-          <h3>Customer Reviews & Ratings</h3>
-        </div>
+  <div
+  style={{
+    padding: '22px',
+    borderBottom: '1px solid var(--medium-brown)',
+    backgroundColor: 'white',
+    fontSize: '15px',
+    color: 'var(--dark-brown)',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+   marginLeft: '-30px',
+  }}
+>
+  <h3 style={{ margin: 0 }}>Customer Reviews & Ratings</h3>
+</div>
 
         <div className="ratings-summary flex items-center justify-between">
           <div className="ratings-count flex flex-col items-center">

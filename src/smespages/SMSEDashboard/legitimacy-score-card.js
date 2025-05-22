@@ -90,9 +90,17 @@ export function LegitimacyScoreCard({ styles, profileData }) {
   return (
     <>
       <div className={`readiness-card fun-card ${showModal ? "blurred" : ""}`}>
-        <div className="fun-card-header">
-          <h2>BIG Legitimacy Score</h2>
-        </div>
+     <div
+     style={{
+    padding: '30px',
+    borderBottom: '1px solid var(--medium-brown)',
+    backgroundColor: 'white',
+    fontSize: '12px', // adjust as needed
+    color: 'var(--dark-brown)', // replace with desired color or hex code
+     }}
+     >
+  <h2>BIG Legitimacy Score</h2>
+</div>
 
         <div className="score-wrapper">
           <div
@@ -112,7 +120,7 @@ export function LegitimacyScoreCard({ styles, profileData }) {
           <button
             className="fun-button"
             onClick={() => setShowModal(true)}
-            style={{ backgroundColor: styles.paleBrown, color: styles.primaryBrown }}
+            style={{ backgroundColor: ' #8d6e63', color: 'white' }}
           >
             View More
             <ChevronDown className="ml-1 inline-block" size={16} />
