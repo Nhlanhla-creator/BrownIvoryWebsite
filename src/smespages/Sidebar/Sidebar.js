@@ -259,7 +259,7 @@ const Sidebar = ({ companyName = "Company Name" }) => {
         
         {/* Header */}
         <div className="company-header">
-          <div className="logo-circle">{companyName.charAt(0)}</div>
+
           {!isCollapsed && (
             <div className="company-info">
               <div className="company-name">{companyName}</div>
