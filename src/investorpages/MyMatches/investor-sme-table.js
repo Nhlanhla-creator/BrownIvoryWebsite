@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Eye, Check, X, CalendarCheck2, FileText, Send, AlertTriangle } from 'lucide-react'
 import styles from "./investor-funding.module.css"
 import { db } from "../../firebaseConfig"
-import { collection, query, where, onSnapshot, updateDoc, doc } from "firebase/firestore"
+import { collection, query, where, onSnapshot, updateDoc, doc, getDoc, getDocs } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 
 export function InvestorSMETable() {
@@ -23,19 +23,19 @@ export function InvestorSMETable() {
   useEffect(() => {
     const auth = getAuth()
     const user = auth.currentUser
-    
+
     if (!user) {
       setLoading(false)
       return
     }
-    
+
     setLoading(true)
-    
+
     const q = query(
       collection(db, "investorApplications"),
       where("funderId", "==", user.uid)
     )
-    
+
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const applications = []
       querySnapshot.forEach((doc) => {
@@ -44,7 +44,7 @@ export function InvestorSMETable() {
           ...doc.data()
         })
       })
-      
+
       // Sort by application date (newest first)
       applications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       setSmes(applications)
@@ -57,7 +57,7 @@ export function InvestorSMETable() {
       })
       setLoading(false)
     })
-    
+
     return () => unsubscribe()
   }, [])
 
@@ -65,61 +65,79 @@ export function InvestorSMETable() {
     // Validate form if approving or declining
     if (modalType !== "view") {
       const errors = {}
-      
+
       if (!message.trim()) {
         errors.message = "Please provide a message to the SME"
       }
-      
+
       if (modalType === "approve" && !meetingTime) {
         errors.meetingTime = "Please select a meeting time"
       }
-      
+
       if (modalType === "approve" && !meetingLocation.trim()) {
         errors.meetingLocation = "Please provide a meeting location"
       }
-      
+
       if (modalType === "approve" && !meetingPurpose.trim()) {
         errors.meetingPurpose = "Please provide a purpose for the meeting"
       }
-      
+
       if (Object.keys(errors).length > 0) {
         setFormErrors(errors)
         return
       }
     }
-    
-    setIsSubmitting(true)
-    
+
+    setIsSubmitting(true);
+
     try {
       const updateData = {
         status: status,
         responseMessage: message,
-        updatedAt: new Date().toISOString()
-      }
-      
+        updatedAt: new Date().toISOString(),
+      };
+
       if (status === "Approved") {
-        updateData.meetingTime = meetingTime
-        updateData.meetingLocation = meetingLocation
-        updateData.meetingPurpose = meetingPurpose
+        updateData.meetingTime = meetingTime;
+        updateData.meetingLocation = meetingLocation;
+        updateData.meetingPurpose = meetingPurpose;
       }
-      
-      await updateDoc(doc(db, "investorApplications", id), updateData)
-      
+
+      // Update investorApplications
+      await updateDoc(doc(db, "investorApplications", id), updateData);
+
+      // Also find and update the corresponding smeApplications doc
+      const investorAppSnap = await getDoc(doc(db, "investorApplications", id));
+      const { smeId, funderId } = investorAppSnap.data();
+
+      // Find matching application in smeApplications
+      const smeQuery = query(
+        collection(db, "smeApplications"),
+        where("smeId", "==", smeId),
+        where("funderId", "==", funderId)
+      );
+
+      const smeSnapshot = await getDocs(smeQuery);
+      if (!smeSnapshot.empty) {
+        const smeDocRef = smeSnapshot.docs[0].ref;
+        await updateDoc(smeDocRef, { status: status, updatedAt: new Date().toISOString() });
+      }
+
       setNotification({
         type: "success",
-        message: `Application ${status.toLowerCase()} successfully`
-      })
-      
-      setTimeout(() => setNotification(null), 3000)
-      resetModal()
+        message: `Application ${status.toLowerCase()} successfully`,
+      });
+
+      setTimeout(() => setNotification(null), 3000);
+      resetModal();
     } catch (error) {
-      console.error("Error updating application:", error)
+      console.error("Error updating application:", error);
       setNotification({
         type: "error",
-        message: "Failed to update application"
-      })
+        message: "Failed to update application",
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -135,8 +153,8 @@ export function InvestorSMETable() {
 
   const getStatusBadgeClass = (status) => {
     let baseClass = styles.statusBadge
-    
-    switch(status) {
+
+    switch (status) {
       case "Approved":
         return `${baseClass} ${styles.statusApproved}`
       case "Declined":
@@ -150,19 +168,19 @@ export function InvestorSMETable() {
 
   const handleSendMessage = async () => {
     if (!message.trim()) {
-      setFormErrors({...formErrors, message: "Please provide a message to the SME"})
+      setFormErrors({ ...formErrors, message: "Please provide a message to the SME" })
       return
     }
-    
+
     setIsSubmitting(true)
-    
+
     try {
       // In a real app, you might send this via email or store it separately
       setNotification({
         type: "success",
         message: "Message sent successfully"
       })
-      
+
       setTimeout(() => setNotification(null), 3000)
     } catch (error) {
       setNotification({
@@ -176,33 +194,33 @@ export function InvestorSMETable() {
 
   const handleScheduleMeeting = async () => {
     const errors = {}
-    
+
     if (!meetingTime) {
       errors.meetingTime = "Please select a meeting time"
     }
-    
+
     if (!meetingLocation.trim()) {
       errors.meetingLocation = "Please provide a meeting location"
     }
-    
+
     if (!meetingPurpose.trim()) {
       errors.meetingPurpose = "Please provide a purpose for the meeting"
     }
-    
+
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors)
       return
     }
-    
+
     setIsSubmitting(true)
-    
+
     try {
       // In a real app, you would integrate with a calendar API
       setNotification({
         type: "success",
         message: "Meeting scheduled successfully"
       })
-      
+
       setTimeout(() => setNotification(null), 3000)
     } catch (error) {
       setNotification({
@@ -258,8 +276,8 @@ export function InvestorSMETable() {
                   <td>{sme.investmentType}</td>
                   <td>
                     <div className={styles.matchPercentage}>
-                      <div 
-                        className={styles.matchBar} 
+                      <div
+                        className={styles.matchBar}
                         style={{ width: `${sme.matchPercentage}%` }}
                       ></div>
                       <span>{sme.matchPercentage}%</span>
@@ -276,23 +294,23 @@ export function InvestorSMETable() {
                     </span>
                   </td>
                   <td style={{ whiteSpace: "nowrap" }}>
-                    <button 
-                      className={styles.actionBtn} 
+                    <button
+                      className={styles.actionBtn}
                       title="View details"
                       onClick={() => { setSelectedSME(sme); setModalType("view") }}
                     >
                       <Eye size={16} />
                     </button>
-                    <button 
-                      className={styles.actionBtn} 
+                    <button
+                      className={styles.actionBtn}
                       title="Approve application"
                       onClick={() => { setSelectedSME(sme); setModalType("approve") }}
                       disabled={sme.status !== "Application Received"}
                     >
                       <Check size={16} />
                     </button>
-                    <button 
-                      className={styles.actionBtn} 
+                    <button
+                      className={styles.actionBtn}
                       title="Decline application"
                       onClick={() => { setSelectedSME(sme); setModalType("decline") }}
                       disabled={sme.status !== "Application Received"}
@@ -311,10 +329,10 @@ export function InvestorSMETable() {
         <div className={styles.modalOverlay} onClick={resetModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <h3 className={styles.modalTitle}>
-              {modalType === "approve" 
-                ? "Approve Application" 
-                : modalType === "decline" 
-                  ? "Decline Application" 
+              {modalType === "approve"
+                ? "Approve Application"
+                : modalType === "decline"
+                  ? "Decline Application"
                   : "View SME Application"}
             </h3>
             <p className={styles.modalSMEName}><strong>{selectedSME.smeName}</strong></p>
@@ -356,7 +374,7 @@ export function InvestorSMETable() {
                     onChange={(e) => {
                       setMessage(e.target.value)
                       if (e.target.value.trim()) {
-                        setFormErrors({...formErrors, message: null})
+                        setFormErrors({ ...formErrors, message: null })
                       }
                     }}
                     placeholder="Type your message here..."
@@ -379,7 +397,7 @@ export function InvestorSMETable() {
                         onChange={(e) => {
                           setMeetingTime(e.target.value)
                           if (e.target.value) {
-                            setFormErrors({...formErrors, meetingTime: null})
+                            setFormErrors({ ...formErrors, meetingTime: null })
                           }
                         }}
                       />
@@ -389,7 +407,7 @@ export function InvestorSMETable() {
                         </p>
                       )}
                     </div>
-                    
+
                     <div>
                       <label>Meeting Location:</label>
                       <input
@@ -399,7 +417,7 @@ export function InvestorSMETable() {
                         onChange={(e) => {
                           setMeetingLocation(e.target.value)
                           if (e.target.value.trim()) {
-                            setFormErrors({...formErrors, meetingLocation: null})
+                            setFormErrors({ ...formErrors, meetingLocation: null })
                           }
                         }}
                         placeholder="e.g., Office, Virtual Meeting, etc."
@@ -410,7 +428,7 @@ export function InvestorSMETable() {
                         </p>
                       )}
                     </div>
-                    
+
                     <div>
                       <label>Purpose of Meeting:</label>
                       <input
@@ -420,7 +438,7 @@ export function InvestorSMETable() {
                         onChange={(e) => {
                           setMeetingPurpose(e.target.value)
                           if (e.target.value.trim()) {
-                            setFormErrors({...formErrors, meetingPurpose: null})
+                            setFormErrors({ ...formErrors, meetingPurpose: null })
                           }
                         }}
                         placeholder="e.g., Initial Discussion, Due Diligence, etc."
@@ -439,28 +457,28 @@ export function InvestorSMETable() {
             <div className={styles.modalActions}>
               {modalType !== "view" && (
                 <>
-                  <button 
-                    className={styles.confirmBtn} 
+                  <button
+                    className={styles.confirmBtn}
                     onClick={handleSendMessage}
                     disabled={isSubmitting}
                   >
                     <Send size={16} /> Send Message
                   </button>
-                  
+
                   {modalType === "approve" && (
-                    <button 
-                      className={styles.confirmBtn} 
+                    <button
+                      className={styles.confirmBtn}
                       onClick={handleScheduleMeeting}
                       disabled={isSubmitting}
                     >
                       <CalendarCheck2 size={16} /> Schedule Meeting
                     </button>
                   )}
-                  
+
                   <button
                     className={modalType === "approve" ? styles.approveBtn : styles.declineBtn}
                     onClick={() => handleUpdateStatus(
-                      selectedSME.id, 
+                      selectedSME.id,
                       modalType === "approve" ? "Approved" : "Declined"
                     )}
                     disabled={isSubmitting}
@@ -475,8 +493,8 @@ export function InvestorSMETable() {
                   </button>
                 </>
               )}
-              <button 
-                className={styles.cancelBtn} 
+              <button
+                className={styles.cancelBtn}
                 onClick={resetModal}
                 disabled={isSubmitting}
               >

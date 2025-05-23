@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import "./top-matches.css";
 
@@ -11,47 +11,41 @@ export function TopMatchesTable({ selectedCategory: initialCategory = "Funders",
   const [funderMatches, setFunderMatches] = useState([]);
 
   useEffect(() => {
-    const fetchFunderApplications = async () => {
-      try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-        if (!user) return;
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) return;
 
-        const q = query(
-          collection(db, "smeApplications"),
-          where("smeId", "==", user.uid)
-        );
+    const q = query(
+      collection(db, "smeApplications"),
+      where("smeId", "==", user.uid)
+    );
 
-        const snapshot = await getDocs(q);
-        const seen = new Set(); // To track unique funder names
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const seen = new Set();
+      const results = snapshot.docs
+        .map(doc => doc.data())
+        .filter(app => app.status && app.status !== "Draft") // exclude drafts
+        .filter(app => {
+          if (seen.has(app.fundName)) return false;
+          seen.add(app.fundName);
+          return true;
+        })
+        .map(app => ({
+          id: app.fundId || app.fundName,
+          name: app.fundName || "Unnamed Funder",
+          investmentType: app.investmentType || "N/A",
+          match: app.matchPercentage || 0,
+          location: app.location || "N/A",
+          stageFocus: app.stage || "N/A",
+          status: app.status || "Submitted",
+        }));
 
-        const results = snapshot.docs
-          .map(doc => doc.data())
-          .filter(app => app.status && app.status.toLowerCase().includes("application")) // filter only submitted
-          .filter(app => {
-            if (seen.has(app.fundName)) return false;
-            seen.add(app.fundName);
-            return true;
-          })
-          .map(app => ({
-            id: app.fundId || app.fundName,
-            name: app.fundName || "Unnamed Funder",
-            investmentType: app.investmentType || "N/A",
-            match: app.matchPercentage || 0,
-            location: app.location || "N/A",
-            stageFocus: app.stage || "N/A",
-            status: app.status || "Submitted",
-          }));
+      setFunderMatches(results);
+    }, (error) => {
+      console.error("Failed to load funder matches:", error);
+    });
 
-        setFunderMatches(results);
-      } catch (error) {
-        console.error("Failed to load funder matches:", error);
-      }
-    };
-
-    if (selectedCategory === "Funders") {
-      fetchFunderApplications();
-    }
+    return () => unsubscribe();
   }, [selectedCategory, refreshKey]);
 
   const getStatusClass = (status) => {
