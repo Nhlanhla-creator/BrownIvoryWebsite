@@ -81,7 +81,7 @@ function InvestorSidebar({ companyName }) {
     },
     { 
       id: "matches", 
-      label: "Matches", 
+      label: "Matches Dashboard", 
       icon: <HeartHandshake size={18} />, 
       route: "/investor-matches" 
     },

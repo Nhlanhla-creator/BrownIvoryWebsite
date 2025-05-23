@@ -304,7 +304,7 @@
 
 .welcome-side {
   flex: 1;
-  background: linear-gradient(135deg, var(--primary-dark) 0%, #b89f8d 100%);
+  background: linear-gradient(135deg, var(--primary-dark) 0%,#592d18 100%);
   color: var(--background-light);
   display: flex;
   flex-direction: column;

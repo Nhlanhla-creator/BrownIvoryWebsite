@@ -14,7 +14,7 @@ import styles from "./investor-funding.module.css"
 // Onboarding steps for the welcome popup
 const onboardingSteps = [
   {
-    title: "Welcome to Your Investment Dashboard",
+    title: "Welcome to Your SMSE Dashboard",
     content: "This dashboard provides you with tools to discover, analyze, and manage potential investment opportunities.",
     icon: "💼",
   },
@@ -140,12 +140,12 @@ export default function InvestorDashboardPage() {
         </div>
 
         <div className={styles.sectionCard}>
-          <h2 className={styles.sectionTitle}>Filter SMEs</h2>
+          <h2 className={styles.sectionTitle}>Filter SMSEs</h2>
           <FilterFunding onFilterChange={handleFilterChange} filters={filters} />
         </div>
 
         <div className={styles.sectionCard}>
-          <h2 className={styles.sectionTitle}>SME Opportunities</h2>
+      
           <InvestorSMETable filters={filters} />
         </div>
       </div>

@@ -1,5 +1,6 @@
 /* Main container and overlay styles */
 .container {
+  overflow: auto;
   position: relative;
   width: 100%;
   font-family: 'Arial', sans-serif;
@@ -22,9 +23,9 @@
   background-color: #fff8f0;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(79, 46, 29, 0.3);
-  width: 90%;
-  max-width: 800px;
-  max-height: 90vh;
+  width: 95%; /* Increased from 90% to make it wider */
+  max-width: 1200px; /* Increased from 800px to allow more width */
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   border: 2px solid #8b5a2b;
@@ -45,81 +46,87 @@
   font-weight: 600;
 }
 
-/* NDA content styles */
+/* NDA content styles - MADE MUCH WIDER */
 .nda-content {
-  padding: 20px;
+  padding: 120px 40px; /* Increased horizontal padding */
   overflow-y: auto;
-  max-height: 50vh;
+  max-height: 80%; /* Increased from 50vh to give more reading space */
   background-color: #fff8f0;
   border: 1px solid #d2b48c;
-  margin: 15px;
+  margin: 15px 20px; /* Reduced horizontal margin to use more space */
   border-radius: 4px;
   color: #4e2e1d;
   line-height: 1.6;
+  width: calc(100% - 40px); /* Use almost full width minus margins */
 }
 
 /* ENLARGED TITLE SECTION - BIGGER OVERALL */
 .nda-title {
   text-align: center;
-  margin: 0 auto 40px auto; /* Increased bottom margin */
-  padding: 40px 20px; /* Added significant padding to make section bigger */
-  max-width: 90%; /* Control width */
-  line-height: 1.8; /* Increased line height for more vertical space */
+  margin: 0 auto 40px auto;
+  padding: 40px 30px; /* Increased horizontal padding */
+  max-width: 95%; /* Increased from 90% to use more width */
+  line-height: 1.8;
 }
 
 .nda-title h3 {
   color: #5d4037;
   font-weight: bold;
-  font-size: 2.2rem; /* Increased font size */
+  font-size: 2.2rem;
   letter-spacing: 1px;
   text-transform: uppercase;
-  margin-bottom: 15px; /* More space below title */
-  line-height: 1.4; /* Specific line height for title */
+  margin-bottom: 15px;
+  line-height: 1.4;
 }
 
 .nda-title p {
   font-size: 1.4rem;
-  margin: 10px 0; /* More space between paragraphs */
+  margin: 10px 0;
   color: #6b4226;
 }
 
 .company-name {
   font-weight: bold;
   color: #8b5a2b;
-  font-size: 1.8rem !important; /* Increased font size */
-  margin: 15px 0 !important; /* More space around company names */
+  font-size: 1.8rem !important;
+  margin: 15px 0 !important;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  line-height: 1.4; /* Specific line height for company name */
+  line-height: 1.4;
 }
 
 .nda-content h4 {
   color: #5d4037;
-  margin-top: 20px;
-  margin-bottom: 10px;
+  margin-top: 25px; /* Increased spacing */
+  margin-bottom: 15px; /* Increased spacing */
   border-bottom: 1px solid #d2b48c;
-  padding-bottom: 5px;
+  padding-bottom: 8px;
+  font-size: 1.3rem; /* Made headings larger */
 }
 
 .nda-content ol {
-  padding-left: 20px;
+  padding-left: 25px; /* Increased indentation */
+  margin-bottom: 20px; /* Added more space between sections */
 }
 
 .nda-content li {
-  margin-bottom: 10px;
+  margin-bottom: 15px; /* Increased spacing between list items */
+  font-size: 1.05rem; /* Slightly larger text */
+  line-height: 1.7; /* Better line spacing */
 }
 
 .nda-note {
   font-style: italic;
-  margin-top: 20px;
-  padding: 10px;
+  margin-top: 25px;
+  padding: 15px 20px; /* Increased padding */
   background-color: #f5e9d9;
   border-left: 4px solid #8b5a2b;
+  font-size: 1.05rem; /* Larger text */
 }
 
 /* Signature section styles */
 .signature-section {
-  padding: 20px;
+  padding:1px 30px; /* Increased padding */
   background-color: #f5e9d9;
   border-top: 1px solid #d2b48c;
   border-bottom-left-radius: 6px;
@@ -131,12 +138,16 @@
 }
 
 .signature-info p {
-  margin: 5px 0;
+  margin: 8px 0; /* Increased spacing */
   color: #5d4037;
+  font-size: 1.05rem; /* Larger text */
 }
 
 .signature-canvas-container {
-  margin: 15px 0;
+  margin: 20px 0; /* Increased margin */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .signature-canvas {
@@ -144,7 +155,8 @@
   background-color: #fff;
   cursor: crosshair;
   width: 100%;
-  max-width: 400px;
+  max-width: 500px; /* Increased from 400px */
+  height: 120px; /* Increased height */
   border-radius: 4px;
 }
 
@@ -152,11 +164,11 @@
   background-color: #a67c52;
   color: white;
   border: none;
-  padding: 5px 10px;
+  padding: 8px 15px; /* Increased padding */
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
-  margin-top: 5px;
+  font-size: 1rem; /* Increased font size */
+  margin-top: -11px;
 }
 
 .clear-signature-btn:hover {
@@ -167,17 +179,18 @@
 .button-group {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 15px; /* Increased gap */
+  margin-top: 25px; /* Increased margin */
 }
 
 .btn {
-  padding: 10px 20px;
+  padding: 12px 25px; /* Increased padding */
   border-radius: 4px;
   font-weight: 600;
   cursor: pointer;
   border: none;
   transition: all 0.3s ease;
+  font-size: 1rem; /* Ensured consistent font size */
 }
 
 .btn-primary {
@@ -219,18 +232,19 @@
 /* Warning and error messages */
 .warning-text {
   color: #a6551d;
-  font-size: 0.9rem;
-  margin-top: 10px;
+  font-size: 1rem; /* Increased font size */
+  margin-top: 15px; /* Increased margin */
   text-align: center;
 }
 
 .error-message {
   background-color: #f8d7da;
   color: #842029;
-  padding: 10px 15px;
-  margin: 15px;
+  padding: 15px 20px; /* Increased padding */
+  margin: 20px; /* Increased margin */
   border-radius: 4px;
   border-left: 4px solid #842029;
+  font-size: 1rem; /* Increased font size */
 }
 
 /* Loading overlay */
@@ -271,7 +285,7 @@
   box-shadow: 0 4px 20px rgba(79, 46, 29, 0.3);
   padding: 30px;
   text-align: center;
-  max-width: 600px;
+  max-width: 700px; /* Increased from 600px */
   margin: 0 auto;
   border: 2px solid #8b5a2b;
 }
@@ -285,21 +299,40 @@
   background-color: #f5e9d9;
   border: 1px solid #d2b48c;
   border-radius: 4px;
-  padding: 15px;
-  margin: 20px 0;
+  padding: 20px; /* Increased padding */
+  margin: 25px 0; /* Increased margin */
   text-align: left;
 }
 
 .user-info-box p {
-  margin: 5px 0;
+  margin: 8px 0; /* Increased spacing */
   color: #5d4037;
+  font-size: 1.05rem; /* Larger text */
 }
 
 /* Responsive adjustments */
+@media (max-width: 1024px) {
+  .popup-content {
+    width: 98%;
+    max-width: 1000px;
+  }
+  
+  .nda-content {
+    padding: 25px 30px;
+    margin: 15px;
+  }
+}
+
 @media (max-width: 768px) {
   .popup-content {
-    width: 95%;
+    width: 98%;
     max-height: 95vh;
+  }
+  
+  .nda-content {
+    padding: 20px 25px;
+    margin: 10px;
+    max-height: 55vh;
   }
   
   .button-group {
@@ -311,9 +344,8 @@
     margin-bottom: 10px;
   }
   
-  /* Make title section responsive */
   .nda-title {
-    padding: 25px 15px; /* Smaller padding on mobile but still substantial */
+    padding: 25px 20px;
   }
   
   .nda-title h3 {
@@ -326,5 +358,20 @@
   
   .nda-title p {
     font-size: 1.2rem;
+  }
+  
+  .signature-canvas {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .nda-content {
+    padding: 15px 20px;
+    margin: 8px;
+  }
+  
+  .signature-section {
+    padding: 20px;
   }
 }

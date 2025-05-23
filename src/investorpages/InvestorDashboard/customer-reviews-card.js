@@ -84,13 +84,29 @@ export function CustomerReviewsCard() {
             </div>
           </div>
 
-          <button
-            className="view-summary-btn centered-btn w-full"
-            onClick={() => setShowReviewsModal(true)}
-          >
-            View More
-            <ChevronDown className="ml-1 inline-block" size={16} />
-          </button>
+       <div
+  style={{
+    
+    height: "100%", // or a specific height like "300px"
+  }}
+>
+  {/* Other content goes here */}
+
+  <button
+    style={{
+      marginTop: "57px",
+       width: "100%",
+         padding: "10px 16px",
+           borderRadius: "7px",
+      
+    }}
+    onClick={() => setShowReviewsModal(true)}
+  >
+    View More
+    <ChevronDown style={{ marginLeft: "8px", display: "inline-block" }} size={16} />
+  </button>
+</div>
+
         </div>
       </div>
 
