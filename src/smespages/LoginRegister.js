@@ -322,7 +322,7 @@ export default function LoginRegister() {
                       className={role ? 'has-value' : ''}
                     >
                       <option value="">I am a </option>
-                      <option value="SME/BUSINESS">SME</option>
+                      <option value="SME/BUSINESS"> Small and Medium Social Enterprise</option>
                       <option value="Investor">Investor</option>
                       <option value="Support Program">Support Program</option>
                     </select>
