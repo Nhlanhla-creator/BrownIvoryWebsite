@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
@@ -6,7 +6,7 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import "./top-matches.css";
 
-export function TopMatchesTable({ selectedCategory: initialCategory = "Funders" }) {
+export function TopMatchesTable({ selectedCategory: initialCategory = "Funders", refreshKey = 0 }) {
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [funderMatches, setFunderMatches] = useState([]);
 
@@ -17,18 +17,31 @@ export function TopMatchesTable({ selectedCategory: initialCategory = "Funders" 
         const user = auth.currentUser;
         if (!user) return;
 
-        const q = query(collection(db, "smeApplications"), where("smeId", "==", user.uid));
-        const snapshot = await getDocs(q);
+        const q = query(
+          collection(db, "smeApplications"),
+          where("smeId", "==", user.uid)
+        );
 
-        const results = snapshot.docs.map(doc => ({
-          id: doc.id,
-          name: doc.data().fundName,
-          investmentType: doc.data().investmentType,
-          match: doc.data().matchPercentage,
-          location: doc.data().location,
-          stageFocus: doc.data().stage,
-          status: doc.data().status
-        }));
+        const snapshot = await getDocs(q);
+        const seen = new Set(); // To track unique funder names
+
+        const results = snapshot.docs
+          .map(doc => doc.data())
+          .filter(app => app.status && app.status.toLowerCase().includes("application")) // filter only submitted
+          .filter(app => {
+            if (seen.has(app.fundName)) return false;
+            seen.add(app.fundName);
+            return true;
+          })
+          .map(app => ({
+            id: app.fundId || app.fundName,
+            name: app.fundName || "Unnamed Funder",
+            investmentType: app.investmentType || "N/A",
+            match: app.matchPercentage || 0,
+            location: app.location || "N/A",
+            stageFocus: app.stage || "N/A",
+            status: app.status || "Submitted",
+          }));
 
         setFunderMatches(results);
       } catch (error) {
@@ -39,7 +52,7 @@ export function TopMatchesTable({ selectedCategory: initialCategory = "Funders" 
     if (selectedCategory === "Funders") {
       fetchFunderApplications();
     }
-  }, [selectedCategory]);
+  }, [selectedCategory, refreshKey]);
 
   const getStatusClass = (status) => {
     if (["New", "Open", "Available", "Accepting", "Application Received"].some(s => status.includes(s))) {
@@ -62,15 +75,12 @@ export function TopMatchesTable({ selectedCategory: initialCategory = "Funders" 
       <div className="top-matches-header">
         <h3>Top Matches</h3>
         <div className="category-tabs">
-          {["Funders"].map((category) => (
-            <button
-              key={category}
-              className={`category-tab ${selectedCategory === category ? "active" : ""}`}
-              onClick={() => setSelectedCategory(category)}
-            >
-              {category}
-            </button>
-          ))}
+          <button
+            className={`category-tab ${selectedCategory === "Funders" ? "active" : ""}`}
+            onClick={() => setSelectedCategory("Funders")}
+          >
+            Funders
+          </button>
         </div>
       </div>
 

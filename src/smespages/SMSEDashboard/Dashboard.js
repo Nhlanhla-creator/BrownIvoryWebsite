@@ -17,9 +17,9 @@ import "./Dashboard.css"
 export function Dashboard() {
   const [profileData, setProfileData] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [refreshKey, setRefreshKey] = useState(0)
   const [selectedCategory, setSelectedCategory] = useState("Funders");
   const [showDashboardPopup, setShowDashboardPopup] = useState(false)
+  const [applicationRefreshKey, setApplicationRefreshKey] = useState(0);
   const [currentDashboardStep, setCurrentDashboardStep] = useState(0)
   const user = auth.currentUser
   const userName = user ? user.email : "User"
@@ -162,7 +162,7 @@ export function Dashboard() {
   }
 
   const handleApplicationSubmitted = () => {
-    setRefreshKey((prev) => prev + 1)
+    setApplicationRefreshKey((prev) => prev + 1);
   }
 
   if (loading) {
@@ -240,14 +240,10 @@ export function Dashboard() {
             </div>
           </section>
 
-          <section className="funding-table-section">
-            <FundingTable onApplicationSubmitted={handleApplicationSubmitted} />
-          </section>
-
           {/* Top Matches - Full Width */}
           <section className="top-matches-section">
             <TopMatchesTable
-              key={refreshKey}
+              key={applicationRefreshKey}
               styles={styles}
               selectedCategory={selectedCategory}
               setSelectedCategory={setSelectedCategory}

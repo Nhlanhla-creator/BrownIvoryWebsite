@@ -60,6 +60,7 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
         };
 
         setCurrentBusiness(businessData);
+        console.log("Business Profile for Matching:", businessData);
 
         const investorsSnapshot = await getDocs(collection(db, "MyuniversalProfiles"));
         const matchedFunds = [];
@@ -69,8 +70,15 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
           const funds = investorData.formData?.productsServices?.funds || [];
 
           funds.forEach((fund) => {
-            const matchScore = calculateMatchScore(businessData, fund);
-            if (matchScore >= 30) {
+            const matchScore = calculateHybridScore(businessData, fund);
+            console.log("Matching Fund:", {
+              fundName: fund.name,
+              businessSectors: businessData.economicSectors,
+              fundSectorFocus: fund.sectorFocus,
+              matchScore,
+            });
+
+            if (matchScore >= 5) {
               matchedFunds.push({
                 id: `${investorDoc.id}_${fund.name}`,
                 funderId: investorDoc.id,
@@ -90,8 +98,9 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
           });
         });
 
+        matchedFunds.sort((a, b) => b.matchPercentage - a.matchPercentage);
         setAllFunders(matchedFunds);
-        setFunders(applyFilters(matchedFunds, filters));
+        setFunders(matchedFunds); // Show unfiltered results to ensure they appear
       } catch (error) {
         setNotification({ type: "error", message: "Failed to load funder data." });
       } finally {
@@ -102,76 +111,58 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (!filters || allFunders.length === 0) return;
-    setFunders(applyFilters(allFunders, filters));
-  }, [filters]);
+  const calculateHybridScore = (business, fund) => {
+    const weights = {
+      sector: 0.3,
+      stage: 0.25,
+      ticketSize: 0.25,
+      location: 0.1,
+      support: 0.1,
+    };
 
-  const applyFilters = (funders, filters) => {
-    return funders
-      .filter((funder) => {
-        const {
-          location, matchScore, minValue, maxValue,
-          instruments, stages, sectors, supportTypes,
-          funderType, sortBy
-        } = filters || {};
-
-        if (location && !funder.geographicFocus.toLowerCase().includes(location.toLowerCase())) return false;
-        if (matchScore && funder.matchPercentage < matchScore) return false;
-        if (minValue && funder.maxInvestment < Number(minValue)) return false;
-        if (maxValue && funder.minInvestment > Number(maxValue)) return false;
-        if (instruments?.length && !instruments.some(i => funder.investmentType.toLowerCase().includes(i.toLowerCase()))) return false;
-        if (stages?.length && !stages.some(s => funder.targetStage.toLowerCase().includes(s.toLowerCase()))) return false;
-        if (sectors?.length && !sectors.some(sector => funder.sectorFocus.toLowerCase().includes(sector.toLowerCase()))) return false;
-        if (supportTypes?.length && !supportTypes.some(support => funder.supportOffered.toLowerCase().includes(support.toLowerCase()))) return false;
-        if (funderType && funder.website?.toLowerCase().includes(funderType.toLowerCase()) === false) return false;
-
-        return true;
-      })
-      .sort((a, b) => {
-        switch (filters.sortBy) {
-          case "Match Score (High to Low)": return b.matchPercentage - a.matchPercentage;
-          case "Match Score (Low to High)": return a.matchPercentage - b.matchPercentage;
-          case "Amount (High to Low)": return b.maxInvestment - a.maxInvestment;
-          case "Amount (Low to High)": return a.minInvestment - b.minInvestment;
-          default: return 0;
-        }
-      });
-  };
-
-  const calculateMatchScore = (business, fund) => {
     let score = 0;
-    const sector = (business.economicSector || "").toLowerCase();
-    const stage = (business.operationStage || "").toLowerCase();
-    const location = (business.location || "").toLowerCase();
-    const amount = parseFloat(business.useOfFunds?.amountRequested || 0);
 
-    if (fund.sectorFocus?.some(s => s.toLowerCase() === sector)) score += 30;
-    else if (ADJACENT_INDUSTRIES[sector]?.some(ai => fund.sectorFocus?.includes(ai))) score += 20;
+    const sectorMatch = Array.isArray(business.economicSectors) && fund.sectorFocus?.some(
+      s => business.economicSectors.map(sector => sector.toLowerCase()).includes(s.toLowerCase())
+    ) ? 10 : 0;
+    score += sectorMatch * weights.sector;
 
     const stageIndex = FUNDING_STAGES.indexOf(business.operationStage);
     const fundStageIndex = FUNDING_STAGES.indexOf(fund.stages?.[0]);
-    if (stageIndex === fundStageIndex) score += 30;
-    else if (Math.abs(stageIndex - fundStageIndex) === 1) score += 15;
+    const stageMatch = stageIndex === fundStageIndex ? 10 : Math.abs(stageIndex - fundStageIndex) === 1 ? 6 : 0;
+    score += stageMatch * weights.stage;
 
+    const amount = parseFloat(business.useOfFunds?.amountRequested || 0);
     const min = parseFloat(fund.ticketMin || 0);
     const max = parseFloat(fund.ticketMax || 0);
-    if (amount >= min && amount <= max) score += 25;
-    else if (max > min) {
+    let ticketScore = 0;
+    if (amount >= min && amount <= max) {
+      ticketScore = 10;
+    } else if (max > min) {
       const midpoint = (min + max) / 2;
-      const penalty = Math.abs(amount - midpoint) / (max - min) * 25;
-      score += Math.max(0, 25 - penalty);
+      const penalty = Math.abs(amount - midpoint) / (max - min) * 10;
+      ticketScore = Math.max(0, 10 - penalty);
     }
+    score += ticketScore * weights.ticketSize;
 
-    if (fund.geographicFocus?.some(l => l.toLowerCase() === location)) score += 15;
+    const locationMatch = fund.geographicFocus?.some(
+      loc => loc.toLowerCase() === business.location?.toLowerCase()
+    ) ? 10 : 0;
+    score += locationMatch * weights.location;
 
-    return Math.min(100, Math.round(score));
+    const supportMatch = Array.isArray(business.supportNeeded) && fund.supportOffered?.some(
+      s => business.supportNeeded.map(need => need.toLowerCase()).includes(s.toLowerCase())
+    ) ? 10 : 0;
+    score += supportMatch * weights.support;
+
+    return Math.round(score * 10);
   };
 
   const formatTicketSize = (min, max) => {
     if (!min && !max) return "Not specified";
     return `R${Number(min).toLocaleString()} - R${Number(max).toLocaleString()}`;
   };
+
 
   const handleViewClick = async (funder) => {
     try {
