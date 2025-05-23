@@ -12,14 +12,12 @@ export function LegitimacyScoreCard({ styles, profileData }) {
   useEffect(() => {
     if (profileData) {
       const { score, documents } = calculateComplianceStatus(profileData)
-      // Calculate the multiplier to scale the score to 100
-      const multiplier = score > 0 ? 100 / score : 0
-      setLegitimacyScore(Math.round(score * multiplier))
+      setLegitimacyScore(score) // No multiplier needed
       setComplianceDocuments(documents)
     }
   }, [profileData])
 
-  const calculateComplianceStatus = (profileData) => {
+  const calculateComplianceStatus = (data) => {
     const documentMapping = [
       {
         path: "entityOverview.registrationCertificate",
@@ -60,7 +58,7 @@ export function LegitimacyScoreCard({ styles, profileData }) {
 
     let presentCount = 0
     const documents = documentMapping.map(doc => {
-      const isPresent = checkDocumentExists(profileData, doc.path)
+      const isPresent = checkDocumentExists(data, doc.path)
       if (isPresent) presentCount++
       return {
         ...doc,
@@ -80,27 +78,31 @@ export function LegitimacyScoreCard({ styles, profileData }) {
       if (value === undefined || value === null || value === "") {
         return false
       }
-      if (typeof value === 'object' && (value.url || value.fileName)) {
-        return true
+    }
+
+    if (typeof value === 'object') {
+      if ('url' in value || 'fileName' in value) {
+        return Boolean(value.url || value.fileName)
       }
     }
-    return true
+
+    return Boolean(value)
   }
 
   return (
     <>
       <div className={`readiness-card fun-card ${showModal ? "blurred" : ""}`}>
-     <div
-     style={{
-    padding: '30px',
-    borderBottom: '1px solid var(--medium-brown)',
-    backgroundColor: 'white',
-    fontSize: '12px', // adjust as needed
-    color: 'var(--dark-brown)', // replace with desired color or hex code
-     }}
-     >
-  <h2>BIG Legitimacy Score</h2>
-</div>
+        <div
+          style={{
+            padding: '30px',
+            borderBottom: '1px solid var(--medium-brown)',
+            backgroundColor: 'white',
+            fontSize: '12px',
+            color: 'var(--dark-brown)'
+          }}
+        >
+          <h2>BIG Legitimacy Score</h2>
+        </div>
 
         <div className="score-wrapper">
           <div
@@ -120,7 +122,7 @@ export function LegitimacyScoreCard({ styles, profileData }) {
           <button
             className="fun-button"
             onClick={() => setShowModal(true)}
-            style={{ backgroundColor: ' #8d6e63', color: 'white' }}
+            style={{ backgroundColor: '#8d6e63', color: 'white' }}
           >
             View More
             <ChevronDown className="ml-1 inline-block" size={16} />
@@ -134,9 +136,9 @@ export function LegitimacyScoreCard({ styles, profileData }) {
             <button className="close-btn" onClick={() => setShowModal(false)}>×</button>
             <h3 className="popup-title">Legitimacy Verification</h3>
             <ul className="summary-list">
-              {complianceDocuments.map((doc, i) => (
-                <li key={i} className="summary-item">
-                  <div className="summary-label">
+              {complianceDocuments.map((doc) => (
+                <li key={doc.path} className="summary-item">
+                  <div className="summary-label" title={doc.description}>
                     <div className="summary-bullet" style={{ backgroundColor: styles.accentBrown }}></div>
                     <span>{doc.displayName}</span>
                   </div>

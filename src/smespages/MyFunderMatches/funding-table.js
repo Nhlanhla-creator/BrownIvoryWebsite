@@ -5,6 +5,7 @@ import styles from "./funding.module.css";
 import { db } from "../../firebaseConfig";
 import { doc, getDoc, collection, getDocs, addDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+
 import InvestorProfileSummary from "../../investorpages/InvestorUniversalProfile/investor-profile-summary";
 
 const ADJACENT_INDUSTRIES = {
@@ -29,14 +30,14 @@ const DOCUMENTS = [
   "Financial Statements", "Support Letters / Endorsements ", "Scope of Work"
 ];
 
-export function FundingTable() {
+export function FundingTable({ filters, onApplicationSubmitted }) {
   const [funders, setFunders] = useState([]);
+  const [allFunders, setAllFunders] = useState([]);
   const [currentBusiness, setCurrentBusiness] = useState(null);
   const [loading, setLoading] = useState(true);
   const [statuses, setStatuses] = useState({});
   const [modalFunder, setModalFunder] = useState(null);
   const [applyingFunder, setApplyingFunder] = useState(null);
-  const [selectedDocs, setSelectedDocs] = useState([]);
   const [notification, setNotification] = useState(null);
   const [submittedDocuments, setSubmittedDocuments] = useState([]);
 
@@ -89,13 +90,8 @@ export function FundingTable() {
           });
         });
 
-        setFunders(
-          matchedFunds.sort(
-            (a, b) =>
-              b.matchPercentage - a.matchPercentage ||
-              a.minInvestment - b.minInvestment
-          )
-        );
+        setAllFunders(matchedFunds);
+        setFunders(applyFilters(matchedFunds, filters));
       } catch (error) {
         setNotification({ type: "error", message: "Failed to load funder data." });
       } finally {
@@ -107,48 +103,51 @@ export function FundingTable() {
   }, []);
 
   useEffect(() => {
-    const fetchUserDocuments = async () => {
-      try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-        if (!user) return;
+    if (!filters || allFunders.length === 0) return;
+    setFunders(applyFilters(allFunders, filters));
+  }, [filters]);
 
-        const profileSnap = await getDoc(doc(db, "universalProfiles", user.uid));
-        if (!profileSnap.exists()) return;
+  const applyFilters = (funders, filters) => {
+    return funders
+      .filter((funder) => {
+        const {
+          location, matchScore, minValue, maxValue,
+          instruments, stages, sectors, supportTypes,
+          funderType, sortBy
+        } = filters || {};
 
-        const profileData = profileSnap.data();
-        const submitted = new Set();
+        if (location && !funder.geographicFocus.toLowerCase().includes(location.toLowerCase())) return false;
+        if (matchScore && funder.matchPercentage < matchScore) return false;
+        if (minValue && funder.maxInvestment < Number(minValue)) return false;
+        if (maxValue && funder.minInvestment > Number(maxValue)) return false;
+        if (instruments?.length && !instruments.some(i => funder.investmentType.toLowerCase().includes(i.toLowerCase()))) return false;
+        if (stages?.length && !stages.some(s => funder.targetStage.toLowerCase().includes(s.toLowerCase()))) return false;
+        if (sectors?.length && !sectors.some(sector => funder.sectorFocus.toLowerCase().includes(sector.toLowerCase()))) return false;
+        if (supportTypes?.length && !supportTypes.some(support => funder.supportOffered.toLowerCase().includes(support.toLowerCase()))) return false;
+        if (funderType && funder.website?.toLowerCase().includes(funderType.toLowerCase()) === false) return false;
 
-        const extractDocs = (obj) => {
-          if (typeof obj === "string" && obj.startsWith("http")) {
-            DOCUMENTS.forEach((doc) => {
-              const key = doc.toLowerCase().replace(/[^a-z]/g, "").slice(0, 6);
-              if (obj.toLowerCase().includes(key)) submitted.add(doc);
-            });
-          } else if (typeof obj === "object" && obj !== null) {
-            Object.values(obj).forEach(extractDocs);
-          }
-        };
-
-        extractDocs(profileData);
-        setSubmittedDocuments([...submitted]);
-      } catch (err) {
-        console.error("Failed to load documents:", err);
-      }
-    };
-
-    fetchUserDocuments();
-  }, []);
+        return true;
+      })
+      .sort((a, b) => {
+        switch (filters.sortBy) {
+          case "Match Score (High to Low)": return b.matchPercentage - a.matchPercentage;
+          case "Match Score (Low to High)": return a.matchPercentage - b.matchPercentage;
+          case "Amount (High to Low)": return b.maxInvestment - a.maxInvestment;
+          case "Amount (Low to High)": return a.minInvestment - b.minInvestment;
+          default: return 0;
+        }
+      });
+  };
 
   const calculateMatchScore = (business, fund) => {
     let score = 0;
-    const businessSector = (business.economicSector || "").toLowerCase();
-    const businessStage = (business.operationStage || "").toLowerCase();
-    const businessLocation = (business.location || "").toLowerCase();
-    const requestedAmount = parseFloat(business.useOfFunds?.amountRequested || 0);
+    const sector = (business.economicSector || "").toLowerCase();
+    const stage = (business.operationStage || "").toLowerCase();
+    const location = (business.location || "").toLowerCase();
+    const amount = parseFloat(business.useOfFunds?.amountRequested || 0);
 
-    if (fund.sectorFocus?.some(s => s.toLowerCase() === businessSector)) score += 30;
-    else if (ADJACENT_INDUSTRIES[businessSector]?.some(ai => fund.sectorFocus?.includes(ai))) score += 20;
+    if (fund.sectorFocus?.some(s => s.toLowerCase() === sector)) score += 30;
+    else if (ADJACENT_INDUSTRIES[sector]?.some(ai => fund.sectorFocus?.includes(ai))) score += 20;
 
     const stageIndex = FUNDING_STAGES.indexOf(business.operationStage);
     const fundStageIndex = FUNDING_STAGES.indexOf(fund.stages?.[0]);
@@ -157,14 +156,14 @@ export function FundingTable() {
 
     const min = parseFloat(fund.ticketMin || 0);
     const max = parseFloat(fund.ticketMax || 0);
-    if (requestedAmount >= min && requestedAmount <= max) score += 25;
+    if (amount >= min && amount <= max) score += 25;
     else if (max > min) {
       const midpoint = (min + max) / 2;
-      const penalty = Math.abs(requestedAmount - midpoint) / (max - min) * 25;
+      const penalty = Math.abs(amount - midpoint) / (max - min) * 25;
       score += Math.max(0, 25 - penalty);
     }
 
-    if (fund.geographicFocus?.some(l => l.toLowerCase() === businessLocation)) score += 15;
+    if (fund.geographicFocus?.some(l => l.toLowerCase() === location)) score += 15;
 
     return Math.min(100, Math.round(score));
   };
@@ -220,6 +219,7 @@ export function FundingTable() {
 
       await addDoc(collection(db, "investorApplications"), applicationData);
       await addDoc(collection(db, "smeApplications"), applicationData);
+      onApplicationSubmitted?.();
 
       setStatuses((prev) => ({ ...prev, [funder.id]: "Application Sent" }));
       setApplyingFunder(null);

@@ -10,13 +10,15 @@ import { CalendarCard } from "./calendar-card"
 import { CustomerReviewsCard } from "./customer-reviews-card"
 import { doc, getDoc } from "firebase/firestore"
 import { auth, db } from "../../firebaseConfig"
+import { FundingTable } from "../../smespages/MyFunderMatches/funding-table";
 import { X, ChevronRight } from "lucide-react"
 import "./Dashboard.css"
 
 export function Dashboard() {
   const [profileData, setProfileData] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [selectedCategory, setSelectedCategory] = useState("Customers")
+  const [refreshKey, setRefreshKey] = useState(0)
+  const [selectedCategory, setSelectedCategory] = useState("Funders");
   const [showDashboardPopup, setShowDashboardPopup] = useState(false)
   const [currentDashboardStep, setCurrentDashboardStep] = useState(0)
   const user = auth.currentUser
@@ -159,6 +161,10 @@ export function Dashboard() {
     localStorage.setItem(getUserSpecificKey("hasSeenDashboardPopup"), "true")
   }
 
+  const handleApplicationSubmitted = () => {
+    setRefreshKey((prev) => prev + 1)
+  }
+
   if (loading) {
     return <div className="flex h-screen items-center justify-center">Loading dashboard...</div>
   }
@@ -234,9 +240,14 @@ export function Dashboard() {
             </div>
           </section>
 
+          <section className="funding-table-section">
+            <FundingTable onApplicationSubmitted={handleApplicationSubmitted} />
+          </section>
+
           {/* Top Matches - Full Width */}
           <section className="top-matches-section">
             <TopMatchesTable
+              key={refreshKey}
               styles={styles}
               selectedCategory={selectedCategory}
               setSelectedCategory={setSelectedCategory}
