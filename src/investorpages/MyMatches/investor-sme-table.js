@@ -45,7 +45,6 @@ export function InvestorSMETable() {
         })
       })
 
-      // Sort by application date (newest first)
       applications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       setSmes(applications)
       setLoading(false)
@@ -62,7 +61,6 @@ export function InvestorSMETable() {
   }, [])
 
   const handleUpdateStatus = async (id, status) => {
-    // Validate form if approving or declining
     if (modalType !== "view") {
       const errors = {}
 
@@ -103,14 +101,11 @@ export function InvestorSMETable() {
         updateData.meetingPurpose = meetingPurpose;
       }
 
-      // Update investorApplications
       await updateDoc(doc(db, "investorApplications", id), updateData);
 
-      // Also find and update the corresponding smeApplications doc
       const investorAppSnap = await getDoc(doc(db, "investorApplications", id));
       const { smeId, funderId } = investorAppSnap.data();
 
-      // Find matching application in smeApplications
       const smeQuery = query(
         collection(db, "smeApplications"),
         where("smeId", "==", smeId),
@@ -139,7 +134,6 @@ export function InvestorSMETable() {
           type: "inbox"
         });
 
-        // Optional: Save to funder's 'sent' messages
         await addDoc(collection(db, "messages"), {
           to: smeId,
           from: funderId,
@@ -148,6 +142,17 @@ export function InvestorSMETable() {
           date: new Date().toISOString(),
           read: true,
           type: "sent"
+        });
+      }
+
+      if (status === "Approved") {
+        await addDoc(collection(db, "smeCalendarEvents"), {
+          smeId,
+          title: meetingPurpose,
+          date: meetingTime,
+          location: meetingLocation,
+          type: "meeting",
+          createdAt: new Date().toISOString()
         });
       }
 
@@ -168,6 +173,7 @@ export function InvestorSMETable() {
       setIsSubmitting(false);
     }
   }
+
 
   const resetModal = () => {
     setSelectedSME(null)

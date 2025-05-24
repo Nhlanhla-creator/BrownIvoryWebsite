@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import "./myDocuments.css";
 import { getAuth } from "firebase/auth"
-import { doc, getDoc } from "firebase/firestore"
+import { getDoc } from "firebase/firestore"
 import { db } from "../../firebaseConfig"
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore"
 import get from "lodash.get"
 import { ChevronDown, ChevronUp, FileText, ExternalLink, Loader } from "lucide-react";
 
@@ -136,8 +138,32 @@ const MyDocuments = () => {
     fetchUserDocuments();
   }, []);
 
-  const handleUpload = (doc) => {
-    setSubmittedDocuments([...submittedDocuments, doc]);
+  const handleFileUpload = async (docLabel, file) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user || !file) return;
+
+    const storage = getStorage();
+    const storageRef = ref(storage, `documents/${user.uid}/${docLabel}.pdf`);
+
+    try {
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+
+      const profileRef = doc(db, "universalProfiles", user.uid);
+      const path = DOCUMENT_PATHS[docLabel];
+      const timestampField = `${path}UpdatedAt`;
+
+      await updateDoc(profileRef, {
+        [path]: downloadURL,
+        [timestampField]: serverTimestamp()
+      });
+
+      // Optionally refetch profileData
+      alert(`${docLabel} uploaded successfully.`);
+    } catch (error) {
+      console.error("Upload failed:", error);
+    }
   };
 
   const handleDelete = (doc) => {
@@ -209,15 +235,21 @@ const MyDocuments = () => {
                           {isSubmitted ? 'Submitted' : 'Pending'}
                         </span>
                       </td>
-                      <td className="document-actions">
-                        {isSubmitted ? (
-                          <>
-                            {renderDocumentLink(doc)}
-                            <button onClick={() => handleDelete(doc)}>Delete</button>
-                          </>
-                        ) : (
-                          <button onClick={() => handleUpload(doc)}>Upload</button>
-                        )}
+                      <td>
+                        {renderDocumentLink(doc)}
+                        <label className="upload-btn">
+                          {isSubmitted ? "Update" : "Upload"}
+                          <input
+                            type="file"
+                            style={{ display: "none" }}
+                            onChange={(e) => handleFileUpload(doc, e.target.files[0])}
+                          />
+                        </label>
+                      </td>
+                      <td>
+                        {get(profileData, `${DOCUMENT_PATHS[doc]}UpdatedAt`)
+                          ? new Date(get(profileData, `${DOCUMENT_PATHS[doc]}UpdatedAt`).seconds * 1000).toLocaleDateString()
+                          : "-"}
                       </td>
                     </tr>
                   );
