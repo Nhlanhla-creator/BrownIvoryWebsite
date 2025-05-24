@@ -1,26 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Bell, Mail, Search, Calendar, ChevronDown, 
-  Settings, LogOut, User, HelpCircle 
+import {
+  Bell, Mail, Search, Calendar, ChevronDown,
+  Settings, LogOut, User, HelpCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './DashboardHeader.css';
 import { auth } from "../../firebaseConfig";
+import { db } from "../../firebaseConfig";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { getDoc, doc as docRef } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+
 
 const Header = ({ companyName, profileImage, setProfileImage }) => {
   const navigate = useNavigate();
   const user = auth.currentUser;
   const userName = user ? user.displayName || user.email.split('@')[0] : "User";
   const userEmail = user ? user.email : "";
-  
+
   const [date, setDate] = useState(new Date());
-  const [unreadNotifications] = useState(3);
-  const [unreadMessages] = useState(2);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [recentMessages, setRecentMessages] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showMessages, setShowMessages] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   const notificationsRef = useRef(null);
   const messagesRef = useRef(null);
   const profileRef = useRef(null);
@@ -31,8 +37,67 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
     const timer = setInterval(() => {
       setDate(new Date());
     }, 60000);
-    
+
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const unsubscribeAuth = getAuth().onAuthStateChanged((user) => {
+      if (!user) return;
+
+      const q = query(
+        collection(db, "messages"),
+        where("to", "==", user.uid),
+        where("read", "==", false)
+      );
+
+      const unsubscribeMessages = onSnapshot(q, (snapshot) => {
+        setUnreadMessages(snapshot.size);
+
+        const fetchSenderNames = async () => {
+          const limitedDocs = snapshot.docs.slice(0, 5);
+
+          const messagesWithNames = await Promise.all(
+            limitedDocs.map(async (doc) => {
+              const msg = doc.data();
+              const fromUID = msg.from;
+
+              try {
+                const senderDoc = await getDoc(docRef(db, "MyuniversalProfiles", fromUID));
+                if (senderDoc.exists()) {
+                  const data = senderDoc.data();
+                  const fundName = data?.formData?.productsServices?.funds?.[0]?.name;
+                  return {
+                    ...msg,
+                    senderName: fundName || "Unnamed Funder",
+                  };
+                } else {
+                  return {
+                    ...msg,
+                    senderName: "Unknown Funder",
+                  };
+                }
+              } catch (err) {
+                console.error("Error fetching sender name:", err);
+                return {
+                  ...msg,
+                  senderName: "Unknown Funder",
+                };
+              }
+            })
+          );
+
+          setRecentMessages(messagesWithNames);
+        };
+
+        fetchSenderNames();
+      });
+
+      // Cleanup
+      return () => unsubscribeMessages();
+    });
+
+    return () => unsubscribeAuth();
   }, []);
 
   // Handle clicks outside to close dropdowns
@@ -48,7 +113,7 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
         setShowProfileMenu(false);
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -63,7 +128,7 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
       reader.readAsDataURL(file);
     }
   };
-  
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -71,7 +136,7 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
       setSearchQuery('');
     }
   };
-  
+
   const handleLogout = () => {
     auth.signOut()
       .then(() => {
@@ -81,7 +146,7 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
         console.error("Error signing out: ", error);
       });
   };
-  
+
   // Format date
   const formattedDate = date.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -95,13 +160,13 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
       <div className="header-left">
         {/* Added logo container */}
         <div className="header-logo">
-          <img 
-            src="/PrimaryLogo.jpg" 
-            alt="Company Logo" 
+          <img
+            src="/PrimaryLogo.jpg"
+            alt="Company Logo"
             className="logo-image"
           />
         </div>
-        
+
         <h1 className="welcome-message">
           Welcome back, <span className="user-name">{userName}</span>
           <span className="date-display">
@@ -110,7 +175,7 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
           </span>
         </h1>
       </div>
-      
+
       <div className="header-right">
         <div className="header-icons">
           <div className="icon-wrapper" ref={notificationsRef}>
@@ -128,7 +193,7 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
                 <span className="notification-badge">{unreadNotifications}</span>
               )}
             </button>
-            
+
             {showNotifications && (
               <div className="dropdown-menu notifications-dropdown">
                 <div className="dropdown-header">
@@ -165,7 +230,7 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
               </div>
             )}
           </div>
-          
+
           <div className="icon-wrapper" ref={messagesRef}>
             <button
               className={`icon-button ${showMessages ? 'active' : ''}`}
@@ -181,7 +246,7 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
                 <span className="message-badge">{unreadMessages}</span>
               )}
             </button>
-            
+
             {showMessages && (
               <div className="dropdown-menu messages-dropdown">
                 <div className="dropdown-header">
@@ -190,26 +255,27 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
                 </div>
                 <div className="dropdown-divider"></div>
                 <div className="messages-list">
-                  <div className="message-item unread">
-                    <div className="message-avatar">
-                      <img src="https://i.pravatar.cc/100?img=1" alt="Avatar" />
-                    </div>
-                    <div className="message-content">
-                      <p className="message-sender">Support Team</p>
-                      <p className="message-text">Your request has been processed...</p>
-                      <p className="message-time">10 min ago</p>
-                    </div>
-                  </div>
-                  <div className="message-item unread">
-                    <div className="message-avatar">
-                      <img src="https://i.pravatar.cc/100?img=2" alt="Avatar" />
-                    </div>
-                    <div className="message-content">
-                      <p className="message-sender">John Doe</p>
-                      <p className="message-text">I've shared the document with you...</p>
-                      <p className="message-time">Yesterday</p>
-                    </div>
-                  </div>
+                  {recentMessages.length === 0 ? (
+                    <div className="message-item">No new messages</div>
+                  ) : (
+                    recentMessages.map((msg, index) => (
+                      <div key={index} className="message-item unread">
+                        <div className="message-avatar">
+                          <img src="https://i.pravatar.cc/100?img=2" alt="Avatar" />
+                        </div>
+                        <div className="message-content">
+                          <p className="message-sender">{msg.senderName || "Unknown Funder"}</p>
+                          <p className="message-text">{msg.subject}</p>
+                          <p className="message-time">{new Date(msg.date).toLocaleString("en-ZA", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            day: "numeric",
+                            month: "short"
+                          })}</p>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
                 <div className="dropdown-footer">
                   <button onClick={() => navigate('/messages')}>View all messages</button>
@@ -218,9 +284,9 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
             )}
           </div>
         </div>
-        
+
         <div className="profile-wrapper" ref={profileRef}>
-          <button 
+          <button
             className="profile-button profile-button-simple"
             onClick={() => {
               setShowProfileMenu(!showProfileMenu);
@@ -230,10 +296,10 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
           >
             <div className="profile-image-container">
               {profileImage ? (
-                <img 
-                  src={profileImage} 
-                  alt="Profile" 
-                  className="profile-image" 
+                <img
+                  src={profileImage}
+                  alt="Profile"
+                  className="profile-image"
                 />
               ) : (
                 <div className="profile-placeholder">
@@ -242,7 +308,7 @@ const Header = ({ companyName, profileImage, setProfileImage }) => {
               )}
             </div>
           </button>
-          
+
           {showProfileMenu && (
             <div className="dropdown-menu profile-dropdown">
               <div className="dropdown-header">
