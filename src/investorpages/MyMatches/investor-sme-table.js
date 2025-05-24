@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Eye, Check, X, CalendarCheck2, FileText, Send, AlertTriangle } from 'lucide-react'
 import styles from "./investor-funding.module.css"
 import { db } from "../../firebaseConfig"
-import { collection, query, where, onSnapshot, updateDoc, doc, getDoc, getDocs } from "firebase/firestore"
+import { collection, query, where, onSnapshot, updateDoc, doc, getDoc, getDocs, addDoc } from "firebase/firestore"
 import { getAuth } from "firebase/auth"
 
 export function InvestorSMETable() {
@@ -121,6 +121,34 @@ export function InvestorSMETable() {
       if (!smeSnapshot.empty) {
         const smeDocRef = smeSnapshot.docs[0].ref;
         await updateDoc(smeDocRef, { status: status, updatedAt: new Date().toISOString() });
+      }
+
+      if (status === "Approved" || status === "Declined") {
+        let subject = status === "Approved" ? meetingPurpose : "Declined Application";
+        let content = status === "Approved"
+          ? `${message}\n\nMeeting Details:\nTime: ${meetingTime}\nLocation: ${meetingLocation}`
+          : message;
+
+        await addDoc(collection(db, "messages"), {
+          to: smeId,
+          from: funderId,
+          subject,
+          content,
+          date: new Date().toISOString(),
+          read: false,
+          type: "inbox"
+        });
+
+        // Optional: Save to funder's 'sent' messages
+        await addDoc(collection(db, "messages"), {
+          to: smeId,
+          from: funderId,
+          subject,
+          content,
+          date: new Date().toISOString(),
+          read: true,
+          type: "sent"
+        });
       }
 
       setNotification({

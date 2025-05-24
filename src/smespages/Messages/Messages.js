@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './Messages.css';
+import { collection, query, where, onSnapshot, doc, getDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { db } from "../../firebaseConfig"; // adjust if your path is different
+
 
 const Messages = () => {
   const [activeTab, setActiveTab] = useState('inbox');
@@ -11,66 +15,113 @@ const Messages = () => {
     subject: '',
     content: ''
   });
-  
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      sender: 'Investor X',
-      subject: 'Meeting Request',
-      content: 'We would like to schedule a meeting to discuss your proposal. Please let us know your availability for next week.',
-      date: '2023-05-15',
-      read: false,
-      type: 'inbox',
-      attachments: ['proposal_review.pdf']
-    },
-    {
-      id: 2,
-      sender: 'Partner Y',
-      subject: 'Project Update',
-      content: 'Here is the latest update on our joint project. We have completed phase 1 and are moving to phase 2 next week.',
-      date: '2023-05-10',
-      read: true,
-      type: 'inbox'
-    },
-    {
-      id: 3,
-      sender: 'You',
-      recipient: 'Investor Z',
-      subject: 'Follow-up on funding',
-      content: 'Following up on our conversation last week regarding the potential funding round.',
-      date: '2023-05-08',
-      read: true,
-      type: 'sent'
-    },
-    {
-      id: 4,
-      sender: 'Team Member',
-      subject: 'Draft: Q2 Strategy',
-      content: 'Here is the draft for our Q2 strategy document. Please review and provide feedback.',
-      date: '2023-05-05',
-      read: true,
-      type: 'drafts',
-      attachments: ['q2_strategy_draft.docx']
-    },
-  ]);
+
+  const [messages, setMessages] = useState([]);
+  const [senderName, setSenderName] = useState("");
+
 
   const filteredMessages = messages.filter(msg => {
-    const matchesSearch = msg.subject.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         msg.sender.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = msg.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      msg.sender.toLowerCase().includes(searchQuery.toLowerCase());
     return msg.type === activeTab && (searchQuery === '' || matchesSearch);
   });
 
   useEffect(() => {
-    if (filteredMessages.length > 0 && !selectedMessage) {
-      setSelectedMessage(filteredMessages[0]);
-    }
-  }, [activeTab, filteredMessages]);
+    const auth = getAuth();
+    const user = auth.currentUser;
 
-  const handleMessageSelect = (message) => {
+    if (!user) return;
+
+    const q = query(
+      collection(db, "messages"),
+      where("to", "==", user.uid) // inbox messages
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const inboxMessages = [];
+      querySnapshot.forEach((doc) => {
+        inboxMessages.push({
+          id: doc.id,
+          ...doc.data(),
+        });
+      });
+
+      setMessages((prevMessages) => {
+        const sentMessages = prevMessages.filter(msg => msg.type === "sent");
+        return [...inboxMessages, ...sentMessages];
+      });
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const formatDate = (isoString) => {
+    const date = new Date(isoString);
+    return date.toLocaleString("en-ZA", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  useEffect(() => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) return;
+
+    const q = query(
+      collection(db, "messages"),
+      where("from", "==", user.uid) // sent messages
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const sentMessages = [];
+      querySnapshot.forEach((doc) => {
+        sentMessages.push({
+          id: doc.id,
+          ...doc.data(),
+          type: "sent"
+        });
+      });
+
+      setMessages((prevMessages) => {
+        const inboxMessages = prevMessages.filter(msg => msg.type === "inbox");
+        return [...inboxMessages, ...sentMessages];
+      });
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleMessageSelect = async (message) => {
     setSelectedMessage(message);
-    setMessages(messages.map(msg => 
-      msg.id === message.id ? {...msg, read: true} : msg
-    ));
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === message.id ? { ...msg, read: true } : msg
+      )
+    );
+
+    // Fetch funder's name from correct path
+    if (message.from) {
+      try {
+        const senderDoc = await getDoc(doc(db, "MyuniversalProfiles", message.from));
+        if (senderDoc.exists()) {
+          const data = senderDoc.data();
+          const fundName = data?.formData?.productsServices?.funds?.[0]?.name;
+
+          setSenderName(fundName || "Unnamed Funder");
+        } else {
+          console.warn("Sender profile not found in Firestore.");
+          setSenderName("Unknown Funder");
+        }
+      } catch (error) {
+        console.error("Error fetching sender profile:", error);
+        setSenderName("Unknown Funder");
+      }
+    }
   };
 
   const handleDelete = (id) => {
@@ -112,7 +163,7 @@ const Messages = () => {
       read: true,
       type: 'sent'
     };
-    
+
     setMessages([sentMessage, ...messages]);
     setIsComposing(false);
     setSelectedMessage(sentMessage);
@@ -131,7 +182,7 @@ const Messages = () => {
       read: true,
       type: 'drafts'
     };
-    
+
     setMessages([draftMessage, ...messages]);
     setIsComposing(false);
     setSelectedMessage(draftMessage);
@@ -150,7 +201,7 @@ const Messages = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <button 
+          <button
             className="new-message-btn"
             onClick={() => {
               setIsComposing(true);
@@ -161,7 +212,7 @@ const Messages = () => {
           </button>
         </div>
       </div>
-      
+
       <div className="messages-container">
         <div className="messages-sidebar">
           <div className="messages-tabs">
@@ -193,12 +244,12 @@ const Messages = () => {
               Drafts ({messages.filter(msg => msg.type === 'drafts').length})
             </button>
           </div>
-          
+
           <div className="messages-list">
             {filteredMessages.length > 0 ? (
               filteredMessages.map((message) => (
-                <div 
-                  key={message.id} 
+                <div
+                  key={message.id}
                   className={`message-item ${!message.read ? 'unread' : ''} ${selectedMessage?.id === message.id ? 'selected' : ''}`}
                   onClick={() => handleMessageSelect(message)}
                 >
@@ -220,7 +271,7 @@ const Messages = () => {
             )}
           </div>
         </div>
-        
+
         <div className="message-content">
           {isComposing ? (
             <div className="compose-message">
@@ -230,25 +281,25 @@ const Messages = () => {
               <div className="compose-form">
                 <div className="form-group">
                   <label>To:</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={newMessage.to}
-                    onChange={(e) => setNewMessage({...newMessage, to: e.target.value})}
+                    onChange={(e) => setNewMessage({ ...newMessage, to: e.target.value })}
                   />
                 </div>
                 <div className="form-group">
                   <label>Subject:</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={newMessage.subject}
-                    onChange={(e) => setNewMessage({...newMessage, subject: e.target.value})}
+                    onChange={(e) => setNewMessage({ ...newMessage, subject: e.target.value })}
                   />
                 </div>
                 <div className="form-group">
                   <label>Message:</label>
-                  <textarea 
+                  <textarea
                     value={newMessage.content}
-                    onChange={(e) => setNewMessage({...newMessage, content: e.target.value})}
+                    onChange={(e) => setNewMessage({ ...newMessage, content: e.target.value })}
                     rows="10"
                   />
                 </div>
@@ -265,25 +316,47 @@ const Messages = () => {
                 <h3>{selectedMessage.subject}</h3>
                 <div className="message-meta">
                   <div>
-                    <span className="meta-label">From:</span> 
-                    <span className="sender">{selectedMessage.sender}</span>
+                    <span className="meta-label">From:</span>
+                    <span className="sender">{senderName}</span>
                   </div>
                   {selectedMessage.recipient && (
                     <div>
-                      <span className="meta-label">To:</span> 
+                      <span className="meta-label">To:</span>
                       <span className="recipient">{selectedMessage.recipient}</span>
                     </div>
                   )}
                   <div>
-                    <span className="meta-label">Date:</span> 
-                    <span className="date">{selectedMessage.date}</span>
+                    <span className="meta-label">Date:</span>
+                    <span className="date">{formatDate(selectedMessage.date)}</span>
                   </div>
                 </div>
               </div>
-              
+
               <div className="message-body">
-                <p style={{ whiteSpace: 'pre-wrap' }}>{selectedMessage.content}</p>
-                
+                {selectedMessage.content.split("\n\nMeeting Details:")[0] && (
+                  <p style={{ whiteSpace: 'pre-wrap', marginBottom: "1rem" }}>
+                    {selectedMessage.content.split("\n\nMeeting Details:")[0]}
+                  </p>
+                )}
+
+                {selectedMessage.content.includes("Meeting Details:") && (() => {
+                  const details = selectedMessage.content.split("\n\nMeeting Details:")[1];
+                  const timeMatch = details.match(/Time:\s*(.+)/);
+                  const locationMatch = details.match(/Location:\s*(.+)/);
+
+                  const formattedTime = timeMatch
+                    ? formatDate(timeMatch[1].trim())
+                    : "Not specified";
+
+                  return (
+                    <div className="meeting-details-box">
+                      <h4>Meeting Details</h4>
+                      <p><strong>Time:</strong> {formattedTime}</p>
+                      <p><strong>Location:</strong> {locationMatch ? locationMatch[1].trim() : "Not specified"}</p>
+                    </div>
+                  );
+                })()}
+
                 {selectedMessage.attachments && selectedMessage.attachments.length > 0 && (
                   <div className="attachments">
                     <h4>Attachments:</h4>
@@ -297,12 +370,12 @@ const Messages = () => {
                   </div>
                 )}
               </div>
-              
+
               <div className="message-actions">
                 <button className="reply-btn" onClick={handleReply}>Reply</button>
                 <button className="forward-btn" onClick={handleForward}>Forward</button>
-                <button 
-                  className="delete-btn" 
+                <button
+                  className="delete-btn"
                   onClick={() => handleDelete(selectedMessage.id)}
                 >
                   Delete
@@ -314,7 +387,7 @@ const Messages = () => {
               <div className="empty-state-icon">✉️</div>
               <h3>Select a message to read</h3>
               <p>Choose a message from the list to view its contents</p>
-              <button 
+              <button
                 className="new-message-btn"
                 onClick={() => setIsComposing(true)}
               >

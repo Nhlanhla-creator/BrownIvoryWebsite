@@ -168,7 +168,8 @@
     margin-left: 5px;
 }
 
-.no-messages, .no-message-selected {
+.no-messages,
+.no-message-selected {
     padding: 30px;
     text-align: center;
     color: #6D6D6D;
@@ -407,22 +408,40 @@
     .messages-container {
         flex-direction: column;
     }
-    
+
     .messages-sidebar {
         width: 100%;
         border-right: none;
         border-bottom: 1px solid #D3D2CE;
     }
-    
+
     .messages-list {
         height: 300px;
     }
-    
+
     .search-bar {
         width: 100%;
     }
-    
+
     .search-bar input {
         flex: 1;
+    }
+
+    .meeting-details-box {
+        background-color: #f8f6f2;
+        border-left: 4px solid #5D4037;
+        padding: 12px 16px;
+        margin-top: 16px;
+        border-radius: 4px;
+    }
+
+    .meeting-details-box h4 {
+        margin: 0 0 8px;
+        color: #3E2723;
+    }
+
+    .meta-label {
+        font-weight: 600;
+        margin-right: 4px;
     }
 }
