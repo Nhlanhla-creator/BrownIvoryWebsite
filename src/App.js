@@ -13,10 +13,6 @@ import InvestorHeader from "./investorpages/Header/InvestorHeader"
 import SupportProgramHeader from "./supportprogram/Header/SupportHeader"
 import Documents from "./investorpages/Documents"
 
-
-
-
-
 // Public Pages
 import LandingPage from "./mainpages/LandingPage"
 import AboutPage from "./mainpages/About"
@@ -54,6 +50,7 @@ import SMEHowDidYouHear from "./smespages/UniversalProfile/how-did-you-hear"
 import SMEDeclarationConsent from "./smespages/UniversalProfile/declaration-consent"
 import RegistrationSummary from "./smespages/UniversalProfile/registration-summary" // Import the registration summary component
 import ProfileSummary from "./smespages/Documents"
+
 // Investor Universal Profile Components
 import InvestorUniversalProfile from "./investorpages/InvestorUniversalProfile/InvestorUniversalProfile"
 import InvestorProfileTracker from "./investorpages/InvestorUniversalProfile/ProfileTracker"
@@ -90,6 +87,16 @@ import FundingMatchesPage from "./smespages/MyFunderMatches/funders-matches"
 import SupplierMatchesPage from "./smespages/MySupplierMatches/supplier-matches"
 import SupportProgramMatchesPage from "./smespages/MySupportProgramMatches/support-program-matches"
 import MatchesPage from "./investorpages/MyMatches/investor-matches"
+
+// Billing and Payment Components
+// import MySubscriptions from "./smespages/BillingInformation/my-subscriptions"
+// import BillingInfo from "./smespages/BillingInformation/billing-info"
+// import InvestorsSubscriptions from "./investorpages/BillingAndPayments/investors-subscriptions"
+// import BillingInfoInvestors from "./investorpages/BillingAndPayments/billing-info-investors"
+
+// // Growth Tools Orders
+// import GrowthToolsOrders from "./smespages/BillingInformation/growth-tools-orders"
+// import InvestorGrowthToolsOrders from "./investorpages/BillingAndPayments/investor-growth-tools-orders"
 
 // Initial Data States
 const initialFormData = {
@@ -180,11 +187,7 @@ function App() {
         </div>
 
         {/* Registration Summary Modal - will only show when showSummary is true */}
-        <RegistrationSummary
-          data={formData}
-          open={showSummary}
-          onClose={() => setShowSummary(false)}
-        />
+        <RegistrationSummary data={formData} open={showSummary} onClose={() => setShowSummary(false)} />
       </div>
     )
   }
@@ -311,6 +314,12 @@ function App() {
         <Route path="/messages" element={renderSMERoute(Messages)} />
         <Route path="/settings" element={renderSMERoute(Settings)} />
         <Route path="/documents" element={renderSMERoute(ProfileSummary)} />
+
+        {/* SME Billing and Payments Routes */}
+        {/* <Route path="/billing/subscriptions" element={renderSMERoute(MySubscriptions)} />
+        <Route path="/billing/info" element={renderSMERoute(BillingInfo)} />
+        <Route path="/billing/growth-tools-orders" element={renderSMERoute(GrowthToolsOrders)} /> */}
+
         {/* Protected Investor Dashboard Routes */}
         <Route path="/investor-documents" element={renderInvestorRoute(Documents)} />
         <Route path="/investor-dashboard" element={renderInvestorRoute(InvestorDashboard)} />
@@ -319,6 +328,11 @@ function App() {
         <Route path="/investor-portfolio" element={<div>Coming Soon</div>} />
         <Route path="/investor-messages" element={renderInvestorRoute(Messages)} />
         <Route path="/investor-settings" element={renderInvestorRoute(Settings)} />
+
+        {/* Investor Billing and Payments Routes */}
+        {/* <Route path="/investor/billing/subscriptions" element={renderInvestorRoute(InvestorsSubscriptions)} />
+        <Route path="/investor/billing/info" element={renderInvestorRoute(BillingInfoInvestors)} />
+        <Route path="/investor/billing/growth-tools-orders" element={renderInvestorRoute(InvestorGrowthToolsOrders)} /> */}
 
         {/* Protected Support Program Dashboard Routes */}
         <Route path="/support-dashboard" element={renderSupportProgramRoute(SupportProgramDashboard)} />
@@ -439,6 +453,9 @@ function App() {
         <Route path="/applications/funding-application" element={<Navigate to="/applications/funding" replace />} />
         <Route path="/applications/product-application" element={<Navigate to="/applications/product" replace />} />
 
+        {/* Billing Redirects */}
+        {/* <Route path="/billing" element={<Navigate to="/billing/subscriptions" replace />} />
+        <Route path="/investor/billing" element={<Navigate to="/investor/billing/subscriptions" replace />} /> */}
       </Routes>
     </Router>
   )

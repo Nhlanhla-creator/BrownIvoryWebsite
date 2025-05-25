@@ -582,6 +582,7 @@ const ProfileSummary = ({ data, onEdit }) => {
             </div>
           </div>
         )}
+        
       </div>
     </div>
   )

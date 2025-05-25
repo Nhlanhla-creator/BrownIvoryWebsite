@@ -81,7 +81,7 @@ function InvestorSidebar({ companyName }) {
     },
     { 
       id: "matches", 
-      label: "Matches Dashboard", 
+      label: "Matches", 
       icon: <HeartHandshake size={18} />, 
       route: "/investor-matches" 
     },
@@ -101,26 +101,26 @@ function InvestorSidebar({ companyName }) {
       id: "billing",
       label: "Billing & Payments",
       icon: <CreditCard size={18} />,
-      route: "/investor-billing",
+      route: "/investor/billing",
       hasSubmenu: true,
       subItems: [
         {
           id: "billing-info",
           label: "Billing Information",
           icon: <FileText size={16} />,
-          route: "/investor-billing/info",
+          route: "/investor/billing/info",
         },
         {
           id: "subscriptions",
           label: "Subscriptions",
           icon: <FileText size={16} />,
-          route: "/investor-billing/subscriptions",
+          route: "/investor/billing/subscriptions",
         },
         {
           id: "transactions",
-          label: "Transaction History",
+          label: "Grotwth tools Orders",
           icon: <FileText size={16} />,
-          route: "/investor-billing/transactions",
+          route: "/investor/billing/growth-tools-orders",
         },
       ],
     },

@@ -128,7 +128,7 @@ export default function FundingMatchesPage() {
    
 
       <div className={styles.pageContainer}>
-        <h1 className={styles.pageTitle}>My Funding Matches and Insights</h1>
+
 
         <div className={styles.sectionCard}>
           <FundingFlowPipeline />

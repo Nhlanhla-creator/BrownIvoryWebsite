@@ -195,7 +195,7 @@ const Sidebar = ({ companyName = "Company Name" }) => {
           id: "tool-orders",
           label: "Growth Tool Orders",
           icon: <Tool size={16} />,
-          route: "/billing/tool-orders",
+          route: "/billing/growth-tools-orders",
         },
       ],
     },
