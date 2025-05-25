@@ -4,8 +4,12 @@ import { useState, useEffect } from "react"
 import { Eye, Check, X, CalendarCheck2, FileText, Send, AlertTriangle } from 'lucide-react'
 import styles from "./investor-funding.module.css"
 import { db } from "../../firebaseConfig"
-import { collection, query, where, onSnapshot, updateDoc, doc, getDoc, getDocs, addDoc } from "firebase/firestore"
+import {
+  collection, query, where, onSnapshot, updateDoc, doc,
+  getDoc, getDocs, addDoc
+} from "firebase/firestore"
 import { getAuth } from "firebase/auth"
+import ApplicationSummary from "../../smespages/FundingApplication/application-summary"
 
 export function InvestorSMETable() {
   const [smes, setSmes] = useState([])
@@ -41,7 +45,8 @@ export function InvestorSMETable() {
       querySnapshot.forEach((doc) => {
         applications.push({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
+          formData: doc.data().applicationForm || {} // ✅ Ensure this field exists
         })
       })
 
@@ -50,10 +55,7 @@ export function InvestorSMETable() {
       setLoading(false)
     }, (error) => {
       console.error("Error fetching applications:", error)
-      setNotification({
-        type: "error",
-        message: "Failed to load applications"
-      })
+      setNotification({ type: "error", message: "Failed to load applications" })
       setLoading(false)
     })
 
@@ -64,21 +66,10 @@ export function InvestorSMETable() {
     if (modalType !== "view") {
       const errors = {}
 
-      if (!message.trim()) {
-        errors.message = "Please provide a message to the SME"
-      }
-
-      if (modalType === "approve" && !meetingTime) {
-        errors.meetingTime = "Please select a meeting time"
-      }
-
-      if (modalType === "approve" && !meetingLocation.trim()) {
-        errors.meetingLocation = "Please provide a meeting location"
-      }
-
-      if (modalType === "approve" && !meetingPurpose.trim()) {
-        errors.meetingPurpose = "Please provide a purpose for the meeting"
-      }
+      if (!message.trim()) errors.message = "Please provide a message to the SME"
+      if (modalType === "approve" && !meetingTime) errors.meetingTime = "Please select a meeting time"
+      if (modalType === "approve" && !meetingLocation.trim()) errors.meetingLocation = "Please provide a meeting location"
+      if (modalType === "approve" && !meetingPurpose.trim()) errors.meetingPurpose = "Please provide a purpose for the meeting"
 
       if (Object.keys(errors).length > 0) {
         setFormErrors(errors)
@@ -86,92 +77,71 @@ export function InvestorSMETable() {
       }
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true)
 
     try {
       const updateData = {
-        status: status,
+        status,
         responseMessage: message,
         updatedAt: new Date().toISOString(),
-      };
-
-      if (status === "Approved") {
-        updateData.meetingTime = meetingTime;
-        updateData.meetingLocation = meetingLocation;
-        updateData.meetingPurpose = meetingPurpose;
       }
 
-      await updateDoc(doc(db, "investorApplications", id), updateData);
+      if (status === "Approved") {
+        updateData.meetingTime = meetingTime
+        updateData.meetingLocation = meetingLocation
+        updateData.meetingPurpose = meetingPurpose
+      }
 
-      const investorAppSnap = await getDoc(doc(db, "investorApplications", id));
-      const { smeId, funderId } = investorAppSnap.data();
+      await updateDoc(doc(db, "investorApplications", id), updateData)
+
+      const investorAppSnap = await getDoc(doc(db, "investorApplications", id))
+      const { smeId, funderId } = investorAppSnap.data()
 
       const smeQuery = query(
         collection(db, "smeApplications"),
         where("smeId", "==", smeId),
         where("funderId", "==", funderId)
-      );
+      )
 
-      const smeSnapshot = await getDocs(smeQuery);
+      const smeSnapshot = await getDocs(smeQuery)
       if (!smeSnapshot.empty) {
-        const smeDocRef = smeSnapshot.docs[0].ref;
-        await updateDoc(smeDocRef, { status: status, updatedAt: new Date().toISOString() });
+        const smeDocRef = smeSnapshot.docs[0].ref
+        await updateDoc(smeDocRef, { status, updatedAt: new Date().toISOString() })
       }
 
-      if (status === "Approved" || status === "Declined") {
-        let subject = status === "Approved" ? meetingPurpose : "Declined Application";
+      if (["Approved", "Declined"].includes(status)) {
+        let subject = status === "Approved" ? meetingPurpose : "Declined Application"
         let content = status === "Approved"
           ? `${message}\n\nMeeting Details:\nTime: ${meetingTime}\nLocation: ${meetingLocation}`
-          : message;
+          : message
 
         await addDoc(collection(db, "messages"), {
-          to: smeId,
-          from: funderId,
-          subject,
-          content,
-          date: new Date().toISOString(),
-          read: false,
-          type: "inbox"
-        });
+          to: smeId, from: funderId, subject, content,
+          date: new Date().toISOString(), read: false, type: "inbox"
+        })
 
         await addDoc(collection(db, "messages"), {
-          to: smeId,
-          from: funderId,
-          subject,
-          content,
-          date: new Date().toISOString(),
-          read: true,
-          type: "sent"
-        });
+          to: smeId, from: funderId, subject, content,
+          date: new Date().toISOString(), read: true, type: "sent"
+        })
       }
 
       if (status === "Approved") {
         await addDoc(collection(db, "smeCalendarEvents"), {
-          smeId,
-          funderId, // ← add this
-          title: meetingPurpose,
-          date: meetingTime,
-          location: meetingLocation,
-          type: "meeting",
-          createdAt: new Date().toISOString()
-        });
+          smeId, funderId, title: meetingPurpose,
+          date: meetingTime, location: meetingLocation,
+          type: "meeting", createdAt: new Date().toISOString()
+        })
       }
 
-      setNotification({
-        type: "success",
-        message: `Application ${status.toLowerCase()} successfully`,
-      });
-
-      setTimeout(() => setNotification(null), 3000);
-      resetModal();
+      setNotification({ type: "success", message: `Application ${status.toLowerCase()} successfully` })
+      setTimeout(() => setNotification(null), 3000)
+      resetModal()
     } catch (error) {
-      console.error("Error updating application:", error);
-      setNotification({
-        type: "error",
-        message: "Failed to update application",
-      });
+      console.error("Error updating application:", error)
+      setNotification({ type: "error", message: "Failed to update application" })
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
   }
 
@@ -188,17 +158,10 @@ export function InvestorSMETable() {
 
   const getStatusBadgeClass = (status) => {
     let baseClass = styles.statusBadge
-
-    switch (status) {
-      case "Approved":
-        return `${baseClass} ${styles.statusApproved}`
-      case "Declined":
-        return `${baseClass} ${styles.statusDeclined}`
-      case "Application Received":
-        return `${baseClass} ${styles.statusPending}`
-      default:
-        return baseClass
-    }
+    if (status === "Approved") return `${baseClass} ${styles.statusApproved}`
+    if (status === "Declined") return `${baseClass} ${styles.statusDeclined}`
+    if (status === "Application Received") return `${baseClass} ${styles.statusPending}`
+    return baseClass
   }
 
   const handleSendMessage = async () => {
@@ -285,16 +248,9 @@ export function InvestorSMETable() {
         <table className={styles.fundingTable}>
           <thead>
             <tr>
-              <th>SMSE Name</th>
-              <th>Investment Type</th>
-              <th>% Match</th>
-              <th>Location</th>
-              <th>Stage/Focus</th>
-              <th>Sector</th>
-              <th>Funding Needed</th>
-              <th>Application Date</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>SMSE Name</th><th>Investment Type</th><th>% Match</th>
+              <th>Location</th><th>Stage/Focus</th><th>Sector</th>
+              <th>Funding Needed</th><th>Application Date</th><th>Status</th><th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -311,10 +267,7 @@ export function InvestorSMETable() {
                   <td>{sme.investmentType}</td>
                   <td>
                     <div className={styles.matchPercentage}>
-                      <div
-                        className={styles.matchBar}
-                        style={{ width: `${sme.matchPercentage}%` }}
-                      ></div>
+                      <div className={styles.matchBar} style={{ width: `${sme.matchPercentage}%` }}></div>
                       <span>{sme.matchPercentage}%</span>
                     </div>
                   </td>
@@ -324,32 +277,21 @@ export function InvestorSMETable() {
                   <td>R{Number(sme.fundingNeeded).toLocaleString()}</td>
                   <td>{sme.applicationDate}</td>
                   <td>
-                    <span className={getStatusBadgeClass(sme.status)}>
-                      {sme.status}
-                    </span>
+                    <span className={getStatusBadgeClass(sme.status)}>{sme.status}</span>
                   </td>
                   <td style={{ whiteSpace: "nowrap" }}>
-                    <button
-                      className={styles.actionBtn}
-                      title="View details"
-                      onClick={() => { setSelectedSME(sme); setModalType("view") }}
-                    >
+                    <button className={styles.actionBtn} title="View details"
+                      onClick={() => { setSelectedSME(sme); setModalType("view") }}>
                       <Eye size={16} />
                     </button>
-                    <button
-                      className={styles.actionBtn}
-                      title="Approve application"
+                    <button className={styles.actionBtn} title="Approve"
                       onClick={() => { setSelectedSME(sme); setModalType("approve") }}
-                      disabled={sme.status !== "Application Received"}
-                    >
+                      disabled={sme.status !== "Application Received"}>
                       <Check size={16} />
                     </button>
-                    <button
-                      className={styles.actionBtn}
-                      title="Decline application"
+                    <button className={styles.actionBtn} title="Decline"
                       onClick={() => { setSelectedSME(sme); setModalType("decline") }}
-                      disabled={sme.status !== "Application Received"}
-                    >
+                      disabled={sme.status !== "Application Received"}>
                       <X size={16} />
                     </button>
                   </td>
@@ -363,43 +305,14 @@ export function InvestorSMETable() {
       {selectedSME && modalType && (
         <div className={styles.modalOverlay} onClick={resetModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <h3 className={styles.modalTitle}>
-              {modalType === "approve"
-                ? "Approve Application"
-                : modalType === "decline"
-                  ? "Decline Application"
-                  : "View SME Application"}
-            </h3>
-            <p className={styles.modalSMEName}><strong>{selectedSME.smeName}</strong></p>
-
-            <div className={styles.profileDetails}>
-              <div className={styles.profileGrid}>
-                <div>
-                  <p><strong>Sector:</strong> {selectedSME.sector}</p>
-                  <p><strong>Stage:</strong> {selectedSME.stage}</p>
-                  <p><strong>Focus Area:</strong> {selectedSME.focusArea}</p>
-                </div>
-                <div>
-                  <p><strong>Location:</strong> {selectedSME.location}</p>
-                  <p><strong>Revenue:</strong> {selectedSME.revenue}</p>
-                  <p><strong>Team Size:</strong> {selectedSME.teamSize}</p>
-                </div>
-              </div>
-              <p><strong>Funding Needed:</strong> R{Number(selectedSME.fundingNeeded).toLocaleString()}</p>
-              <p><strong>Match Percentage:</strong> {selectedSME.matchPercentage}%</p>
-              <p><strong>Documents:</strong></p>
-              <ul className={styles.documentList}>
-                {selectedSME.documents?.map((doc, idx) => (
-                  <li key={idx}>
-                    <FileText size={14} className={styles.docIcon} />
-                    <span>{doc}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {modalType !== "view" && (
+            {modalType === "view" ? (
+              <ApplicationSummary formData={selectedSME.formData} onEdit={() => { }} />
+            ) : (
               <>
+                <h3 className={styles.modalTitle}>
+                  {modalType === "approve" ? "Approve Application" : "Decline Application"}
+                </h3>
+
                 <div className={styles.messageBox}>
                   <label>Message to SME:</label>
                   <textarea
@@ -512,10 +425,12 @@ export function InvestorSMETable() {
 
                   <button
                     className={modalType === "approve" ? styles.approveBtn : styles.declineBtn}
-                    onClick={() => handleUpdateStatus(
-                      selectedSME.id,
-                      modalType === "approve" ? "Approved" : "Declined"
-                    )}
+                    onClick={() =>
+                      handleUpdateStatus(
+                        selectedSME.id,
+                        modalType === "approve" ? "Approved" : "Declined"
+                      )
+                    }
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
@@ -541,4 +456,5 @@ export function InvestorSMETable() {
       )}
     </div>
   )
+
 }

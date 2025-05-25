@@ -1,4 +1,4 @@
-// MyDocuments.js — cleaned up and debugged
+// MyDocuments.js — updated and debugged
 import { useEffect, useState } from "react";
 import "./myDocuments.css";
 import { getAuth } from "firebase/auth";
@@ -16,6 +16,7 @@ const MyDocuments = () => {
   const [submittedDocuments, setSubmittedDocuments] = useState([]);
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserDocuments = async () => {
@@ -34,6 +35,8 @@ const MyDocuments = () => {
         setSubmittedDocuments(submitted);
       } catch (err) {
         console.error("Failed to load user documents:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -54,14 +57,23 @@ const MyDocuments = () => {
 
       const profileRef = doc(db, "universalProfiles", user.uid);
       const path = DOCUMENT_PATHS[docLabel];
-      const timestampField = `${path}UpdatedAt`;
+
+      // Handle deeply nested UpdatedAt
+      const timestampPath = (() => {
+        const parts = path.split(".");
+        if (parts.length === 1) return `${parts[0]}UpdatedAt`;
+        parts.pop();
+        return `${parts.join(".")}.UpdatedAt`;
+      })();
 
       await updateDoc(profileRef, {
         [path]: downloadURL,
-        [timestampField]: serverTimestamp()
+        [timestampPath]: serverTimestamp(),
       });
 
-      setSubmittedDocuments(prev => [...new Set([...prev, docLabel])]);
+      setSubmittedDocuments((prev) =>
+        Array.from(new Set([...prev, docLabel]))
+      );
       alert(`${docLabel} uploaded successfully.`);
     } catch (error) {
       console.error("Upload failed:", error);
@@ -82,7 +94,12 @@ const MyDocuments = () => {
     const url = getDocumentURL(label, profileData);
     if (!url) return "No document uploaded";
     return (
-      <a href={url} target="_blank" rel="noopener noreferrer" className="document-link">
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="document-link"
+      >
         <FileText size={16} />
         <span>View Document</span>
         <ExternalLink size={14} />
@@ -99,7 +116,6 @@ const MyDocuments = () => {
             <h1>My Documents</h1>
             <p>Track all your submitted documents in one place</p>
           </div>
-          <button className="upload-button">Upload Document</button>
         </div>
 
         <div className="document-controls">
@@ -123,7 +139,9 @@ const MyDocuments = () => {
           />
         </div>
 
-        {filteredDocuments.length === 0 ? (
+        {loading ? (
+          <div className="empty-state">Loading documents...</div>
+        ) : filteredDocuments.length === 0 ? (
           <div className="empty-state">No documents found</div>
         ) : (
           <div className="documents-table-container">
@@ -139,11 +157,26 @@ const MyDocuments = () => {
               <tbody>
                 {filteredDocuments.map((doc) => {
                   const isSubmitted = submittedDocuments.includes(doc);
+                  const base = DOCUMENT_PATHS[doc];
+
+                  let updatedAt;
+                  if (typeof base === "string") {
+                    const parts = base.split(".");
+                    const timestampPath =
+                      parts.length === 1
+                        ? `${parts[0]}UpdatedAt`
+                        : `${parts.slice(0, -1).join(".")}.UpdatedAt`;
+                    updatedAt = get(profileData, timestampPath);
+                  }
+
                   return (
                     <tr key={doc}>
                       <td>{doc}</td>
                       <td>
-                        <span className={`status-badge ${isSubmitted ? "status-submitted" : "status-pending"}`}>
+                        <span
+                          className={`status-badge ${isSubmitted ? "status-submitted" : "status-pending"
+                            }`}
+                        >
                           {isSubmitted ? "Submitted" : "Pending"}
                         </span>
                       </td>
@@ -159,8 +192,8 @@ const MyDocuments = () => {
                         </label>
                       </td>
                       <td>
-                        {get(profileData, `${DOCUMENT_PATHS[doc]}UpdatedAt`)
-                          ? new Date(get(profileData, `${DOCUMENT_PATHS[doc]}UpdatedAt`).seconds * 1000).toLocaleDateString()
+                        {updatedAt?.seconds
+                          ? new Date(updatedAt.seconds * 1000).toLocaleDateString()
                           : "-"}
                       </td>
                     </tr>

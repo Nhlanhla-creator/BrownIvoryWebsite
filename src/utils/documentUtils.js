@@ -30,16 +30,23 @@ export const DOCUMENT_PATHS = {
 
 export const checkSubmittedDocs = (requiredDocs, profileData) => {
   const submitted = [];
-  for (const docLabel of requiredDocs) {
-    const path = DOCUMENT_PATHS[docLabel];
-    if (!path) continue;
+
+  requiredDocs.forEach(doc => {
+    const path = DOCUMENT_PATHS[doc];
+    if (!path) return;
+
     const value = Array.isArray(path)
-      ? path.map(p => get(profileData, p)).find(v => !!v)
+      ? path.map(p => get(profileData, p)).find(Boolean)
       : get(profileData, path);
-    if (value && (Array.isArray(value) ? value.length > 0 : true)) {
-      submitted.push(docLabel);
-    }
-  }
+
+    // ✅ This now detects both string URLs and object values with `url`
+    const isSubmitted = typeof value === "string"
+      ? value.startsWith("http") || value.length > 5
+      : value?.url;
+
+    if (isSubmitted) submitted.push(doc);
+  });
+
   return submitted;
 };
 
