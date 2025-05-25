@@ -148,6 +148,7 @@ export function InvestorSMETable() {
       if (status === "Approved") {
         await addDoc(collection(db, "smeCalendarEvents"), {
           smeId,
+          funderId, // ← add this
           title: meetingPurpose,
           date: meetingTime,
           location: meetingLocation,

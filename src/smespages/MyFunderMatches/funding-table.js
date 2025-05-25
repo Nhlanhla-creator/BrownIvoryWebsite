@@ -69,6 +69,15 @@ const formatLabel = (value) => {
     .join(", ");
 };
 
+const formatDocumentLabel = (label) => {
+  if (!label) return "";
+  return label
+    .replace(/_/g, " ") // replace underscores with spaces
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+};
+
 const capitalize = (str) => str?.charAt(0).toUpperCase() + str?.slice(1).toLowerCase();
 
 export function FundingTable({ filters, onApplicationSubmitted }) {
@@ -387,7 +396,7 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
                 return (
                   <label key={doc} className={styles.documentItem}>
                     <input type="checkbox" checked={submitted} readOnly />
-                    <span>{doc}</span>
+                    <span>{formatDocumentLabel(doc)}</span>
                     {!submitted && (
                       <input type="file" onChange={e => handleUpload(doc, e.target.files[0])} />
                     )}

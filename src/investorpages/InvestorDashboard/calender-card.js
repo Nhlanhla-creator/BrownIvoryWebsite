@@ -4,6 +4,9 @@ import { useState, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { CalendarIcon, Plus, X, ChevronLeft, ChevronRight, Mail } from "lucide-react"
 import styles from "./calender-card.module.css"
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db } from "../../firebaseConfig";
+import { getAuth } from "firebase/auth";
 
 export function CalendarCard() {
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -37,6 +40,37 @@ export function CalendarCard() {
     }, 5000)
     return () => clearInterval(bounceInterval)
   }, [])
+
+  useEffect(() => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const q = query(collection(db, "smeCalendarEvents"), where("funderId", "==", user.uid)); // Optional filter
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetched = snapshot.docs.map(doc => doc.data());
+
+      const newDeadlines = fetched.map(ev => ({
+        date: new Date(ev.date).getDate(), // for calendar dots
+        title: ev.title,
+        type: ev.type,
+      }));
+
+      const newUpcoming = fetched.map(ev => ({
+        title: ev.title,
+        date: new Date(ev.date).toLocaleDateString("en-US", {
+          month: "short", day: "numeric", year: "numeric"
+        }),
+        type: ev.type,
+      }));
+
+      setDeadlines(newDeadlines);
+      setUpcomingEvents(newUpcoming);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
 
   useEffect(() => {
     if (showFullCalendar || showDeadlineModal) {
@@ -142,9 +176,8 @@ export function CalendarCard() {
                   return (
                     <div
                       key={`day-${day}`}
-                      className={`${styles.calendarDayFull} ${isDeadline ? styles.hasEvent : ""} ${
-                        isToday ? styles.today : ""
-                      }`}
+                      className={`${styles.calendarDayFull} ${isDeadline ? styles.hasEvent : ""} ${isToday ? styles.today : ""
+                        }`}
                       onClick={() => handleDayClick(day)}
                     >
                       <span className={styles.dayNumber}>{day}</span>
