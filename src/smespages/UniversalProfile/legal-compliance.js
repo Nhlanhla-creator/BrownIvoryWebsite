@@ -158,7 +158,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
         <div>
           <FormField label="Tax Number" required>
             <input
-              type="number"
+              type="text"
               name="taxNumber"
               value={formData.taxNumber || ""}
               onChange={handleChange}
@@ -170,7 +170,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Tax Clearance Number" required>
               <input
-                type="number"
+                type="text"
                 name="taxClearanceNumber"
                 value={formData.taxClearanceNumber || ""}
                 onChange={handleChange}
@@ -193,7 +193,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
 
           <FormField label="VAT Number">
             <input
-              type="number"
+              type="text"
               name="vatNumber"
               value={formData.vatNumber || ""}
               onChange={handleChange}
@@ -203,7 +203,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
 
           <FormField label="RSC Number (if any)">
             <input
-              type="number"
+              type="text"
               name="rscNumber"
               value={formData.rscNumber || ""}
               onChange={handleChange}
@@ -216,7 +216,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
           <div className="grid grid-cols-2 gap-4">
             <FormField label="UIF Number">
               <input
-                type="number"
+                type="text"
                 name="uifNumber"
                 value={formData.uifNumber || ""}
                 onChange={handleChange}
@@ -226,7 +226,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
 
             <FormField label="PAYE Number">
               <input
-                type="number"
+                type="text"
                 name="payeNumber"
                 value={formData.payeNumber || ""}
                 onChange={handleChange}
@@ -287,7 +287,7 @@ export default function LegalCompliance({ data = {}, updateData }) {
 
           <FormField label="COIDA No. (if applicable)">
             <input
-              type="number"
+              type="text"
               name="coidaNumber"
               value={formData.coidaNumber || ""}
               onChange={handleChange}
