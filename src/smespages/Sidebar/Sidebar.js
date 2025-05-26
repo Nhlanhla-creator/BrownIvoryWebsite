@@ -2,14 +2,16 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
   BarChart, Home, User, FileText, Search, MessageSquare, Settings, 
-  LogOut, ChevronDown, ChevronRight, PenToolIcon as Tool, 
-  Shield, Users, Building, HelpCircle, Book, Menu, X, ChevronLeft
+  LogOut, ChevronDown, ChevronRight, ChevronLeft,
+  Briefcase, Handshake, ShoppingCart, Wrench, Calendar,
+  CreditCard, FileBox, Users, Building, CircleDollarSign,
+  BookOpen, Mail, Menu, X, HelpCircle, PenTool
 } from "lucide-react";
 
 import "./Sidebar.css";
 
-// Custom Rand Icon
-const RandIcon = ({ size = 16, className = "" }) => (
+// Custom Funding Icon
+const FundingIcon = ({ size = 16, className = "" }) => (
   <svg
     width={size}
     height={size}
@@ -21,19 +23,7 @@ const RandIcon = ({ size = 16, className = "" }) => (
     strokeLinejoin="round"
     className={className}
   >
-    <text
-      x="7"
-      y="19"
-      fontSize="16"
-      fontWeight="bold"
-      fontFamily="sans-serif"
-    >
-      R
-    </text>
-    <path
-      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
-      strokeWidth="1"
-    />
+    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
   </svg>
 );
 
@@ -90,44 +80,56 @@ const Sidebar = ({ companyName = "Company Name" }) => {
     { id: "home", label: "Home", icon: <Home size={18} />, route: "/" },
     {
       id: "dashboard",
-      label: "Big Score",
+      label: "My Big Score",
       icon: <BarChart size={18} />,
       route: "/dashboard",
     },
     {
       id: "profile",
-      label: "Universal Profile",
+      label: "My Profile",
       icon: <User size={18} />,
       route: "/profile",
     },
     {
       id: "applications",
-      label: "Applications",
-      icon: <FileText size={18} />,
+      label: "My Applications",
+      icon: <Briefcase size={18} />,
       route: "/applications",
       hasSubmenu: true,
       subItems: [
         {
           id: "funding-applications",
           label: "Funding & Support",
-          icon: <RandIcon size={16} />,
+          icon: <FundingIcon size={16} />,
           route: "/applications/funding",
         },
         {
           id: "product-applications",
           label: "Products & Services",
-          icon: <Users size={16} />,
+          icon: <ShoppingCart size={16} />,
           route: "/applications/product",
         },
       ],
     },
     {
       id: "matches",
-      label: "Dashboard",
-      icon: <Search size={18} />,
+      label: "My Matches",
+      icon: <Handshake size={18} />,
       route: "/matches",
       hasSubmenu: true,
       subItems: [
+        {
+          id: "funder-matches",
+          label: "Funders",
+          icon: <CircleDollarSign size={16} />,
+          route: "/funding-matches",
+        },
+        {
+          id: "support-matches",
+          label: "Support Programs",
+          icon: <HelpCircle size={16} />,
+          route: "/support-program-matches",
+        },
         {
           id: "customer-matches",
           label: "Customers",
@@ -140,42 +142,36 @@ const Sidebar = ({ companyName = "Company Name" }) => {
           icon: <Building size={16} />,
           route: "/supplier-matches",
         },
-        {
-          id: "funder-matches",
-          label: "Funders",
-          icon: <RandIcon size={16} />,
-          route: "/funding-matches",
-        },
-        {
-          id: "support-matches",
-          label: "Support Programs",
-          icon: <HelpCircle size={16} />,
-          route: "/support-program-matches",
-        },
       ],
     },
     {
       id: "growth-tools",
-      label: "Growth Tools",
-      icon: <Tool size={18} />,
+      label: "My Growth Tools",
+      icon: <Wrench size={18} />,
       route: "/growth",
     },
     {
       id: "documents",
-      label: "Documents",
-      icon: <Book size={18} />,
+      label: "My Documents",
+      icon: <FileBox size={18} />,
       route: "/my-documents",
     },
     {
       id: "messages",
-      label: "Messages",
-      icon: <MessageSquare size={18} />,
+      label: "My Messages",
+      icon: <Mail size={18} />,
       route: "/messages",
+    },
+    {
+      id: "calendar",
+      label: "My Calendar",
+      icon: <Calendar size={18} />,
+      route: "/calendar",
     },
     {
       id: "billing",
       label: "Billing & Payments",
-      icon: <RandIcon size={18} />,
+      icon: <CreditCard size={18} />,
       route: "/billing",
       hasSubmenu: true,
       subItems: [
@@ -188,13 +184,13 @@ const Sidebar = ({ companyName = "Company Name" }) => {
         {
           id: "subscriptions",
           label: "Subscriptions",
-          icon: <FileText size={16} />,
+          icon: <BookOpen size={16} />,
           route: "/billing/subscriptions",
         },
         {
           id: "tool-orders",
           label: "Growth Tool Orders",
-          icon: <Tool size={16} />,
+          icon: <PenTool size={16} />,
           route: "/billing/growth-tools-orders",
         },
       ],
@@ -259,7 +255,6 @@ const Sidebar = ({ companyName = "Company Name" }) => {
         
         {/* Header */}
         <div className="company-header">
-
           {!isCollapsed && (
             <div className="company-info">
               <div className="company-name">{companyName}</div>

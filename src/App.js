@@ -37,6 +37,7 @@ import FindMatches from "./smespages/MyMatches/FindMatches"
 import MyDocuments from "./smespages/MyDocuments/myDocuments"
 import GrowthEnabler from "./smespages/MyGrowthTools/GrowthEnabler"
 import Messages from "./smespages/Messages/Messages"
+import Calendar from "./smespages/MyCalender/Calendar"
 import Settings from "./smespages/Settings/Settings"
 
 // SME Universal Profile Components
@@ -81,6 +82,7 @@ import FundingApplication from "./smespages/FundingApplication/FundingApplicatio
 
 // Product Application
 import ProductApplication from "./smespages/ProductApplication/ProductApplication"
+//my calender
 
 // Add these imports at the top of the file with the other imports
 import CustomerMatchesPage from "./smespages/MyCustomerMatches/customer-matches"
@@ -315,6 +317,7 @@ function App() {
         <Route path="/my-documents" element={renderSMERoute(MyDocuments)} />
         <Route path="/growth" element={renderSMERoute(GrowthEnabler)} />
         <Route path="/messages" element={renderSMERoute(Messages)} />
+       <Route path="/calendar" element={renderSMERoute(Calendar)} /> 
         <Route path="/settings" element={renderSMERoute(Settings)} />
         <Route path="/documents" element={renderSMERoute(ProfileSummary)} />
 
@@ -345,6 +348,7 @@ function App() {
         <Route path="/support-analytics" element={renderSupportProgramRoute(GrowthEnabler)} />
         <Route path="/support-messages" element={renderSupportProgramRoute(Messages)} />
         <Route path="/support-settings" element={renderSupportProgramRoute(Settings)} />
+
 
         {/* Application Routes */}
         <Route path="/applications/funding" element={renderSMERoute(FundingApplication)} />
@@ -455,6 +459,7 @@ function App() {
         <Route path="/support-universal-profile" element={<Navigate to="/support-profile/instructions" replace />} />
         <Route path="/applications/funding-application" element={<Navigate to="/applications/funding" replace />} />
         <Route path="/applications/product-application" element={<Navigate to="/applications/product" replace />} />
+
 
         {/* Billing Redirects */}
         {/* <Route path="/billing" element={<Navigate to="/billing/subscriptions" replace />} />

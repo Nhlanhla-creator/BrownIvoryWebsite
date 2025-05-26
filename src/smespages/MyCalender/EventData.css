@@ -1,0 +1,70 @@
+.event-data-pipeline {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.pipeline-card {
+  flex: 1;
+  padding: 15px 10px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.pipeline-value {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: white;
+}
+
+.pipeline-title {
+  font-size: 14px;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pipeline-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #5D4037;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  margin-bottom: 10px;
+}
+
+.pipeline-card:hover .pipeline-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.created-card {
+  background-color: #8D6E63;
+}
+
+.completed-card {
+  background-color: #689F38;
+}
+
+.rescheduled-card {
+  background-color: #0288D1;
+}
+
+.cancelled-card {
+  background-color: #D32F2F;
+}

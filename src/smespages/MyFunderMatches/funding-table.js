@@ -27,13 +27,11 @@ const formatLabel = (value) => {
 
   return value
     .toString()
-    .split(",") // split on commas
+    .split(",")
     .map(item => item.trim())
     .map(word => {
       if (word.toLowerCase() === "ict") return "ICT";
       if (word.toLowerCase() === "southafrica" || word.toLowerCase() === "south_africa") return "South Africa";
-
-      // Capitalize each word in compound terms (like Green Energy → Green Energy)
       return word
         .split(/[_\s-]+/)
         .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
@@ -45,7 +43,7 @@ const formatLabel = (value) => {
 const formatDocumentLabel = (label) => {
   if (!label) return "";
   return label
-    .replace(/_/g, " ") // replace underscores with spaces
+    .replace(/_/g, " ")
     .split(" ")
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(" ");
@@ -53,12 +51,54 @@ const formatDocumentLabel = (label) => {
 
 const capitalize = (str) => str?.charAt(0).toUpperCase() + str?.slice(1).toLowerCase();
 
+const getStatusColor = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'accepted': return '#4CAF50';
+    case 'declined': return '#F44336';
+    case 'pending': return '#FFC107';
+    case 'not accepted': return '#9E9E9E';
+    default: return '#607D8B';
+  }
+};
+
+const getStageColor = (stage) => {
+  switch (stage?.toLowerCase()) {
+    case 'initial match': return '#2196F3';
+    case 'send application': return '#673AB7';
+    case 'under review': return '#3F51B5';
+    case 'investor feedback': return '#009688';
+    case 'termsheet': return '#FF9800';
+    case 'deals': return '#4CAF50';
+    case 'withdrawn': return '#9E9E9E';
+    case 'declined': return '#F44336';
+    default: return '#607D8B';
+  }
+};
+
+const getNextStage = (currentStage) => {
+  const stages = [
+    'initial match',
+    'send application',
+    'under review',
+    'investor feedback',
+    'termsheet',
+    'deals'
+  ];
+  
+  const currentIndex = stages.indexOf(currentStage?.toLowerCase());
+  if (currentIndex === -1 || currentIndex === stages.length - 1) return 'N/A';
+  return stages[currentIndex + 1].charAt(0).toUpperCase() + stages[currentIndex + 1].slice(1);
+};
+
 export function FundingTable({ filters, onApplicationSubmitted }) {
   const [funders, setFunders] = useState([]);
   const [allFunders, setAllFunders] = useState([]);
   const [currentBusiness, setCurrentBusiness] = useState(null);
   const [loading, setLoading] = useState(true);
   const [statuses, setStatuses] = useState({});
+  const [pipelineStages, setPipelineStages] = useState({});
+  const [applicationDates, setApplicationDates] = useState({});
+  const [waitingTimes, setWaitingTimes] = useState({});
   const [modalFunder, setModalFunder] = useState(null);
   const [applyingFunder, setApplyingFunder] = useState(null);
   const [notification, setNotification] = useState(null);
@@ -77,7 +117,6 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
       const user = auth.currentUser;
       if (!user) throw new Error("User not authenticated");
 
-      // Fetch funder and SME profile in parallel
       const [funderSnap, profileSnap] = await Promise.all([
         getDoc(doc(db, "MyuniversalProfiles", funder.funderId)),
         getDoc(doc(db, "universalProfiles", user.uid))
@@ -89,8 +128,6 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
 
       const funderData = funderSnap.data();
       const profile = profileSnap.data();
-
-      // Inject funder's fullProfile before checking requiredDocs
       const requiredDocs = getRequiredDocs({ ...funder, fullProfile: funderData.formData });
 
       const submitted = requiredDocs.filter((docLabel) => {
@@ -152,7 +189,8 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
       if (!user || !currentBusiness) throw new Error("Missing user or business");
 
       const requiredDocs = getRequiredDocs(funder);
-
+      const applicationDate = new Date().toISOString().split("T")[0];
+      
       const applicationData = {
         smeId: user.uid,
         funderId: funder.funderId,
@@ -164,13 +202,15 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
         stage: currentBusiness.operationStage || "Not specified",
         sector: currentBusiness.economicSectors?.join(", ") || "Not specified",
         fundingNeeded: currentBusiness.useOfFunds?.amountRequested || "Not specified",
-        applicationDate: new Date().toISOString().split("T")[0],
-        status: "Application Received",
+        applicationDate,
+        status: "pending",
+        pipelineStage: "application sent",
         teamSize: currentBusiness.teamSize || "Not specified",
         revenue: currentBusiness.financials?.annualRevenue || "Not specified",
         focusArea: currentBusiness.businessDescription || "Not specified",
         documents: requiredDocs,
         createdAt: new Date().toISOString(),
+        waitingTime: "3-5 days"
       };
 
       await Promise.all([
@@ -178,8 +218,12 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
         addDoc(collection(db, "smeApplications"), applicationData)
       ]);
 
+      setStatuses((prev) => ({ ...prev, [funder.id]: "pending" }));
+      setPipelineStages((prev) => ({ ...prev, [funder.id]: "application sent" }));
+      setApplicationDates((prev) => ({ ...prev, [funder.id]: applicationDate }));
+      setWaitingTimes((prev) => ({ ...prev, [funder.id]: "3-5 days" }));
+      
       onApplicationSubmitted?.();
-      setStatuses((prev) => ({ ...prev, [funder.id]: "Application Sent" }));
       setApplyingFunder(null);
       setNotification({ type: "success", message: "Application submitted!" });
     } catch (err) {
@@ -240,11 +284,23 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
 
         const appSnapshot = await getDocs(query(collection(db, "smeApplications"), where("smeId", "==", user.uid)));
         const appStatusMap = {};
+        const pipelineStageMap = {};
+        const applicationDateMap = {};
+        const waitingTimeMap = {};
+        
         appSnapshot.forEach(doc => {
           const data = doc.data();
-          appStatusMap[`${data.funderId}_${data.fundName}`] = data.status;
+          const key = `${data.funderId}_${data.fundName}`;
+          appStatusMap[key] = data.status || "pending";
+          pipelineStageMap[key] = data.pipelineStage || "application sent";
+          applicationDateMap[key] = data.applicationDate || new Date().toISOString().split("T")[0];
+          waitingTimeMap[key] = data.waitingTime || "3-5 days";
         });
+        
         setStatuses(appStatusMap);
+        setPipelineStages(pipelineStageMap);
+        setApplicationDates(applicationDateMap);
+        setWaitingTimes(waitingTimeMap);
       } catch (error) {
         setNotification({ type: "error", message: error.message });
       } finally {
@@ -313,42 +369,86 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
       {funders.length === 0 ? (
         <div className={styles.noResults}><p>No matching funders found. Try adjusting your profile.</p></div>
       ) : (
-        <table className={styles.fundingTable}>
-          <thead>
-            <tr>
-              <th>Funder</th><th>Match</th><th>Type</th><th>Stage</th>
-              <th>Ticket Size</th><th>Sector</th><th>Location</th>
-              <th>Support</th><th>Status</th><th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {funders.map(funder => (
-              <tr key={funder.id}>
-                <td>{funder.name}</td>
-                <td>{funder.matchPercentage}%</td>
-                <td>{formatLabel(funder.investmentType)}</td>
-                <td>{formatLabel(funder.targetStage)}</td>
-                <td>{funder.ticketSize}</td>
-                <td>{formatLabel(funder.sectorFocus)}</td>
-                <td>{formatLabel(funder.geographicFocus)}</td>
-                <td>{formatLabel(funder.supportOffered)}</td>
-                <td>{capitalize(statuses[funder.id]) || "Not Applied"}</td>
-                <td>
-                  <button onClick={() => handleViewClick(funder)} className={styles.viewButton}><Eye size={16} /> View</button>
-                  {statuses[funder.id] ? <span className={styles.sentBadge}><Check size={16} /> Sent</span> : <button onClick={() => handleApplyClick(funder)} className={styles.applyButton}>Apply</button>}
-                </td>
+        <div className={styles.tableContainer}>
+          <table className={styles.fundingTable}>
+            <thead>
+              <tr>
+                <th>Funder</th>
+                <th>Location</th>
+                <th>Sector</th>
+                <th>Funding Stage</th>
+                <th>Support Offered</th>
+                <th>Funding Type</th>
+                <th>Ticket Size</th>
+                <th>Match</th>
+                <th>Application Date</th>
+                <th>Pipeline Stage</th>
+                <th>Status</th>
+                <th>Next Stage</th>
+                <th>Waiting Time</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {funders.map(funder => {
+                const status = statuses[funder.id] || "new";
+                const pipelineStage = pipelineStages[funder.id] || "initial match";
+                const nextStage = getNextStage(pipelineStage);
+                
+                return (
+                  <tr key={funder.id}>
+                    <td>{funder.name}</td>
+                    <td>{formatLabel(funder.geographicFocus)}</td>
+                    <td>{formatLabel(funder.sectorFocus)}</td>
+                    <td>{formatLabel(funder.targetStage)}</td>
+                    <td>{formatLabel(funder.supportOffered)}</td>
+                    <td>{formatLabel(funder.investmentType)}</td>
+                    <td>{funder.ticketSize}</td>
+                    <td>{funder.matchPercentage}%</td>
+                    <td>{applicationDates[funder.id] || "N/A"}</td>
+                    <td>
+                      <span className={styles.stageBadge} style={{ backgroundColor: getStageColor(pipelineStage) }}>
+                        {capitalize(pipelineStage)}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={styles.statusBadge} style={{ backgroundColor: getStatusColor(status) }}>
+                        {capitalize(status)}
+                      </span>
+                    </td>
+                    <td>{nextStage}</td>
+                    <td>{waitingTimes[funder.id] || "N/A"}</td>
+                    <td>
+                      <div className={styles.actionButtons}>
+                        <button onClick={() => handleViewClick(funder)} className={styles.viewButton}>View</button>
+                        {statuses[funder.id] ? (
+                          <span className={styles.sentBadge}><Check size={16} /> Sent</span>
+                        ) : (
+                          <button onClick={() => handleApplyClick(funder)} className={styles.applyButton}>Apply</button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {modalFunder && modalFunder.data && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
-            <div className={styles.modalHeader}><h3>{modalFunder.name} Profile Summary</h3><button onClick={() => setModalFunder(null)}>✖</button></div>
-            <div className={styles.modalBody}><InvestorProfileSummary data={modalFunder.data} onEdit={() => { }} /></div>
-            <div className={styles.modalActions}><button className={styles.cancelButton} onClick={() => setModalFunder(null)}>Close</button></div>
+            <div className={styles.modalHeader}>
+              <h3>{modalFunder.name} Profile Summary</h3>
+              <button onClick={() => setModalFunder(null)}>✖</button>
+            </div>
+            <div className={styles.modalBody}>
+              <InvestorProfileSummary data={modalFunder.data} onEdit={() => { }} />
+            </div>
+            <div className={styles.modalActions}>
+              <button className={styles.cancelButton} onClick={() => setModalFunder(null)}>Close</button>
+            </div>
           </div>
         </div>
       )}
@@ -356,7 +456,10 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
       {applyingFunder && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
-            <div className={styles.modalHeader}><h3>Application Documents</h3><button onClick={() => setApplyingFunder(null)}>✖</button></div>
+            <div className={styles.modalHeader}>
+              <h3>Application Documents</h3>
+              <button onClick={() => setApplyingFunder(null)}>✖</button>
+            </div>
             <div className={styles.documentsList}>
               <p><strong>Required Documents:</strong></p>
               {getRequiredDocs(applyingFunder).map(docLabel => {

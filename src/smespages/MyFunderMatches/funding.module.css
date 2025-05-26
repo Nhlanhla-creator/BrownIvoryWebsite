@@ -1201,63 +1201,163 @@
 }
 
 /* Table styles - Redesigned */
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+  margin-left: -38px;
+ 
+}
 
-/* Modal styles */
-/* Main container */
 .fundingTable {
   width: 100%;
   border-collapse: collapse;
-  margin: 20px 0;
-  font-size: 0.9em;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  font-size: 0.7rem;
+  background: #FFF8F0;
 }
 
-.fundingTable th,
-.fundingTable td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #e0e0e0;
+.fundingTable thead {
+  background-color: #5D4037;
+  color: white;
 }
 
 .fundingTable th {
-  background-color: #6d4c41; /* Dark brown */
-  color: #fff8f0; /* Cream */
-  font-weight: 600;
+  padding: 12px 8px;
+  text-align: left;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.fundingTable td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #D7CCC8;
+  vertical-align: middle;
+}
+
+.fundingTable tr:nth-child(even) {
+  background-color: #F5E9E0;
 }
 
 .fundingTable tr:hover {
-  background-color: #f5ebe0; /* Light cream */
+  background-color: #EFD5C3;
 }
 
-/* Buttons */
-button {
-  background-color: #8d6e63; /* Medium brown */
-  color: #fff8f0; /* Cream */
+.statusBadge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  min-width: 80px;
+}
+
+.actionsCell {
+  display: flex;
+  gap: 8px;
+}
+
+.viewButton, .applyButton {
+  padding: 6px 12px;
   border: none;
-  padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9em;
-  margin: 4px 2px;
-  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  transition: all 0.2s;
 }
 
-button:hover {
-  background-color: #6d4c41; /* Dark brown */
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.viewButton {
+  background-color: #8D6E63;
+  color: white;
 }
 
-button:disabled {
-  background-color: #d7ccc8; /* Light gray-brown */
-  color: #8d6e63;
-  cursor: not-allowed;
-  transform: none;
+.viewButton:hover {
+  background-color: #6D4C41;
 }
 
-button:active {
-  transform: translateY(0);
+.applyButton {
+  background-color: #A1887F;
+  color: white;
 }
+
+.applyButton:hover {
+  background-color: #8D6E63;
+}
+
+.sentBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.loadingContainer, .noResults {
+  padding: 20px;
+  text-align: center;
+  color: #5D4037;
+}
+
+
+
+.submitButton {
+  background-color: #5D4037;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancelButton {
+  background-color: #D7CCC8;
+  color: #5D4037;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+
+.fileInput {
+  padding: 6px;
+  border: 1px solid #D7CCC8;
+  border-radius: 4px;
+}
+
+.timestamp {
+  font-size: 0.8rem;
+  color: #8D6E63;
+}
+
+.notification {
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  color: white;
+}
+
+.notification.error {
+  background-color: #D32F2F;
+}
+
+.notification.success {
+  background-color: #388E3C;
+}
+
 
 /* Modal overlay - fixed position covering entire screen */
 .modalOverlay {
