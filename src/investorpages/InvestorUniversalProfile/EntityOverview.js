@@ -481,7 +481,7 @@ export default function EntityOverview({ data = {}, updateData }) {
               className={styles.formSelect}
               required
             >
-              <option value="">Select Investment Type</option>
+              <option value="">Company investment type</option>
               {investmentTypes.map((type) => (
                 <option key={type.value} value={type.value}>
                   {type.label}

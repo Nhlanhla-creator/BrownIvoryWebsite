@@ -34,14 +34,18 @@ const funderTypeOptions = [
 
 // Program Type options
 const programTypeOptions = [
-  { value: "funding", label: "Funding" },
-  { value: "incubation", label: "Incubation" },
-  { value: "acceleration", label: "Acceleration" },
-  { value: "esd", label: "ESD" },
-  { value: "marketAccess", label: "Market Access" },
-  { value: "businessMentorship", label: "Business Mentorship" },
-  { value: "technicalSupport", label: "Technical Support" },
-  { value: "development", label: "Development" },
+  { value: "funding", label: "Funding Only" },
+  { value: "incubation", label: "Incubation Program" },
+  { value: "acceleration", label: "Acceleration Program" },
+  { value: "esd", label: "Enterprise Supplier Development (ESD)" },
+  { value: "marketAccess", label: "	Grant Program" },
+  { value: "businessMentorship", label: "Blended Finance" },
+  { value: "technicalSupport", label: "Technical Assistance Facility" },
+  { value: "development", label: "Business Development Support" },
+    { value: "marketAccess", label: "Mentorship & Coaching" },
+  { value: "businessMentorship", label: "Market Access Facilitation" },
+  { value: "technicalSupport", label: "Other (please specify)" },
+  
 ]
 
 // Target Enterprise Type options
@@ -90,24 +94,24 @@ const decisionMakingOptions = [
 // Required Documents options
 const requiredDocumentsOptions = [
   { value: "pitch_deck", label: "Pitch Deck" },
-  { value: "cap_table", label: "Company Registration Certificate " },
-  { value: "env_impact", label: "Certified IDs of Directors & Shareholders" },
-  { value: "financials", label: "Share Register" },
+
+
+  { value: "financials", label: "	Company Registration (CIPC)" },
   { value: "business_plan", label: "Business Plan" },
   { value: "market_analysis", label: "Proof of Address (Utility Bill, Lease Agreement)" },
   { value: "team_bios", label: "Tax Clearance Certificate" },
   { value: "compliance_cert", label: "B-BBEE Certificate" },
-  { value: "company-profile", label: "Company Profile / Brochure" },
+
   { value: "certificates", label: "VAT/UIF/PAYE/COIDA Certificates" },
-  { value: "industry", label: "Industry Accreditations" },
+ 
   { value: "statements", label: "5 Year Budget (Income Statement, Cashflows, Balance Sheet)" },
   { value: "reports", label: "Previous Program Reports" },
   { value: "bank-details", label: "Bank Details Confirmation Letter" },
-  { value: "loan", label: "Loan Agreements " },
+
   { value: "financial_statements", label: "Financial Statements" },
-  { value: "scope", label: "Scope of Work" },
+
   { value: "letters", label: "Support Letters / Endorsements" },
-  { value: "other", label: "Other" },
+  { value: "other", label: "Other(please specify)" },
 ]
 
 // Investment Instruments options
@@ -520,7 +524,7 @@ export default function ProductsServices({ data = {}, updateData }) {
             </div>
 
             <div className={styles.gridContainer}>
-              <FormField label="Fund Type" required>
+              <FormField label="What type of fund is this?" required>
                 <MultiSelect
                   options={fundTypeOptions}
                   selected={fund.type || []}
@@ -529,7 +533,7 @@ export default function ProductsServices({ data = {}, updateData }) {
                 />
               </FormField>
 
-              <FormField label="Type of Funder" required>
+              <FormField label="What type of funder are you?" required>
                 <MultiSelect
                   options={funderTypeOptions}
                   selected={fund.funderType || []}
@@ -540,7 +544,7 @@ export default function ProductsServices({ data = {}, updateData }) {
             </div>
 
             <div className={styles.gridContainer}>
-              <FormField label="Investment Instruments" required>
+              <FormField label="Which types of investments do you offer?" required>
                 <MultiSelect
                   options={investmentInstrumentOptions}
                   selected={fund.instruments || []}
@@ -549,7 +553,7 @@ export default function ProductsServices({ data = {}, updateData }) {
                 />
               </FormField>
 
-              <FormField label="Target Enterprise Stage" required>
+              <FormField label="Which stage of businesses do you want to invest in?" required>
                 <MultiSelect
                   options={enterpriseStageOptions}
                   selected={fund.stages || []}
@@ -618,7 +622,7 @@ export default function ProductsServices({ data = {}, updateData }) {
             )}
 
             <div className={styles.gridContainer}>
-              <FormField label="Support Offered Beyond Capital">
+              <FormField label="Do you offer any support beyond money?">
                 <MultiSelect
                   options={supportOptions}
                   selected={fund.support || []}
@@ -654,7 +658,7 @@ export default function ProductsServices({ data = {}, updateData }) {
               <h5 className={styles.subSectionHeading}>Program Details</h5>
 
               <div className={styles.gridContainer}>
-                <FormField label="Program Type">
+                <FormField label="What type of program(s) does your fund or organization offer to SMEs?">
                   <select
                     value={fund.programType || ""}
                     onChange={(e) => updateFund(fundIndex, "programType", e.target.value)}
@@ -792,7 +796,7 @@ export default function ProductsServices({ data = {}, updateData }) {
               <h5 className={styles.subSectionHeading}>Due Diligence Requirements</h5>
 
               <div className={styles.gridContainer}>
-                <FormField label="Required Documents">
+                <FormField label="What documents do you require from SMEs before investing?">
                   <MultiSelect
                     options={requiredDocumentsOptions}
                     selected={fund.requiredDocuments || []}

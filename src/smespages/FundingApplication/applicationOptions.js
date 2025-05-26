@@ -1,13 +1,15 @@
 
 import "./FundingApplication.css" ;
 export const applicationType = [
-  { value: "funding", label: "Funding" },
-  { value: "incubation", label: "Incubation" },
-  { value: "acceleration", label: "Acceleration" },
-  { value: "esd", label: "ESD" },
-  { value: "marketAccess", label: "Market Access" },
-  { value: "businessMentorship", label: "Business Mentorship" },
-  { value: "technicalSupport", label: "Technical Support" },
+  { value: "funding", label: "Funding (grants, loans, equity, etc.)" },
+  { value: "incubation", label: "	Incubation Programme (early-stage business development)" },
+  { value: "acceleration", label: "Acceleration Programme (short-term growth-focused support)" },
+  { value: "esd", label: "Enterprise Supplier Development (ESD)" },
+  { value: "marketAccess", label: "Technical Assistance" },
+  { value: "businessMentorship", label: "Mentorship or Coaching" },
+  { value: "technicalSupport", label: "Training & Skills Development" },
+    { value: "businessMentorship", label: "Market Access Support" },
+  { value: "technicalSupport", label: "Other (please specify)" },
  
 ];
 
