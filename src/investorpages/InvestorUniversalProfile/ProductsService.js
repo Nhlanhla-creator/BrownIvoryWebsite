@@ -50,10 +50,13 @@ const programTypeOptions = [
 
 // Target Enterprise Type options
 const targetEnterpriseOptions = [
-  { value: "ideation", label: "Idea / Concept stage" },
-  { value: "prototype", label: "	Early-stage Startup" },
-  { value: "startup", label: "Growing Business (2–5 years old)" },
-  { value: "early-growth", label: "Established Business (5+ years)" },
+  { value: "ideation", label: "Idea" },
+  { value: "prototype", label: "Prototype" },
+  { value: "startup", label: "Startup" },
+  { value: "early-growth", label: "Early-Growth" },
+  { value: "growth", label: "Growth" },
+  { value: "scale-up", label: "Scale-up" },
+  { value: "mature", label: "Mature" },
 
 ]
 
@@ -127,13 +130,10 @@ const investmentInstrumentOptions = [
 
 // Enterprise Stage options
 const enterpriseStageOptions = [
-  { value: "ideation", label: "Idea" },
-  { value: "prototype", label: "Prototype" },
-  { value: "startup", label: "Startup" },
-  { value: "early-growth", label: "Early-Growth" },
-  { value: "growth", label: "Growth" },
-  { value: "scale-up", label: "Scale-up" },
-  { value: "mature", label: "Mature" },
+  { value: "ideation", label: "Idea / Concept stage" },
+  { value: "prototype", label: "	Early-stage Startup" },
+  { value: "startup", label: "Growing Business (2–5 years old)" },
+  { value: "early-growth", label: "Established Business (5+ years)" },
 ]
 
 // Sector Focus options
