@@ -135,6 +135,11 @@
     --stage-border: rgba(210, 180, 140, 0.3);
   }
   
+  .stageTermSheet {
+    --stage-color: rgba(188, 143, 143, 0.1); /* Rosy brown tone */
+    --stage-border: rgba(188, 143, 143, 0.3);
+  }
+  
   .stageDeals {
     --stage-color: rgba(205, 133, 63, 0.1);
     --stage-border: rgba(205, 133, 63, 0.3);
@@ -149,6 +154,7 @@
   .stageApplication .stageCard,
   .stageReview .stageCard,
   .stageFeedback .stageCard,
+  .stageTermSheet .stageCard,
   .stageDeals .stageCard,
   .stageWithdrawn .stageCard {
     background-color: var(--stage-color);
@@ -361,4 +367,3 @@
     font-size: 13px;
     color: #6d4c41;
   }
-  

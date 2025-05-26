@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { Eye, Check, X, CalendarCheck2, FileText, Send, AlertTriangle, Info } from 'lucide-react';
+import { Eye, Check, X, CalendarCheck2, FileText, Send, AlertTriangle, Info, ChevronDown } from 'lucide-react';
 import styles from "./investor-funding.module.css";
 import { db } from "../../firebaseConfig";
 import { collection, query, where, onSnapshot, updateDoc, doc, getDoc, getDocs, addDoc } from "firebase/firestore";
@@ -20,6 +20,11 @@ export function InvestorSMETable() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [nextStage, setNextStage] = useState("");
+  const [documentFile, setDocumentFile] = useState(null);
+  const [showNextStageModal, setShowNextStageModal] = useState(false);
+  const [selectedSMEForStage, setSelectedSMEForStage] = useState(null);
+  const [updatedStages, setUpdatedStages] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -195,6 +200,7 @@ export function InvestorSMETable() {
     setMeetingLocation("");
     setMeetingPurpose("");
     setFormErrors({});
+    setDocumentFile(null);
   };
 
   const getStatusBadgeClass = (status) => {
@@ -214,7 +220,7 @@ export function InvestorSMETable() {
 
   const handleSendMessage = async () => {
     if (!message.trim()) {
-      setFormErrors({ ...formErrors, message: "Please provide a message to the SME" });
+      setFormErrors({ ...formErrors, message: "Please provide a message to the SMSE" });
       return;
     }
 
@@ -276,6 +282,135 @@ export function InvestorSMETable() {
     }
   };
 
+  const handleNextStageChange = (sme) => {
+    setSelectedSMEForStage(sme);
+    setShowNextStageModal(true);
+    setNextStage("");
+    setMessage("");
+    setMeetingTime("");
+    setMeetingLocation("");
+    setMeetingPurpose("");
+    setFormErrors({});
+    setDocumentFile(null);
+  };
+
+  const handleUpdateNextStage = async () => {
+    const errors = {};
+
+    if (!nextStage) {
+      errors.nextStage = "Please select a next stage";
+    }
+
+    if (!message.trim()) {
+      errors.message = "Please provide a message to the SMSE";
+    }
+
+    if ((nextStage === "Under Review" || nextStage === "Investor Feedback") && !meetingTime) {
+      errors.meetingTime = "Please select a meeting time";
+    }
+
+    if ((nextStage === "Under Review" || nextStage === "Investor Feedback") && !meetingLocation.trim()) {
+      errors.meetingLocation = "Please provide a meeting location";
+    }
+
+    if ((nextStage === "Under Review" || nextStage === "Investor Feedback") && !meetingPurpose.trim()) {
+      errors.meetingPurpose = "Please provide a purpose for the meeting";
+    }
+
+    if (nextStage === "Termsheet" && !documentFile) {
+      errors.documentFile = "Please attach a termsheet document";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await updateDoc(doc(db, "investorApplications", selectedSMEForStage.id), {
+        stage: nextStage,
+        updatedAt: new Date().toISOString(),
+      });
+
+      setUpdatedStages(prev => ({
+        ...prev,
+        [selectedSMEForStage.id]: nextStage
+      }));
+
+      const auth = getAuth();
+      const user = auth.currentUser;
+      const investorAppSnap = await getDoc(doc(db, "investorApplications", selectedSMEForStage.id));
+      const { smeId } = investorAppSnap.data();
+
+      let subject = "";
+      let content = message;
+
+      if (nextStage === "Under Review" || nextStage === "Investor Feedback") {
+        subject = meetingPurpose;
+        content += `\n\nMeeting Details:\nTime: ${meetingTime}\nLocation: ${meetingLocation}`;
+      } else if (nextStage === "Termsheet") {
+        subject = "Termsheet Shared";
+        content += `\n\nPlease find attached termsheet document for your review.`;
+      } else {
+        subject = `Application ${nextStage}`;
+      }
+
+      await addDoc(collection(db, "messages"), {
+        to: smeId,
+        from: user.uid,
+        subject,
+        content,
+        date: new Date().toISOString(),
+        read: false,
+        type: "inbox"
+      });
+
+      await addDoc(collection(db, "messages"), {
+        to: smeId,
+        from: user.uid,
+        subject,
+        content,
+        date: new Date().toISOString(),
+        read: true,
+        type: "sent"
+      });
+
+      if (nextStage === "Under Review" || nextStage === "Investor Feedback") {
+        await addDoc(collection(db, "smeCalendarEvents"), {
+          smeId,
+          funderId: user.uid,
+          title: meetingPurpose,
+          date: meetingTime,
+          location: meetingLocation,
+          type: "meeting",
+          createdAt: new Date().toISOString()
+        });
+      }
+
+      if (nextStage === "Termsheet" && documentFile) {
+        console.log("Document to upload:", documentFile.name);
+      }
+
+      setNotification({
+        type: "success",
+        message: `Application moved to ${nextStage} successfully`,
+      });
+
+      setTimeout(() => setNotification(null), 3000);
+      setShowNextStageModal(false);
+    } catch (error) {
+      console.error("Error updating next stage:", error);
+      setNotification({
+        type: "error",
+        message: "Failed to update next stage",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (loading) {
     return <div className={styles.loadingContainer}>Loading applications...</div>;
   }
@@ -302,14 +437,15 @@ export function InvestorSMETable() {
               <th>Sector</th>
               <th>Funding Needed</th>
               <th>Application Date</th>
-              <th>Status</th>
+              <th>Company Status</th>
               <th>Actions</th>
+              <th>Next Stage</th>
             </tr>
           </thead>
           <tbody>
             {smes.length === 0 ? (
               <tr>
-                <td colSpan="10" className={styles.noApplications}>
+                <td colSpan="11" className={styles.noApplications}>
                   No applications received yet
                 </td>
               </tr>
@@ -362,6 +498,22 @@ export function InvestorSMETable() {
                       <X size={16} />
                     </button>
                   </td>
+                  <td>
+                    {updatedStages[sme.id] ? (
+                      <div className={styles.currentStageBadge}>
+                        {updatedStages[sme.id]}
+                      </div>
+                    ) : (
+                      <div className={styles.nextStageDropdown}>
+                        <button 
+                          className={styles.nextStageBtn}
+                          onClick={() => handleNextStageChange(sme)}
+                        >
+                          Set Stage <ChevronDown size={14} />
+                        </button>
+                      </div>
+                    )}
+                  </td>
                 </tr>
               ))
             )}
@@ -411,7 +563,7 @@ export function InvestorSMETable() {
               <>
                 <div className={styles.messageBox}>
                   <label>
-                    Message to SME:
+                    Message to SMSE:
                     <div className={styles.tooltip}>
                       <Info size={14} className={styles.infoIcon} />
                       <span className={styles.tooltipText}>
@@ -564,6 +716,197 @@ export function InvestorSMETable() {
                 disabled={isSubmitting}
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showNextStageModal && selectedSMEForStage && (
+        <div className={styles.modalOverlay} onClick={() => setShowNextStageModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>Set Next Stage for {selectedSMEForStage.smeName}</h3>
+            
+            <div className={styles.stageSelection}>
+              <div className={styles.stageOptions}>
+                <button
+                  className={`${styles.stageOption} ${nextStage === "Under Review" ? styles.active : ''}`}
+                  onClick={() => setNextStage("Under Review")}
+                >
+                  Under Review
+                </button>
+                <button
+                  className={`${styles.stageOption} ${nextStage === "Investor Feedback" ? styles.active : ''}`}
+                  onClick={() => setNextStage("Investor Feedback")}
+                >
+                  Investor Feedback
+                </button>
+                <button
+                  className={`${styles.stageOption} ${nextStage === "Termsheet" ? styles.active : ''}`}
+                  onClick={() => setNextStage("Termsheet")}
+                >
+                  Termsheet
+                </button>
+                <button
+                  className={`${styles.stageOption} ${nextStage === "Deal Successful" ? styles.active : ''}`}
+                  onClick={() => setNextStage("Deal Successful")}
+                >
+                  Deal Successful
+                </button>
+                <button
+                  className={`${styles.stageOption} ${nextStage === "Deal Declined" ? styles.active : ''}`}
+                  onClick={() => setNextStage("Deal Declined")}
+                >
+                  Deal Declined
+                </button>
+                <button
+                  className={`${styles.stageOption} ${nextStage === "Deal Closed" ? styles.active : ''}`}
+                  onClick={() => setNextStage("Deal Closed")}
+                >
+                  Deal Closed
+                </button>
+              </div>
+              {formErrors.nextStage && (
+                <p className={styles.errorText}>
+                  <AlertTriangle size={14} /> {formErrors.nextStage}
+                </p>
+              )}
+            </div>
+
+            <div className={styles.messageBox}>
+              <label>Message to SME:</label>
+              <textarea
+                className={`${styles.messageInput} ${formErrors.message ? styles.inputError : ''}`}
+                rows="4"
+                value={message}
+                onChange={(e) => {
+                  setMessage(e.target.value);
+                  if (e.target.value.trim()) {
+                    setFormErrors({ ...formErrors, message: null });
+                  }
+                }}
+                placeholder="Enter your message to the SME regarding this stage change..."
+              />
+              {formErrors.message && (
+                <p className={styles.errorText}>
+                  <AlertTriangle size={14} /> {formErrors.message}
+                </p>
+              )}
+            </div>
+
+            {(nextStage === "Under Review" || nextStage === "Investor Feedback") && (
+              <div className={styles.meetingFields}>
+                <div>
+                  <label>Meeting Time:</label>
+                  <input
+                    type="datetime-local"
+                    className={`${styles.meetingInput} ${formErrors.meetingTime ? styles.inputError : ''}`}
+                    value={meetingTime}
+                    onChange={(e) => {
+                      setMeetingTime(e.target.value);
+                      if (e.target.value) {
+                        setFormErrors({ ...formErrors, meetingTime: null });
+                      }
+                    }}
+                  />
+                  {formErrors.meetingTime && (
+                    <p className={styles.errorText}>
+                      <AlertTriangle size={14} /> {formErrors.meetingTime}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label>Meeting Location:</label>
+                  <input
+                    type="text"
+                    className={`${styles.meetingInput} ${formErrors.meetingLocation ? styles.inputError : ''}`}
+                    value={meetingLocation}
+                    onChange={(e) => {
+                      setMeetingLocation(e.target.value);
+                      if (e.target.value.trim()) {
+                        setFormErrors({ ...formErrors, meetingLocation: null });
+                      }
+                    }}
+                    placeholder="e.g., Office, Virtual Meeting, etc."
+                  />
+                  {formErrors.meetingLocation && (
+                    <p className={styles.errorText}>
+                      <AlertTriangle size={14} /> {formErrors.meetingLocation}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label>Purpose of Meeting:</label>
+                  <input
+                    type="text"
+                    className={`${styles.meetingInput} ${formErrors.meetingPurpose ? styles.inputError : ''}`}
+                    value={meetingPurpose}
+                    onChange={(e) => {
+                      setMeetingPurpose(e.target.value);
+                      if (e.target.value.trim()) {
+                        setFormErrors({ ...formErrors, meetingPurpose: null });
+                      }
+                    }}
+                    placeholder="e.g., Initial Discussion, Due Diligence, etc."
+                  />
+                  {formErrors.meetingPurpose && (
+                    <p className={styles.errorText}>
+                      <AlertTriangle size={14} /> {formErrors.meetingPurpose}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {nextStage === "Termsheet" && (
+              <div className={styles.documentUpload}>
+                <label>
+                  Attach Termsheet Document:
+                  <input
+                    type="file"
+                    className={`${styles.fileInput} ${formErrors.documentFile ? styles.inputError : ''}`}
+                    onChange={(e) => {
+                      setDocumentFile(e.target.files[0]);
+                      if (e.target.files[0]) {
+                        setFormErrors({ ...formErrors, documentFile: null });
+                      }
+                    }}
+                    accept=".pdf,.doc,.docx"
+                  />
+                </label>
+                {formErrors.documentFile && (
+                  <p className={styles.errorText}>
+                    <AlertTriangle size={14} /> {formErrors.documentFile}
+                  </p>
+                )}
+                {documentFile && (
+                  <p className={styles.fileInfo}>Selected file: {documentFile.name}</p>
+                )}
+              </div>
+            )}
+
+            <div className={styles.modalActions}>
+              <button
+                className={styles.acceptBtn}
+                onClick={handleUpdateNextStage}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <span className={styles.loadingSpinner}></span>
+                ) : (
+                  <>
+                    <Check size={16} /> Update Stage
+                  </>
+                )}
+              </button>
+              <button
+                className={styles.cancelBtn}
+                onClick={() => setShowNextStageModal(false)}
+                disabled={isSubmitting}
+              >
+                Cancel
               </button>
             </div>
           </div>

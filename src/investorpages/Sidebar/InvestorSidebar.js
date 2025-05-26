@@ -17,6 +17,11 @@ import {
   ChevronLeft,
   Menu,
   X,
+  Calendar,
+  File,
+  DollarSign,
+  Repeat,
+  Package,
 } from "lucide-react"
 import styles from "./InvestorSidebar.module.css"
 
@@ -69,33 +74,39 @@ function InvestorSidebar({ companyName }) {
     { id: "home", label: "Home", icon: <Home size={18} />, route: "/" },
     { 
       id: "dashboard", 
-      label: "Approved Applications", 
+      label: "My Big Score", 
       icon: <LayoutDashboard size={18} />, 
       route: "/investor-dashboard" 
     },
     { 
       id: "profile", 
-      label: "Universal Profile", 
+      label: "My Profile", 
       icon: <User size={18} />, 
       route: "/investor-profile" 
     },
     { 
       id: "matches", 
-      label: "Dashboard", 
+      label: "My Matches", 
       icon: <HeartHandshake size={18} />, 
       route: "/investor-matches" 
     },
     { 
       id: "documents", 
-      label: "Documents", 
-      icon: <Book size={18} />, 
+      label: "My Documents", 
+      icon: <File size={18} />,  // Changed from Book to File
       route: "/investor-documents" 
     },
     { 
       id: "messages", 
-      label: "Messages", 
+      label: "My Messages", 
       icon: <MessageSquare size={18} />, 
       route: "/investor-messages" 
+    },
+    { 
+      id: "calendar", 
+      label: "My Calendar", 
+      icon: <Calendar size={18} />,  // Changed from MessageSquare to Calendar
+      route: "/investor-calendar" 
     },
     {
       id: "billing",
@@ -107,19 +118,19 @@ function InvestorSidebar({ companyName }) {
         {
           id: "billing-info",
           label: "Billing Information",
-          icon: <FileText size={16} />,
+          icon: <DollarSign size={16} />,  // Changed from FileText
           route: "/investor/billing/info",
         },
         {
           id: "subscriptions",
           label: "Subscriptions",
-          icon: <FileText size={16} />,
+          icon: <Repeat size={16} />,  // Changed from FileText
           route: "/investor/billing/subscriptions",
         },
         {
           id: "transactions",
-          label: "Grotwth tools Orders",
-          icon: <FileText size={16} />,
+          label: "Growth Tools Orders",
+          icon: <Package size={16} />,  // Changed from FileText
           route: "/investor/billing/growth-tools-orders",
         },
       ],
@@ -180,7 +191,6 @@ function InvestorSidebar({ companyName }) {
         
         {/* Header */}
         <div className={styles.companyHeader}>
-
           {!isCollapsed && (
             <div className={styles.companyInfo}>
               <div className={styles.companyName}>{companyName}</div>

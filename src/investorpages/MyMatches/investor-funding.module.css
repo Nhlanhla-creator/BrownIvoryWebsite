@@ -25,7 +25,7 @@
   /* Main layout - Positioned to the right with reduced width */
  
     flex: 1;
-    padding: 12px;
+    padding: 1=80px;
     box-sizing: border-box;
     width: calc(100% - 270px); /* Adjust based on your left sidebar width */
     max-width: 90%; /* Limit the maximum width */
@@ -1378,7 +1378,7 @@
   }
   
   .fundingTable td {
-    padding: 0.5rem;
+    padding: 0.9rem;
     border-bottom: 1px solid var(--brown-100);
     font-size: 0.75rem;
     color: var(--brown-800);
@@ -5329,4 +5329,68 @@
 
 .declineBtn:hover {
   background-color: #d32f2f;
+}
+/* Next Stage styles */
+.nextStageDropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.nextStageBtn {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.nextStageBtn:hover {
+  background-color: #e0e0e0;
+}
+
+.currentStageBadge {
+  background-color: #4CAF50;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Stage selection modal styles */
+.stageSelection {
+  margin-bottom: 20px;
+}
+
+.stageOptions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.stageOption {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.stageOption:hover {
+  background-color: #f0f0f0;
+}
+
+.stageOption.active {
+  background-color: #4CAF50;
+  color: white;
+  border-color: #4CAF50;
 }

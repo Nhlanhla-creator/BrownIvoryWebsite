@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MessageCircle, X, ChevronRight, Info } from "lucide-react";
+import { MessageCircle, X, ChevronRight, Info, FileText } from "lucide-react";
 import styles from "./DealFlowPipeline.module.css";
 import { db } from "../../firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
@@ -27,6 +27,7 @@ export default function DealFlowPipeline() {
       application: 0,
       review: 0,
       feedback: 0,
+      termSheet: 0,
       deals: 0,
       withdrawn: 0,
     };
@@ -39,6 +40,7 @@ export default function DealFlowPipeline() {
       if (status === "application received") counts.application++;
       if (status === "under review") counts.review++;
       if (status === "feedback sent") counts.feedback++;
+      if (status === "term sheet sent") counts.termSheet++;
       if (status === "approved") counts.deals++;
       if (status === "declined" || status === "withdrawn") counts.withdrawn++;
     });
@@ -76,17 +78,25 @@ export default function DealFlowPipeline() {
     {
       id: "feedback",
       name: "Feedback Sent",
-      description: "Feedback sent",
+      description: "Feedback sent to SMSEs",
       hasMessages: true,
       colorClass: styles.stageFeedback,
       iconColor: "#5d4037"
+    },
+    {
+      id: "termSheet",
+      name: "Term Sheet Sent",
+      description: "Term sheets sent to SMSEs for consideration",
+      hasTermSheet: true,
+      colorClass: styles.stageTermSheet,
+      iconColor: "#4e342e"
     },
     {
       id: "deals",
       name: "Deals",
       description: "Successfully closed funding deals",
       colorClass: styles.stageDeals,
-      iconColor: "#4e342e"
+      iconColor: "#3e2723"
     },
     {
       id: "withdrawn",
@@ -94,13 +104,15 @@ export default function DealFlowPipeline() {
       description: "Applications withdrawn by you or declined",
       showRejectionInfo: true,
       colorClass: styles.stageWithdrawn,
-      iconColor: "#3e2723"
+      iconColor: "#2e1a14"
     },
   ];
 
   const handleStageClick = async (stage) => {
     if (stage.id === "feedback" && stage.hasMessages) {
       alert("Redirecting to messages...");
+    } else if (stage.id === "termSheet" && stage.hasTermSheet) {
+      alert("Redirecting to term sheets...");
     } else if (stage.id === "withdrawn" && stage.showRejectionInfo) {
       const auth = getAuth();
       const user = auth.currentUser;
@@ -168,7 +180,12 @@ export default function DealFlowPipeline() {
                   <p className={styles.tooltipDescription}>{stage.description}</p>
                   {stage.hasMessages && (
                     <button className={styles.tooltipAction}>
-                      View messages <ChevronRight size={12} />
+                      <MessageCircle size={12} /> View messages <ChevronRight size={12} />
+                    </button>
+                  )}
+                  {stage.hasTermSheet && (
+                    <button className={styles.tooltipAction}>
+                      <FileText size={12} /> View term sheets <ChevronRight size={12} />
                     </button>
                   )}
                   {stage.showRejectionInfo && (
