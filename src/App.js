@@ -22,6 +22,7 @@ import HowItWorksSMSE from "./mainpages/HowItWorksSMSE"
 import HowItWorksAccelerators from "./mainpages/HowItWorksAccelarators"
 import HowItWorksCorporates from "./mainpages/HowItWorksCoporate"
 import HowItWorksInvestors from "./mainpages/HowItWorksInvestor"
+import FAQPage from "./mainpages/FAQs"
 
 // Auth Components
 import AuthForm from "./smespages/LoginRegister"
@@ -87,6 +88,7 @@ import FundingMatchesPage from "./smespages/MyFunderMatches/funders-matches"
 import SupplierMatchesPage from "./smespages/MySupplierMatches/supplier-matches"
 import SupportProgramMatchesPage from "./smespages/MySupportProgramMatches/support-program-matches"
 import MatchesPage from "./investorpages/MyMatches/investor-matches"
+
 
 // Billing and Payment Components
 // import MySubscriptions from "./smespages/BillingInformation/my-subscriptions"
@@ -304,6 +306,7 @@ function App() {
         <Route path="/HowItWorksInvestors" element={<HowItWorksInvestors />} />
         <Route path="/LoginRegister" element={<LoginRegister />} />
         <Route path="/AboutPage" element={<AboutPage />} />
+        <Route path="/FAQPage" element={<FAQPage />} />
 
         {/* Protected SME Dashboard Routes */}
         <Route path="/dashboard" element={renderSMERoute(Dashboard)} />

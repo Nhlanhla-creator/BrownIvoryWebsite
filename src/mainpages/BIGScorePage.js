@@ -1,667 +1,833 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
-import { 
-  MdLightbulbOutline as EmojiObjects,
-  MdAttachMoney as MonetizationOn,
-  MdHandshake as Handshake,
-  MdAssessment as Assessment,
-  MdCompare as Compare,
-  MdFormatQuote as FormatQuote,
-  MdTimeline as Timeline,
-  MdCheckCircle as CheckCircle,
-  MdCancel as Cancel,
-  MdGroupWork as GroupWork,
-  MdDescription as Description,
-  MdVerifiedUser as VerifiedUser,
-  MdTrendingUp as TrendingUp,
-  MdBarChart as BarChart,
-  MdPeople as People,
-  MdBusiness as Business,
-  MdAccountBalance as AccountBalance,
-  MdAssignment as Assignment,
-  MdGavel as Gavel,
-  MdEqualizer as Equalizer,
-  MdThumbUp as ThumbUp,
-  MdThumbDown as ThumbDown,
-  MdArrowForward as ArrowForward
-} from 'react-icons/md';
 import Header from './Header';
 import Footer from './Footer';
 
-// Darker color palette
-const colors = {
-  darkBrown: '#2a211d',
-  mediumBrown: '#5a3a25',
-  lightBrown: '#8a5b36',
-  cream: '#e8e2d6',
-  warmGray: '#a89e8c',
-  background: '#e0d8d0'
-};
-
-// Styled components
-const PageWrapper = styled.div`
-  background: ${colors.background};
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  font-family: 'Arial', sans-serif;
-`;
-
-const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-  flex: 1;
-`;
-
-const HeroSection = styled.section`
-  background: linear-gradient(rgba(42, 33, 29, 0.85), rgba(42, 33, 29, 0.85)), 
-              url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-  background-size: cover;
-  background-position: center;
-  padding: 4rem 2rem;
-  border-radius: 8px;
-  text-align: center;
-  color: white;
-  margin-bottom: 2rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2.8rem;
-  margin-bottom: 1rem;
-`;
-
-const Subtitle = styled.p`
-  font-size: 1.2rem;
-  max-width: 800px;
-  margin: 0 auto;
-  line-height: 1.6;
-`;
-
-const Section = styled.section`
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin-bottom: 2rem;
-`;
-
-const BenefitsContainer = styled.div`
-  display: flex;
-  overflow-x: auto;
-  gap: 1rem;
-  padding: 1rem 0;
-  margin: 1rem 0;
-  -webkit-overflow-scrolling: touch;
-
-  &::-webkit-scrollbar {
-    height: 6px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: ${colors.mediumBrown};
-    border-radius: 3px;
-  }
-`;
-
-const BenefitCard = styled.div`
-  min-width: 280px;
-  padding: 1.5rem;
-  background: ${colors.cream};
-  border-radius: 6px;
-  display: flex;
-  flex-direction: column;
-
-  h3 {
-    color: ${colors.mediumBrown};
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    white-space: nowrap;
-  }
-
-  ul {
-    flex-grow: 1;
-    li {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.5rem;
-      margin-bottom: 0.8rem;
-    }
-  }
-`;
-
-const Tabs = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-`;
-
-const Tab = styled.button`
-  padding: 0.8rem 1.5rem;
-  background: ${props => props.active ? colors.mediumBrown : colors.cream};
-  color: ${props => props.active ? 'white' : colors.darkBrown};
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: ${props => props.active ? '600' : '400'};
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  &:hover {
-    background: ${props => props.active ? colors.lightBrown : colors.warmGray};
-  }
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-
-  th, td {
-    padding: 0.8rem;
-    text-align: left;
-    border-bottom: 1px solid ${colors.warmGray};
-  }
-
-  th {
-    background-color: ${colors.warmGray};
-    font-weight: 600;
-  }
-`;
-
-const Comparison = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin: 2rem 0;
-
-  @media (max-width: 700px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const ComparisonCard = styled.div`
-  padding: 1.5rem;
-  background: ${props => props.negative ? colors.cream : colors.warmGray};
-  border-radius: 6px;
-
-  h3 {
-    color: ${props => props.negative ? colors.mediumBrown : colors.darkBrown};
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  p {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.8rem;
-    gap: 0.5rem;
-  }
-`;
-
-const Testimonial = styled.div`
-  background: ${colors.mediumBrown};
-  color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  margin: 3rem 0;
-  position: relative;
-
-  p {
-    font-style: italic;
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-    position: relative;
-    z-index: 2;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  cite {
-    font-weight: 600;
-    position: relative;
-    z-index: 2;
-  }
-`;
-
-const Steps = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  margin: 2rem 0;
-
-  @media (max-width: 700px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Step = styled.div`
-  padding: 1rem;
-  background: ${colors.cream};
-  border-radius: 6px;
-  text-align: center;
-  transition: all 0.3s ease;
-
-  span {
-    font-weight: 600;
-    display: block;
-    color: ${colors.mediumBrown};
-  }
-
-  small {
-    font-size: 0.9rem;
-    display: block;
-    color: ${colors.darkBrown};
-  }
-`;
-
-const Button = styled.button`
-  padding: 0.8rem 1.8rem;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: ${props => props.primary ? colors.mediumBrown : 'transparent'};
-  color: ${props => props.primary ? 'white' : colors.mediumBrown};
-  border: ${props => props.primary ? 'none' : `2px solid ${colors.mediumBrown}`};
-
-  &:hover {
-    background: ${props => props.primary ? colors.lightBrown : colors.cream};
-  }
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin: 2rem 0;
-  flex-wrap: wrap;
-`;
-
-const TrustBadges = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin: 1rem 0;
-  flex-wrap: wrap;
-
-  span {
-    padding: 0.5rem 1rem;
-    background: ${colors.cream};
-    border-radius: 20px;
-    font-size: 0.9rem;
-  }
-`;
-
-const BigScorePage = () => {
+const BIGScorePage = () => {
   const [activeTab, setActiveTab] = useState('funding');
 
   return (
-    <PageWrapper>
-      <Header />
-      <Container>
-        <HeroSection>
-          <Title>BIG Score</Title>
-          <Subtitle>
-            Africa's first AI-powered trust metric that validates SMEs, social enterprises, 
-            and ESG-focused businesses as credible partners for funding, supply chains, 
-            and impact collaborations.
-          </Subtitle>
-        </HeroSection>
+    <div style={{ 
+      backgroundImage: 'url("https://i.pinimg.com/736x/ba/37/08/ba37083994c5f3794787b9889f8538c4.jpg")',
+      backgroundSize: 'cover',
+      backgroundAttachment: 'fixed',
+      backgroundPosition: 'center',
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      color: '#372C27'
+    }}>
+      <div style={{
+        backgroundColor: 'rgba(242, 240, 230, 0.92)',
+        minHeight: '100vh'
+      }}>
+        <Header />
+        
+        {/* Hero Banner */}
+        <div style={{
+          background: 'linear-gradient(rgba(55, 44, 39, 0.8), rgba(55, 44, 39, 0.8)), url("https://static.vecteezy.com/system/resources/thumbnails/029/344/318/small_2x/ai-generative-american-business-male-people-shaking-hands-skyscrapers-in-the-background-free-photo.jpg")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          padding: '120px 20px',
+          textAlign: 'center',
+          color: '#F2F0E6',
+          marginBottom: '60px'
+        }}>
+          <h1 style={{
+            fontSize: '3.5rem',
+            fontWeight: '700',
+            marginBottom: '20px',
+            letterSpacing: '1px'
+          }}>BIG Score</h1>
+          <p style={{
+            fontSize: '1.5rem',
+            maxWidth: '800px',
+            margin: '0 auto 40px',
+            lineHeight: '1.6'
+          }}>Africa's first AI-powered trust metric for credible business partnerships</p>
+          <button style={{
+            backgroundColor: '#9E6E3C',
+            color: 'white',
+            border: 'none',
+            padding: '16px 50px',
+            borderRadius: '30px',
+            fontSize: '1.1rem',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            ':hover': {
+              backgroundColor: '#754A2D',
+              transform: 'translateY(-3px)'
+            }
+          }}>Calculate Your BIG Score</button>
+        </div>
+        
+        <div style={{ 
+          maxWidth: '1200px', 
+          margin: '0 auto', 
+          padding: '0 20px 60px'
+        }}>
+          {/* What is BIG Score Section */}
+          <div style={{ 
+            backgroundColor: 'white',
+            padding: '50px',
+            borderRadius: '8px',
+            boxShadow: '0 5px 15px rgba(0,0,0,0.05)',
+            marginBottom: '60px',
+            textAlign: 'center'
+          }}>
+            <h2 style={{ 
+              color: '#754A2D', 
+              fontSize: '2rem',
+              fontWeight: '600',
+              marginBottom: '25px'
+            }}>
+              What is the BIG Score?
+            </h2>
+            <p style={{ 
+              fontSize: '1.1rem',
+              lineHeight: '1.8',
+              maxWidth: '800px',
+              margin: '0 auto 30px'
+            }}>
+              The BIG Score is Africa's first AI-powered trust metric that validates SMEs, social enterprises, and ESG-focused businesses as credible partners for funding, supply chains, and impact collaborations.
+            </p>
+            
+            <div style={{ 
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '30px',
+              flexWrap: 'wrap',
+              marginBottom: '30px'
+            }}>
+              {[
+                "A credit score for business credibility",
+                "A growth roadmap for SMEs",
+                "A risk-reducer for funders and corporates"
+              ].map((item, index) => (
+                <div key={index} style={{
+                  backgroundColor: '#F2F0E6',
+                  padding: '25px',
+                  borderRadius: '8px',
+                  width: '280px',
+                  textAlign: 'center',
+                  flex: '1',
+                  minWidth: '250px'
+                }}>
+                  <p style={{
+                    fontWeight: '600',
+                    color: '#372C27'
+                  }}>{item}</p>
+                </div>
+              ))}
+            </div>
+            
+            <p style={{ 
+              fontStyle: 'italic',
+              color: '#754A2D',
+              fontWeight: '500'
+            }}>
+              Powered by blockchain-backed data and dynamic AI analysis, it replaces guesswork with standardized, actionable insights.
+            </p>
+          </div>
 
-        <Section>
-          <h2 style={{ color: colors.mediumBrown, textAlign: 'center' }}>Think of it as:</h2>
-          <ul style={{ fontSize: '1.1rem', lineHeight: '1.6', paddingLeft: '1.5rem' }}>
-            <li style={{ marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Description /> A credit score for business credibility
-            </li>
-            <li style={{ marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <TrendingUp /> A growth roadmap for SMEs
-            </li>
-            <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <VerifiedUser /> A risk-reducer for funders and corporates
-            </li>
-          </ul>
-          <p style={{ marginTop: '1rem', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <BarChart /> Powered by blockchain-backed data and dynamic AI analysis, it replaces guesswork with standardized, actionable insights.
-          </p>
-        </Section>
-
-        <Section>
-          <h2 style={{ color: colors.mediumBrown, textAlign: 'center' }}>Why the BIG Score Wins for Everyone</h2>
-          
-          <BenefitsContainer>
-            <BenefitCard>
-              <h3><EmojiObjects /> SMEs & Social Enterprises</h3>
-              <ul>
-                <li><span>✅</span> See exactly where you stand with clear scoring breakdowns</li>
-                <li><span>📈</span> Boost visibility to the right funders and customers</li>
-                <li><span>🔍</span> Get tailored "next steps" to improve your score</li>
-              </ul>
-            </BenefitCard>
-            <BenefitCard>
-              <h3><MonetizationOn /> Funders & Investors</h3>
-              <ul>
-                <li><span>⏱️</span> Cut due diligence time by 70% with pre-vetted opportunities</li>
-                <li><span>📊</span> Compare apples-to-apples with standardized metrics</li>
-                <li><span>🤖</span> AI-matched recommendations aligned with your criteria</li>
-              </ul>
-            </BenefitCard>
-            <BenefitCard>
-              <h3><Business /> Corporates</h3>
-              <ul>
-                <li><span>🛡️</span> Source verified partners with compliance & ESG tracking</li>
-                <li><span>🌱</span> Meet CSI/ESD goals with impact-proven suppliers</li>
-                <li><span>⚡</span> Reduce procurement risk with real-time performance data</li>
-              </ul>
-            </BenefitCard>
-            <BenefitCard>
-              <h3><GroupWork /> Accelerators</h3>
-              <ul>
-                <li><span>🎯</span> Identify cohort gaps and tailor support</li>
-                <li><span>📈</span> Demonstrate program ROI with score improvements</li>
-                <li><span>💡</span> Spot high-potential outliers for investor showcases</li>
-              </ul>
-            </BenefitCard>
-          </BenefitsContainer>
-        </Section>
-
-        <Section>
-          <h2 style={{ color: colors.mediumBrown, textAlign: 'center' }}>How It Works</h2>
-          
-          <Tabs>
-            <Tab active={activeTab === 'funding'} onClick={() => setActiveTab('funding')}>
-              <Assessment /> BIG Score for Funding
-            </Tab>
-            <Tab active={activeTab === 'service'} onClick={() => setActiveTab('service')}>
-              <Handshake /> BIG Score for Service
-            </Tab>
-          </Tabs>
-
-          {activeTab === 'funding' ? (
-            <div>
-              <h3 style={{ color: colors.lightBrown, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <AccountBalance /> For: SMSEs seeking capital or social enterprises proving impact
-              </h3>
-              <p>The BIG Score for funding evaluates organizations based on their investment readiness, operational reliability, and ESG/impact alignment:</p>
-              
-              <h4 style={{ color: colors.lightBrown, marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <ArrowForward /> Traditional SMEs (Profit-Driven)
-              </h4>
-              <p>Weightings Focus: Financial viability, market traction, and scalability. Weightings Shift as You Grow.</p>
-              
-              <Table>
-                <thead>
-                  <tr>
-                    <th>Category</th>
-                    <th>Description</th>
-                    <th>Pre-Revenue</th>
-                    <th>Scaling</th>
-                    <th>Mature</th>
-                    <th>Data Sources</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Compliance</td>
-                    <td>Legal documentation, regulatory adherence, operational licenses.</td>
-                    <td>15%</td>
-                    <td>20%</td>
-                    <td>25%</td>
-                    <td>Uploaded docs + govt APIs</td>
-                  </tr>
-                  <tr>
-                    <td>Financial Health</td>
-                    <td>Revenue trends, cash flow management, profitability, debt-to-equity ratio, existing liabilities.</td>
-                    <td>20%</td>
-                    <td>30%</td>
-                    <td>35%</td>
-                    <td>Xero/QuickBooks + projections</td>
-                  </tr>
-                  <tr>
-                    <td>Operational Strength</td>
-                    <td>Team experience, operational capacity, industry benchmarks, scalability, sustainability</td>
-                    <td>20%</td>
-                    <td>20%</td>
-                    <td>15%</td>
-                    <td>Team profiles + LinkedIn</td>
-                  </tr>
-                  <tr>
-                    <td>Pitch Quality</td>
-                    <td>Business model viability, clarity, completeness, feasibility, market fit (Market demand, customer base, competitive positioning, innovation)</td>
-                    <td>25%</td>
-                    <td>15%</td>
-                    <td>10%</td>
-                    <td>ChatGPT deck analysis</td>
-                  </tr>
-                  <tr>
-                    <td>Impact Proof</td>
-                    <td>Basic environmental/social practices</td>
-                    <td>20%</td>
-                    <td>15%</td>
-                    <td>15%</td>
-                    <td>Sector benchmarks (Briter/AfDB)</td>
-                  </tr>
-                </tbody>
-              </Table>
-
-              <div style={{ margin: '1.5rem 0', padding: '1rem', background: colors.cream, borderRadius: '6px' }}>
-                <h5 style={{ marginBottom: '0.5rem' }}>Examples:</h5>
-                <p>1. A scaling SME with strong finances (90%) but weak compliance (60%):</p>
-                <p style={{ fontStyle: 'italic' }}>(20%*60) + (30%*90) + (20%*70) + (15%*80) + (15%*50) = 72.5/100 → "Fundable with Conditions"</p>
-                <p>2. "A scaling fintech SME with strong unit economics (85%) but no B-BBEE cert (0%) loses 5% instantly. We flag this as a quick win."</p>
+          {/* Why BIG Score Wins Section */}
+          <div style={{ 
+            backgroundColor: 'white',
+            padding: '50px',
+            borderRadius: '8px',
+            boxShadow: '0 5px 15px rgba(0,0,0,0.05)',
+            marginBottom: '60px'
+          }}>
+            <h2 style={{ 
+              color: '#372C27', 
+              fontSize: '2rem',
+              fontWeight: '600',
+              textAlign: 'center',
+              marginBottom: '50px'
+            }}>
+              Why the BIG Score Wins for Everyone
+            </h2>
+            
+            <div style={{ 
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '20px'
+            }}>
+              {/* Column 1 */}
+              <div style={{ 
+                backgroundColor: '#F2F0E6',
+                padding: '30px',
+                borderRadius: '8px',
+                minHeight: '350px',
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <h3 style={{ 
+                  fontSize: '1.3rem',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  marginBottom: '20px',
+                  color: '#754A2D'
+                }}>For SMEs & Social Enterprises</h3>
+                <ul style={{ 
+                  listStyleType: 'none',
+                  padding: 0,
+                  margin: 0,
+                  flex: '1'
+                }}>
+                  <li style={{ marginBottom: '15px' }}>✅ See exactly where you stand with clear scoring breakdowns</li>
+                  <li style={{ marginBottom: '15px' }}>📈 Boost visibility to the right funders and customers</li>
+                  <li>🔍 Get tailored "next steps" to improve your score</li>
+                </ul>
               </div>
-
-              <h4 style={{ color: colors.lightBrown, marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <ArrowForward /> Social Enterprises (Impact-Driven)
-              </h4>
-              <p>Weightings Focus: Impact metrics, sustainability, and community alignment. Weightings Favor Real-World Change:</p>
               
-              <Table>
-                <thead>
-                  <tr>
-                    <th>Category</th>
-                    <th>Early-Stage</th>
-                    <th>Growing</th>
-                    <th>Mature</th>
-                    <th>What We Measure</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Impact Proof</td>
-                    <td>40%</td>
-                    <td>35%</td>
-                    <td>30%</td>
-                    <td>SDG alignment, beneficiary stories</td>
-                  </tr>
-                  <tr>
-                    <td>Financial Sustainability</td>
-                    <td>15%</td>
-                    <td>25%</td>
-                    <td>30%</td>
-                    <td>Grant diversity, earned income %</td>
-                  </tr>
-                  <tr>
-                    <td>Governance</td>
-                    <td>20%</td>
-                    <td>20%</td>
-                    <td>25%</td>
-                    <td>Board diversity, transparency</td>
-                  </tr>
-                  <tr>
-                    <td>Community Roots</td>
-                    <td>25%</td>
-                    <td>20%</td>
-                    <td>15%</td>
-                    <td>Local partnerships, participatory design</td>
-                  </tr>
-                </tbody>
-              </Table>
-
-              <div style={{ margin: '1.5rem 0', padding: '1rem', background: colors.cream, borderRadius: '6px' }}>
-                <h5 style={{ marginBottom: '0.5rem' }}>Examples:</h5>
-                <p>1. An early-stage social enterprise with high impact (90%) but low finances (50%):</p>
-                <p style={{ fontStyle: 'italic' }}>(40%*70) + (15%*50) + (20%*90) + (25%*60)= 74.5/100 → "High Impact, Needs Funding"</p>
-                <p>2. A women's coop scores 95% on Impact but 30% on Financials? We recommend capacity-building grants first</p>
+              {/* Column 2 */}
+              <div style={{ 
+                backgroundColor: '#D3D2CE',
+                padding: '30px',
+                borderRadius: '8px',
+                minHeight: '350px',
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <h3 style={{ 
+                  fontSize: '1.3rem',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  marginBottom: '20px',
+                  color: '#372C27'
+                }}>For Funders & Investors</h3>
+                <ul style={{ 
+                  listStyleType: 'none',
+                  padding: 0,
+                  margin: 0,
+                  flex: '1'
+                }}>
+                  <li style={{ marginBottom: '15px' }}>⏱️ Cut due diligence time by 70% with pre-vetted opportunities</li>
+                  <li style={{ marginBottom: '15px' }}>📊 Compare apples-to-apples with standardized metrics</li>
+                  <li>🤖 AI-matched recommendations aligned with your criteria</li>
+                </ul>
+              </div>
+              
+              {/* Column 3 */}
+              <div style={{ 
+                backgroundColor: '#9E6E3C',
+                padding: '30px',
+                borderRadius: '8px',
+                minHeight: '350px',
+                display: 'flex',
+                flexDirection: 'column',
+                color: '#F2F0E6'
+              }}>
+                <h3 style={{ 
+                  fontSize: '1.3rem',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  marginBottom: '20px'
+                }}>For Corporates</h3>
+                <ul style={{ 
+                  listStyleType: 'none',
+                  padding: 0,
+                  margin: 0,
+                  flex: '1'
+                }}>
+                  <li style={{ marginBottom: '15px' }}>🛡️ Source verified partners with compliance & ESG tracking</li>
+                  <li style={{ marginBottom: '15px' }}>🌱 Meet CSI/ESD goals with impact-proven suppliers</li>
+                  <li>⚡ Reduce procurement risk with real-time performance data</li>
+                </ul>
+              </div>
+              
+              {/* Column 4 */}
+              <div style={{ 
+                backgroundColor: '#754A2D',
+                padding: '30px',
+                borderRadius: '8px',
+                minHeight: '350px',
+                display: 'flex',
+                flexDirection: 'column',
+                color: '#F2F0E6'
+              }}>
+                <h3 style={{ 
+                  fontSize: '1.3rem',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  marginBottom: '20px'
+                }}>For Accelerators</h3>
+                <ul style={{ 
+                  listStyleType: 'none',
+                  padding: 0,
+                  margin: 0,
+                  flex: '1'
+                }}>
+                  <li style={{ marginBottom: '15px' }}>🎯 Identify cohort gaps and tailor support</li>
+                  <li style={{ marginBottom: '15px' }}>📈 Demonstrate program ROI with score improvements</li>
+                  <li>💡 Spot high-potential outliers for investor showcases</li>
+                </ul>
               </div>
             </div>
-          ) : (
-            <div>
-              <h3 style={{ color: colors.lightBrown, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <People /> BIG Score for Customer Service
-              </h3>
-              <p>This version of the BIG Score validates SMEs and ESG-focused organizations providing services to customers, ensuring transparency, reliability, and satisfaction.</p>
-              
-              <h4 style={{ color: colors.lightBrown, marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <ArrowForward /> Traditional SMEs (Profit-Driven)
-              </h4>
-              <p>Weightings: Service quality > compliance > operational strength.</p>
-              
-              <Table>
-                <thead>
-                  <tr>
-                    <th>Category</th>
-                    <th>Description</th>
-                    <th>Weighting</th>
-                    <th>Data Sources</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Compliance</td>
-                    <td>SME legitimacy, legal compliance, licensing</td>
-                    <td>20%</td>
-                    <td>Vendor management docs, Tax docs, certifications</td>
-                  </tr>
-                  <tr>
-                    <td>Reliability</td>
-                    <td>Financial and operational strength/health</td>
-                    <td>50%</td>
-                    <td>SLAs, Team capacity</td>
-                  </tr>
-                  <tr>
-                    <td>Customer Satisfaction</td>
-                    <td>Team experience, operational capacity, industry benchmarks scalability, sustainability</td>
-                    <td>30%</td>
-                    <td>Net Promoter Score, repeat business</td>
-                  </tr>
-                </tbody>
-              </Table>
+          </div>
 
-              <h4 style={{ color: colors.lightBrown, marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <ArrowForward /> Social Enterprises (Impact Driven)
-              </h4>
-              <p>Weightings: Impact delivery > stakeholder feedback > compliance.</p>
-              
-              <Table>
-                <thead>
-                  <tr>
-                    <th>Category</th>
-                    <th>Description</th>
-                    <th>Weighting</th>
-                    <th>Data Sources</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Compliance</td>
-                    <td>NGO legitimacy, legal compliance, licensing</td>
-                    <td>25%</td>
-                    <td>NGO registration, audits</td>
-                  </tr>
-                  <tr>
-                    <td>Impact Proof</td>
-                    <td>Environmental and social responsibility practices, ESG compliance</td>
-                    <td>40%</td>
-                    <td>Beneficiary testimonials, SDG reports</td>
-                  </tr>
-                  <tr>
-                    <td>Service Quality</td>
-                    <td>Reliability, consistency in service delivery, operational efficiency - Real-time ratings and reviews from actual customers</td>
-                    <td>35%</td>
-                    <td>Partner/corporate ratings</td>
-                  </tr>
-                </tbody>
-              </Table>
+          {/* How It Works Section */}
+          <div style={{ 
+            backgroundColor: 'white',
+            padding: '50px',
+            borderRadius: '8px',
+            boxShadow: '0 5px 15px rgba(0,0,0,0.05)',
+            marginBottom: '60px'
+          }}>
+            <h2 style={{ 
+              color: '#372C27', 
+              fontSize: '2rem',
+              fontWeight: '600',
+              textAlign: 'center',
+              marginBottom: '40px'
+            }}>
+              How It Works
+            </h2>
+            
+            <div style={{ 
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '20px',
+              marginBottom: '40px'
+            }}>
+              <button 
+                onClick={() => setActiveTab('funding')}
+                style={{ 
+                  backgroundColor: activeTab === 'funding' ? '#9E6E3C' : '#D3D2CE',
+                  color: activeTab === 'funding' ? 'white' : '#372C27',
+                  border: 'none',
+                  padding: '12px 25px',
+                  borderRadius: '6px',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                BIG Score for Funding
+              </button>
+              <button 
+                onClick={() => setActiveTab('service')}
+                style={{ 
+                  backgroundColor: activeTab === 'service' ? '#9E6E3C' : '#D3D2CE',
+                  color: activeTab === 'service' ? 'white' : '#372C27',
+                  border: 'none',
+                  padding: '12px 25px',
+                  borderRadius: '6px',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                BIG Score for Customer Service
+              </button>
             </div>
-          )}
-        </Section>
+            
+            {activeTab === 'funding' ? (
+              <div>
+                <h3 style={{ 
+                  color: '#754A2D', 
+                  fontSize: '1.5rem',
+                  fontWeight: '600',
+                  marginBottom: '20px'
+                }}>BIG Score for Funding</h3>
+                <p style={{ 
+                  fontSize: '1.1rem',
+                  lineHeight: '1.8',
+                  marginBottom: '30px'
+                }}>
+                  For: SMSEs seeking capital or social enterprises proving impact. The BIG Score for funding evaluates organizations based on their investment readiness, operational reliability, and ESG/impact alignment.
+                </p>
+                
+                <h4 style={{ 
+                  color: '#9E6E3C',
+                  fontSize: '1.2rem',
+                  fontWeight: '600',
+                  marginBottom: '15px'
+                }}>A. Traditional SMEs (Profit-Driven)</h4>
+                <p style={{ 
+                  fontStyle: 'italic',
+                  color: '#754A2D',
+                  marginBottom: '20px'
+                }}>
+                  Weightings Focus: Financial viability, market traction, and scalability. Weightings Shift as You Grow.
+                </p>
+                
+                <div style={{ 
+                  overflowX: 'auto',
+                  marginBottom: '40px'
+                }}>
+                  <table style={{ 
+                    width: '100%',
+                    borderCollapse: 'collapse'
+                  }}>
+                    <thead>
+                      <tr style={{ 
+                        backgroundColor: '#9E6E3C',
+                        color: 'white'
+                      }}>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Category</th>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Pre-Revenue</th>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Scaling</th>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Mature</th>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Data Sources</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ backgroundColor: '#F2F0E6' }}>
+                        <td style={{ padding: '12px' }}>Compliance</td>
+                        <td style={{ padding: '12px' }}>15%</td>
+                        <td style={{ padding: '12px' }}>20%</td>
+                        <td style={{ padding: '12px' }}>25%</td>
+                        <td style={{ padding: '12px' }}>Uploaded docs + govt APIs</td>
+                      </tr>
+                      <tr style={{ backgroundColor: '#D3D2CE' }}>
+                        <td style={{ padding: '12px' }}>Financial Health</td>
+                        <td style={{ padding: '12px' }}>20%</td>
+                        <td style={{ padding: '12px' }}>30%</td>
+                        <td style={{ padding: '12px' }}>35%</td>
+                        <td style={{ padding: '12px' }}>Xero/QuickBooks + projections</td>
+                      </tr>
+                      <tr style={{ backgroundColor: '#F2F0E6' }}>
+                        <td style={{ padding: '12px' }}>Operational Strength</td>
+                        <td style={{ padding: '12px' }}>20%</td>
+                        <td style={{ padding: '12px' }}>20%</td>
+                        <td style={{ padding: '12px' }}>15%</td>
+                        <td style={{ padding: '12px' }}>Team profiles + LinkedIn</td>
+                      </tr>
+                      <tr style={{ backgroundColor: '#D3D2CE' }}>
+                        <td style={{ padding: '12px' }}>Pitch Quality</td>
+                        <td style={{ padding: '12px' }}>25%</td>
+                        <td style={{ padding: '12px' }}>15%</td>
+                        <td style={{ padding: '12px' }}>10%</td>
+                        <td style={{ padding: '12px' }}>ChatGPT deck analysis</td>
+                      </tr>
+                      <tr style={{ backgroundColor: '#F2F0E6' }}>
+                        <td style={{ padding: '12px' }}>Impact Proof</td>
+                        <td style={{ padding: '12px' }}>20%</td>
+                        <td style={{ padding: '12px' }}>15%</td>
+                        <td style={{ padding: '12px' }}>15%</td>
+                        <td style={{ padding: '12px' }}>Sector benchmarks (Briter/AfDB)</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <h4 style={{ 
+                  color: '#9E6E3C',
+                  fontSize: '1.2rem',
+                  fontWeight: '600',
+                  marginBottom: '15px'
+                }}>B. Social Enterprises (Impact-Driven)</h4>
+                <p style={{ 
+                  fontStyle: 'italic',
+                  color: '#754A2D',
+                  marginBottom: '20px'
+                }}>
+                  Weightings Focus: Impact metrics, sustainability, and community alignment. Weightings Favor Real-World Change:
+                </p>
+                
+                <div style={{ 
+                  overflowX: 'auto',
+                  marginBottom: '40px'
+                }}>
+                  <table style={{ 
+                    width: '100%',
+                    borderCollapse: 'collapse'
+                  }}>
+                    <thead>
+                      <tr style={{ 
+                        backgroundColor: '#9E6E3C',
+                        color: 'white'
+                      }}>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Category</th>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Early-Stage</th>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Growing</th>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Mature</th>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>What We Measure</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ backgroundColor: '#F2F0E6' }}>
+                        <td style={{ padding: '12px' }}>Impact Proof</td>
+                        <td style={{ padding: '12px' }}>40%</td>
+                        <td style={{ padding: '12px' }}>35%</td>
+                        <td style={{ padding: '12px' }}>30%</td>
+                        <td style={{ padding: '12px' }}>SDG alignment, beneficiary stories</td>
+                      </tr>
+                      <tr style={{ backgroundColor: '#D3D2CE' }}>
+                        <td style={{ padding: '12px' }}>Financial Sustainability</td>
+                        <td style={{ padding: '12px' }}>15%</td>
+                        <td style={{ padding: '12px' }}>25%</td>
+                        <td style={{ padding: '12px' }}>30%</td>
+                        <td style={{ padding: '12px' }}>Grant diversity, earned income %</td>
+                      </tr>
+                      <tr style={{ backgroundColor: '#F2F0E6' }}>
+                        <td style={{ padding: '12px' }}>Governance</td>
+                        <td style={{ padding: '12px' }}>20%</td>
+                        <td style={{ padding: '12px' }}>20%</td>
+                        <td style={{ padding: '12px' }}>25%</td>
+                        <td style={{ padding: '12px' }}>Board diversity, transparency</td>
+                      </tr>
+                      <tr style={{ backgroundColor: '#D3D2CE' }}>
+                        <td style={{ padding: '12px' }}>Community Roots</td>
+                        <td style={{ padding: '12px' }}>25%</td>
+                        <td style={{ padding: '12px' }}>20%</td>
+                        <td style={{ padding: '12px' }}>15%</td>
+                        <td style={{ padding: '12px' }}>Local partnerships, participatory design</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <h3 style={{ 
+                  color: '#754A2D', 
+                  fontSize: '1.5rem',
+                  fontWeight: '600',
+                  marginBottom: '20px'
+                }}>BIG Score for Customer Service</h3>
+                <p style={{ 
+                  fontSize: '1.1rem',
+                  lineHeight: '1.8',
+                  marginBottom: '30px'
+                }}>
+                  This version of the BIG Score validates SMEs and ESG-focused organizations providing services to customers, ensuring transparency, reliability, and satisfaction.
+                </p>
+                
+                <h4 style={{ 
+                  color: '#9E6E3C',
+                  fontSize: '1.2rem',
+                  fontWeight: '600',
+                  marginBottom: '15px'
+                }}>A. Traditional SMEs (Profit-Driven)</h4>
+                <p style={{ 
+                  fontStyle: 'italic',
+                  color: '#754A2D',
+                  marginBottom: '20px'
+                }}>
+                  Weightings: Service quality > compliance > operational strength.
+                </p>
+                
+                <div style={{ 
+                  overflowX: 'auto',
+                  marginBottom: '40px'
+                }}>
+                  <table style={{ 
+                    width: '100%',
+                    borderCollapse: 'collapse'
+                  }}>
+                    <thead>
+                      <tr style={{ 
+                        backgroundColor: '#9E6E3C',
+                        color: 'white'
+                      }}>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Category</th>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Description</th>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Weighting</th>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Data Sources</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ backgroundColor: '#F2F0E6' }}>
+                        <td style={{ padding: '12px' }}>Compliance</td>
+                        <td style={{ padding: '12px' }}>SME legitimacy, legal compliance, licensing</td>
+                        <td style={{ padding: '12px' }}>20%</td>
+                        <td style={{ padding: '12px' }}>Vendor management docs, Tax docs, certifications</td>
+                      </tr>
+                      <tr style={{ backgroundColor: '#D3D2CE' }}>
+                        <td style={{ padding: '12px' }}>Reliability</td>
+                        <td style={{ padding: '12px' }}>Financial and operational strength/health</td>
+                        <td style={{ padding: '12px' }}>50%</td>
+                        <td style={{ padding: '12px' }}>SLAs, Team capacity</td>
+                      </tr>
+                      <tr style={{ backgroundColor: '#F2F0E6' }}>
+                        <td style={{ padding: '12px' }}>Customer Love</td>
+                        <td style={{ padding: '12px' }}>Real-time ratings and reviews from actual customers</td>
+                        <td style={{ padding: '12px' }}>30%</td>
+                        <td style={{ padding: '12px' }}>Net Promoter Score, repeat business</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <h4 style={{ 
+                  color: '#9E6E3C',
+                  fontSize: '1.2rem',
+                  fontWeight: '600',
+                  marginBottom: '15px'
+                }}>B. Social Enterprises (Impact Driven)</h4>
+                <p style={{ 
+                  fontStyle: 'italic',
+                  color: '#754A2D',
+                  marginBottom: '20px'
+                }}>
+                  Weightings: Impact delivery > stakeholder feedback > compliance.
+                </p>
+                
+                <div style={{ 
+                  overflowX: 'auto',
+                  marginBottom: '40px'
+                }}>
+                  <table style={{ 
+                    width: '100%',
+                    borderCollapse: 'collapse'
+                  }}>
+                    <thead>
+                      <tr style={{ 
+                        backgroundColor: '#9E6E3C',
+                        color: 'white'
+                      }}>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Category</th>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Description</th>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Weighting</th>
+                        <th style={{ padding: '12px', textAlign: 'left' }}>Data Sources</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ backgroundColor: '#F2F0E6' }}>
+                        <td style={{ padding: '12px' }}>Compliance</td>
+                        <td style={{ padding: '12px' }}>NGO legitimacy, legal compliance, licensing</td>
+                        <td style={{ padding: '12px' }}>25%</td>
+                        <td style={{ padding: '12px' }}>NGO registration, audits</td>
+                      </tr>
+                      <tr style={{ backgroundColor: '#D3D2CE' }}>
+                        <td style={{ padding: '12px' }}>Impact Proof</td>
+                        <td style={{ padding: '12px' }}>Environmental and social responsibility practices, ESG compliance</td>
+                        <td style={{ padding: '12px' }}>40%</td>
+                        <td style={{ padding: '12px' }}>Beneficiary testimonials, SDG reports</td>
+                      </tr>
+                      <tr style={{ backgroundColor: '#F2F0E6' }}>
+                        <td style={{ padding: '12px' }}>Service Quality</td>
+                        <td style={{ padding: '12px' }}>Reliability, consistency in service delivery, operational efficiency - Real-time ratings and reviews from actual customers</td>
+                        <td style={{ padding: '12px' }}>35%</td>
+                        <td style={{ padding: '12px' }}>Partner/corporate ratings</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
 
-        <Section>
-          <h2 style={{ color: colors.mediumBrown, textAlign: 'center' }}>Why the BIG Score Works</h2>
-          
-          <Comparison>
-            <ComparisonCard negative>
-              <h3><ThumbDown /> Traditional Due Diligence</h3>
-              <p><span>❌</span> Subjective opinions</p>
-              <p><span>❌</span> Static PDF reports</p>
-              <p><span>❌</span> Hidden criteria</p>
-              <p><span>❌</span> Manual processes</p>
-            </ComparisonCard>
-            <ComparisonCard>
-              <h3><ThumbUp /> BIG Score Advantage</h3>
-              <p><span>✅</span> AI-driven objectivity</p>
-              <p><span>✅</span> Live score tracking</p>
-              <p><span>✅</span> Transparent weightings</p>
-              <p><span>✅</span> Blockchain-verified data</p>
-            </ComparisonCard>
-          </Comparison>
-        </Section>
+          {/* Why BIG Score Works Section */}
+          <div style={{ 
+            backgroundColor: 'white',
+            padding: '50px',
+            borderRadius: '8px',
+            boxShadow: '0 5px 15px rgba(0,0,0,0.05)',
+            marginBottom: '60px'
+          }}>
+            <h2 style={{ 
+              color: '#372C27', 
+              fontSize: '2rem',
+              fontWeight: '600',
+              textAlign: 'center',
+              marginBottom: '40px'
+            }}>
+              Why the BIG Score Works
+            </h2>
+            
+            <div style={{ 
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '30px',
+              marginBottom: '40px',
+              flexWrap: 'wrap'
+            }}>
+              <div style={{ 
+                backgroundColor: '#F2F0E6',
+                padding: '30px',
+                borderRadius: '8px',
+                width: '450px'
+              }}>
+                <h3 style={{ 
+                  fontSize: '1.3rem',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  marginBottom: '25px',
+                  color: '#754A2D'
+                }}>Traditional Due Diligence</h3>
+                <ul style={{ 
+                  listStyleType: 'none',
+                  padding: 0,
+                  margin: 0
+                }}>
+                  <li style={{ marginBottom: '20px' }}>❌ Subjective opinions</li>
+                  <li style={{ marginBottom: '20px' }}>❌ Static PDF reports</li>
+                  <li style={{ marginBottom: '20px' }}>❌ Hidden criteria</li>
+                  <li>❌ Manual processes</li>
+                </ul>
+              </div>
+              
+              <div style={{ 
+                backgroundColor: '#9E6E3C',
+                padding: '30px',
+                borderRadius: '8px',
+                width: '450px',
+                color: '#F2F0E6'
+              }}>
+                <h3 style={{ 
+                  fontSize: '1.3rem',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  marginBottom: '25px'
+                }}>BIG Score Advantage</h3>
+                <ul style={{ 
+                  listStyleType: 'none',
+                  padding: 0,
+                  margin: 0
+                }}>
+                  <li style={{ marginBottom: '20px' }}>✅ AI-driven objectivity</li>
+                  <li style={{ marginBottom: '20px' }}>✅ Live score tracking</li>
+                  <li style={{ marginBottom: '20px' }}>✅ Transparent weightings</li>
+                  <li>✅ Blockchain-verified data</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div style={{ 
+              backgroundColor: '#D3D2CE',
+              padding: '30px',
+              borderRadius: '8px',
+              textAlign: 'center',
+              maxWidth: '800px',
+              margin: '0 auto'
+            }}>
+              <p style={{ 
+                fontStyle: 'italic',
+                fontSize: '1.2rem',
+                lineHeight: '1.8',
+                marginBottom: '15px'
+              }}>
+                "The BIG Score helped us identify 3x more investable SMEs in half the time."
+              </p>
+              <p style={{ 
+                fontWeight: 'bold',
+                fontSize: '1.1rem'
+              }}>— [Investor Name], [Fund]</p>
+            </div>
+          </div>
 
-        <Testimonial>
-          <p><FormatQuote /> "The BIG Score helped us identify 3x more investable SMEs in half the time."</p>
-          <cite>— [Investor Name], [Fund]</cite>
-        </Testimonial>
-
-        <Section>
-          <h2 style={{ color: colors.mediumBrown, textAlign: 'center' }}>Get Your BIG Score Today, in just 4 steps</h2>
-          <p style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            Discover your organization's BIG Score in just 4 simple steps:
-          </p>
-          
-          <Steps>
-            <Step>
-              <span>Onboard</span>
-              <small>Share basic docs (5 min)</small>
-            </Step>
-            <Step>
-              <span>Evaluate</span>
-              <small>AI analyzes your profile</small>
-            </Step>
-            <Step>
-              <span>Enhance</span>
-              <small>Get improvement suggestions</small>
-            </Step>
-            <Step>
-              <span>Connect</span>
-              <small>Access new opportunities</small>
-            </Step>
-          </Steps>
-          
-          <ButtonGroup>
-            <Button primary><Timeline /> Get Started Now</Button>
-            <Button><Equalizer /> See Sample Report</Button>
-          </ButtonGroup>
-          
-          <TrustBadges>
-            <span>Backed by [Partner Logos]</span>
-            <span>500+ SMEs scored</span>
-          </TrustBadges>
-        </Section>
-      </Container>
-      <Footer />
-    </PageWrapper>
+          {/* Get Your BIG Score Section */}
+          <div style={{ 
+            backgroundColor: '#754A2D',
+            padding: '60px 40px',
+            borderRadius: '8px',
+            textAlign: 'center',
+            color: '#F2F0E6'
+          }}>
+            <h2 style={{ 
+              fontSize: '2rem',
+              fontWeight: '700',
+              marginBottom: '20px'
+            }}>Get Your BIG Score Today</h2>
+            <p style={{ 
+              fontSize: '1.2rem',
+              maxWidth: '800px',
+              margin: '0 auto 40px',
+              lineHeight: '1.6'
+            }}>
+              Discover your organization's BIG Score and unlock growth and impact opportunities:
+            </p>
+            
+            <div style={{ 
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '30px',
+              marginBottom: '50px',
+              flexWrap: 'wrap'
+            }}>
+              {[
+                { number: 1, title: "Onboard", desc: "Share basic docs (5 min)" },
+                { number: 2, title: "Evaluate", desc: "AI reviews your profile and gives you a score" },
+                { number: 3, title: "Enhance", desc: "Get targeted improvement suggestions" },
+                { number: 4, title: "Expand", desc: "Connect confidently with investors, corporates, and customers" }
+              ].map((step, index) => (
+                <div key={index} style={{
+                  width: '220px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{
+                    width: '50px',
+                    height: '50px',
+                    backgroundColor: '#F2F0E6',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 15px',
+                    color: '#754A2D',
+                    fontSize: '1.3rem',
+                    fontWeight: 'bold'
+                  }}>{step.number}</div>
+                  <h3 style={{ 
+                    fontWeight: '600',
+                    fontSize: '1.2rem',
+                    marginBottom: '10px'
+                  }}>{step.title}</h3>
+                  <p style={{ 
+                    fontSize: '1rem',
+                    lineHeight: '1.6'
+                  }}>{step.desc}</p>
+                </div>
+              ))}
+            </div>
+            
+            <div style={{ 
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '30px',
+              marginBottom: '40px',
+              flexWrap: 'wrap'
+            }}>
+              <button style={{ 
+                backgroundColor: '#372C27',
+                color: 'white',
+                border: 'none',
+                padding: '16px 40px',
+                borderRadius: '30px',
+                fontSize: '1.1rem',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}>
+                Get Scored Now
+              </button>
+              <button style={{ 
+                backgroundColor: '#F2F0E6',
+                color: '#372C27',
+                border: 'none',
+                padding: '16px 40px',
+                borderRadius: '30px',
+                fontSize: '1.1rem',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}>
+                See Sample Report
+              </button>
+            </div>
+            
+            <div style={{ 
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '40px',
+              flexWrap: 'wrap'
+            }}>
+              <p style={{ 
+                fontStyle: 'italic',
+                fontSize: '1.1rem'
+              }}>"Backed by [Partner Logos]"</p>
+              <p style={{ 
+                fontStyle: 'italic',
+                fontSize: '1.1rem'
+              }}>"500+ SMEs scored"</p>
+            </div>a
+          </div>
+        </div>
+        
+        <Footer />
+      </div>
+    </div>
   );
 };
 
-export default BigScorePage;
+export default BIGScorePage;

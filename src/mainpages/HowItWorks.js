@@ -5,11 +5,6 @@ import Footer from './Footer';
 
 const HowItWorks = () => {
   const [activeTab, setActiveTab] = useState('smes');
-  const [activeFaq, setActiveFaq] = useState(null);
-
-  const toggleFaq = (index) => {
-    setActiveFaq(activeFaq === index ? null : index);
-  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -23,21 +18,6 @@ const HowItWorks = () => {
         return <SMESContent />;
     }
   };
-
-  const faqs = [
-    {
-      question: "Is my data secure?",
-      answer: "Yes, we use bank-level encryption and comply with all data protection regulations."
-    },
-    {
-      question: "How is the BIG Score calculated?",
-      answer: "The BIG Score evaluates compliance (30%), growth potential (40%), and pitch quality (30%) based on our proprietary algorithm."
-    },
-    {
-      question: "How long does it take to get my BIG Score?",
-      answer: "Typically within 48 hours after submitting all required documents."
-    }
-  ];
 
   return (
     <div className="app-container">
@@ -94,20 +74,6 @@ const HowItWorks = () => {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* FAQ Section */}
-        <div style={styles.faqSection}>
-          <h3 style={styles.sectionTitle}>Frequently Asked Questions</h3>
-          {faqs.map((faq, index) => (
-            <div key={index} style={styles.faqItem} onClick={() => toggleFaq(index)}>
-              <div style={styles.faqQuestionContainer}>
-                <h4 style={styles.faqQuestion}>{faq.question}</h4>
-                <span style={styles.faqToggle}>{activeFaq === index ? '−' : '+'}</span>
-              </div>
-              {activeFaq === index && <p style={styles.faqAnswer}>{faq.answer}</p>}
-            </div>
-          ))}
         </div>
       </div>
 
@@ -368,17 +334,17 @@ const colors = {
   darkBrown: '#372C27',
   mediumBrown: '#754A2D',
   lightBrown: '#9E6E3C',
-  cream: '#D3D2CE', // Darkened background
+  cream: '#F8F5F0', // Lighter cream background
   lightGray: '#BCAE9C',
   warmGray: '#9E8D7B',
-  white: '#F2F0E6',
+  white: '#FFFFFF', // Pure white for cards
   checkmarkBrown: '#754A2D' // Brown color for checkmarks
 };
 
 // Main Styles
 const styles = {
   container: {
-    fontFamily: "'Arial', sans-serif",
+    fontFamily: "'Inter', sans-serif",
     maxWidth: '1200px',
     margin: '0 auto',
     padding: '20px',
@@ -388,12 +354,12 @@ const styles = {
   },
   heroSection: {
     position: 'relative',
-    height: '400px',
+    height: '350px',
     marginBottom: '40px',
-    borderRadius: '10px',
+    borderRadius: '16px',
     overflow: 'hidden',
-    boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-    backgroundImage: 'linear-gradient(rgba(55, 44, 39, 0.8), rgba(55, 44, 39, 0.8)), url(https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80)',
+    boxShadow: '0 10px 30px rgba(55, 44, 39, 0.15)',
+    backgroundImage: 'linear-gradient(rgba(55, 44, 39, 0.85), rgba(55, 44, 39, 0.85)), url(https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     display: 'flex',
@@ -407,17 +373,19 @@ const styles = {
     zIndex: 2
   },
   mainTitle: {
-    fontSize: '3rem',
-    fontWeight: 'bold',
+    fontSize: '2.8rem',
+    fontWeight: '800',
     color: colors.white,
     marginBottom: '20px',
-    textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+    textShadow: '2px 2px 8px rgba(0,0,0,0.3)',
+    lineHeight: '1.2'
   },
   subTitle: {
-    fontSize: '1.5rem',
+    fontSize: '1.4rem',
     color: colors.lightGray,
     marginBottom: '30px',
-    lineHeight: '1.5'
+    lineHeight: '1.5',
+    fontWeight: '400'
   },
   tabContainer: {
     display: 'flex',
@@ -428,9 +396,9 @@ const styles = {
   },
   tab: {
     padding: '15px 30px',
-    backgroundColor: colors.lightGray,
+    backgroundColor: 'transparent',
     color: colors.darkBrown,
-    border: 'none',
+    border: `2px solid ${colors.lightBrown}`,
     borderRadius: '50px',
     fontSize: '1rem',
     fontWeight: '600',
@@ -440,15 +408,17 @@ const styles = {
     alignItems: 'center',
     gap: '10px',
     ':hover': {
-      transform: 'translateY(-3px)',
-      boxShadow: `0 5px 15px rgba(${colors.mediumBrown}, 0.2)`
+      backgroundColor: colors.lightBrown,
+      color: colors.white,
+      transform: 'translateY(-2px)',
+      boxShadow: `0 5px 15px rgba(158, 110, 60, 0.2)`
     }
   },
   activeTab: {
     padding: '15px 30px',
-    backgroundColor: colors.mediumBrown,
+    backgroundColor: colors.lightBrown,
     color: colors.white,
-    border: 'none',
+    border: `2px solid ${colors.lightBrown}`,
     borderRadius: '50px',
     fontSize: '1rem',
     fontWeight: '600',
@@ -456,18 +426,19 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '10px',
-    transform: 'translateY(-3px)',
-    boxShadow: `0 5px 15px rgba(${colors.mediumBrown}, 0.3)`
+    transform: 'translateY(-2px)',
+    boxShadow: `0 5px 15px rgba(158, 110, 60, 0.3)`
   },
   tabIcon: {
     fontSize: '1.2rem'
   },
   contentContainer: {
     marginBottom: '60px',
+    padding: '0 20px'
   },
   contentTitle: {
     fontSize: '2.2rem',
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: colors.mediumBrown,
     textAlign: 'center',
     marginBottom: '20px',
@@ -483,11 +454,11 @@ const styles = {
     }
   },
   videoTitle: {
-    fontSize: '1.3rem',
-    color: colors.lightBrown,
+    fontSize: '1.2rem',
+    color: colors.warmGray,
     textAlign: 'center',
     marginBottom: '40px',
-    fontStyle: 'italic'
+    fontWeight: '500'
   },
   stepsContainer: {
     display: 'grid',
@@ -498,14 +469,14 @@ const styles = {
   stepCard: {
     backgroundColor: colors.white,
     padding: '30px',
-    borderRadius: '10px',
-    boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
+    borderRadius: '16px',
+    boxShadow: '0 8px 30px rgba(55, 44, 39, 0.08)',
     borderTop: `4px solid ${colors.mediumBrown}`,
     position: 'relative',
     transition: 'all 0.3s ease',
     ':hover': {
-      transform: 'translateY(-10px)',
-      boxShadow: `0 15px 30px rgba(${colors.mediumBrown}, 0.2)`
+      transform: 'translateY(-8px)',
+      boxShadow: `0 15px 30px rgba(158, 110, 60, 0.15)`
     }
   },
   stepNumberCircle: {
@@ -522,7 +493,7 @@ const styles = {
     justifyContent: 'center',
     fontWeight: 'bold',
     fontSize: '1.2rem',
-    boxShadow: `0 3px 10px rgba(${colors.mediumBrown}, 0.3)`
+    boxShadow: `0 4px 12px rgba(117, 74, 45, 0.3)`
   },
   stepNumber: {
     position: 'relative',
@@ -539,8 +510,8 @@ const styles = {
     fontSize: '1.5rem'
   },
   stepTitle: {
-    fontSize: '1.4rem',
-    fontWeight: 'bold',
+    fontSize: '1.3rem',
+    fontWeight: '700',
     color: colors.mediumBrown,
     margin: 0
   },
@@ -584,28 +555,29 @@ const styles = {
   ctaButton: {
     display: 'block',
     margin: '0 auto',
-    padding: '15px 40px',
+    padding: '16px 45px',
     backgroundColor: colors.lightBrown,
     color: colors.white,
     border: 'none',
     borderRadius: '50px',
     fontSize: '1.1rem',
-    fontWeight: 'bold',
+    fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    boxShadow: `0 5px 15px rgba(${colors.lightBrown}, 0.3)`,
+    boxShadow: `0 5px 20px rgba(158, 110, 60, 0.3)`,
     ':hover': {
       backgroundColor: colors.mediumBrown,
       transform: 'translateY(-3px)',
-      boxShadow: `0 8px 20px rgba(${colors.mediumBrown}, 0.4)`
+      boxShadow: `0 8px 25px rgba(117, 74, 45, 0.4)`
     }
   },
   trustSection: {
     textAlign: 'center',
-    margin: '60px 0',
-    padding: '40px 0',
-    borderTop: `1px solid ${colors.warmGray}`,
-    borderBottom: `1px solid ${colors.warmGray}`
+    margin: '80px 0',
+    padding: '50px 0',
+    backgroundColor: colors.white,
+    borderRadius: '16px',
+    boxShadow: '0 10px 30px rgba(55, 44, 39, 0.05)'
   },
   trustText: {
     fontSize: '1.4rem',
@@ -617,12 +589,13 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
     gap: '30px',
-    marginTop: '30px'
+    marginTop: '30px',
+    padding: '0 20px'
   },
   logoPlaceholder: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.cream,
     padding: '20px',
-    borderRadius: '8px',
+    borderRadius: '12px',
     textAlign: 'center',
     color: colors.mediumBrown,
     display: 'flex',
@@ -630,73 +603,14 @@ const styles = {
     alignItems: 'center',
     gap: '10px',
     transition: 'all 0.3s ease',
-    boxShadow: '0 3px 10px rgba(0,0,0,0.05)',
+    boxShadow: '0 3px 10px rgba(0,0,0,0.03)',
     ':hover': {
       transform: 'translateY(-5px)',
-      boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
+      boxShadow: '0 10px 25px rgba(0,0,0,0.08)'
     }
   },
   logoIcon: {
     fontSize: '2rem'
-  },
-  faqSection: {
-    margin: '60px 0 40px',
-    maxWidth: '800px',
-    marginLeft: 'auto',
-    marginRight: 'auto'
-  },
-  sectionTitle: {
-    fontSize: '2rem',
-    color: colors.mediumBrown,
-    marginBottom: '40px',
-    textAlign: 'center',
-    position: 'relative',
-    ':after': {
-      content: '""',
-      display: 'block',
-      width: '60px',
-      height: '3px',
-      backgroundColor: colors.lightBrown,
-      margin: '15px auto',
-      borderRadius: '2px'
-    }
-  },
-  faqItem: {
-    marginBottom: '15px',
-    border: `1px solid ${colors.warmGray}`,
-    borderRadius: '8px',
-    overflow: 'hidden',
-    transition: 'all 0.3s ease',
-    cursor: 'pointer',
-    ':hover': {
-      borderColor: colors.lightBrown
-    }
-  },
-  faqQuestionContainer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '20px',
-    backgroundColor: colors.lightGray
-  },
-  faqQuestion: {
-    fontSize: '1.2rem',
-    color: colors.darkBrown,
-    margin: 0,
-    fontWeight: '600'
-  },
-  faqToggle: {
-    fontSize: '1.5rem',
-    color: colors.mediumBrown,
-    fontWeight: 'bold'
-  },
-  faqAnswer: {
-    padding: '20px',
-    margin: 0,
-    color: colors.darkBrown,
-    lineHeight: '1.7',
-    backgroundColor: colors.white,
-    borderTop: `1px solid ${colors.warmGray}`
   }
 };
 

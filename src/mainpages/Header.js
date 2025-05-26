@@ -216,11 +216,18 @@ const Header = () => {
           >
             Contact Us
           </button>
+          <button 
+            className="nav-button"
+            onClick={() => handleNavigation('/FAQPage')}
+          >
+            FAQs
+          </button>
         </nav>
         <div style={styles.buttonGroup} className="button-group">
           <button className="login-button" onClick={handleLoginClick}>Login</button>
-          <button className="get-started-button">Get Started</button>
+          <button className="get-started-button"  onClick={handleLoginClick}>Register</button>
         </div>
+         
       </header>
     </>
   );
