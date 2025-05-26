@@ -69,7 +69,7 @@ function InvestorSidebar({ companyName }) {
     { id: "home", label: "Home", icon: <Home size={18} />, route: "/" },
     { 
       id: "dashboard", 
-      label: "Dashboard", 
+      label: "Approved Applications", 
       icon: <LayoutDashboard size={18} />, 
       route: "/investor-dashboard" 
     },
@@ -81,7 +81,7 @@ function InvestorSidebar({ companyName }) {
     },
     { 
       id: "matches", 
-      label: "Matches", 
+      label: "Dashboard", 
       icon: <HeartHandshake size={18} />, 
       route: "/investor-matches" 
     },

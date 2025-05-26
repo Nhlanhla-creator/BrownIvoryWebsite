@@ -90,7 +90,7 @@ const Sidebar = ({ companyName = "Company Name" }) => {
     { id: "home", label: "Home", icon: <Home size={18} />, route: "/" },
     {
       id: "dashboard",
-      label: "Dashboard",
+      label: "Big Score",
       icon: <BarChart size={18} />,
       route: "/dashboard",
     },
@@ -123,7 +123,7 @@ const Sidebar = ({ companyName = "Company Name" }) => {
     },
     {
       id: "matches",
-      label: "Matches",
+      label: "Dashboard",
       icon: <Search size={18} />,
       route: "/matches",
       hasSubmenu: true,
