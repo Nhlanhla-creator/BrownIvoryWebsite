@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { MessageCircle, X, ChevronRight, Info } from "lucide-react";
 import { collection, getDocs } from "firebase/firestore";
@@ -47,12 +45,21 @@ export default function DealFlowPipeline() {
       iconColor: "#5d4037"
     },
     {
+      id: "termsheet",
+      name: "Term Sheet",
+      count: 0,
+      description: "Term sheets received from investors",
+      colorClass: styles.stageTermsheet,
+      iconColor: "#4e342e",
+      useClient: true
+    },
+    {
       id: "deals",
       name: "Deals",
       count: 0,
       description: "Successfully closed funding deals",
       colorClass: styles.stageDeals,
-      iconColor: "#4e342e"
+      iconColor: "#3e2723"
     },
     {
       id: "withdrawn",
@@ -77,6 +84,7 @@ export default function DealFlowPipeline() {
         application: 0,
         review: 0,
         feedback: 0,
+        termsheet: 0,
         deals: 0,
         withdrawn: 0,
       };
@@ -94,6 +102,9 @@ export default function DealFlowPipeline() {
             break;
           case "Investor Feedback":
             stageCounts.feedback += 1;
+            break;
+          case "Term Sheet":
+            stageCounts.termsheet += 1;
             break;
           case "Deal Closed":
             stageCounts.deals += 1;
@@ -191,6 +202,14 @@ export default function DealFlowPipeline() {
                       onClick={handleWithdrawnClick}
                     >
                       See rejection details <ChevronRight size={12} />
+                    </button>
+                  )}
+                  {stage.useClient && (
+                    <button
+                      className={styles.tooltipAction}
+                      onClick={() => alert("View term sheets")}
+                    >
+                      View term sheets <ChevronRight size={12} />
                     </button>
                   )}
                 </div>

@@ -53,25 +53,25 @@ const capitalize = (str) => str?.charAt(0).toUpperCase() + str?.slice(1).toLower
 
 const getStatusColor = (status) => {
   switch (status?.toLowerCase()) {
-    case 'accepted': return '#4CAF50';
-    case 'declined': return '#F44336';
-    case 'pending': return '#FFC107';
-    case 'not accepted': return '#9E9E9E';
-    default: return '#607D8B';
+    case 'accepted': return '#88E788';
+    case 'declined': return '#FF746C';
+    case 'pending': return '#FFC067';
+    case 'no application': return '#D3D3D3';
+    default: return '#FBEC5D';
   }
 };
 
 const getStageColor = (stage) => {
   switch (stage?.toLowerCase()) {
-    case 'initial match': return '#2196F3';
-    case 'send application': return '#673AB7';
-    case 'under review': return '#3F51B5';
-    case 'investor feedback': return '#009688';
-    case 'termsheet': return '#FF9800';
-    case 'deals': return '#4CAF50';
-    case 'withdrawn': return '#9E9E9E';
-    case 'declined': return '#F44336';
-    default: return '#607D8B';
+    case 'initial match': return '#F0FFF0';
+    case 'send application': return '#FFFFC5';
+    case 'under review': return '#F7D9BC';
+    case 'investor feedback': return '#FFD3AC';
+    case 'termsheet': return '#F0FFF0';
+    case 'deals': return '#ADEBB3';
+    case 'withdrawn': return '#FA5053';
+    case 'declined': return '#FF2C2C';
+    default: return '#EED9C4';
   }
 };
 

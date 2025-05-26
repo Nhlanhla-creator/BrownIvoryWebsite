@@ -111,7 +111,10 @@ const Calendar = () => {
 
       {workingHoursSet ? (
         <>
-          <EventData stats={stats} />
+          <div className="dashboard-header">
+       
+            <EventData stats={stats} />
+          </div>
           <div className="dashboard-content">
             <Meetings 
               events={events} 
@@ -121,6 +124,13 @@ const Calendar = () => {
               onMeetingAction={handleMeetingAction}
               workingHours={workingHours}
             />
+            <div className="calendar-view">
+              <h2>Calendar View</h2>
+              <div className="calendar-grid">
+                {/* Calendar implementation would go here */}
+                <p>Calendar visualization would appear here</p>
+              </div>
+            </div>
           </div>
         </>
       ) : (

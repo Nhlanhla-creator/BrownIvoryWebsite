@@ -1,5 +1,8 @@
-/* Brown color palette */
-.mainContent {
+/* ==================== */
+/* COLOR PALETTE & VARIABLES */
+/* ==================== */
+:root {
+  /* Brown color palette */
   --brown-50: #efebe9;
   --brown-100: #d7ccc8;
   --brown-200: #bcaaa4;
@@ -11,6 +14,8 @@
   --brown-800: #4e342e;
   --brown-900: #3e2723;
   --brown-accent: #d7ccc8;
+  
+  /* Other colors */
   --white: #ffffff;
   --black: #212121;
   --pink-bubble: #f8bbd0;
@@ -20,16 +25,18 @@
   --red-500: #f44336;
   --orange-500: #ff9800;
   --purple-500: #9c27b0;
+}
 
-
-/* Main layout - Positioned to the right with reduced width */
-
+/* ==================== */
+/* LAYOUT & STRUCTURE */
+/* ==================== */
+.mainContent {
   flex: 1;
   padding: 12px;
   box-sizing: border-box;
-  width: calc(100% - 250px); /* Adjust based on your left sidebar width */
-  max-width: 100%; /* Limit the maximum width */
-  margin-left: 250px; /* Push content to the right */
+  width: calc(100% - 250px);
+  max-width: 100%;
+  margin-left: 250px;
   margin-right: 0;
   background-color: #f8f5f2;
   margin-top: 55px;
@@ -39,7 +46,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 100%; /* Ensure content doesn't overflow container */
+  max-width: 100%;
   margin-left: auto;
   margin-right: 20px;
 }
@@ -80,7 +87,9 @@
   position: relative;
 }
 
-/* Funding Tracker Styles */
+/* ==================== */
+/* FUNDING TRACKER */
+/* ==================== */
 .trackerContainer {
   position: relative;
   padding: 1rem 0;
@@ -285,6 +294,9 @@
   margin-top: 0.25rem;
 }
 
+/* ==================== */
+/* BUTTONS & ACTIONS */
+/* ==================== */
 .actionButtons {
   display: flex;
   gap: 0.25rem;
@@ -351,6 +363,43 @@
   background-color: #1565c0;
 }
 
+.btn {
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #5d4037;
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #3e2723;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #5d4037;
+  border: 1px solid #5d4037;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(93, 64, 55, 0.1);
+}
+
+/* ==================== */
+/* STATUS & BADGES */
+/* ==================== */
 .statusBadge {
   display: inline-block;
   padding: 0.15rem 0.5rem;
@@ -371,6 +420,29 @@
   color: #0d47a1;
 }
 
+.decisionBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.decisionApproved .decisionBadge {
+  background-color: var(--green-500);
+  color: white;
+}
+
+.decisionRejected .decisionBadge {
+  background-color: var(--red-500);
+  color: white;
+}
+
+/* ==================== */
+/* INFO BOXES & CARDS */
+/* ==================== */
 .stageInfo {
   display: flex;
   flex-wrap: wrap;
@@ -543,26 +615,6 @@
   background-color: #ffebee;
 }
 
-.decisionBadge {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.decisionApproved .decisionBadge {
-  background-color: var(--green-500);
-  color: white;
-}
-
-.decisionRejected .decisionBadge {
-  background-color: var(--red-500);
-  color: white;
-}
-
 .nextStepButtons {
   display: flex;
   gap: 0.5rem;
@@ -611,10 +663,9 @@
   gap: 0.5rem;
 }
 
-
-
-
-/* Insights styles - Redesigned */
+/* ==================== */
+/* INSIGHTS & CHARTS */
+/* ==================== */
 .insightsSummary {
   display: flex;
   justify-content: space-between;
@@ -736,49 +787,9 @@
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* --- Animations --- */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes popIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-3px);
-  }
-}
-
-
-/* Filter styles - Redesigned */
+/* ==================== */
+/* FILTERS & SEARCH */
+/* ==================== */
 .filterSection {
   display: flex;
   flex-direction: column;
@@ -1200,166 +1211,100 @@
   background-color: var(--brown-700);
 }
 
-/* Table styles - Redesigned */
+/* ==================== */
+/* TABLES */
+/* ==================== */
 .loadingContainer {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 200px;
+  color: var(--brown-700);
+  font-size: 1.1rem;
 }
-.tableContainer {
-  width: 100%;
-  overflow-x: auto;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin: 20px 0;
-  margin-left: -38px;
- 
-}
-
 .fundingTable {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.7rem;
-  background: #FFF8F0;
+  margin: 30px 0;
+  font-size: 0.8em;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
-.fundingTable thead {
-  background-color: #5D4037;
-  color: white;
+.fundingTable th,
+.fundingTable td {
+  padding: 12px 6px;
+  text-align: left;
+  border-bottom: 1px solid #431b05;
 }
 
 .fundingTable th {
-  padding: 12px 8px;
-  text-align: left;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.fundingTable td {
-  padding: 10px 8px;
-  border-bottom: 1px solid #D7CCC8;
-  vertical-align: middle;
-}
-
-.fundingTable tr:nth-child(even) {
-  background-color: #F5E9E0;
+  background-color: var(--brown-600);
+  color: #fff8f0;
+  font-weight: 600;
 }
 
 .fundingTable tr:hover {
-  background-color: #EFD5C3;
+  background-color: #f5ebe0;
 }
 
-.statusBadge {
+/* Status & Stage Badges */
+.statusBadge,
+.stageBadge {
   display: inline-block;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border-radius: 12px;
-  color: white;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   text-align: center;
   min-width: 80px;
 }
 
-.actionsCell {
+.sentBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: grey;
+  color: white;
+}
+
+/* Action Buttons */
+.actionButtons {
   display: flex;
   gap: 8px;
 }
 
-.viewButton, .applyButton {
+.viewButton,
+.applyButton {
   padding: 6px 12px;
-  border: none;
   border-radius: 4px;
-  cursor: pointer;
   font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
   transition: all 0.2s;
+  border: none;
 }
 
 .viewButton {
-  background-color: #8D6E63;
-  color: white;
+  background-color: var(--brown-100);
+  color: var(--brown-700);
 }
 
 .viewButton:hover {
-  background-color: #6D4C41;
+  background-color: var(--brown-200);
 }
 
 .applyButton {
-  background-color: #A1887F;
+  background-color: #6b3808 ;
   color: white;
 }
 
 .applyButton:hover {
-  background-color: #8D6E63;
+  background-color: #6b3808;
 }
-
-.sentBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  background-color: #4CAF50;
-  color: white;
-  border-radius: 4px;
-  font-size: 0.8rem;
-}
-
-.loadingContainer, .noResults {
-  padding: 20px;
-  text-align: center;
-  color: #5D4037;
-}
-
-
-
-.submitButton {
-  background-color: #5D4037;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.cancelButton {
-  background-color: #D7CCC8;
-  color: #5D4037;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-
-
-.fileInput {
-  padding: 6px;
-  border: 1px solid #D7CCC8;
-  border-radius: 4px;
-}
-
-.timestamp {
-  font-size: 0.8rem;
-  color: #8D6E63;
-}
-
-.notification {
-  padding: 12px;
-  margin-bottom: 20px;
-  border-radius: 4px;
-  color: white;
-}
-
-.notification.error {
-  background-color: #D32F2F;
-}
-
-.notification.success {
-  background-color: #388E3C;
-}
-
-
-/* Modal overlay - fixed position covering entire screen */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -1373,101 +1318,147 @@
   z-index: 1000;
 }
 
-/* Modal container */
 .modal {
-  background-color: #fff8f0; /* Cream */
+  background-color: white;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   width: 90%;
-  max-width: 600px;
+  max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
-  padding: 20px;
   animation: modalFadeIn 0.3s ease-out;
-  z-index: 1001; /* Above overlay */
-  position: relative; /* Needed for z-index to work */
 }
 
-/* Modal header */
 .modalHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #d7ccc8; /* Light gray-brown */
+  padding: 1rem;
+  border-bottom: 1px solid var(--brown-100);
 }
 
 .modalHeader h3 {
   margin: 0;
-  color: #5d4037; /* Dark brown */
+  font-size: 1.2rem;
+  color: var(--brown-800);
 }
 
 .modalHeader button {
   background: none;
   border: none;
-  font-size: 1.5em;
-  color: #8d6e63; /* Medium brown */
-  padding: 0;
-  margin: 0;
-}
-
-.modalHeader button:hover {
-  color: #5d4037; /* Dark brown */
-  background: none;
-  transform: none;
-}
-
-/* Modal content */
-.modal div p {
-  margin: 10px 0;
-  line-height: 1.6;
-  color: #5d4037; /* Dark brown */
-}
-
-.modal div strong {
-  color: #3e2723; /* Very dark brown */
-}
-
-/* Checkbox styles */
-label {
-  display: block;
-  margin: 10px 0;
+  font-size: 1.5rem;
   cursor: pointer;
-  padding: 8px;
+  color: var(--brown-500);
+}
+
+.modalBody {
+  padding: 1rem;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid var(--brown-100);
+}
+
+.cancelButton,
+.submitButton {
+  padding: 8px 16px;
   border-radius: 4px;
-  transition: background-color 0.2s;
-  color: #5d4037; /* Dark brown */
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-label:hover {
-  background-color: #efebe9; /* Very light cream */
+.cancelButton {
+  background-color: var(--brown-100);
+  color: var(--brown-700);
+  border: 1px solid var(--brown-200);
 }
 
-input[type="checkbox"] {
-  margin-right: 10px;
-  accent-color: #8d6e63; /* Medium brown */
+.cancelButton:hover {
+  background-color: var(--brown-200);
 }
 
-/* Blur effect for background when modal is open */
-.blurredContainer {
-  position: relative;
+.submitButton {
+  background-color: var(--brown-200);
+  color: white;
+  border: 1px solid var(--green-700);
 }
 
-.blurredContainer::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(4px);
-  z-index: 999;
-  pointer-events: none;
+.submitButton:hover {
+  background-color: var(--brown-200);
 }
 
-/* Animation for modal */
+/* Documents List */
+.documentsList {
+  padding: 1rem;
+  margin-left: 0.2rem;
+}
+
+.documentItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+    margin-left: -680px;
+  border-bottom: 1px solid var(--brown-100);
+}
+
+.documentLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  flex-grow: 1;
+}
+
+.documentLabel input[type="checkbox"] {
+  accent-color: var(--brown-600);
+}
+
+.timestamp {
+  font-size: 0.75rem;
+  color: var(--brown-500);
+  margin-left: 8px;
+}
+
+.fileInput {
+  font-size: 0.8rem;
+}
+
+/* Notifications */
+.notification {
+  padding: 12px 16px;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.notification.success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.notification.error {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+/* No Results */
+.noResults {
+  padding: 2rem;
+  text-align: center;
+  background-color: var(--brown-50);
+  border-radius: 8px;
+  color: var(--brown-700);
+}
+
+/* Animations */
 @keyframes modalFadeIn {
   from {
     opacity: 0;
@@ -1479,56 +1470,203 @@ input[type="checkbox"] {
   }
 }
 
-/* Status badges */
-span[data-status="Under Review"] {
-  background-color: #a1887f; /* Medium gray-brown */
-  color: white;
-  padding: 4px 8px;
+/* ==================== */
+/* MODALS & POPUPS */
+/* ==================== */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: #fff8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 0px;
+  animation: modalFadeIn 0.3s ease-out;
+  z-index: 1001;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--brown-100);
+}
+
+.modalHeader h3 {
+  margin: 0;
+  color: var(--brown-700);
+}
+
+.modalHeader button {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  color: var(--brown-500);
+  padding: 0;
+  margin: 0;
+}
+
+.modalHeader button:hover {
+  color: var(--brown-700);
+  background: none;
+  transform: none;
+}
+
+.modalBody {
+  padding: 1rem 0;
+  overflow-y: auto;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.welcome-popup {
+  background-color: white;
   border-radius: 12px;
-  font-size: 0.8em;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 0.4s ease-out;
 }
 
-span[data-status="Application Sent"] {
-  background-color: #a5d6a7; /* Soft green */
-  color: #1b5e20; /* Dark green */
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.8em;
+.close-popup {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  z-index: 10;
+  transition: color 0.2s;
 }
 
-/* Links */
-a {
-  color: #8d6e63; /* Medium brown */
-  text-decoration: none;
+.close-popup:hover {
+  color: #333;
 }
 
-a:hover {
-  text-decoration: underline;
-  color: #5d4037; /* Dark brown */
+.popup-content {
+  padding: 40px 30px;
+  text-align: center;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .fundingTable {
-    font-size: 0.8em;
-  }
-  
-  .fundingTable th,
-  .fundingTable td {
-    padding: 8px 10px;
-  }
-  
-  button {
-    padding: 6px 12px;
-    font-size: 0.8em;
-  }
-  
-  .modal {
-    width: 95%;
-    padding: 15px;
-  }
+.funding-popup .popup-content {
+  background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
 }
 
+.popup-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  animation: bounce 1s ease infinite alternate;
+}
+
+.popup-progress {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+  gap: 8px;
+}
+
+.progress-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.progress-dot.active {
+  background-color: var(--brown-500);
+  transform: scale(1.3);
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.funding-popup h2 {
+  color: var(--brown-700);
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.funding-popup p {
+  margin-bottom: 15px;
+  color: var(--brown-800);
+  line-height: 1.6;
+}
+
+/* ==================== */
+/* DOCUMENTS */
+/* ==================== */
+.requiredDocuments {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+.requiredDocuments p {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.requiredDocuments ul {
+  padding-left: 1.5rem;
+  margin: 0;
+}
+
+.requiredDocuments li {
+  list-style-type: disc;
+  margin-bottom: 0.25rem;
+  color: #555;
+}
+
+/* ==================== */
+/* REJECTION STATUS */
+/* ==================== */
 .rejectionStatus {
   display: flex;
   align-items: center;
@@ -1559,14 +1697,81 @@ a:hover {
 
 .detailLabel {
   font-weight: 600;
-  color: #6d4c41;
+  color: var(--brown-600);
 }
 
 .detailValue {
-  color: #5d4037;
+  color: var(--brown-700);
 }
 
-/* Responsive adjustments */
+/* ==================== */
+/* ANIMATIONS */
+/* ==================== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ==================== */
+/* RESPONSIVE ADJUSTMENTS */
+/* ==================== */
 @media (max-width: 1200px) {
   .mainContent {
     width: calc(100% - 200px);
@@ -1609,16 +1814,6 @@ a:hover {
     margin-right: 0;
   }
 
-  .tableHeader {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .tableSearch {
-    max-width: 100%;
-    width: 100%;
-  }
-
   .insightsContainer {
     grid-template-columns: 1fr;
   }
@@ -1635,253 +1830,8 @@ a:hover {
   .quickSearch {
     width: 100%;
   }
-
-  .expandedActions {
-    flex-direction: column;
-  }
-}
-.requiredDocuments {
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 8px;
 }
 
-.requiredDocuments p {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #333;
-}
-
-.requiredDocuments ul {
-  padding-left: 1.5rem;
-  margin: 0;
-}
-
-.requiredDocuments li {
-  list-style-type: disc;
-  margin-bottom: 0.25rem;
-  color: #555;
-}
-
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1000; /* Make sure this is higher than anything else */
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal {
-  background: white;
-  max-height: 90vh;
-  overflow-y: auto;
-  width: 100%;
-  max-width: 1200px;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  position: relative;
-  z-index: 1001; /* Ensure it's above the overlay */
-}
-
-.modalHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #e5e7eb;
-  padding-bottom: 0.5rem;
-}
-
-.modalBody {
-  padding: 1rem 0;
-  overflow-y: auto;
-}
-
-.modalActions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid #e5e7eb;
-  margin-top: 1rem;
-  padding-top: 1rem;
-}
-
-.cancelButton {
-  background-color: #4f46e5;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-/* Popup Overlay */
-.popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Base Popup Styles */
-.welcome-popup {
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  width: 90%;
-  max-width: 500px;
-  position: relative;
-  overflow: hidden;
-  animation: slideUp 0.4s ease-out;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(50px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.close-popup {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #666;
-  z-index: 10;
-  transition: color 0.2s;
-}
-
-.close-popup:hover {
-  color: #333;
-}
-
-.popup-content {
-  padding: 40px 30px;
-  text-align: center;
-}
-
-/* Funding Popup Specific */
-.funding-popup .popup-content {
-  background: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
-}
-
-.popup-icon {
-  font-size: 48px;
-  margin-bottom: 20px;
-  animation: bounce 1s ease infinite alternate;
-}
-
-@keyframes bounce {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-10px);
-  }
-}
-
-.popup-progress {
-  display: flex;
-  justify-content: center;
-  margin: 30px 0;
-  gap: 8px;
-}
-
-.progress-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: #e0e0e0;
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-.progress-dot.active {
-  background-color: #8d6e63;
-  transform: scale(1.3);
-}
-
-.popup-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-.funding-popup h2 {
-  color: #5d4037;
-  font-size: 24px;
-  margin-bottom: 15px;
-}
-
-.funding-popup p {
-  margin-bottom: 15px;
-  color: #3e2723;
-  line-height: 1.6;
-}
-
-/* Brown theme buttons */
-.btn {
-  padding: 12px 20px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-}
-
-.btn-primary {
-  background-color: #5d4037;
-  color: white;
-  border: none;
-}
-
-.btn-primary:hover {
-  background-color: #3e2723;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.btn-secondary {
-  background-color: transparent;
-  color: #5d4037;
-  border: 1px solid #5d4037;
-}
-
-.btn-secondary:hover {
-  background-color: rgba(93, 64, 55, 0.1);
-}
-
-/* Responsive adjustments */
 @media (max-width: 600px) {
   .welcome-popup {
     width: 95%;
