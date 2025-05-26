@@ -127,10 +127,10 @@ export default function InvestorDashboardPage() {
       )}
 
       <div className={styles.pageContainer}>
-        <h1 className={styles.pageTitle}>My Matches and Insights</h1>
+
 
         <div className={styles.sectionCard}>
-          <h2 className={styles.sectionTitle}>Deal Flow Pipeline</h2>
+    
           <InvestorDealFlowPipeline />
         </div>
 

@@ -2,9 +2,11 @@
 
 import { useState } from "react"
 import { ChevronDown, ChevronUp, Edit, Printer,ExternalLink,FileText } from "lucide-react"
-import "./investor-profile-summary.css"   
+import "./investor-profile-summary.css"  
+import { useNavigate } from "react-router-dom"  
 
 const InvestorProfileSummary = ({ data, onEdit }) => {
+      const navigate = useNavigate()
 
   const renderDocumentLink = (url, label = "View Document") => {
       if (!url) return "No document uploaded";
@@ -670,6 +672,14 @@ const InvestorProfileSummary = ({ data, onEdit }) => {
             </div>
           </div>
         )}
+      </div>
+            <div className="mt-6 text-center">
+        <button 
+          className="btn btn-primary"
+          onClick={() => navigate('/investor-dashboard')}
+        >
+          Go to Dashboard
+        </button>
       </div>
     </div>
   )

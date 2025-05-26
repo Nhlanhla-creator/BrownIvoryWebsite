@@ -8,51 +8,24 @@ import "./FundingApplication.css" // Regular CSS import
 
 // Funding Instrument options
 const fundingInstrumentOptions = [
-  { value: "equity", label: "Equity" },
-  { value: "debt", label: "Debt" },
-  { value: "grant", label: "Grant" },
-  { value: "convertible", label: "Convertible Note" },
-  { value: "blended", label: "Blended Finance" },
-  { value: "quasi", label: "Quasi-Equity" },
-  { value: "alternative", label: "Alternative Financing" },
-  { value: "grants", label: "Grants & Subsidies" },
-  { value: "specialized", label: "Specialized Funders" },
+   { value: "workingCapital", label: "Equity (Buying shares in the business)" },
+  { value: "ventureCapital", label: "Debt (Loan-based funding)" },
+  { value: "invoiceDiscounting", label: "Grants (Non-repayable funding)" },
+  { value: "mezzanine", label: "Convertible Notes (Loan that can turn into shares)" },
+  { value: "common_shares", label: "Revenue-based Financing" },
+  { value: "preferred_shares", label: "Other (please specify)" },
 ]
 
 // Type of Funder options
 const funderTypeOptions = [
-  // Equity-based
-  { value: "angelInvestors", label: "Angel Investors (Early-stage, high-risk)" },
-  { value: "vcFirms", label: "Venture Capital (VC) Firms (Startups/growth-stage)" },
-  { value: "peFirms", label: "Private Equity (PE) Firms (Mature businesses, buyouts)" },
-  { value: "cvc", label: "Corporate Venture Capital (CVC) (Strategic investments)" },
-  { value: "familyOffices", label: "Family Offices (Wealthy families investing directly)" },
-  { value: "crowdfunding", label: "Crowdfunding Platforms (Equity-based)" },
-
-  // Debt-based
-  { value: "commercialBanks", label: "Commercial Banks (Term loans, overdrafts)" },
-  { value: "nbfcs", label: "Non-Banking Financial Companies (NBFCs) (Flexible debt)" },
-  { value: "mfis", label: "Microfinance Institutions (MFIs) (Small-ticket loans)" },
-  { value: "p2pLenders", label: "Peer-to-Peer (P2P) Lenders (Marketplace lending)" },
-  { value: "developmentBanks", label: "Development Banks (SME-focused, low-interest)" },
-
-  // Alternative financing
-  { value: "revenueBased", label: "Revenue-Based Financing (Repay via % revenue)" },
-  { value: "convertibleNote", label: "Convertible Note Investors (Debt → equity)" },
-  { value: "mezzanine", label: "Mezzanine Financing (Hybrid debt/equity)" },
-  { value: "factoring", label: "Factoring Companies (Invoice-based advances)" },
-  { value: "supplyChain", label: "Supply Chain Financiers (Supplier/vendor credit)" },
-
-  // Grants
-  { value: "governmentGrants", label: "Government Grants (Non-repayable, sector-specific)" },
-  { value: "corporateGrants", label: "Corporate Grants (CSR/foundation funding)" },
-  { value: "aidAgencies", label: "International Aid Agencies (UNDP, World Bank)" },
-
-  // Specialized
-  { value: "impactInvestors", label: "Impact Investors (ESG/social impact focus)" },
-  { value: "realEstateFinanciers", label: "Real Estate Financiers (Property-backed loans)" },
-  { value: "equipmentLessors", label: "Equipment Lessors (Hardware/tech leasing)" },
-  { value: "franchiseFinanciers", label: "Franchise Financiers (Franchise-specific capital)" },
+  { value: "equity", label: "Venture Capital" },
+  { value: "debt", label: "Angel Investment" },
+  { value: "grant", label: "Private Equity" },
+  { value: "convertible", label: "Government Fund" },
+  { value: "blended", label: "Grant / Non-Profit" },
+  { value: "quasi", label: "Development Finance" },
+  { value: "alternative", label: "Corporate Investment" },
+ 
 
   // Other
   { value: "other", label: "Other (specify)" },

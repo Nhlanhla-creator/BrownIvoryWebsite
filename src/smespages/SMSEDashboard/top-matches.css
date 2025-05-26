@@ -10,9 +10,9 @@
     --pale-brown: #f0e6d9;
   
     /* Status colors with brown tints */
-    --status-positive: #8d6e63;
-    --status-pending: #bcaaa4;
-    --status-neutral: #d7ccc8;
+    --status-positive: #2c8d06;
+    --status-pending: #c0502b;
+    --status-neutral: #2ff10d;
   
     /* Match percentage colors */
     --match-excellent: #5d4037;

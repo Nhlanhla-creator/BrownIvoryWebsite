@@ -5,9 +5,9 @@ import { X, ArrowRight } from 'lucide-react'
 
 import { ApplicationTracker } from "./application-tracker"
 import { SMEApplicationsTable } from "./top-matches-table"
-import { LegitimacyScoreCard } from "./legitimacy-score-card"
+//import { LegitimacyScoreCard } from "./legitimacy-score-card"
 import { CalendarCard } from "./calender-card"
-import { CustomerReviewsCard } from "./customer-reviews-card"
+//import { CustomerReviewsCard } from "./customer-reviews-card"
 
 import { doc, getDoc } from "firebase/firestore"
 import { auth, db } from "../../firebaseConfig"
@@ -27,18 +27,18 @@ const dashboardSteps = [
     content: "Track the status of all your applications in one place. See which stage each application is in and what's next.",
     icon: "📊",
   },
+  // {
+  //   title: "Business Metrics",
+  //   content: "Monitor your Legitimacy Score and other key metrics to understand how your business is perceived by partners.",
+  //   icon: "📈",
+  // },
   {
-    title: "Business Metrics",
-    content: "Monitor your Legitimacy Score and other key metrics to understand how your business is perceived by partners.",
-    icon: "📈",
-  },
-  {
-    title: "SME Applications",
+    title: "SME Approved Applications",
     content: "View and manage applications from small and medium enterprises that match your investment criteria.",
     icon: "🤝",
   },
   {
-    title: "Calendar & Reviews",
+    title: "Calendar ",
     content: "Keep track of upcoming events and meetings, and see what customers are saying about your business.",
     icon: "📅",
   },
@@ -205,14 +205,14 @@ export function Dashboard() {
           {/* Stats Cards Row */}
           <section className={styles.statsCardsRow}>
             {/* Legitimacy Score Card */}
-            <div className={styles.resizableCardContainer}>
+            {/* <div className={styles.resizableCardContainer}>
               <LegitimacyScoreCard profileData={profileData} />
-            </div>
+            </div> */}
 
             {/* Customer Reviews Card */}
-            <div className={styles.resizableCardContainer}>
+            {/* <div className={styles.resizableCardContainer}>
               <CustomerReviewsCard />
-            </div>
+            </div> */}
 
             {/* Calendar Card */}
             <div className={styles.resizableCardContainer}>

@@ -7,50 +7,29 @@ import styles from "./InvestorUniversalProfile.module.css"
 
 // Fund Type options
 const fundTypeOptions = [
-  { value: "equity", label: "Equity" },
-  { value: "debt", label: "Debt" },
-  { value: "grant", label: "Grant" },
-  { value: "convertible", label: "Convertible Note" },
-  { value: "blended", label: "Blended Finance" },
-  { value: "quasi", label: "Quasi-Equity" },
-  { value: "alternative", label: "Alternative Financing" },
-  { value: "grants", label: "Grants & Subsidies" },
-  { value: "specialized", label: "Specialized Funders" },
+  { value: "equity", label: "Venture Capital" },
+  { value: "debt", label: "Angel Investment" },
+  { value: "grant", label: "Private Equity" },
+  { value: "convertible", label: "Government Fund" },
+  { value: "blended", label: "Grant / Non-Profit" },
+  { value: "quasi", label: "Development Finance" },
+  { value: "alternative", label: "Corporate Investment" },
+  { value: "other", label: "Other (specify)" },
+ 
 ]
 
 const funderTypeOptions = [
   // Equity-based
-  { value: "angelInvestors", label: "Angel Investors (Early-stage, high-risk)" },
-  { value: "vcFirms", label: "Venture Capital (VC) Firms (Startups/growth-stage)" },
-  { value: "peFirms", label: "Private Equity (PE) Firms (Mature businesses, buyouts)" },
-  { value: "cvc", label: "Corporate Venture Capital (CVC) (Strategic investments)" },
-  { value: "familyOffices", label: "Family Offices (Wealthy families investing directly)" },
-  { value: "crowdfunding", label: "Crowdfunding Platforms (Equity-based)" },
+  { value: "angelInvestors", label: "	Individual Investor" },
+  { value: "vcFirms", label: "Investment Company" },
+  { value: "peFirms", label: "Bank or Financial Institution" },
+  { value: "cvc", label: "Government or Public Agency" },
+  { value: "familyOffices", label: "NGO / Foundation" },
+  { value: "crowdfunding", label: "Development Organization" },
 
   // Debt-based
-  { value: "commercialBanks", label: "Commercial Banks (Term loans, overdrafts)" },
-  { value: "nbfcs", label: "Non-Banking Financial Companies (NBFCs) (Flexible debt)" },
-  { value: "mfis", label: "Microfinance Institutions (MFIs) (Small-ticket loans)" },
-  { value: "p2pLenders", label: "Peer-to-Peer (P2P) Lenders (Marketplace lending)" },
-  { value: "developmentBanks", label: "Development Banks (SME-focused, low-interest)" },
-
-  // Alternative financing
-  { value: "revenueBased", label: "Revenue-Based Financing (Repay via % revenue)" },
-  { value: "convertibleNote", label: "Convertible Note Investors (Debt → equity)" },
-  { value: "mezzanine", label: "Mezzanine Financing (Hybrid debt/equity)" },
-  { value: "factoring", label: "Factoring Companies (Invoice-based advances)" },
-  { value: "supplyChain", label: "Supply Chain Financiers (Supplier/vendor credit)" },
-
-  // Grants
-  { value: "governmentGrants", label: "Government Grants (Non-repayable, sector-specific)" },
-  { value: "corporateGrants", label: "Corporate Grants (CSR/foundation funding)" },
-  { value: "aidAgencies", label: "International Aid Agencies (UNDP, World Bank)" },
-
-  // Specialized
-  { value: "impactInvestors", label: "Impact Investors (ESG/social impact focus)" },
-  { value: "realEstateFinanciers", label: "Real Estate Financiers (Property-backed loans)" },
-  { value: "equipmentLessors", label: "Equipment Lessors (Hardware/tech leasing)" },
-  { value: "franchiseFinanciers", label: "Franchise Financiers (Franchise-specific capital)" },
+  { value: "commercialBanks", label: "Other (please specify)" },
+ 
 ]
 
 // Program Type options
@@ -67,25 +46,23 @@ const programTypeOptions = [
 
 // Target Enterprise Type options
 const targetEnterpriseOptions = [
-  { value: "ideation", label: "Idea" },
-  { value: "prototype", label: "Prototype" },
-  { value: "startup", label: "Startup" },
-  { value: "early-growth", label: "Early-Growth" },
-  { value: "growth", label: "Growth" },
-  { value: "scale-up", label: "Scale-up" },
-  { value: "mature", label: "Mature" },
+  { value: "ideation", label: "Idea / Concept stage" },
+  { value: "prototype", label: "	Early-stage Startup" },
+  { value: "startup", label: "Growing Business (2–5 years old)" },
+  { value: "early-growth", label: "Established Business (5+ years)" },
+
 ]
 
 // Support Offered options
 const supportOfferedOptions = [
-  { value: "blended", label: "Blended" },
+  { value: "blended", label: "Strategic Partnerships" },
   { value: "mentorship", label: "Mentorship" },
   { value: "technical", label: "Technical Assistance" },
-  { value: "network", label: "Network Access" },
-  { value: "market", label: "Market Access" },
-  { value: "development", label: "Market Development" },
-  { value: "supply", label: "Supply Access" },
-  { value: "training", label: "Training" },
+
+  { value: "market", label: "Market Access / Networking" },
+  { value: "development", label: "Business Development Support" },
+
+  { value: "training", label: "No, I only provide capital" },
 ]
 
 // Follow-On Funding options
@@ -135,19 +112,13 @@ const requiredDocumentsOptions = [
 
 // Investment Instruments options
 const investmentInstrumentOptions = [
-  { value: "workingCapital", label: "Working Capital Loans" },
-  { value: "ventureCapital", label: "Venture Capital" },
-  { value: "invoiceDiscounting", label: "Invoice Discounting" },
-  { value: "mezzanine", label: "Mezzanine Finance" },
-  { value: "common_shares", label: "Common Shares" },
-  { value: "preferred_shares", label: "Preferred Shares" },
-  { value: "safe", label: "SAFE (Simple Agreement for Future Equity)" },
-  { value: "convertible_note", label: "Convertible Note" },
-  { value: "equity_warrant", label: "Equity Warrant" },
-  { value: "innovation_grant", label: "Innovation Grant" },
-  { value: "matching_grant", label: "Matching Grant" },
-  { value: "milestone_grant", label: "Milestone-Based Grant" },
-  { value: "technical_assistance", label: "Technical Assistance Grant" },
+  { value: "workingCapital", label: "Equity (Buying shares in the business)" },
+  { value: "ventureCapital", label: "Debt (Loan-based funding)" },
+  { value: "invoiceDiscounting", label: "Grants (Non-repayable funding)" },
+  { value: "mezzanine", label: "Convertible Notes (Loan that can turn into shares)" },
+  { value: "common_shares", label: "Revenue-based Financing" },
+  { value: "preferred_shares", label: "Other (please specify)" },
+ 
 ]
 
 // Enterprise Stage options
@@ -163,21 +134,37 @@ const enterpriseStageOptions = [
 
 // Sector Focus options
 const sectorFocusOptions = [
-  { value: "agriculture", label: "Agriculture" },
-  { value: "mining", label: "Mining" },
-  { value: "manufacturing", label: "Manufacturing" },
-  { value: "energy", label: "Energy" },
-  { value: "construction", label: "Construction" },
-  { value: "retail", label: "Retail & Wholesale" },
-  { value: "transport", label: "Transport & Logistics" },
-  { value: "finance", label: "Finance & Insurance" },
-  { value: "realestate", label: "Real Estate" },
-  { value: "ict", label: "ICT" },
-  { value: "tourism", label: "Tourism & Hospitality" },
-  { value: "education", label: "Education" },
-  { value: "health", label: "Health & Social Services" },
-  { value: "arts", label: "Arts & Entertainment" },
-]
+  { value: "accounting_finance", label: "Accounting / Finance" },
+  { value: "advertising_marketing_pr", label: "Advertising / Marketing / PR" },
+  { value: "agriculture_forestry_fishing", label: "Agriculture / Forestry / Fishing" },
+  { value: "automotive_motor_industry", label: "Automotive / Motor Industry" },
+  { value: "banking_insurance_investments", label: "Banking / Insurance / Investments" },
+  { value: "call_centre_customer_service", label: "Call Centre / Customer Service" },
+  { value: "construction_building_civils", label: "Construction / Building / Civils" },
+  { value: "consulting_business_services", label: "Consulting / Business Services" },
+  { value: "education_training_teaching", label: "Education / Training / Teaching" },
+  { value: "engineering", label: "Engineering (Civil, Mechanical, Electrical,)" },
+  { value: "government_public_sector", label: "Government / Public Sector" },
+  { value: "healthcare_nursing_medical", label: "Healthcare / Nursing / Medical" },
+  { value: "hospitality_hotel_catering", label: "Hospitality / Hotel / Catering" },
+  { value: "human_resources_recruitment", label: "Human Resources / Recruitment" },
+  { value: "ict_information_technology", label: "ICT / Information Technology" },
+  { value: "legal_law", label: "Legal / Law" },
+  { value: "logistics_transport_supply_chain", label: "Logistics / Transport / Supply Chain" },
+  { value: "manufacturing_production", label: "Manufacturing / Production" },
+  { value: "media_journalism_publishing", label: "Media / Journalism / Publishing" },
+  { value: "mining_energy_oil_gas", label: "Mining / Energy / Oil & Gas" },
+  { value: "ngo_nonprofit_community", label: "NGO / Non-Profit / Community Services" },
+  { value: "real_estate_property", label: "Real Estate / Property" },
+  { value: "retail_wholesale_sales", label: "Retail / Wholesale / Sales" },
+  { value: "science_research_development", label: "Science / Research / Development" },
+  { value: "security_emergency_services", label: "Security / Emergency Services" },
+  { value: "telecommunications", label: "Telecommunications" },
+  { value: "tourism_travel_leisure", label: "Tourism / Travel / Leisure" },
+  { value: "trades_artisans_technical", label: "Trades / Artisans / Technical" },
+  { value: "utilities_water_electricity", label: "Utilities / Water / Electricity" },
+];
+
 
 // Support Beyond Capital options
 const supportOptions = [
@@ -193,20 +180,35 @@ const supportOptions = [
 
 // Sector Experts options
 const sectorExpertsOptions = [
-  { value: "agriculture", label: "Agriculture" },
-  { value: "mining", label: "Mining" },
-  { value: "manufacturing", label: "Manufacturing" },
-  { value: "energy", label: "Energy" },
-  { value: "construction", label: "Construction" },
-  { value: "retail", label: "Retail & Wholesale" },
-  { value: "transport", label: "Transport & Logistics" },
-  { value: "finance", label: "Finance & Insurance" },
-  { value: "realestate", label: "Real Estate" },
-  { value: "ict", label: "ICT" },
-  { value: "tourism", label: "Tourism & Hospitality" },
-  { value: "education", label: "Education" },
-  { value: "health", label: "Health & Social Services" },
-  { value: "arts", label: "Arts & Entertainment" },
+  { value: "accounting_finance", label: "Accounting / Finance" },
+  { value: "advertising_marketing_pr", label: "Advertising / Marketing / PR" },
+  { value: "agriculture_forestry_fishing", label: "Agriculture / Forestry / Fishing" },
+  { value: "automotive_motor_industry", label: "Automotive / Motor Industry" },
+  { value: "banking_insurance_investments", label: "Banking / Insurance / Investments" },
+  { value: "call_centre_customer_service", label: "Call Centre / Customer Service" },
+  { value: "construction_building_civils", label: "Construction / Building / Civils" },
+  { value: "consulting_business_services", label: "Consulting / Business Services" },
+  { value: "education_training_teaching", label: "Education / Training / Teaching" },
+  { value: "engineering", label: "Engineering (Civil, Mechanical, Electrical,)" },
+  { value: "government_public_sector", label: "Government / Public Sector" },
+  { value: "healthcare_nursing_medical", label: "Healthcare / Nursing / Medical" },
+  { value: "hospitality_hotel_catering", label: "Hospitality / Hotel / Catering" },
+  { value: "human_resources_recruitment", label: "Human Resources / Recruitment" },
+  { value: "ict_information_technology", label: "ICT / Information Technology" },
+  { value: "legal_law", label: "Legal / Law" },
+  { value: "logistics_transport_supply_chain", label: "Logistics / Transport / Supply Chain" },
+  { value: "manufacturing_production", label: "Manufacturing / Production" },
+  { value: "media_journalism_publishing", label: "Media / Journalism / Publishing" },
+  { value: "mining_energy_oil_gas", label: "Mining / Energy / Oil & Gas" },
+  { value: "ngo_nonprofit_community", label: "NGO / Non-Profit / Community Services" },
+  { value: "real_estate_property", label: "Real Estate / Property" },
+  { value: "retail_wholesale_sales", label: "Retail / Wholesale / Sales" },
+  { value: "science_research_development", label: "Science / Research / Development" },
+  { value: "security_emergency_services", label: "Security / Emergency Services" },
+  { value: "telecommunications", label: "Telecommunications" },
+  { value: "tourism_travel_leisure", label: "Tourism / Travel / Leisure" },
+  { value: "trades_artisans_technical", label: "Trades / Artisans / Technical" },
+  { value: "utilities_water_electricity", label: "Utilities / Water / Electricity" },
 ]
 
 // Preferred Engagement Method options

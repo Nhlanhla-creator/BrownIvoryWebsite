@@ -63,7 +63,7 @@ export function SMEApplicationsTable({ selectedCategory: initialCategory = "SME 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h3>SMSE Applications</h3>
+    <h3>Approved SMSE Applications</h3>
         <div className={styles.categoryTabs}>
           <button
             className={`${styles.categoryTab} ${selectedCategory === "SMSE Applications" ? styles.active : ""}`}

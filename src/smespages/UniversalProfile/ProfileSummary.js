@@ -2,9 +2,12 @@
 
 import { useState } from "react"
 import { ChevronDown, ChevronUp, Edit ,FileText,ExternalLink} from 'lucide-react'
+import { useNavigate } from "react-router-dom" 
 import "./UniversalProfile.css"
 
 const ProfileSummary = ({ data, onEdit }) => {
+    const navigate = useNavigate() 
+  
 
      const renderDocumentLink = (url, label = "View Document") => {
       if (!url) return "No document uploaded";
@@ -20,6 +23,7 @@ const ProfileSummary = ({ data, onEdit }) => {
   
   
   const [expandedSections, setExpandedSections] = useState({
+    
 
     
     entityOverview: true,
@@ -583,6 +587,14 @@ const ProfileSummary = ({ data, onEdit }) => {
           </div>
         )}
         
+      </div>
+            <div className="mt-6 text-center">
+        <button 
+          className="btn btn-primary"
+          onClick={() => navigate('/applications/funding')}
+        >
+          Go to Funding Application
+        </button>
       </div>
     </div>
   )

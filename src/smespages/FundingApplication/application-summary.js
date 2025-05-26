@@ -3,8 +3,10 @@
 import { useState } from "react"
 import { ChevronDown, ChevronUp, Edit,ExternalLink ,FileText} from "lucide-react"
 import "./application-summary.css";  
+import { useNavigate } from "react-router-dom"
 
 const ApplicationSummary = ({ formData, onEdit }) => {
+    const navigate = useNavigate()
 
   
      const renderDocumentLink = (url, label = "View Document") => {
@@ -450,6 +452,14 @@ const ApplicationSummary = ({ formData, onEdit }) => {
             </div>
           </div>
         )}
+      </div>
+                 <div className="mt-6 text-center">
+        <button 
+          className="btn btn-primary"
+          onClick={() => navigate('/dashboard')}
+        >
+          Go to Dashboard
+        </button>
       </div>
     </div>
   )

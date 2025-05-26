@@ -12,7 +12,7 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  margin-bottom: 150px;
+  margin-bottom: 230px;
   opacity: 0;
   animation: calendarFadeIn 0.5s ease-out forwards;
 }

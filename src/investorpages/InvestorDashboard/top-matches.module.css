@@ -25,7 +25,7 @@
   
   /* Main container - positioned at the bottom with a lot of space */
   .container {
-    margin-top:20px; /* Large space at the top to push content down */
+ margin-top:30px;/* Large space at the top to push content down */
     background-color: var(--white);
     border-radius: 12px;
     box-shadow: 0 4px 12px var(--shadow-color);
