@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import EventData from './event-data';
-import Meetings from './meetings';
-import Availability from './availability';
+import EventData from './EventData';
+import Meetings from './Meetings';
+import Availability from './Availability';
 import Modal from './Modal';
 import './Calendar.css';
 

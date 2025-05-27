@@ -333,6 +333,7 @@ function App() {
         <Route path="/investor-opportunities" element={renderInvestorRoute(FindMatches)} />
         <Route path="/investor-portfolio" element={<div>Coming Soon</div>} />
         <Route path="/investor-messages" element={renderInvestorRoute(Messages)} />
+       <Route path="/investor-calendar" element={renderInvestorRoute(Calendar)} /> 
         <Route path="/investor-settings" element={renderInvestorRoute(Settings)} />
 
         {/* Investor Billing and Payments Routes */}
