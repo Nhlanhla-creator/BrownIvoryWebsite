@@ -202,7 +202,7 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
           role: userInfo.role
         },
         signature: signatureData, // Base64 data URL
-        ndaContent: "KELE Mining Solutions NDA",
+        ndaContent: "BIG Marketplace Mutual NDA",
         dateSigned: signedDate.toISOString(),
       };
 
@@ -221,7 +221,7 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
           role: userInfo.role
         },
         signatureUrl,
-        ndaContent: "KELE Mining Solutions NDA",
+        ndaContent: "BIG Marketplace Mutual NDA",
         dateSigned: signedDate.toISOString(),
       };
       
@@ -269,155 +269,212 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
       // Add a header to the PDF
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('CONFIDENTIALITY AND NON-DISCLOSURE AGREEMENT', pageWidth / 2, margin + 10, { align: 'center' });
+      pdf.text('BIG MARKETPLACE MUTUAL NON-DISCLOSURE AGREEMENT (NDA)', pageWidth / 2, margin + 10, { align: 'center' });
       
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'normal');
-      pdf.text('Between', pageWidth / 2, margin + 20, { align: 'center' });
+      pdf.text('Effective Date: Upon registration', pageWidth / 2, margin + 20, { align: 'center' });
       
+      pdf.text('Applies To: All users of BIG Marketplace, including SMEs, Funders,', pageWidth / 2, margin + 30, { align: 'center' });
+      pdf.text('Service Providers, Corporates, and Accelerators.', pageWidth / 2, margin + 40, { align: 'center' });
+      
+      // Add content sections
       pdf.setFont('helvetica', 'bold');
-      pdf.text('KELE MINING SOLUTIONS PROPRIETARY LIMITED', pageWidth / 2, margin + 30, { align: 'center' });
+      pdf.setFontSize(12);
+      let yPosition = margin + 55;
       
-      pdf.setFont('helvetica', 'normal');
-      pdf.text('(Registration Number: 2013/124544/07)', pageWidth / 2, margin + 40, { align: 'center' });
-      
-      pdf.text('AND', pageWidth / 2, margin + 50, { align: 'center' });
-      
-      pdf.setFont('helvetica', 'bold');
-      pdf.text(ndaData.userInfo.company, pageWidth / 2, margin + 60, { align: 'center' });
-      
-      // Add Introduction section
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Introduction', margin, margin + 75);
-      
+      // Section 1: Purpose
+      pdf.text('1. Purpose', margin, yPosition);
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(10);
       
-      const introText = [
-        "1. The parties wish to record the terms and conditions upon which the disclosing party shall disclose confidential",
-        "information to the other, which terms and conditions shall constitute a binding and enforceable agreement between",
-        "the parties and their agents.",
-        "",
-        "2. This agreement shall also bind the parties, notwithstanding the date of signature hereof, in the event that either",
-        "party shall have disclosed any confidential information to the other party prior to date of signature hereof.",
-        "",
-        "3. For the purposes of this agreement the party which discloses confidential information shall be referred to as",
-        "the disclosing party and the party which receives the confidential information shall be referred to as the receiving party",
+      const purposeText = [
+        "This Mutual NDA governs the protection and non-disclosure of Confidential Information exchanged",
+        "between BIG Marketplace users and between each user and Brown Ivory Group Proprietary Limited (\"BIG\")."
       ];
       
-      let yPosition = margin + 85;
-      introText.forEach(line => {
-        pdf.text(line, margin, yPosition);
-        yPosition += 5; // 5mm line spacing
-      });
-      
-      // Add Confidential Information section
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('The Confidential Information', margin, yPosition + 5);
-      
-      pdf.setFont('helvetica', 'normal');
-      const confInfoText = [
-        "4. Confidential Information shall, for the purpose of this agreement include, without limitation, any technical",
-        "commercial or scientific information, know-how, trade secrets, processes, machinery, designs, drawings, technical",
-        "specifications, terms of agreements, details of investment strategies, organisational strategies or structure of either",
-        "party, products or services offered by either party or any other matter which relates to the business of either party",
-        "in respect of which information is not readily available in the normal course of business which may come to the",
-        "knowledge of the other party in whatever form, disclosed to or assessed by either party during the course of his",
-        "relationship with the other party."
-      ];
-      
-      yPosition += 15;
-      confInfoText.forEach(line => {
+      yPosition += 8;
+      purposeText.forEach(line => {
         pdf.text(line, margin, yPosition);
         yPosition += 5;
       });
       
-      // Add Disclosure section
+      // Section 2: Definition of Confidential Information
+      yPosition += 8;
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Disclosure of confidential information', margin, yPosition + 5);
+      pdf.setFontSize(12);
+      pdf.text('2. Definition of Confidential Information', margin, yPosition);
       
       pdf.setFont('helvetica', 'normal');
-      const disclosureText = [
-        "5. The disclosing party shall only disclose the confidential information to the receiving party to the extent deemed",
-        "necessary or desirable by the disclosing party in its discretion.",
-        "",
-        "6. The receiving party acknowledges that the confidential information is a valuable, special and unique proprietary",
-        "asset to the disclosing party.",
-        "",
-        "7. The receiving party agrees that it will not, during or after the course of their relationship and/or the term of this",
-        "agreement as described in Clause 25, disclose the confidential information to any third party for any reason or",
-        "purpose whatsoever without the prior written consent of the disclosing party, save in accordance with the provisions",
-        "of this agreement. In this agreement third party means any party other than the parties."
+      pdf.setFontSize(10);
+      const definitionText = [
+        "\"Confidential Information\" includes, but is not limited to: business plans, financial information,",
+        "funding requirements, investment terms, product/service data, IP, customer data, documents, and",
+        "any non-public business or personal data disclosed via the platform or through follow-up communications."
       ];
       
-      yPosition += 15;
-      disclosureText.forEach(line => {
-        // Check if we need a new page
-        if (yPosition > pageHeight - margin) {
-          pdf.addPage();
-          yPosition = margin + 10;
-        }
+      yPosition += 8;
+      definitionText.forEach(line => {
         pdf.text(line, margin, yPosition);
         yPosition += 5;
       });
       
-      // Add Term section
+      // Section 3: Mutual Obligations
+      yPosition += 8;
       pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(12);
+      pdf.text('3. Mutual Obligations', margin, yPosition);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      const obligationsText = [
+        "All parties agree to:",
+        "• Keep Confidential Information strictly confidential.",
+        "• Use it solely for evaluation or engagement within the BIG Marketplace platform.",
+        "• Not disclose it to third parties except employees or advisors who are bound by similar",
+        "  confidentiality obligations."
+      ];
+      
+      yPosition += 8;
+      obligationsText.forEach(line => {
+        pdf.text(line, margin, yPosition);
+        yPosition += 5;
+      });
+      
+      // Section 4: Permitted Disclosures
+      yPosition += 8;
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(12);
+      pdf.text('4. Permitted Disclosures', margin, yPosition);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      const permittedText = [
+        "Information may be disclosed:",
+        "• To advisors who have a need to know.",
+        "• As required by law or legal process (with notice to the disclosing party).",
+        "• If already in the public domain or lawfully obtained from another source."
+      ];
+      
+      yPosition += 8;
+      permittedText.forEach(line => {
+        pdf.text(line, margin, yPosition);
+        yPosition += 5;
+      });
+      
+      // Section 5: Duration
+      yPosition += 8;
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(12);
+      pdf.text('5. Duration', margin, yPosition);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      const durationText = [
+        "This NDA is valid:",
+        "• For two years from date of last disclosure on the platform, or",
+        "• Until the Confidential Information becomes publicly available through no fault of the receiving party."
+      ];
+      
+      yPosition += 8;
+      durationText.forEach(line => {
+        pdf.text(line, margin, yPosition);
+        yPosition += 5;
+      });
       
       // Check if we need a new page
-      if (yPosition > pageHeight - 50) {
+      if (yPosition > pageHeight - 80) {
         pdf.addPage();
         yPosition = margin + 10;
-      } else {
-        yPosition += 10;
       }
       
-      pdf.text('Term', margin, yPosition);
-      
-      pdf.setFont('helvetica', 'normal');
-      const termText = [
-        "27. Subject to clause 2, this agreement shall commence upon the date of signature of the last signing party hereto",
-        "(the effective date) and shall endure for a period of 12 (twelve) months (the term) thereafter, or for a period of one",
-        "year from the date of the last disclosure of confidential information to the receiving party, whichever is the longer",
-        "period, whether or not the parties continue to have any relationship for that period of time."
-      ];
-      
-      yPosition += 10;
-      termText.forEach(line => {
-        pdf.text(line, margin, yPosition);
-        yPosition += 5;
-      });
-      
-      // Add Governing Law section
+      // Section 6: Data Protection
+      yPosition += 8;
       pdf.setFont('helvetica', 'bold');
-      
-      // Check if we need a new page
-      if (yPosition > pageHeight - 50) {
-        pdf.addPage();
-        yPosition = margin + 10;
-      } else {
-        yPosition += 10;
-      }
-      
-      pdf.text('Governing law', margin, yPosition);
+      pdf.setFontSize(12);
+      pdf.text('6. Data Protection', margin, yPosition);
       
       pdf.setFont('helvetica', 'normal');
-      const lawText = [
-        "36. This agreement and the relationship of the parties in connection with the subject matter of this agreement and",
-        "each other shall be governed and determined in accordance with the laws of the Republic of South Africa."
+      pdf.setFontSize(10);
+      const dataProtectionText = [
+        "All users agree to comply with applicable data protection laws, including POPIA. Personal Information",
+        "may not be misused, shared, or processed outside the intended platform purpose without explicit consent."
       ];
       
-      yPosition += 10;
-      lawText.forEach(line => {
+      yPosition += 8;
+      dataProtectionText.forEach(line => {
         pdf.text(line, margin, yPosition);
         yPosition += 5;
       });
       
-      // Add note
-      yPosition += 10;
-      pdf.text('Note: This is a summarized version of the NDA. By signing below, you acknowledge that you have read and agree', margin, yPosition);
-      yPosition += 5;
-      pdf.text('to the full terms and conditions of the KELE Mining Solutions Non-Disclosure Agreement.', margin, yPosition);
+      // Section 7: Return or Destruction
+      yPosition += 8;
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(12);
+      pdf.text('7. Return or Destruction', margin, yPosition);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      const returnText = [
+        "Upon written request, users must return or delete any Confidential Information shared with them",
+        "via the platform."
+      ];
+      
+      yPosition += 8;
+      returnText.forEach(line => {
+        pdf.text(line, margin, yPosition);
+        yPosition += 5;
+      });
+      
+      // Section 8: No License or IP Rights
+      yPosition += 8;
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(12);
+      pdf.text('8. No License or IP Rights', margin, yPosition);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      pdf.text('No rights to Confidential Information or underlying IP are granted by this NDA.', margin, yPosition + 8);
+      
+      // Section 9: Breach & Enforcement
+      yPosition += 20;
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(12);
+      pdf.text('9. Breach & Enforcement', margin, yPosition);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      const breachText = [
+        "Violation of this NDA may result in:",
+        "• Removal from the BIG Marketplace platform,",
+        "• Legal action and damages, and",
+        "• Blacklisting from the ecosystem."
+      ];
+      
+      yPosition += 8;
+      breachText.forEach(line => {
+        pdf.text(line, margin, yPosition);
+        yPosition += 5;
+      });
+      
+      // Section 10: Acceptance
+      yPosition += 8;
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(12);
+      pdf.text('10. Acceptance', margin, yPosition);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      const acceptanceText = [
+        "By using the platform, you agree to this Mutual NDA. This agreement is binding and enforceable",
+        "under South African law without requiring a physical signature."
+      ];
+      
+      yPosition += 8;
+      acceptanceText.forEach(line => {
+        pdf.text(line, margin, yPosition);
+        yPosition += 5;
+      });
       
       // Add a new page for signature if needed
       if (yPosition > pageHeight - 60) {
@@ -547,7 +604,7 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
             <p><strong>Date Signed:</strong> {savedNDA.dateSigned ? new Date(savedNDA.dateSigned).toLocaleDateString() : 'N/A'}</p>
           </div>
           <div className="button-group">
-            {signedPdfUrl && (
+            {/* {signedPdfUrl && (
               <a 
                 href={signedPdfUrl} 
                 target="_blank" 
@@ -556,7 +613,7 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
               >
                 View Signed NDA
               </a>
-            )}
+            )} */}
             <button 
               className="btn btn-success"
               onClick={() => {
@@ -581,7 +638,7 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
         <div className="popup-overlay">
           <div className="popup-content">
             <div className="popup-header">
-              <h2>Confidentiality and Non-Disclosure Agreement</h2>
+              <h3>BIG Marketplace Mutual Non-Disclosure Agreement (NDA)</h3>
             </div>
             
             {errorMessage && (
@@ -596,47 +653,62 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
               className="nda-content"
             >
               <div className="nda-title">
-                <h3>CONFIDENTIALITY AND NON-DISCLOSURE AGREEMENT</h3>
-                <p>Between</p>
-                <p className="company-name">Brown Ivory Group</p>
-                <p>(Registration Number: 2013/124544/07)</p>
-                <p>AND</p>
-                <p className="company-name">{userInfo.company || '[Company Name]'}</p>
+                <h3>BIG MARKETPLACE MUTUAL NON-DISCLOSURE AGREEMENT (NDA)</h3>
+                <p><strong>Effective Date:</strong> Upon registration</p>
+                <p><strong>Applies To:</strong> All users of BIG Marketplace, including SMEs, Funders, Service Providers, Corporates, and Accelerators.</p>
               </div>
               
-              <h4>Introduction</h4>
-              <ol>
-                <li>The parties wish to record the terms and conditions upon which the disclosing party shall disclose confidential information to the other, which terms and conditions shall constitute a binding and enforceable agreement between the parties and their agents.</li>
-                <li>This agreement shall also bind the parties, notwithstanding the date of signature hereof, in the event that either party shall have disclosed any confidential information to the other party prior to date of signature hereof.</li>
-                <li>For the purposes of this agreement the party which discloses confidential information shall be referred to as "the disclosing party" and the party which receives the confidential information shall be referred to as "the receiving party".</li>
-              </ol>
+              <h4>1. Purpose</h4>
+              <p>This Mutual NDA governs the protection and non-disclosure of Confidential Information exchanged between BIG Marketplace users and between each user and Brown Ivory Group Proprietary Limited ("BIG").</p>
               
-              <h4>The Confidential Information</h4>
-              <ol start="4">
-                <li>"Confidential Information" shall, for the purpose of this agreement include, without limitation, any technical, commercial or scientific information, know-how, trade secrets, processes, machinery, designs, drawings, technical specifications, terms of agreements, details of investment strategies, organisational strategies or structure of either party, products or services offered by either party or any other matter which relates to the business of either party in respect of which information is not readily available in the normal course of business which may come to the knowledge of the other party in whatever form, disclosed to or assessed by either party during the course of his relationship with the other party.</li>
-              </ol>
+              <h4>2. Definition of Confidential Information</h4>
+              <p>"Confidential Information" includes, but is not limited to: business plans, financial information, funding requirements, investment terms, product/service data, IP, customer data, documents, and any non-public business or personal data disclosed via the platform or through follow-up communications.</p>
               
-              <h4>Disclosure of confidential information</h4>
-              <ol start="5">
-                <li>The disclosing party shall only disclose the confidential information to the receiving party to the extent deemed necessary or desirable by the disclosing party in its discretion.</li>
-                <li>The receiving party acknowledges that the confidential information is a valuable, special and unique proprietary asset to the disclosing party.</li>
-                <li>The receiving party agrees that it will not, during or after the course of their relationship and/or the term of this agreement as described in Clause 25, disclose the confidential information to any third party for any reason or purpose whatsoever without the prior written consent of the disclosing party, save in accordance with the provisions of this agreement. In this agreement "third party" means any party other than the parties.</li>
-              </ol>
+              <h4>3. Mutual Obligations</h4>
+              <p>All parties agree to:</p>
+              <ul>
+                <li>Keep Confidential Information strictly confidential.</li>
+                <li>Use it solely for evaluation or engagement within the BIG Marketplace platform.</li>
+                <li>Not disclose it to third parties except employees or advisors who are bound by similar confidentiality obligations.</li>
+              </ul>
               
-              <h4>Term</h4>
-              <ol start="27">
-                <li>Subject to clause 2, this agreement shall commence upon the date of signature of the last signing party hereto ("the effective date") and shall endure for a period of 12 (twelve) months ("the term") thereafter, or for a period of one year from the date of the last disclosure of confidential information to the receiving party, whichever is the longer period, whether or not the parties continue to have any relationship for that period of time.</li>
-              </ol>
+              <h4>4. Permitted Disclosures</h4>
+              <p>Information may be disclosed:</p>
+              <ul>
+                <li>To advisors who have a need to know.</li>
+                <li>As required by law or legal process (with notice to the disclosing party).</li>
+                <li>If already in the public domain or lawfully obtained from another source.</li>
+              </ul>
               
-              <h4>Governing law</h4>
-              <ol start="36">
-                <li>This agreement and the relationship of the parties in connection with the subject matter of this agreement and each other shall be governed and determined in accordance with the laws of the Republic of South Africa.</li>
-              </ol>
+              <h4>5. Duration</h4>
+              <p>This NDA is valid:</p>
+              <ul>
+                <li>For <strong>two years from date of last disclosure</strong> on the platform, or</li>
+                <li>Until the Confidential Information becomes publicly available through no fault of the receiving party.</li>
+              </ul>
               
-              <p className="nda-note">Note: This is a summarized version of the NDA. By signing below, you acknowledge that you have read and agree to the full terms and conditions of the KELE Mining Solutions Non-Disclosure Agreement.</p>
-            </div>
-            
-            <div className="signature-section">
+              <h4>6. Data Protection</h4>
+              <p>All users agree to comply with applicable data protection laws, including POPIA. Personal Information may not be misused, shared, or processed outside the intended platform purpose without explicit consent.</p>
+              
+              <h4>7. Return or Destruction</h4>
+              <p>Upon written request, users must return or delete any Confidential Information shared with them via the platform.</p>
+              
+              <h4>8. No License or IP Rights</h4>
+              <p>No rights to Confidential Information or underlying IP are granted by this NDA.</p>
+              
+              <h4>9. Breach & Enforcement</h4>
+              <p>Violation of this NDA may result in:</p>
+              <ul>
+                <li>Removal from the BIG Marketplace platform,</li>
+                <li>Legal action and damages, and</li>
+                <li>Blacklisting from the ecosystem.</li>
+              </ul>
+              
+              <h4>10. Acceptance</h4>
+              <p>By using the platform, you agree to this Mutual NDA. This agreement is binding and enforceable under South African law without requiring a physical signature.</p>
+              
+              <p className="nda-note"><strong>Note:</strong> By signing below, you acknowledge that you have read and agree to the full terms and conditions of the BIG Marketplace Mutual Non-Disclosure Agreement.</p>
+                       <div className="signature-section">
               <div className="signature-info">
                 <p><strong>Date:</strong> {today}</p>
                 <p><strong>Company:</strong> {userInfo.company || 'N/A'}</p>
@@ -691,6 +763,9 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
                   I Agree & Sign
                 </button>
               </div>
+            </div>
+            
+   
               
               {!isScrolledToBottom && (
                 <p className="warning-text">Please scroll through the entire document before signing.</p>

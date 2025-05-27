@@ -2,7 +2,7 @@
 .container {
   overflow: auto;
   position: relative;
-  width: 100%;
+  width: 400px;
   font-family: 'Arial', sans-serif;
 }
 
@@ -23,8 +23,8 @@
   background-color: #fff8f0;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(79, 46, 29, 0.3);
-  width: 95%; /* Increased from 90% to make it wider */
-  max-width: 1200px; /* Increased from 800px to allow more width */
+  width: 55%; /* Increased from 90% to make it wider */
+  max-width: 800px; /* Increased from 800px to allow more width */
   max-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -126,7 +126,7 @@
 
 /* Signature section styles */
 .signature-section {
-  padding:1px 30px; /* Increased padding */
+  /* padding:1px 30px; Increased padding */
   background-color: #f5e9d9;
   border-top: 1px solid #d2b48c;
   border-bottom-left-radius: 6px;
