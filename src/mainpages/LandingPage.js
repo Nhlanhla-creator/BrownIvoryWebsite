@@ -112,91 +112,107 @@ const LandingPage = () => {
           maxWidth: '1200px',
           margin: '0 auto',
           width: '100%',
-          display: 'grid',
-          gridTemplateColumns: '70% 30%',
-          gap: '40px',
-          alignItems: 'center'
+          position: 'relative'
         }}>
-          <div style={{ zIndex: 1 }}>
+          {/* Slogan spanning full width */}
+          <div style={{
+            width: '100%',
+            marginBottom: '30px',
+            textAlign: 'center'
+          }}>
             <h1 style={{ 
-              fontSize: '2.8rem', 
+              fontSize: '2.7rem', // Reduced from 3.5rem
               fontWeight: '800',
-              marginBottom: '15px',
               lineHeight: '1.2',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+              textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+              margin: '0 auto',
+              maxWidth: '100%',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'clip'
             }}>
               <span style={{ color: colors.secondary }}>BIG</span> ON IDEAS. <span style={{ color: colors.secondary }}>BIG</span> ON GROWTH. <span style={{ color: colors.secondary }}>BIG</span> ON IMPACT.
             </h1>
-            <p style={{ 
-              fontSize: '1.2rem',
-              margin: '0 0 20px 0',
-              opacity: 0.9
-            }}>
-              HOLISTIC SOLUTIONS DESIGNED TO PROPEL HIGH-IMPACT ENTERPRISES FORWARD — BECAUSE SCALING SUCCESS REQUIRES STRATEGY, INSIGHT, AND THE RIGHT PARTNERSHIPS.
-            </p>
-            <p style={{ 
-              fontSize: '1rem',
-              margin: '0 0 25px 0',
-              fontWeight: '500'
-            }}>
-              WE'RE CLOSING THE SMALL, MEDIUM, AND SOCIAL ENTERPRISES (SMSEs) FUNDING GAP IN AFRICA — WITH THE TOOLS, TRUST, AND PATHWAYS TO GROW YOUR BUSINESS.
-            </p>
-            <p style={{
-              fontSize: '0.9rem',
-              fontStyle: 'italic',
-              marginBottom: '25px'
-            }}>
-              TRUSTED BY 500+ SMSES AND 50+ FUNDERS ACROSS AFRICA
-            </p>
-            <div style={{ 
-              display: 'flex',
-              gap: '15px',
-              flexWrap: 'wrap'
-            }}>
-              <Link to="/register" style={{
-                backgroundColor: colors.secondary,
-                color: colors.light,
-                padding: '12px 30px',
-                borderRadius: '50px',
-                fontWeight: '700',
-                textDecoration: 'none',
-                transition: 'all 0.3s ease',
-                ':hover': {
-                  transform: 'translateY(-3px)',
-                  boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
-                }
-              }}>
-                GET STARTED
-              </Link>
-              <Link to="/demo" style={{
-                backgroundColor: 'transparent',
-                color: colors.light,
-                border: `2px solid ${colors.secondary}`,
-                padding: '12px 30px',
-                borderRadius: '50px',
-                fontWeight: '600',
-                textDecoration: 'none',
-                transition: 'all 0.3s ease',
-                ':hover': {
-                  backgroundColor: 'rgba(255,255,255,0.1)'
-                }
-              }}>
-                SEE DEMO
-              </Link>
-            </div>
           </div>
+
           <div style={{ 
-            display: 'flex',
-            justifyContent: 'center',
+            display: 'grid',
+            gridTemplateColumns: '60% 40%',
+            gap: '40px',
             alignItems: 'center'
           }}>
-            <div style={{
-              width: '100%',
-              height: '300px',
-              backgroundSize: 'contain',
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'center'
-            }}></div>
+            <div style={{ zIndex: 1 }}>
+              <p style={{ 
+                fontSize: '1.2rem',
+                margin: '0 0 20px 0',
+                opacity: 0.9
+              }}>
+                HOLISTIC SOLUTIONS DESIGNED TO PROPEL HIGH-IMPACT ENTERPRISES FORWARD — BECAUSE SCALING SUCCESS REQUIRES STRATEGY, INSIGHT, AND THE RIGHT PARTNERSHIPS.
+              </p>
+              <p style={{ 
+                fontSize: '1rem',
+                margin: '0 0 25px 0',
+                fontWeight: '500'
+              }}>
+                WE'RE CLOSING THE SMALL, MEDIUM, AND SOCIAL ENTERPRISES (SMSEs) FUNDING GAP IN AFRICA — WITH THE TOOLS, TRUST, AND PATHWAYS TO GROW YOUR BUSINESS.
+              </p>
+              <p style={{
+                fontSize: '0.9rem',
+                fontStyle: 'italic',
+                marginBottom: '25px'
+              }}>
+                TRUSTED BY 500+ SMSES AND 50+ FUNDERS ACROSS AFRICA
+              </p>
+              <div style={{ 
+                display: 'flex',
+                gap: '15px',
+                flexWrap: 'wrap'
+              }}>
+                <Link to="/register" style={{
+                  backgroundColor: colors.secondary,
+                  color: colors.light,
+                  padding: '12px 30px',
+                  borderRadius: '50px',
+                  fontWeight: '700',
+                  textDecoration: 'none',
+                  transition: 'all 0.3s ease',
+                  ':hover': {
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
+                  }
+                }}>
+                  GET STARTED
+                </Link>
+                <Link to="/demo" style={{
+                  backgroundColor: 'transparent',
+                  color: colors.light,
+                  border: `2px solid ${colors.secondary}`,
+                  padding: '12px 30px',
+                  borderRadius: '50px',
+                  fontWeight: '600',
+                  textDecoration: 'none',
+                  transition: 'all 0.3s ease',
+                  ':hover': {
+                    backgroundColor: 'rgba(255,255,255,0.1)'
+                  }
+                }}>
+                  SEE DEMO
+                </Link>
+              </div>
+            </div>
+            <div style={{ 
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <div style={{
+                width: '100%',
+                height: '300px',
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center'
+              }}></div>
+            </div>
           </div>
         </div>
       </section>
@@ -1321,7 +1337,46 @@ const LandingPage = () => {
           alignItems: 'center',
           justifyContent: 'center'
         }}>
-          <FaComments size={32} />
+          {/* Robot Head Design */}
+          <div style={{
+            width: '40px',
+            height: '40px',
+            backgroundColor: 'white',
+            borderRadius: '50%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative'
+          }}>
+            {/* Eyes */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-around',
+              width: '100%',
+              marginBottom: '5px'
+            }}>
+              <div style={{
+                width: '8px',
+                height: '8px',
+                backgroundColor: colors.primary,
+                borderRadius: '50%'
+              }}></div>
+              <div style={{
+                width: '8px',
+                height: '8px',
+                backgroundColor: colors.primary,
+                borderRadius: '50%'
+              }}></div>
+            </div>
+            {/* Mouth */}
+            <div style={{
+              width: '16px',
+              height: '6px',
+              backgroundColor: colors.primary,
+              borderRadius: '0 0 8px 8px'
+            }}></div>
+          </div>
           <div style={{
             position: 'absolute',
             top: '-5px',
@@ -1343,7 +1398,7 @@ const LandingPage = () => {
         </div>
       </button>
 
-      {/* Chatbot Window */}
+      {/* Chatbot Window with Robot Head */}
       {chatbotOpen && (
         <div style={{
           position: 'fixed',
@@ -1361,7 +1416,7 @@ const LandingPage = () => {
           opacity: chatbotOpen ? 1 : 0,
           transition: 'all 0.3s ease'
         }}>
-          {/* Chatbot Header */}
+          {/* Chatbot Header with Robot Head */}
           <div style={{
             backgroundColor: colors.primary,
             color: 'white',
@@ -1371,7 +1426,47 @@ const LandingPage = () => {
             alignItems: 'center'
           }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <FaComments style={{ marginRight: '10px' }} />
+              {/* Robot Head Icon */}
+              <div style={{
+                marginRight: '10px',
+                width: '30px',
+                height: '30px',
+                backgroundColor: 'white',
+                borderRadius: '50%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative'
+              }}>
+                {/* Eyes */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-around',
+                  width: '100%',
+                  marginBottom: '3px'
+                }}>
+                  <div style={{
+                    width: '6px',
+                    height: '6px',
+                    backgroundColor: colors.primary,
+                    borderRadius: '50%'
+                  }}></div>
+                  <div style={{
+                    width: '6px',
+                    height: '6px',
+                    backgroundColor: colors.primary,
+                    borderRadius: '50%'
+                  }}></div>
+                </div>
+                {/* Mouth */}
+                <div style={{
+                  width: '12px',
+                  height: '4px',
+                  backgroundColor: colors.primary,
+                  borderRadius: '0 0 6px 6px'
+                }}></div>
+              </div>
               <h3 style={{ margin: 0, fontSize: '1.1rem' }}>
                 BIG MARKETPLACE ASSISTANT
               </h3>

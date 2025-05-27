@@ -43,7 +43,7 @@ const pulse = keyframes`
 `;
 
 // Background image URL
-const backgroundImageUrl = 'https://i.pinimg.com/736x/ba/37/08/ba37083994c5f3794787b9889f8538c4.jpg';
+const backgroundImageUrl = 'https://media.istockphoto.com/id/2153478836/photo/digital-technology-internet-network-connection-big-data-digital-marketing-iot-internet-of.jpg?s=1024x1024&w=is&k=20&c=ZLIKNbPQbEMb07-eQK1u-j180Q2Nk3zAh6mR3D1U0ZQ=';
 
 // Styled components
 const PageWrapper = styled.div`
@@ -52,8 +52,8 @@ const PageWrapper = styled.div`
   min-height: 100vh;
   background: linear-gradient(
       to bottom,
-      rgba(245, 240, 235, 0.9),
-      rgba(245, 240, 235, 0.95)
+      rgba(245, 240, 235, 0.42),
+      rgba(245, 240, 235, 0.56)
     ),
     url(${backgroundImageUrl});
   background-size: cover;

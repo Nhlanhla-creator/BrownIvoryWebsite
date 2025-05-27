@@ -77,7 +77,7 @@ const Sidebar = ({ companyName = "Company Name" }) => {
   }, [location]);
 
   const menuItems = [
-    { id: "home", label: "Home", icon: <Home size={18} />, route: "/" },
+    { id: "home", label: "Home", icon: <Home size={18} />, route: "/HomePage" },
     {
       id: "dashboard",
       label: "My Big Score",

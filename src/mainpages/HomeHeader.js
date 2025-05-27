@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Header = () => {
+const HomeHeader = () => {
   const navigate = useNavigate();
 
   const handleLoginClick = () => {
@@ -240,18 +240,10 @@ const Header = () => {
             FAQs
           </button>
         </nav>
-        <div style={styles.buttonGroup} className="button-group">
-          <button className="login-button" onClick={handleLoginClick}>Login</button>
-          <div className="register-container">
-            <button className="get-started-button" onClick={handleLoginClick}>Register</button>
-            <div style={styles.registerText} className="register-text" onClick={handleLoginClick}>
-              Have not registered yet?
-            </div>
-          </div>
-        </div>
+        
       </header>
     </>
   );
 };
 
-export default Header;
+export default HomeHeader;

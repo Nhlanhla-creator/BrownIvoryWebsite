@@ -23,6 +23,7 @@ import HowItWorksAccelerators from "./mainpages/HowItWorksAccelarators"
 import HowItWorksCorporates from "./mainpages/HowItWorksCoporate"
 import HowItWorksInvestors from "./mainpages/HowItWorksInvestor"
 import FAQPage from "./mainpages/FAQs"
+import HomePage from "./mainpages/HomePage"
 
 // Auth Components
 import AuthForm from "./smespages/LoginRegister"
@@ -309,6 +310,7 @@ function App() {
         <Route path="/LoginRegister" element={<LoginRegister />} />
         <Route path="/AboutPage" element={<AboutPage />} />
         <Route path="/FAQPage" element={<FAQPage />} />
+        <Route path="/HomePage" element={<HomePage />} />
 
         {/* Protected SME Dashboard Routes */}
         <Route path="/dashboard" element={renderSMERoute(Dashboard)} />
