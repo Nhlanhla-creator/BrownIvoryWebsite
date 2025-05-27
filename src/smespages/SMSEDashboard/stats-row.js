@@ -3,7 +3,7 @@
 import { LegitimacyScoreCard } from "./legitimacy-score-card"
 import { FundabilityScoreCard } from "./fundability-score-card"
 import { CustomerReviewsCard } from "./customer-reviews-card"
-import { CalendarCard } from "./calendar-card"
+import { CalendarCard } from "./compliance-score"
 import "./Dashboard.css"
 
 export function StatsRow({ styles, profileData }) {

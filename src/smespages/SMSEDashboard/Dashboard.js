@@ -3,28 +3,26 @@
 import { useState, useEffect } from "react"
 import { DashboardHeader } from "./dashboard-header"
 import { ApplicationTracker } from "./application-tracker"
-import { TopMatchesTable } from "./top-matches-table"
 import { LegitimacyScoreCard } from "./legitimacy-score-card"
 import { FundabilityScoreCard } from "./fundability-score-card"
-import { CalendarCard } from "./calendar-card"
+import { ComplianceScoreCard } from "./compliance-score" // ✅ Updated import
 import { CustomerReviewsCard } from "./customer-reviews-card"
 import { doc, getDoc } from "firebase/firestore"
 import { auth, db } from "../../firebaseConfig"
-import { FundingTable } from "../../smespages/MyFunderMatches/funding-table";
 import { X, ChevronRight } from "lucide-react"
 import "./Dashboard.css"
 
 export function Dashboard() {
   const [profileData, setProfileData] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [selectedCategory, setSelectedCategory] = useState("Funders");
+  const [selectedCategory, setSelectedCategory] = useState("Funders")
   const [showDashboardPopup, setShowDashboardPopup] = useState(false)
-  const [applicationRefreshKey, setApplicationRefreshKey] = useState(0);
+  const [applicationRefreshKey, setApplicationRefreshKey] = useState(0)
   const [currentDashboardStep, setCurrentDashboardStep] = useState(0)
+
   const user = auth.currentUser
   const userName = user ? user.email : "User"
 
-  // Dashboard explanation steps
   const dashboardSteps = [
     {
       title: "Welcome to Your Dashboard",
@@ -56,7 +54,6 @@ export function Dashboard() {
     },
   ]
 
-  // Styles
   const styles = {
     primaryBrown: "#5D4037",
     lightBrown: "#8D6E63",
@@ -66,7 +63,6 @@ export function Dashboard() {
     backgroundBrown: "#EFEBE9",
   }
 
-  // Helper function to get user-specific localStorage key
   const getUserSpecificKey = (baseKey) => {
     const userId = auth.currentUser?.uid
     return userId ? `${baseKey}_${userId}` : baseKey
@@ -99,7 +95,6 @@ export function Dashboard() {
 
     fetchProfileData()
 
-    // Check if this is the first time visiting the dashboard for this user
     const userId = auth.currentUser?.uid
     if (userId) {
       const hasSeenDashboardPopup = localStorage.getItem(getUserSpecificKey("hasSeenDashboardPopup")) === "true"
@@ -109,11 +104,9 @@ export function Dashboard() {
     }
   }, [])
 
-  // Enable resizable cards
   useEffect(() => {
     const resizableContainers = document.querySelectorAll(".resizable-card-container")
 
-    // Save card sizes to localStorage
     const saveCardSizes = () => {
       resizableContainers.forEach((container, index) => {
         const width = container.style.width
@@ -124,7 +117,6 @@ export function Dashboard() {
       })
     }
 
-    // Load card sizes from localStorage
     resizableContainers.forEach((container, index) => {
       const savedSize = localStorage.getItem(`card-${index}-size`)
       if (savedSize) {
@@ -134,7 +126,6 @@ export function Dashboard() {
       }
     })
 
-    // Add event listener to save sizes when resizing stops
     let resizeTimeout
     const handleResize = () => {
       clearTimeout(resizeTimeout)
@@ -162,7 +153,7 @@ export function Dashboard() {
   }
 
   const handleApplicationSubmitted = () => {
-    setApplicationRefreshKey((prev) => prev + 1);
+    setApplicationRefreshKey((prev) => prev + 1)
   }
 
   if (loading) {
@@ -171,7 +162,6 @@ export function Dashboard() {
 
   return (
     <div className="dashboard-container bg-[#EFEBE9]">
-      {/* Dashboard Welcome Popup */}
       {showDashboardPopup && (
         <div className="popup-overlay">
           <div className="welcome-popup dashboard-popup">
@@ -182,25 +172,19 @@ export function Dashboard() {
               <div className="popup-icon">{dashboardSteps[currentDashboardStep].icon}</div>
               <h2>{dashboardSteps[currentDashboardStep].title}</h2>
               <p>{dashboardSteps[currentDashboardStep].content}</p>
-
               <div className="popup-progress">
                 {dashboardSteps.map((_, index) => (
                   <div key={index} className={`progress-dot ${index === currentDashboardStep ? "active" : ""}`} />
                 ))}
               </div>
-
               <div className="popup-buttons">
-                <button className="btn btn-secondary" onClick={handleCloseDashboardPopup}>
-                  Close
-                </button>
+                <button className="btn btn-secondary" onClick={handleCloseDashboardPopup}>Close</button>
                 {currentDashboardStep < dashboardSteps.length - 1 ? (
                   <button className="btn btn-primary" onClick={handleNextDashboardStep}>
                     Next <ChevronRight size={16} />
                   </button>
                 ) : (
-                  <button className="btn btn-primary" onClick={handleCloseDashboardPopup}>
-                    Get Started
-                  </button>
+                  <button className="btn btn-primary" onClick={handleCloseDashboardPopup}>Get Started</button>
                 )}
               </div>
             </div>
@@ -212,42 +196,23 @@ export function Dashboard() {
         <main className="dashboard-main">
           <DashboardHeader userName={userName} />
 
-          {/* Application Tracker */}
           <section className="tracker-section">
             <ApplicationTracker styles={styles} />
           </section>
 
-          {/* Stats Cards Row */}
           <section className="stats-cards-row">
-            {/* Legitimacy Score Card */}
             <div className="resizable-card-container">
               <LegitimacyScoreCard styles={styles} profileData={profileData} />
             </div>
-
-            {/* Customer Reviews Card */}
             <div className="resizable-card-container">
               <CustomerReviewsCard styles={styles} />
             </div>
-
-            {/* Fundability Score Card */}
             <div className="resizable-card-container">
               <FundabilityScoreCard profileData={profileData} />
             </div>
-
-            {/* Calendar Card */}
             <div className="resizable-card-container">
-              <CalendarCard />
+              <ComplianceScoreCard styles={styles} profileData={profileData} /> {/* ✅ Correct usage */}
             </div>
-          </section>
-
-          {/* Top Matches - Full Width */}
-          <section className="top-matches-section">
-            <TopMatchesTable
-              key={applicationRefreshKey}
-              styles={styles}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-            />
           </section>
         </main>
       </div>

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, useEffect } from "react";
 import { Eye, Check, X, CalendarCheck2, FileText, Send, AlertTriangle, Info, ChevronDown } from 'lucide-react';
@@ -220,7 +220,7 @@ export function InvestorSMETable() {
 
   const handleSendMessage = async () => {
     if (!message.trim()) {
-      setFormErrors({ ...formErrors, message: "Please provide a message to the SMSE" });
+      setFormErrors({ ...formErrors, message: "Please provide a message to the SME" });
       return;
     }
 
@@ -302,7 +302,7 @@ export function InvestorSMETable() {
     }
 
     if (!message.trim()) {
-      errors.message = "Please provide a message to the SMSE";
+      errors.message = "Please provide a message to the SME";
     }
 
     if ((nextStage === "Under Review" || nextStage === "Investor Feedback") && !meetingTime) {
@@ -485,7 +485,7 @@ export function InvestorSMETable() {
                       className={styles.actionBtn}
                       title="Accept application"
                       onClick={() => { setSelectedSME(sme); setModalType("approve") }}
-                      disabled={sme.status !== "Application Received"}
+                      enabled={sme.status !== "Application Received"}
                     >
                       <Check size={16} />
                     </button>
@@ -493,7 +493,7 @@ export function InvestorSMETable() {
                       className={styles.actionBtn}
                       title="Decline application"
                       onClick={() => { setSelectedSME(sme); setModalType("decline") }}
-                      disabled={sme.status !== "Application Received"}
+                      enabled={sme.status !== "Application Received"}
                     >
                       <X size={16} />
                     </button>
@@ -563,7 +563,7 @@ export function InvestorSMETable() {
               <>
                 <div className={styles.messageBox}>
                   <label>
-                    Message to SMSE:
+                    Message to SME:
                     <div className={styles.tooltip}>
                       <Info size={14} className={styles.infoIcon} />
                       <span className={styles.tooltipText}>
@@ -674,24 +674,9 @@ export function InvestorSMETable() {
             <div className={styles.modalActions}>
               {modalType !== "view" && (
                 <>
-                  <button
-                    className={styles.confirmBtn}
-                    onClick={handleSendMessage}
-                    disabled={isSubmitting}
-                  >
-                    <Send size={16} /> Send Message
-                  </button>
+                 
 
-                  {modalType === "approve" && (
-                    <button
-                      className={styles.confirmBtn}
-                      onClick={handleScheduleMeeting}
-                      disabled={isSubmitting}
-                    >
-                      <CalendarCheck2 size={16} /> Schedule Meeting
-                    </button>
-                  )}
-
+                 
                   <button
                     className={modalType === "approve" ? styles.acceptBtn : styles.declineBtn}
                     onClick={() => handleUpdateStatus(
@@ -704,7 +689,7 @@ export function InvestorSMETable() {
                       <span className={styles.loadingSpinner}></span>
                     ) : (
                       <>
-                        <Check size={16} /> {modalType === "approve" ? "Accept" : "Decline"}
+                        <CalendarCheck2 size={16} /> {modalType === "approve" ? "Schedule Meeting" : "Decline"}
                       </>
                     )}
                   </button>

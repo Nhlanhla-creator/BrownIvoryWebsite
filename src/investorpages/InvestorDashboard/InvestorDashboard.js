@@ -4,18 +4,17 @@ import { useState, useEffect } from "react"
 import { X, ArrowRight } from 'lucide-react'
 
 import { ApplicationTracker } from "./application-tracker"
-import { SMEApplicationsTable } from "./top-matches-table"
-//import { LegitimacyScoreCard } from "./legitimacy-score-card"
-import { CalendarCard } from "./calender-card"
-//import { CustomerReviewsCard } from "./customer-reviews-card"
+import { LegitimacyScoreCard } from "./legitimacy-score-card"
+import { ComplianceScoreCard } from "./compliance"
+// import { CustomerReviewsCard } from "./customer-reviews-card"
+// import { CalendarCard } from "./calender-card"
+// import { SMEApplicationsTable } from "./top-matches-table"
 
 import { doc, getDoc } from "firebase/firestore"
 import { auth, db } from "../../firebaseConfig"
 
 import styles from "./InvestorDashboard.module.css"
 
-
-// Dashboard explanation steps
 const dashboardSteps = [
   {
     title: "Welcome to Your Dashboard",
@@ -27,36 +26,22 @@ const dashboardSteps = [
     content: "Track the status of all your applications in one place. See which stage each application is in and what's next.",
     icon: "📊",
   },
-  // {
-  //   title: "Business Metrics",
-  //   content: "Monitor your Legitimacy Score and other key metrics to understand how your business is perceived by partners.",
-  //   icon: "📈",
-  // },
   {
-    title: "SME Approved Applications",
-    content: "View and manage applications from small and medium enterprises that match your investment criteria.",
-    icon: "🤝",
-  },
-  {
-    title: "Calendar ",
-    content: "Keep track of upcoming events and meetings, and see what customers are saying about your business.",
-    icon: "📅",
+    title: "Compliance and Legitimacy",
+    content: "Monitor your Legitimacy Score and Compliance Score to assess business readiness.",
+    icon: "📈",
   },
 ]
 
 export function Dashboard() {
   const [profileData, setProfileData] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [selectedCategory, setSelectedCategory] = useState("Customers")
-  
-  // Popup states
   const [showDashboardPopup, setShowDashboardPopup] = useState(false)
   const [currentDashboardStep, setCurrentDashboardStep] = useState(0)
-  
+
   const user = auth.currentUser
   const userName = user ? user.email : "User"
 
-  // Helper function to get user-specific localStorage key
   const getUserSpecificKey = (baseKey) => {
     const userId = auth.currentUser?.uid
     return userId ? `${baseKey}_${userId}` : baseKey
@@ -89,7 +74,6 @@ export function Dashboard() {
 
     fetchProfileData()
 
-    // Check if this is the first time visiting the dashboard for this user
     const userId = auth.currentUser?.uid
     if (userId) {
       const hasSeenDashboardPopup = localStorage.getItem(getUserSpecificKey("hasSeenDashboardPopup")) === "true"
@@ -100,7 +84,6 @@ export function Dashboard() {
     }
   }, [])
 
-  // Enable resizable cards
   useEffect(() => {
     const resizableContainers = document.querySelectorAll(`.${styles.resizableCardContainer}`)
 
@@ -158,7 +141,6 @@ export function Dashboard() {
 
   return (
     <div className={styles.dashboardContainer}>
-      {/* Dashboard Welcome Popup */}
       {showDashboardPopup && (
         <div className="popup-overlay">
           <div className="welcome-popup dashboard-popup">
@@ -204,28 +186,12 @@ export function Dashboard() {
 
           {/* Stats Cards Row */}
           <section className={styles.statsCardsRow}>
-            {/* Legitimacy Score Card */}
-            {/* <div className={styles.resizableCardContainer}>
-              <LegitimacyScoreCard profileData={profileData} />
-            </div> */}
-
-            {/* Customer Reviews Card */}
-            {/* <div className={styles.resizableCardContainer}>
-              <CustomerReviewsCard />
-            </div> */}
-
-            {/* Calendar Card */}
             <div className={styles.resizableCardContainer}>
-              <CalendarCard />
+              <LegitimacyScoreCard profileData={profileData} />
             </div>
-          </section>
-
-          {/* Top Matches - Full Width */}
-          <section className={styles.topMatchesSection}>
-            <SMEApplicationsTable
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-            />
+            <div className={styles.resizableCardContainer}>
+              <ComplianceScoreCard />
+            </div>
           </section>
         </main>
       </div>

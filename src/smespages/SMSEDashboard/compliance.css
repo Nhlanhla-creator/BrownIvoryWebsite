@@ -1,3 +1,4 @@
+/* Brown color palette */
 :root {
   --light-brown: #f5f0e1;
   --medium-brown: #e6d7c3;
@@ -7,13 +8,14 @@
   --text-brown: #4a352f;
   --background-brown: #faf7f2;
   --pale-brown: #f0e6d9;
-  --soft-brown: #b89f8d;
-  --light-text: #6b5a50;
-  --success-green: #4caf50;
-  --error-red: #f44336;
+  --soft-brown: #b89f8d; /* New softer brown for text */
+  --light-text: #6b5a50; /* New lighter text color */
+  --success-green: #4caf50; /* Green for verified items */
+  --error-red: #f44336; /* Red for unverified items */
 }
 
-.readinessCard {
+/* Legitimacy Score Card */
+.readiness-card {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(166, 124, 82, 0.12);
@@ -26,22 +28,21 @@
   position: relative;
   overflow: hidden;
   border: 1px solid var(--medium-brown);
-  margin-bottom: 220px;
 }
 
-.readinessCard.blurred {
+.readiness-card.blurred {
   filter: blur(4px);
   pointer-events: none;
 }
 
-.funCardHeader {
-  padding: 16px;
+.fun-card-header {
+  padding: 30px;
   border-bottom: 1px solid var(--light-brown);
-  background-color: white;
+  background-color:white;
 }
 
-.funCardHeader h2 {
-  font-size: 18px;
+.fun-card-header h2 {
+  font-size: 18px; /* Increased from 10px for better readability */
   font-weight: 600;
   color: var(--dark-brown);
   margin: 0;
@@ -50,45 +51,45 @@
   padding: 14px;
 }
 
-.funCardHeader h2::after {
+.fun-card-header h2::after {
   content: "";
   position: absolute;
   bottom: -6px;
-  left: 50%;
+  left: 50%; /* Center the underline */
   transform: translateX(-50%);
-  width: 80px;
+  width: 80px; /* Wider underline */
   height: 2px;
   background-color: white;
 }
 
-.scoreWrapper {
+.score-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 30px 0;
+  padding: 30px 0; /* More padding for better spacing */
   flex: 1;
-  background-color: white;
+    background-color: white;
 }
 
-.scoreCircle {
-  width: 130px;
+.score-circle {
+  width: 130px; /* Slightly larger */
   height: 130px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 36px;
+  font-size: 36px; /* Larger font for better visibility */
   font-weight: 800;
-  color: var(--text-brown);
-  border: 5px solid var(--accent-brown);
+  color: var(--text-brown); /* Darker brown for better visibility */
+  border: 5px solid var(--accent-brown); /* Specified border color */
   box-shadow: 0 4px 12px rgba(166, 124, 82, 0.15);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  margin-top: -30px;
+  margin-top: -50px; /* Added margin for spacing */
 }
 
-.scoreCircle::before {
+.score-circle::before {
   content: "";
   position: absolute;
   top: 0;
@@ -97,48 +98,47 @@
   height: 100%;
   background: radial-gradient(circle, rgba(255, 250, 245, 0.9) 0%, rgba(246, 242, 239, 0.7) 1%);
   pointer-events: none;
-  border-radius: 50%;
+    border-radius: 50%;
 }
 
-.scoreCircle:hover {
+/* Add a subtle shine effect to the score circle */
+
+
+.score-circle:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 16px rgba(166, 124, 82, 0.25);
 }
 
-.textCenter {
+.text-center {
   text-align: center;
 }
 
-.funButton {
+.fun-button {
+  margin-top: -48px;
   margin-left: 30px;
-margin-bottom: 10px;
+  padding: 12px 63px;
   border-radius: 8px;
-  width: 220px;
-  height: 40px;
+  background-color:#8d6e63;
+  color: white;
   border: none;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  background-color: #8d6e63;
-  color: white;
   box-shadow: 0 2px 8px rgba(125, 90, 80, 0.1);
 }
 
-.funButton:hover {
+.fun-button:hover {
   background-color: var(--primary-brown);
   color: var(--pale-brown);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(125, 90, 80, 0.2);
 }
 
-.ml1 {
-  margin-left: 4px;
-}
-
-.modalOverlay {
+/* Modal styles */
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -155,7 +155,7 @@ margin-bottom: 10px;
   overflow: hidden;
 }
 
-.modalContent {
+.modal-content {
   background: white;
   border-radius: 16px;
   width: 90%;
@@ -178,19 +178,19 @@ margin-bottom: 10px;
   }
 }
 
-.funPopup {
+.fun-popup {
   padding: 24px;
   border-top: 5px solid var(--accent-brown);
 }
 
-.closeBtn {
+.close-btn {
   position: absolute;
   top: 16px;
   right: 16px;
   background: none;
   border: none;
   font-size: 24px;
-  color: var(--error-red);
+  color: var(--error-red); /* Changed to red as requested */
   cursor: pointer;
   width: 32px;
   height: 32px;
@@ -201,13 +201,13 @@ margin-bottom: 10px;
   transition: all 0.2s ease;
 }
 
-.closeBtn:hover {
+.close-btn:hover {
   background-color: var(--error-red);
   color: white;
   transform: rotate(90deg);
 }
 
-.popupTitle {
+.popup-title {
   font-size: 22px;
   font-weight: 600;
   color: var(--primary-brown);
@@ -217,13 +217,13 @@ margin-bottom: 10px;
   text-align: center;
 }
 
-.summaryList {
+.summary-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.summaryItem {
+.summary-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -231,11 +231,11 @@ margin-bottom: 10px;
   border-bottom: 1px solid var(--light-brown);
 }
 
-.summaryItem:last-child {
+.summary-item:last-child {
   border-bottom: none;
 }
 
-.summaryLabel {
+.summary-label {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -244,14 +244,14 @@ margin-bottom: 10px;
   font-weight: 500;
 }
 
-.summaryBullet {
+.summary-bullet {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background-color: var(--accent-brown);
 }
 
-.statusIndicator {
+.status-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -259,34 +259,53 @@ margin-bottom: 10px;
   height: 24px;
 }
 
-.statusIndicator svg {
+/* Status indicator colors */
+.status-indicator svg {
   color: var(--success-green);
 }
 
-.statusIndicator:not(:has(svg)) {
+.status-indicator:has(svg) + span {
+  color: var(--success-green);
+}
+
+/* For the X symbol */
+.status-indicator:contains('✕') {
   color: var(--error-red);
 }
 
-.inlineBlock {
+/* This is a more reliable way to style the X mark */
+.status-indicator:not(:has(svg)) {
+  color: var(--error-red);
+}
+
+/* Helper for inline block elements */
+.inline-block {
   display: inline-block;
 }
 
-@media (max-width: 768px) {
-  .scoreCircle {
-    width: 100px;
-    height: 100px;
-    font-size: 28px;
-  }
+/* Margin utilities */
+.ml-1 {
+  margin-left: 0.25rem;
+}
 
-  .funCardHeader h2 {
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .score-circle {
+    width: 110px;
+    height: 110px;
+    font-size: 32px;
+    border-width: 4px;
+  }
+  
+  .fun-card-header h2 {
     font-size: 16px;
   }
-
-  .popupTitle {
+  
+  .popup-title {
     font-size: 18px;
   }
-
-  .summaryLabel {
+  
+  .summary-label {
     font-size: 14px;
   }
 }
