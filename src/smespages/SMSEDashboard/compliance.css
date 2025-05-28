@@ -28,6 +28,7 @@
   position: relative;
   overflow: hidden;
   border: 1px solid var(--medium-brown);
+  
 }
 
 .readiness-card.blurred {
@@ -86,7 +87,7 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  margin-top: -50px; /* Added margin for spacing */
+  margin-top: -56px; /* Added margin for spacing */
 }
 
 .score-circle::before {
@@ -115,6 +116,7 @@
 
 .fun-button {
   margin-top: -48px;
+  margin-bottom: 9px;
   margin-left: 30px;
   padding: 12px 63px;
   border-radius: 8px;

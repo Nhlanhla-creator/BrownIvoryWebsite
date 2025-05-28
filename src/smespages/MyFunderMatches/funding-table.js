@@ -22,6 +22,70 @@ const ADJACENT_INDUSTRIES = {
 
 const FUNDING_STAGES = ["Pre-Seed", "Seed", "Series A", "Series B", "Growth"];
 
+// Pipeline stage definitions with colors and next stages
+const PIPELINE_STAGES = {
+MATCH: {
+  label: "Match",
+  color: "#F5EBE0", // Light cream/beige brown
+  next: "send application"
+},
+APPLICATION_SENT: {
+  label: "Application Sent", 
+  color: "#E8D5C4", // Warm light brown
+  next: "Investor Feedback"
+},
+  UNDER_REVIEW: {
+    label: "Under Review",
+    color: "#FFE0B2", // Light orange
+    next: "Investor Feedback"
+  },
+  INVESTOR_FEEDBACK: {
+    label: "Investor Feedback",
+    color: "#DCE775", // Light lime
+    next: "Term Sheet"
+  },
+  TERM_SHEET: {
+    label: "Term Sheet",
+    color: "#C8E6C9", // Light green
+    next: "Deal Closed"
+  },
+  DEAL_CLOSED: {
+    label: "Deal Closed",
+    color: "#A5D6A7", // Green
+    next: "N/A"
+  },
+  WITHDRAWN: {
+    label: "Withdrawn",
+    color: "#EEEEEE", // Gray
+    next: "N/A"
+  },
+  DECLINED: {
+    label: "Declined",
+    color: "#FFCDD2", // Light red
+    next: "N/A"
+  }
+};
+
+// Simplified statuses
+const APPLICATION_STATUSES = {
+  NO_APPLICATION: {
+    label: "Application not sent",
+    color: "#E0E0E0" // Light gray
+  },
+  PENDING: {
+    label: "Pending",
+    color: "#FFE082" // Amber
+  },
+  ACCEPTED: {
+    label: "Accepted",
+    color: "#81C784" // Green
+  },
+  DECLINED: {
+    label: "Declined",
+    color: "#E57373" // Red
+  }
+};
+
 const formatLabel = (value) => {
   if (!value) return "";
 
@@ -52,42 +116,24 @@ const formatDocumentLabel = (label) => {
 const capitalize = (str) => str?.charAt(0).toUpperCase() + str?.slice(1).toLowerCase();
 
 const getStatusColor = (status) => {
-  switch (status?.toLowerCase()) {
-    case 'accepted': return '#88E788';
-    case 'declined': return '#FF746C';
-    case 'pending': return '#FFC067';
-    case 'no application': return '#D3D3D3';
-    default: return '#FBEC5D';
-  }
+  const statusKey = Object.keys(APPLICATION_STATUSES).find(key => 
+    APPLICATION_STATUSES[key].label.toLowerCase() === status?.toLowerCase()
+  );
+  return statusKey ? APPLICATION_STATUSES[statusKey].color : "#E0E0E0";
 };
 
 const getStageColor = (stage) => {
-  switch (stage?.toLowerCase()) {
-    case 'initial match': return '#F0FFF0';
-    case 'send application': return '#FFFFC5';
-    case 'under review': return '#F7D9BC';
-    case 'investor feedback': return '#FFD3AC';
-    case 'termsheet': return '#F0FFF0';
-    case 'deals': return '#ADEBB3';
-    case 'withdrawn': return '#FA5053';
-    case 'declined': return '#FF2C2C';
-    default: return '#EED9C4';
-  }
+  const stageKey = Object.keys(PIPELINE_STAGES).find(key => 
+    PIPELINE_STAGES[key].label.toLowerCase() === stage?.toLowerCase()
+  );
+  return stageKey ? PIPELINE_STAGES[stageKey].color : "#E0E0E0";
 };
 
 const getNextStage = (currentStage) => {
-  const stages = [
-    'initial match',
-    'send application',
-    'under review',
-    'investor feedback',
-    'termsheet',
-    'deals'
-  ];
-  
-  const currentIndex = stages.indexOf(currentStage?.toLowerCase());
-  if (currentIndex === -1 || currentIndex === stages.length - 1) return 'N/A';
-  return stages[currentIndex + 1].charAt(0).toUpperCase() + stages[currentIndex + 1].slice(1);
+  const stageEntry = Object.values(PIPELINE_STAGES).find(stage => 
+    stage.label.toLowerCase() === currentStage?.toLowerCase()
+  );
+  return stageEntry ? stageEntry.next : "N/A";
 };
 
 export function FundingTable({ filters, onApplicationSubmitted }) {
@@ -203,8 +249,8 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
         sector: currentBusiness.economicSectors?.join(", ") || "Not specified",
         fundingNeeded: currentBusiness.useOfFunds?.amountRequested || "Not specified",
         applicationDate,
-        status: "pending",
-        pipelineStage: "application sent",
+        status: "Pending",
+        pipelineStage: "Application Sent",
         teamSize: currentBusiness.teamSize || "Not specified",
         revenue: currentBusiness.financials?.annualRevenue || "Not specified",
         focusArea: currentBusiness.businessDescription || "Not specified",
@@ -218,8 +264,8 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
         addDoc(collection(db, "smeApplications"), applicationData)
       ]);
 
-      setStatuses((prev) => ({ ...prev, [funder.id]: "pending" }));
-      setPipelineStages((prev) => ({ ...prev, [funder.id]: "application sent" }));
+      setStatuses((prev) => ({ ...prev, [funder.id]: "Pending" }));
+      setPipelineStages((prev) => ({ ...prev, [funder.id]: "Application Sent" }));
       setApplicationDates((prev) => ({ ...prev, [funder.id]: applicationDate }));
       setWaitingTimes((prev) => ({ ...prev, [funder.id]: "3-5 days" }));
       
@@ -291,8 +337,8 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
         appSnapshot.forEach(doc => {
           const data = doc.data();
           const key = `${data.funderId}_${data.fundName}`;
-          appStatusMap[key] = data.status || "pending";
-          pipelineStageMap[key] = data.pipelineStage || "application sent";
+          appStatusMap[key] = data.status || "Pending";
+          pipelineStageMap[key] = data.pipelineStage || "Application Sent";
           applicationDateMap[key] = data.applicationDate || new Date().toISOString().split("T")[0];
           waitingTimeMap[key] = data.waitingTime || "3-5 days";
         });
@@ -391,13 +437,25 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
             </thead>
             <tbody>
               {funders.map(funder => {
-                const status = statuses[funder.id] || "new";
-                const pipelineStage = pipelineStages[funder.id] || "initial match";
+                const status = statuses[funder.id] || "Application not sent";
+                const pipelineStage = pipelineStages[funder.id] || "Match";
                 const nextStage = getNextStage(pipelineStage);
                 
                 return (
                   <tr key={funder.id}>
-                    <td>{funder.name}</td>
+                    <td>
+                      <span 
+                        onClick={() => handleViewClick(funder)} 
+                        style={{
+                          color: '#a67c52',
+                          textDecoration: 'underline',
+                          cursor: 'pointer',
+                          fontWeight: '500'
+                        }}
+                      >
+                        {funder.name}
+                      </span>
+                    </td>
                     <td>{formatLabel(funder.geographicFocus)}</td>
                     <td>{formatLabel(funder.sectorFocus)}</td>
                     <td>{formatLabel(funder.targetStage)}</td>
@@ -420,7 +478,6 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
                     <td>{waitingTimes[funder.id] || "N/A"}</td>
                     <td>
                       <div className={styles.actionButtons}>
-                        <button onClick={() => handleViewClick(funder)} className={styles.viewButton}>View</button>
                         {statuses[funder.id] ? (
                           <span className={styles.sentBadge}><Check size={16} /> Sent</span>
                         ) : (

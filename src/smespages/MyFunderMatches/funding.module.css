@@ -1222,125 +1222,190 @@
   color: var(--brown-700);
   font-size: 1.1rem;
 }
+
 .fundingTable {
   width: 100%;
   border-collapse: collapse;
   margin: 30px 0;
-  font-size: 0.8em;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  font-size: 0.85em;
+  box-shadow: 0 4px 24px rgba(139, 69, 19, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-left: -15px;
+  background-color: #fefcfa;
 }
 
 .fundingTable th,
 .fundingTable td {
-  padding: 12px 6px;
+  padding: 16px 3px;
   text-align: left;
-  border-bottom: 1px solid #431b05;
+  border-bottom: 2px solid rgba(139, 69, 19, 0.15);
+  border-right: 2px solid rgba(139, 69, 19, 0.15);
+  vertical-align: middle;
 }
 
 .fundingTable th {
-  background-color: var(--brown-600);
-  color: #fff8f0;
+  background: linear-gradient(135deg, #4e2106 0%,  #372c27 100%);
+  color: #fefcfa;
   font-weight: 600;
+  font-size: 0.8em;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 3px solid #1a0c02;
+  border-right: 2px solid #1a0c02;
 }
 
-.fundingTable tr:hover {
+.fundingTable th:last-child,
+.fundingTable td:last-child {
+  border-right: none;
+}
+
+.fundingTable tbody tr {
+  transition: all 0.2s ease;
+  background-color: #fefcfa;
+}
+
+.fundingTable tbody tr:nth-child(even) {
+  background-color: #faf7f2;
+}
+
+.fundingTable tbody tr:hover {
   background-color: #f5ebe0;
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.1);
+}
+
+.fundingTable td {
+  color: #5d2a0a;
+  line-height: 1.5;
+}
+
+/* Improved spacing for content-heavy tables */
+.fundingTable td:first-child {
+  font-weight: 500;
+  color: #3e1a05;
+}
+
+.fundingTable td:last-child {
+  text-align: center;
 }
 
 /* Status & Stage Badges */
 .statusBadge,
 .stageBadge {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   text-align: center;
   min-width: 80px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-transform: capitalize;
 }
 
 .sentBadge {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border-radius: 12px;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
   font-size: 0.75rem;
-  font-weight: 500;
-  background-color: grey;
+  font-weight: 600;
+  background: linear-gradient(135deg, #1d1101 0%, #a67c52 100%);
   color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Action Buttons */
 .actionButtons {
   display: flex;
   gap: 8px;
+  justify-content: center;
 }
 
 .viewButton,
 .applyButton {
-  padding: 6px 12px;
-  border-radius: 4px;
+  padding: 8px 16px;
+  border-radius: 8px;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   border: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .viewButton {
-  background-color: var(--brown-100);
-  color: var(--brown-700);
+  background: linear-gradient(135deg, #f5ebe0 0%, #e8d5c4 100%);
+  color: #5d2a0a;
+  border: 1px solid rgba(139, 69, 19, 0.2);
 }
 
 .viewButton:hover {
-  background-color: var(--brown-200);
+  background: linear-gradient(135deg, #e8d5c4 0%, #dcc5a8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(139, 69, 19, 0.15);
 }
 
 .applyButton {
-  background-color: #6b3808 ;
+  background: linear-gradient(135deg,#a67c52 0%, #6b3808 100%);
   color: white;
+  border: 1px solid #5d2a0a;
 }
 
 .applyButton:hover {
-  background-color: #6b3808;
+  background: linear-gradient(135deg, #6b3808 0%, #5d2a0a 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
 }
+
+/* Modal Styles */
 .modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(139, 69, 19, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
 .modal {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #fefcfa 0%, #faf7f2 100%);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(139, 69, 19, 0.15);
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
   animation: modalFadeIn 0.3s ease-out;
+  border: 1px solid rgba(139, 69, 19, 0.1);
 }
 
 .modalHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid var(--brown-100);
+  padding: 1.5rem;
+  border-bottom: 2px solid rgba(139, 69, 19, 0.1);
+  background: linear-gradient(135deg, #f5ebe0 0%, #e8d5c4 100%);
+  border-radius: 16px 16px 0 0;
 }
 
 .modalHeader h3 {
   margin: 0;
-  font-size: 1.2rem;
-  color: var(--brown-800);
+  font-size: 1.3rem;
+  color: #3e1a05;
+  font-weight: 700;
 }
 
 .modalHeader button {
@@ -1348,53 +1413,69 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: var(--brown-500);
+  color: #8b4513;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modalHeader button:hover {
+  background-color: rgba(139, 69, 19, 0.1);
+  transform: rotate(90deg);
 }
 
 .modalBody {
-  padding: 1rem;
+  padding: 1.5rem;
+  color: #5d2a0a;
 }
 
 .modalActions {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  padding: 1rem;
-  border-top: 1px solid var(--brown-100);
+  padding: 1.5rem;
+  border-top: 2px solid rgba(139, 69, 19, 0.1);
+  background-color: #faf7f2;
+  border-radius: 0 0 16px 16px;
 }
 
 .cancelButton,
 .submitButton {
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .cancelButton {
-  background-color: var(--brown-100);
-  color: var(--brown-700);
-  border: 1px solid var(--brown-200);
+  background: linear-gradient(135deg, #f5ebe0 0%, #e8d5c4 100%);
+  color: #5d2a0a;
+  border: 2px solid rgba(139, 69, 19, 0.2);
 }
 
 .cancelButton:hover {
-  background-color: var(--brown-200);
+  background: linear-gradient(135deg, #e8d5c4 0%, #dcc5a8 100%);
+  transform: translateY(-1px);
 }
 
 .submitButton {
-  background-color: var(--brown-200);
+  background: linear-gradient(135deg, #8b4513 0%, #6b3808 100%);
   color: white;
-  border: 1px solid var(--green-700);
+  border: 2px solid #5d2a0a;
 }
 
 .submitButton:hover {
-  background-color: var(--brown-200);
+  background: linear-gradient(135deg, #6b3808 0%, #5d2a0a 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
 }
 
 /* Documents List */
 .documentsList {
-  padding: 1rem;
+  padding: 1.5rem;
   margin-left: 0.2rem;
 }
 
@@ -1402,72 +1483,133 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 0;
-    margin-left: -680px;
-  border-bottom: 1px solid var(--brown-100);
+  padding: 1rem 0;
+  margin-left: -680px;
+  border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+  transition: all 0.2s ease;
+}
+
+.documentItem:hover {
+  background-color: rgba(245, 235, 224, 0.5);
+  padding-left: 8px;
+  border-radius: 8px;
 }
 
 .documentLabel {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   cursor: pointer;
   flex-grow: 1;
+  color: #5d2a0a;
 }
 
 .documentLabel input[type="checkbox"] {
-  accent-color: var(--brown-600);
+  accent-color: #8b4513;
+  transform: scale(1.2);
 }
 
 .timestamp {
-  font-size: 0.75rem;
-  color: var(--brown-500);
-  margin-left: 8px;
+  font-size: 0.8rem;
+  color: #a0522d;
+  margin-left: 12px;
+  font-weight: 500;
 }
 
 .fileInput {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
+  padding: 8px 12px;
+  border: 2px solid rgba(139, 69, 19, 0.2);
+  border-radius: 8px;
+  background-color: #fefcfa;
+  color: #5d2a0a;
 }
 
 /* Notifications */
 .notification {
-  padding: 12px 16px;
+  padding: 16px 20px;
   margin-bottom: 1.5rem;
-  border-radius: 4px;
+  border-radius: 12px;
   font-size: 0.9rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .notification.success {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #c8e6c9;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  color: #1b5e20;
+  border: 2px solid #4caf50;
 }
 
 .notification.error {
-  background-color: #ffebee;
-  color: #c62828;
-  border: 1px solid #ffcdd2;
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  color: #b71c1c;
+  border: 2px solid #f44336;
 }
 
 /* No Results */
 .noResults {
-  padding: 2rem;
+  padding: 3rem 2rem;
   text-align: center;
-  background-color: var(--brown-50);
-  border-radius: 8px;
-  color: var(--brown-700);
+  background: linear-gradient(135deg, #faf7f2 0%, #f5ebe0 100%);
+  border-radius: 16px;
+  color: #5d2a0a;
+  border: 2px dashed rgba(139, 69, 19, 0.3);
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .fundingTable {
+    font-size: 0.8em;
+  }
+  
+  .fundingTable th,
+  .fundingTable td {
+    padding: 12px 8px;
+  }
+  
+  .actionButtons {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .viewButton,
+  .applyButton {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
 }
 
 /* Animations */
 @keyframes modalFadeIn {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-30px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
+}
+
+/* Scrollbar Styling */
+.fundingTable::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.fundingTable::-webkit-scrollbar-track {
+  background: #f5ebe0;
+  border-radius: 4px;
+}
+
+.fundingTable::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+  border-radius: 4px;
+}
+
+.fundingTable::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #6b3808 0%, #8b4513 100%);
 }
 
 /* ==================== */

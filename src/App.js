@@ -65,6 +65,7 @@ import InvestorLegalCompliance from "./investorpages/InvestorUniversalProfile/Le
 import InvestorProductsServices from "./investorpages/InvestorUniversalProfile/ProductsService"
 import InvestorHowDidYouHear from "./investorpages/InvestorUniversalProfile/HowDidYouHear"
 import InvestorDeclarationConsent from "./investorpages/InvestorUniversalProfile/DeclarationConsent"
+import InvestorCalendar from "./investorpages/Calender/InvestorCalendar"
 
 // Support Programs Universal Profile Components
 import SupportUniversalProfile from "./supportprogram/SupportProgramUniversalProfile/SupportUniversalProfile"
@@ -335,7 +336,7 @@ function App() {
         <Route path="/investor-opportunities" element={renderInvestorRoute(FindMatches)} />
         <Route path="/investor-portfolio" element={<div>Coming Soon</div>} />
         <Route path="/investor-messages" element={renderInvestorRoute(Messages)} />
-       <Route path="/investor-calendar" element={renderInvestorRoute(Calendar)} /> 
+       <Route path="/investor-calendar" element={renderInvestorRoute(InvestorCalendar)} /> 
         <Route path="/investor-settings" element={renderInvestorRoute(Settings)} />
 
         {/* Investor Billing and Payments Routes */}

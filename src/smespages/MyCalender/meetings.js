@@ -191,13 +191,7 @@ const Meetings = ({ events, setEvents, stats, setStats }) => {
             <CalendarIcon size={16} />
             Calendar
           </button>
-          <button 
-            className="create-event-btn"
-            onClick={() => setShowCreateModal(true)}
-          >
-            <Plus size={16} />
-            Create Event
-          </button>
+      
         </div>
       </div>
 

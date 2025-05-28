@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Calendar as CalendarIcon, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
-import Modal from './Modal';
+import Modal from './Modal.js';
 import CreateEventForm from './CreateEventForm';
 import MeetingDetails from './MeetingDetails';
 import './Meetings.css';

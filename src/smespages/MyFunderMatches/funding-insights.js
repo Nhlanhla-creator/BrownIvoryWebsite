@@ -36,11 +36,12 @@ export function FundingInsights() {
       light: "#D4B996",
       lighter: "#E6CCAB",
       lightest: "#F5E6CB",
-      accent1: "#D2691E", // Orange-brown
-      accent2: "#CD853F", // Light orange
-      accent3: "#4682B4", // Blue
-      accent4: "#6B8E23", // Green
-      accent5: "#9370DB", // Purple
+ accent1: "#CD853F", // Peru brown (keeping one of yours)
+accent2: "#DEB887", // Burlywood
+accent3: "#8B4513", // Saddle brown
+accent4: "#6B4226", // Umber brown
+accent5: "#4A3728", // Dark walnut
+  
     }
 
     const createChart = (ref, config) => {

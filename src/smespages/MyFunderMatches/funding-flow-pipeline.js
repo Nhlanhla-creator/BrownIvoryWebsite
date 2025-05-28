@@ -152,9 +152,8 @@ export default function DealFlowPipeline() {
     <div className={styles.dealflowPipelineContainer}>
       <div className={styles.pipelineHeader}>
         <h2 className={styles.pipelineTitle}>Deal Flow Pipeline</h2>
-        <p className={styles.pipelineDescription}>
-          Track your funding applications through each stage of the process
-        </p>
+       
+       
       </div>
 
       <div className={styles.pipelineStagesContainer}>

@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import EventData from './EventData';
 import Meetings from './Meetings';
 import Availability from './Availability';
-import Modal from './Modal';
+import Modal from './Modal.js';
 import './Calendar.css';
 
-const Calendar = () => {
+const InvestorCalendar = () => {
   const [showWelcome, setShowWelcome] = useState(true);
   const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
   const [workingHoursSet, setWorkingHoursSet] = useState(false);
@@ -168,4 +168,4 @@ const Calendar = () => {
   );
 };
 
-export default Calendar;
+export default InvestorCalendar;

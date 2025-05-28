@@ -437,7 +437,7 @@ export function InvestorSMETable() {
               <th>Sector</th>
               <th>Funding Needed</th>
               <th>Application Date</th>
-              <th>Company Status</th>
+              <th>Status</th>
               <th>Actions</th>
               <th>Next Stage</th>
             </tr>

@@ -61,7 +61,7 @@ export function LegitimacyScoreCard({ profileData }) {
     <>
       <div className={`${styles.readinessCard} ${styles.funCard} ${showModal ? styles.blurred : ""}`}>
         <div className={styles.funCardHeader}>
-          <h2>BIG Legitimacy Score</h2>
+          <h2>Verification Score</h2>
         </div>
 
         <div className={styles.scoreWrapper}>

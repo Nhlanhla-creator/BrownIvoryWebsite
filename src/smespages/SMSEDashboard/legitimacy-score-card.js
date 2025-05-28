@@ -134,7 +134,7 @@ export function LegitimacyScoreCard({ styles, profileData }) {
           <button
             className="fun-button"
             onClick={() => setShowModal(true)}
-            style={{ backgroundColor: '#8d6e63', color: 'white' }}
+            style={{ backgroundColor: '#8d6e63', color: 'white', padding: '12px 68px', }}
           >
             View More
             <ChevronDown className="ml-1 inline-block" size={16} />

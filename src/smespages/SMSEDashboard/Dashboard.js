@@ -202,16 +202,16 @@ export function Dashboard() {
 
           <section className="stats-cards-row">
             <div className="resizable-card-container">
-              <LegitimacyScoreCard styles={styles} profileData={profileData} />
+              < ComplianceScoreCard styles={styles} profileData={profileData} />
             </div>
             <div className="resizable-card-container">
-              <CustomerReviewsCard styles={styles} />
+              < LegitimacyScoreCard styles={styles}  profileData={profileData} />
             </div>
             <div className="resizable-card-container">
               <FundabilityScoreCard profileData={profileData} />
             </div>
             <div className="resizable-card-container">
-              <ComplianceScoreCard styles={styles} profileData={profileData} /> {/* ✅ Correct usage */}
+              <CustomerReviewsCard styles={styles} /> 
             </div>
           </section>
         </main>

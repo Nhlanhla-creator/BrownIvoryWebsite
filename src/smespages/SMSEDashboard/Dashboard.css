@@ -148,16 +148,21 @@
 /* Resizable Card Container */
 .resizable-card-container {
   position: relative;
-  height: 60%;
+  height: 80%;
   width: 100%;
   resize: both;
   margin-bottom: 1.5rem;
   overflow: hidden;
-  border-radius: var(--card-border-radius);
-  box-shadow: var(--card-shadow);
-  background-color: var(--white);
-  border: 1px solid var(--medium-brown);
-  transition: box-shadow 0.3s ease;
+  border-radius: 16px;
+  box-shadow: 
+    0 8px 32px rgba(139, 69, 19, 0.12),
+    0 4px 16px rgba(101, 67, 33, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  background: linear-gradient(135deg, #fefcfa 0%, #faf7f2 100%);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: grab;
 }
 
 .resizable-card-container:hover {

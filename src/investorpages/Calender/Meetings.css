@@ -1,4 +1,4 @@
- :root {
+    .meetings-container {
           --light-brown: #f5f0e1;
           --medium-brown: #e6d7c3;
           --accent-brown: #c8b6a6;
@@ -7,9 +7,9 @@
           --text-brown: #4a352f;
           --background-brown: #faf7f2;
           --pale-brown: #f0e6d9;
-        }
+        
 
-        .meetings-container {
+    
           max-width: 1000px;
           margin-bottom: 100px;
           margin: 0 auto;

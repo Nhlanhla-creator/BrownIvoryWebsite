@@ -19,6 +19,13 @@ const Calendar = () => {
   const [workingHours, setWorkingHours] = useState(null);
 
   useEffect(() => {
+    const savedHours = localStorage.getItem('availabilities');
+    if (savedHours) {
+      setWorkingHours(JSON.parse(savedHours));
+      setWorkingHoursSet(true);
+      setShowWelcome(false);
+    }
+
     const sampleEvents = [
       {
         id: '1',
@@ -43,25 +50,13 @@ const Calendar = () => {
         host: 'You',
         invitees: ['client@example.com'],
         status: 'pending'
-      },
-      {
-        id: '3',
-        title: 'Completed Project Review',
-        date: new Date(new Date().setDate(new Date().getDate() - 2)).toISOString(),
-        time: '16:00',
-        duration: '90',
-        location: 'Conference Room B',
-        description: 'Review completed project milestones',
-        host: 'You',
-        invitees: ['team@example.com'],
-        status: 'completed'
       }
     ];
 
     setEvents(sampleEvents);
     setStats({
-      created: 3,
-      completed: 1,
+      created: 2,
+      completed: 0,
       rescheduled: 0,
       cancelled: 0
     });
@@ -78,56 +73,22 @@ const Calendar = () => {
     setShowAvailabilityModal(true);
   };
 
-  const addEvent = (newEvent) => {
-    setEvents([...events, newEvent]);
-    setStats(prev => ({...prev, created: prev.created + 1}));
-  };
-
-  const handleMeetingAction = (id, action) => {
-    const updatedEvents = events.map(event => {
-      if (event.id === id) {
-        return {...event, status: action};
-      }
-      return event;
-    });
-    
-    setEvents(updatedEvents);
-    
-    if (action === 'completed') {
-      setStats(prev => ({...prev, completed: prev.completed + 1}));
-    } else if (action === 'cancelled') {
-      setStats(prev => ({...prev, cancelled: prev.cancelled + 1}));
-    } else if (action === 'rescheduled') {
-      setStats(prev => ({...prev, rescheduled: prev.rescheduled + 1}));
-    }
-  };
-
   return (
     <div className="calendar-system">
-      {/* Welcome Modal - First time setup */}
-      {showWelcome && (
-        <Modal onClose={() => setShowWelcome(false)}>
-          <div className="welcome-modal">
-            <h2>Welcome to Your Calendar!</h2>
-            <p>Before you begin, please set up your working hours and availability.</p>
-            <Availability onSubmit={handleWorkingHoursSubmit} />
-          </div>
-        </Modal>
-      )}
-
-      {/* Availability Edit Modal - For editing existing hours */}
+      {/* Availability Edit Modal */}
       {showAvailabilityModal && (
         <Modal onClose={() => setShowAvailabilityModal(false)}>
           <div className="availability-modal">
             <Availability 
               onSubmit={handleWorkingHoursSubmit} 
               workingHours={workingHours}
+              showSaveButton={true}
             />
           </div>
         </Modal>
       )}
 
-      {/* Main Dashboard - Shows after working hours are set */}
+      {/* Main Dashboard */}
       {workingHoursSet ? (
         <div className="dashboard-content">
           <EventData stats={stats} />
@@ -139,8 +100,6 @@ const Calendar = () => {
                 setEvents={setEvents} 
                 stats={stats} 
                 setStats={setStats} 
-                onMeetingAction={handleMeetingAction}
-                workingHours={workingHours}
               />
             </div>
             
@@ -149,18 +108,20 @@ const Calendar = () => {
                 showAsCard={true}
                 workingHours={workingHours}
                 onEditClick={handleEditAvailability}
+                showSaveButton={false}
               />
             </div>
           </div>
         </div>
       ) : (
-        /* Setup Required Screen - Fallback if working hours not set */
+        /* Setup Required Screen */
         <div className="setup-required">
           <div className="setup-container">
-            <div className="setup-icon">⏰</div>
-            <h2>Setup Required</h2>
-            <p>Please set up your working hours to continue using the calendar system.</p>
-            <Availability onSubmit={handleWorkingHoursSubmit} />
+           
+            <Availability 
+              onSubmit={handleWorkingHoursSubmit} 
+              showSaveButton={true}
+            />
           </div>
         </div>
       )}
