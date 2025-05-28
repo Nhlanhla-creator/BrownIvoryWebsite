@@ -249,7 +249,7 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
         sector: currentBusiness.economicSectors?.join(", ") || "Not specified",
         fundingNeeded: currentBusiness.useOfFunds?.amountRequested || "Not specified",
         applicationDate,
-        status: "Pending",
+
         pipelineStage: "Application Sent",
         teamSize: currentBusiness.teamSize || "Not specified",
         revenue: currentBusiness.financials?.annualRevenue || "Not specified",
@@ -429,7 +429,6 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
                 <th>Match</th>
                 <th>Application Date</th>
                 <th>Pipeline Stage</th>
-                <th>Status</th>
                 <th>Next Stage</th>
                 <th>Waiting Time</th>
                 <th>Action</th>
@@ -469,11 +468,7 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
                         {capitalize(pipelineStage)}
                       </span>
                     </td>
-                    <td>
-                      <span className={styles.statusBadge} style={{ backgroundColor: getStatusColor(status) }}>
-                        {capitalize(status)}
-                      </span>
-                    </td>
+                  
                     <td>{nextStage}</td>
                     <td>{waitingTimes[funder.id] || "N/A"}</td>
                     <td>

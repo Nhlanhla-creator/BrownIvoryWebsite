@@ -13,7 +13,7 @@ export default function DealFlowPipeline() {
   const [stages, setStages] = useState([
     {
       id: "initial",
-      name: "Initial Matches",
+      name: "Primary Matches",
       count: 0,
       description: "Funders that match your profile with a score of 80% or higher",
       colorClass: styles.stageInitial,
@@ -21,7 +21,7 @@ export default function DealFlowPipeline() {
     },
     {
       id: "application",
-      name: "Application Sent",
+      name: "Applications",
       count: 0,
       description: "Applications you've submitted to potential funders",
       colorClass: styles.stageApplication,
@@ -37,25 +37,17 @@ export default function DealFlowPipeline() {
     },
     {
       id: "feedback",
-      name: "Investor Feedback",
+      name: "Deals Initiated",
       count: 0,
       description: "Feedback received from potential investors",
       hasMessages: true,
       colorClass: styles.stageFeedback,
       iconColor: "#5d4037"
     },
-    {
-      id: "termsheet",
-      name: "Term Sheet",
-      count: 0,
-      description: "Term sheets received from investors",
-      colorClass: styles.stageTermsheet,
-      iconColor: "#4e342e",
-      useClient: true
-    },
+ 
     {
       id: "deals",
-      name: "Deals",
+      name: "Deals Closed",
       count: 0,
       description: "Successfully closed funding deals",
       colorClass: styles.stageDeals,

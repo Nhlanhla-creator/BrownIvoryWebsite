@@ -280,3 +280,67 @@
     width: 100%;
   }
 }
+/* Available Slots Section */
+.available-slots-section {
+  margin: 20px 0;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 20px;
+}
+
+.show-slots-btn {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.show-slots-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.available-slots {
+  margin-top: 15px;
+}
+
+.available-slots h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #5A3921;
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.slot-card {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.slot-card:hover {
+  border-color: #8C6842;
+  background-color: #f9f5f0;
+}
+
+.slot-card.selected {
+  border-color: #5A3921;
+  background-color: #f0e6d8;
+}
+
+.slot-date {
+  font-weight: 500;
+  color: #5A3921;
+}
+
+.slot-duration {
+  font-size: 13px;
+  color: #8C6842;
+}

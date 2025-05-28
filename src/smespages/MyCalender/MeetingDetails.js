@@ -7,12 +7,14 @@ const MeetingDetails = ({ meeting, onAction, onClose }) => {
   const [rescheduleTime, setRescheduleTime] = useState('');
   const [responseMessage, setResponseMessage] = useState('');
   const [showResponse, setShowResponse] = useState(false);
+  const [showAvailableSlots, setShowAvailableSlots] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState(null);
 
   // Sample meeting data for demo
   const defaultMeeting = {
     id: 1,
     title: 'Team Meeting',
-    date: new Date('2025-05-27T14:00:00'),
+    date: null, // Initialize with null date
     duration: 60,
     location: 'Conference Room A',
     host: 'You',
@@ -21,15 +23,36 @@ const MeetingDetails = ({ meeting, onAction, onClose }) => {
     status: 'pending'
   };
 
+  // Sample available time slots
+  const availableSlots = [
+    {
+      id: 1,
+      date: new Date(new Date().setDate(new Date().getDate() + 1)),
+      duration: 60
+    },
+    {
+      id: 2,
+      date: new Date(new Date().setDate(new Date().getDate() + 2)),
+      duration: 60
+    },
+    {
+      id: 3,
+      date: new Date(new Date().setDate(new Date().getDate() + 3)),
+      duration: 60
+    }
+  ];
+
   const currentMeeting = meeting || defaultMeeting;
-  const formattedDate = new Date(currentMeeting.date).toLocaleString('en-GB', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  const formattedDate = currentMeeting.date 
+    ? new Date(currentMeeting.date).toLocaleString('en-GB', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    : 'No date selected (choose a slot)';
 
   // Set default reschedule date to tomorrow
   useEffect(() => {
@@ -62,6 +85,10 @@ const MeetingDetails = ({ meeting, onAction, onClose }) => {
   };
 
   const handleAccept = () => {
+    if (!currentMeeting.date) {
+      showResponseMessage('Please select a time slot before accepting');
+      return;
+    }
     showResponseMessage('Meeting accepted! Calendar invitation has been added.');
     if (onAction) {
       onAction(currentMeeting.id, 'completed');
@@ -84,6 +111,33 @@ const MeetingDetails = ({ meeting, onAction, onClose }) => {
     if (onClose) {
       onClose();
     }
+  };
+
+  const formatSlotTime = (date) => {
+    return date.toLocaleString('en-GB', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const handleSlotSelect = (slot) => {
+    setSelectedSlot(slot);
+    // Update the meeting's date/time immediately when a slot is selected
+    const updatedMeeting = {
+      ...currentMeeting,
+      date: slot.date,
+      time: slot.date.toTimeString().substring(0, 5)
+    };
+    
+    // Call onAction with 'rescheduled' status and the new date
+    if (onAction) {
+      onAction(currentMeeting.id, 'rescheduled', { newDate: slot.date });
+    }
+    
+    showResponseMessage(`Meeting scheduled for ${formatSlotTime(slot.date)}`);
   };
 
   return (
@@ -123,7 +177,7 @@ const MeetingDetails = ({ meeting, onAction, onClose }) => {
             <div className="info-row">
               <div className="info-label">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M17.657 16.657L13.414 20.9C13.039 21.2746 12.5306 21.4852 12.0005 21.4852C11.4704 21.4852 10.962 21.2746 10.587 20.9L6.343 16.657C5.22422 15.5382 4.46234 14.1127 4.15369 12.5609C3.84504 11.009 4.00349 9.4005 4.60901 7.93871C5.21452 6.47693 6.2399 5.22749 7.55548 4.34846C8.87107 3.46943 10.4178 3.00024 12 3.00024C13.5822 3.00024 15.1289 3.46943 16.4445 4.34846C17.7601 5.22749 18.7855 6.47693 19.391 7.93871C19.9965 9.4005 20.155 11.009 19.8463 12.5609C19.5377 14.1127 18.7758 15.5382 17.657 16.657Z" stroke="#8C6842" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M17.657 16.657L13.414 20.9C13.039 21.2746 13.0306 21.4852 12.0005 21.4852C11.4704 21.4852 10.962 21.2746 10.587 20.9L6.343 16.657C5.22422 15.5382 4.46234 14.1127 4.15369 12.5609C3.84504 11.009 4.00349 9.4005 4.60901 7.93871C5.21452 6.47693 6.2399 5.22749 7.55548 4.34846C8.87107 3.46943 10.4178 3.00024 12 3.00024C13.5822 3.00024 15.1289 3.46943 16.4445 4.34846C17.7601 5.22749 18.7855 6.47693 19.391 7.93871C19.9965 9.4005 20.155 11.009 19.8463 12.5609C19.5377 14.1127 18.7758 15.5382 17.657 16.657Z" stroke="#8C6842" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 <span>Location</span>
               </div>
@@ -164,6 +218,34 @@ const MeetingDetails = ({ meeting, onAction, onClose }) => {
                       <span key={index} className="invitee-tag">{invitee}</span>
                     ))}
                   </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Available Slots Section */}
+          <div className="available-slots-section">
+            <button 
+              className="show-slots-btn"
+              onClick={() => setShowAvailableSlots(!showAvailableSlots)}
+            >
+              {showAvailableSlots ? 'Hide Available Slots' : 'Show Available Slots'}
+            </button>
+
+            {showAvailableSlots && (
+              <div className="available-slots">
+                <h3>Choose an Available Slot</h3>
+                <div className="slots-grid">
+                  {availableSlots.map(slot => (
+                    <div 
+                      key={slot.id}
+                      className={`slot-card ${selectedSlot?.id === slot.id ? 'selected' : ''}`}
+                      onClick={() => handleSlotSelect(slot)}
+                    >
+                      <div className="slot-date">{formatSlotTime(slot.date)}</div>
+                      <div className="slot-duration">{slot.duration} minutes</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

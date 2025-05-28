@@ -121,6 +121,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                   name: "",
                   idRegNo: "",
                   country: "",
+                  linkedin:"",
                   shareholding: "",
                   race: "",
                   gender: "",
@@ -135,6 +136,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                   id: "",
                   position: "",
                   nationality: "",
+                  linkedin:"",
                   isExec: false,
                   doc: null,
                 }
@@ -151,6 +153,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                 name: "",
                 idRegNo: "",
                 country: "",
+                linkedin:"",
                 shareholding: "",
                 race: "",
                 gender: "",
@@ -165,6 +168,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                 id: "",
                 position: "",
                 nationality: "",
+                linkedin:"",
                 isExec: false,
                 doc: null,
               }
@@ -182,6 +186,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
               name: "",
               idRegNo: "",
               country: "",
+              linkedin:"",
               shareholding: "",
               race: "",
               gender: "",
@@ -196,6 +201,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
               id: "",
               position: "",
               nationality: "",
+              linkedin:"",
               isExec: false,
               doc: null,
             }
@@ -221,7 +227,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
   const addShareholder = () => {
     const newShareholders = [
       ...formData.shareholders,
-      { name: "", idRegNo: "", country: "", shareholding: "", race: "", gender: "", isYouth: false, isDisabled: false },
+      { name: "", idRegNo: "", country: "", linkedin:"",shareholding: "", race: "", gender: "", isYouth: false, isDisabled: false },
     ]
     const updatedData = { ...formData, shareholders: newShareholders }
     setFormData(updatedData)
@@ -250,6 +256,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
       id: "", 
       position: "", 
       nationality: "", 
+      linkedin:"",
       execType: "", 
       race: "", 
       gender: "", 
@@ -337,10 +344,13 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                   Name
                 </th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  ID/Reg No.
+                  ID
                 </th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
                   Country
+                </th>
+                   <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
+                  LinkedIn
                 </th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
                   % Shareholding
@@ -394,6 +404,14 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                         </option>
                       ))}
                     </select>
+                  </td>
+                    <td className="px-4 py-2 border-b">
+                    <input
+                      type="text"
+                      value={shareholder.linkedin|| ""}
+                      onChange={(e) => updateShareholder(index, "linkedin", e.target.value)}
+                      className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
+                    />
                   </td>
                   <td className="px-4 py-2 border-b">
                     <input
@@ -487,6 +505,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
     { label: "ID", style: { width: "20%", minWidth: "180px" } },
     { label: "Position", style: { width: "18%", minWidth: "150px" } },
     { label: "Nationality", style: { width: "12%" } },
+    { label: "linkedin", style: { width: "35%", minWidth: "200px" } },
     { label: "Exec/Non-Exec", style: { width: "80px" } },
     { label: "Race", style: { width: "10%" } },
     { label: "Gender", style: { width: "80px" } },
@@ -544,6 +563,14 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                         </option>
                       ))}
                     </select>
+                  </td>
+                    <td className="px-4 py-2 border-b">
+                    <input
+                      type="text"
+                      value={director.linkedin || ""}
+                      onChange={(e) => updateDirector(index, "linkedin", e.target.value)}
+                      className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
+                    />
                   </td>
                   <td className="px-4 py-2 border-b">
                     <select

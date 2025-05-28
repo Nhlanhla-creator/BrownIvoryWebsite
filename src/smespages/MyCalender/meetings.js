@@ -39,6 +39,7 @@ const CalendarPopup = ({ events, onClose, onDateSelect }) => {
     if (!day) return [];
     const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     return events.filter(event => {
+      if (!event.date) return false;
       const eventDate = new Date(event.date);
       const eventDateStr = `${eventDate.getFullYear()}-${String(eventDate.getMonth() + 1).padStart(2, '0')}-${String(eventDate.getDate()).padStart(2, '0')}`;
       return eventDateStr === dateStr;
@@ -137,14 +138,26 @@ const Meetings = ({ events, setEvents, stats, setStats }) => {
   });
 
   const handleCreateEvent = (newEvent) => {
-    setEvents([...events, newEvent]);
+    const eventWithDefaults = {
+      ...newEvent,
+      date: null, // Initialize with null date
+      status: 'pending'
+    };
+    setEvents([...events, eventWithDefaults]);
     setStats(prev => ({...prev, created: prev.created + 1}));
     setShowCreateModal(false);
   };
 
-  const handleMeetingAction = (id, action) => {
+  const handleMeetingAction = (id, action, additionalData) => {
     const updatedEvents = events.map(event => {
       if (event.id === id) {
+        if (action === 'rescheduled' && additionalData?.newDate) {
+          return {
+            ...event,
+            date: additionalData.newDate,
+            status: 'rescheduled'
+          };
+        }
         return {...event, status: action};
       }
       return event;
@@ -160,21 +173,23 @@ const Meetings = ({ events, setEvents, stats, setStats }) => {
       setStats(prev => ({...prev, rescheduled: prev.rescheduled + 1}));
     }
     
-    setSelectedMeeting(null);
+    if (action !== 'rescheduled') {
+      setSelectedMeeting(null);
+    }
   };
 
   const filteredEvents = events.filter(event => {
-    const eventDate = new Date(event.date);
+    const eventDate = event.date ? new Date(event.date) : null;
     const now = new Date();
     
     if (activeTab === 'upcoming') {
-      return eventDate > now && event.status !== 'cancelled';
+      return eventDate ? eventDate > now && event.status !== 'cancelled' : true;
     } else if (activeTab === 'past') {
-      return eventDate < now;
+      return eventDate ? eventDate < now : false;
     } else if (activeTab === 'pending') {
       return event.status === 'pending';
     } else if (activeTab === 'range') {
-      return eventDate >= dateRange.start && eventDate <= dateRange.end;
+      return eventDate ? eventDate >= dateRange.start && eventDate <= dateRange.end : false;
     }
     return true;
   });
@@ -191,7 +206,13 @@ const Meetings = ({ events, setEvents, stats, setStats }) => {
             <CalendarIcon size={16} />
             Calendar
           </button>
-      
+          <button 
+            className="create-event-btn"
+            onClick={() => setShowCreateModal(true)}
+          >
+            <Plus size={16} />
+            Create Event
+          </button>
         </div>
       </div>
 
@@ -238,39 +259,43 @@ const Meetings = ({ events, setEvents, stats, setStats }) => {
         </div>
       )}
 
-     <div className="table-container">
-  <table className="meetings-table">
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Date & Time</th>
-        <th>Location</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {filteredEvents.map(event => (
-        <tr key={event.id}>
-          <td className="event-title" data-label="Title">{event.title}</td>
-          <td className="event-date" data-label="Date">{new Date(event.date).toLocaleString()}</td>
-          <td className="event-location" data-label="Location">{event.location}</td>
-          <td data-label="Status">
-            <span className={`status-badge ${event.status}`}>{event.status}</span>
-          </td>
-          <td data-label="Action">
-            <button 
-              className="view-meeting-btn"
-              onClick={() => setSelectedMeeting(event)}
-            >
-              View
-            </button>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+      <div className="table-container">
+        <table className="meetings-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Date & Time</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredEvents.map(event => (
+              <tr key={event.id}>
+                <td className="event-title" data-label="Title">{event.title}</td>
+                <td className="event-date" data-label="Date">
+                  {event.date 
+                    ? new Date(event.date).toLocaleString() 
+                    : 'Choose a slot'}
+                </td>
+                <td className="event-location" data-label="Location">{event.location}</td>
+                <td data-label="Status">
+                  <span className={`status-badge ${event.status}`}>{event.status}</span>
+                </td>
+                <td data-label="Action">
+                  <button 
+                    className="view-meeting-btn"
+                    onClick={() => setSelectedMeeting(event)}
+                  >
+                    View
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {showCreateModal && (
         <Modal onClose={() => setShowCreateModal(false)}>

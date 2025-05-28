@@ -54,65 +54,6 @@
   border-bottom: none;
 }
 
-/* Availability Panel - Right Side */
-.availability-panel {
-  flex: 1;
-}
-
-.availability-card {
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  padding: 24px;
-  height: 100%;
-}
-
-.availability-card h3 {
-  color: #5D4037;
-  margin-top: 0;
-  margin-bottom: 16px;
-  font-size: 18px;
-}
-
-.availability-card .working-hours {
-  margin-bottom: 16px;
-}
-
-.availability-card .day-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #f3efeb;
-}
-
-.availability-card .day-row:last-child {
-  border-bottom: none;
-}
-
-.availability-card .day-name {
-  font-weight: 500;
-  color: #6d4c41;
-}
-
-.availability-card .time-range {
-  color: #8d6e63;
-}
-
-.availability-card .edit-btn {
-  background-color: #f8f5f2;
-  border: 1px solid #d4c4b0;
-  color: #5D4037;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  margin-top: 16px;
-  transition: all 0.2s;
-}
-
-.availability-card .edit-btn:hover {
-  background-color: #efebe7;
-}
 
 /* Modal Styles (kept from original) */
 .modal-overlay {
