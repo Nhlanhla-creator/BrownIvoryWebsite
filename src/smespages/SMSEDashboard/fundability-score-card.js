@@ -19,41 +19,55 @@ export function FundabilityScoreCard({ profileData }) {
 
   // Define weights for each operating stage
   const operationStageWeights = {
-    ideation: {
+    idea: {
+      compliance: 0.10,
+      financialHealth: 0.05,
+      operationalStrength: 0.10,
+      pitchQuality: 0.40,
+      impactProof: 0.35,
+    },
+    prototype: {
       compliance: 0.15,
-      financialHealth: 0.1,
+      financialHealth: 0.10,
       operationalStrength: 0.15,
-      pitchQuality: 0.3,
-      impactProof: 0.3,
+      pitchQuality: 0.35,
+      impactProof: 0.25,
     },
     startup: {
-      compliance: 0.2,
+      compliance: 0.20,
       financialHealth: 0.15,
-      operationalStrength: 0.2,
+      operationalStrength: 0.20,
       pitchQuality: 0.25,
-      impactProof: 0.2,
+      impactProof: 0.20,
     },
-    growth: {
+    "early-growth": {
       compliance: 0.25,
-      financialHealth: 0.2,
+      financialHealth: 0.20,
       operationalStrength: 0.25,
       pitchQuality: 0.15,
       impactProof: 0.15,
     },
-    mature: {
-      compliance: 0.3,
+    growth: {
+      compliance: 0.25,
       financialHealth: 0.25,
-      operationalStrength: 0.2,
-      pitchQuality: 0.1,
+      operationalStrength: 0.25,
+      pitchQuality: 0.10,
       impactProof: 0.15,
     },
-    turnaround: {
+    "scale-up": {
+      compliance: 0.30,
+      financialHealth: 0.30,
+      operationalStrength: 0.25,
+      pitchQuality: 0.05,
+      impactProof: 0.10,
+    },
+    mature: {
       compliance: 0.35,
-      financialHealth: 0.2,
-      operationalStrength: 0.15,
-      pitchQuality: 0.15,
-      impactProof: 0.15,
-    },
+      financialHealth: 0.30,
+      operationalStrength: 0.25,
+      pitchQuality: 0.05,
+      impactProof: 0.05,
+    }
   }
 
   // Add body class when modal is open to prevent background scrolling
@@ -73,48 +87,46 @@ export function FundabilityScoreCard({ profileData }) {
   // Update the score calculation to use stage-specific weights
   useEffect(() => {
     if (profileData) {
-      const operationStage = profileData.entityOverview?.operationStage || "ideation"
-      const weights = operationStageWeights[operationStage] || operationStageWeights.ideation
+      const rawStage = profileData.entityOverview?.operationStage?.toLowerCase() || "ideation"
+      const operationStage = Object.keys(operationStageWeights).includes(rawStage) ? rawStage : "ideation"
+      const weights = operationStageWeights[operationStage]
 
-      // Calculate individual scores (0-100 range)
-      const complianceScoreValue = calculateComplianceScore(profileData)
+      const complianceRaw = calculateComplianceScore(profileData)
       const financialHealth = calculateFinancialHealth(profileData)
       const operationalStrength = calculateOperationalStrength(profileData)
       const pitchQuality = calculatePitchQuality(profileData)
       const impactProof = calculateImpactProof(profileData)
 
-      // Apply weights
+      setComplianceScore(Math.round(complianceRaw * 100))
+
       const weightedScores = {
-        compliance: Math.round(complianceScoreValue * weights.compliance * 100),
-        financialHealth: Math.round(financialHealth * weights.financialHealth),
-        operationalStrength: Math.round(operationalStrength * weights.operationalStrength),
-        pitchQuality: Math.round(pitchQuality * weights.pitchQuality),
-        impactProof: Math.round(impactProof * weights.impactProof),
+        compliance: complianceRaw * weights.compliance,
+        financialHealth: (financialHealth / 100) * weights.financialHealth,
+        operationalStrength: (operationalStrength / 100) * weights.operationalStrength,
+        pitchQuality: (pitchQuality / 100) * weights.pitchQuality,
+        impactProof: (impactProof / 100) * weights.impactProof,
       }
 
-      // Update state
-      setComplianceScore(weightedScores.compliance)
       setCategoryScores({
-        financialHealth: weightedScores.financialHealth,
-        operationalStrength: weightedScores.operationalStrength,
-        pitchQuality: weightedScores.pitchQuality,
-        impactProof: weightedScores.impactProof,
+        compliance: Math.round(weightedScores.compliance * 100),
+        financialHealth: Math.round(weightedScores.financialHealth * 100),
+        operationalStrength: Math.round(weightedScores.operationalStrength * 100),
+        pitchQuality: Math.round(weightedScores.pitchQuality * 100),
+        impactProof: Math.round(weightedScores.impactProof * 100),
       })
 
-      // Calculate missing documents
-      const missingDocs = calculateMissingDocuments(profileData)
-      setMissingDocuments(missingDocs)
+      setMissingDocuments(calculateMissingDocuments(profileData))
     }
   }, [profileData])
 
   // Calculate total score
   const totalFundabilityScore =
     Math.round(
-      complianceScore +
-        categoryScores.financialHealth +
-        categoryScores.operationalStrength +
-        categoryScores.pitchQuality +
-        categoryScores.impactProof,
+      categoryScores.compliance +
+      categoryScores.financialHealth +
+      categoryScores.operationalStrength +
+      categoryScores.pitchQuality +
+      categoryScores.impactProof
     ) || 0 // Default value if calculation fails
 
   // Monthly score data
@@ -203,79 +215,36 @@ export function FundabilityScoreCard({ profileData }) {
     let value = data
     for (const part of parts) {
       value = value?.[part]
-      if (value === undefined || value === null || value === "") {
-        return false
-      }
-      if (typeof value === "object" && (value.url || value.fileName)) {
-        return true
-      }
+      if (value === undefined || value === null || value === "") return false
     }
-    return true
+    if (Array.isArray(value)) return value.length > 0
+    if (typeof value === "object") return Boolean(value.url || value.fileName)
+    return Boolean(value)
   }
 
   // Score calculation functions
   const calculateComplianceScore = (profileData) => {
-    if (!profileData) return 0.8 // Default value
-
     const requiredDocuments = [
       "entityOverview.registrationCertificate",
-      "entityOverview.proofOfAddress",
+      "contactDetails.proofOfAddress",
       "ownershipManagement.certifiedIds",
       "ownershipManagement.shareRegister",
       "legalCompliance.taxClearanceCert",
       "legalCompliance.bbbeeCert",
-      "declarationConsent.signedDocument",
     ]
-
     const presentCount = requiredDocuments.filter((path) => checkDocumentExists(profileData, path)).length
-
     return presentCount / requiredDocuments.length
   }
 
   const calculateMissingDocuments = (profileData) => {
-    if (!profileData) return []
-
-    const documentMapping = [
-      {
-        key: "companyregistrationcertificate",
-        path: "entityOverview.registrationCertificate",
-        displayName: "Company Registration Certificate",
-      },
-      {
-        key: "proofofoperatingaddress",
-        path: "entityOverview.proofOfAddress",
-        displayName: "Proof of Operating Address",
-      },
-      {
-        key: "certifiedids",
-        path: "ownershipManagement.certifiedIds",
-        displayName: "Certified IDs",
-      },
-      {
-        key: "shareregister",
-        path: "ownershipManagement.shareRegister",
-        displayName: "Share Register",
-      },
-      {
-        key: "taxclearancecertificate",
-        path: "legalCompliance.taxClearanceCert",
-        displayName: "Tax Clearance Certificate",
-      },
-      {
-        key: "bbbeecertificate",
-        path: "legalCompliance.bbbeeCert",
-        displayName: "B-BBEE Certificate",
-      },
-      {
-        key: "signeddeclarationconsentform",
-        path: "declarationConsent.signedDocument",
-        displayName: "Signed Declaration/Consent Form",
-      },
-    ]
-
-    return documentMapping
-      .filter(({ path }) => !checkDocumentExists(profileData, path))
-      .map(({ key, displayName }) => ({ key, displayName }))
+    const mapping = [
+      { key: "companyregistrationcertificate", path: "entityOverview.registrationCertificate", displayName: "Company Registration Certificate" },
+      { key: "proofofoperatingaddress", path: "contactDetails.proofOfAddress", displayName: "Proof of Operating Address" },
+      { key: "certifiedids", path: "ownershipManagement.certifiedIds", displayName: "Certified IDs" },
+      { key: "shareregister", path: "ownershipManagement.shareRegister", displayName: "Share Register" },
+      { key: "taxclearancecertificate", path: "legalCompliance.taxClearanceCert", displayName: "Tax Clearance Certificate" },
+      { key: "bbbeecertificate", path: "legalCompliance.bbbeeCert", displayName: "B-BBEE Certificate" },]
+    return mapping.filter(doc => !checkDocumentExists(profileData, doc.path)).map(doc => ({ key: doc.key, displayName: doc.displayName }))
   }
 
   const calculateFinancialHealth = (profileData) => {
@@ -448,7 +417,7 @@ export function FundabilityScoreCard({ profileData }) {
 
         <div className={styles.scoreContainer}>
           <div className={styles.scoreCircle}>
-            
+
             <span className={styles.scoreValue}>{totalFundabilityScore}%</span>
           </div>
         </div>
@@ -535,7 +504,6 @@ export function FundabilityScoreCard({ profileData }) {
                     "Share Register",
                     "Tax Clearance Certificate",
                     "B-BBEE Certificate",
-                    "Signed Declaration/Consent Form",
                   ].map((doc, index) => {
                     const docKey = doc.toLowerCase().replace(/\s+/g, "").replace(/-/g, "").replace(/\//g, "")
                     const isMissing = missingDocuments.some((missingDoc) => missingDoc.key === docKey)

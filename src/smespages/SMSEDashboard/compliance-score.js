@@ -35,7 +35,7 @@ export function ComplianceScoreCard({ styles, profileData }) {
         description: "B-BBEE Certificate"
       },
       {
-        path: "entityOverview.proofOfAddress",
+        path: "contactDetails.proofOfAddress",  // <-- corrected
         displayName: "Company address verified",
         description: "Proof of Operating Address"
       },
@@ -48,11 +48,6 @@ export function ComplianceScoreCard({ styles, profileData }) {
         path: "ownershipManagement.shareRegister",
         displayName: "Ownership structure verified",
         description: "Share Register"
-      },
-      {
-        path: "declarationConsent.signedDocument",
-        displayName: "Legal declarations signed",
-        description: "Signed Declaration/Consent Form"
       }
     ]
 
