@@ -16,6 +16,8 @@ import ProductsServices from "./products-services"
 import HowDidYouHear from "./how-did-you-hear"
 import DeclarationConsent from "./declaration-consent"
 import ProfileSummary from "./ProfileSummary"
+import { onAuthStateChanged } from "firebase/auth";
+
 
 const sections = [
   { id: "instructions", label: "Instructions" },
@@ -125,135 +127,43 @@ export default function UniversalProfile() {
     },
   })
 
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const savedData = localStorage.getItem(getUserSpecificKey("universalProfileData"));
+      const savedCompletedSections = localStorage.getItem(getUserSpecificKey("universalProfileCompletedSections"));
+      const savedSubmissionStatus = localStorage.getItem(getUserSpecificKey("profileSubmitted"));
+      const hasSeenWelcomePopup = localStorage.getItem(getUserSpecificKey("hasSeenWelcomePopup")) === "true";
+      const hasSeenCongratulationsPopup =
+        localStorage.getItem(getUserSpecificKey("hasSeenCongratulationsPopup")) === "true";
+
+      if (savedData) setFormData(JSON.parse(savedData));
+      if (savedCompletedSections) setCompletedSections(JSON.parse(savedCompletedSections));
+      if (savedSubmissionStatus === "true") {
+        setProfileSubmitted(true);
+        setShowSummary(true);
+      }
+
+      if (!hasSeenWelcomePopup) {
+        setShowWelcomePopup(true);
+        localStorage.setItem(getUserSpecificKey("hasSeenWelcomePopup"), "true");
+      }
+    } else {
+      // Redirect to login or home page if not authenticated
+      navigate("/login");
+    }
+    setLoading(false); // Done loading regardless
+  });
+
+  return () => unsubscribe(); // Cleanup listener on unmount
+}, []);
   // Helper function to get user-specific localStorage key
   const getUserSpecificKey = (baseKey) => {
     const userId = auth.currentUser?.uid
     return userId ? `${baseKey}_${userId}` : baseKey
   }
 
-  // Function to save onboarding status to Firebase
-  const saveOnboardingStatusToFirebase = async (status) => {
-    try {
-      const userId = auth.currentUser?.uid
-      if (!userId) return
-
-      const docRef = doc(db, "universalProfiles", userId)
-      await setDoc(docRef, { 
-        universalProfileOnboardingSeen: status 
-      }, { merge: true })
-    } catch (error) {
-      console.error("Error saving onboarding status to Firebase:", error)
-    }
-  }
-
-  // Function to check if declaration consent is complete
-  const checkDeclarationConsent = (data) => {
-    const declarationConsent = data?.declarationConsent
-    if (!declarationConsent) return false
-
-    return (
-      declarationConsent.accuracy === true &&
-      declarationConsent.dataProcessing === true &&
-      declarationConsent.termsConditions === true
-    )
-  }
-
-  // Function to load data from Firebase
-  const loadDataFromFirebase = async () => {
-    try {
-      const userId = auth.currentUser?.uid
-      if (!userId) {
-        console.log("User not logged in, skipping Firebase data retrieval")
-        setLoading(false)
-        return
-      }
-
-      const docRef = doc(db, "universalProfiles", userId)
-      const docSnap = await getDoc(docRef)
-
-      if (docSnap.exists()) {
-        const firebaseData = docSnap.data()
-        console.log("Retrieved data from Firebase:", firebaseData)
-
-        // Check onboarding status from Firebase
-        const hasSeenOnboarding = firebaseData.universalProfileOnboardingSeen === true
-        
-        // Show welcome popup only if user hasn't seen it (based on Firebase data)
-        if (!hasSeenOnboarding) {
-          setShowWelcomePopup(true)
-        }
-
-        // Check if declaration consent is complete in Firebase
-        const declarationConsentComplete = checkDeclarationConsent(firebaseData)
-
-        // Profile is considered submitted if declaration consent is complete OR profileSubmitted is true
-        const firebaseSubmissionStatus = declarationConsentComplete || firebaseData.profileSubmitted === true
-
-        // Merge Firebase data with current formData, preserving structure
-        setFormData((prevData) => {
-          const mergedData = { ...prevData }
-
-          // Handle each section
-          Object.keys(prevData).forEach((sectionKey) => {
-            if (firebaseData[sectionKey]) {
-              mergedData[sectionKey] = {
-                ...prevData[sectionKey],
-                ...firebaseData[sectionKey],
-              }
-            }
-          })
-
-          return mergedData
-        })
-
-        // Update completed sections based on what data exists
-        setCompletedSections((prevCompleted) => {
-          const updatedCompleted = { ...prevCompleted }
-
-          Object.keys(prevCompleted).forEach((sectionKey) => {
-            if (firebaseData[sectionKey]) {
-              // Check if section has meaningful data
-              const sectionData = firebaseData[sectionKey]
-              const hasData = Object.keys(sectionData).some((key) => {
-                const value = sectionData[key]
-                return (
-                  value !== "" &&
-                  value !== null &&
-                  value !== undefined &&
-                  (Array.isArray(value) ? value.length > 0 : true)
-                )
-              })
-
-              if (hasData) {
-                updatedCompleted[sectionKey] = true
-              }
-            }
-          })
-
-          return updatedCompleted
-        })
-
-        // If profile is marked as submitted in Firebase, show summary
-        if (firebaseSubmissionStatus) {
-          setProfileSubmitted(true)
-          setShowSummary(true)
-        }
-
-        // Set profile data for summary
-        setProfileData(firebaseData)
-      } else {
-        console.log("No previous data found in Firebase")
-        // If no Firebase data exists, show onboarding for new users
-        setShowWelcomePopup(true)
-      }
-    } catch (error) {
-      console.error("Error loading data from Firebase:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Load saved data from localStorage and Firebase
+  // Load saved data from localStorage
   useEffect(() => {
     const userId = auth.currentUser?.uid
     if (!userId) {
@@ -261,10 +171,12 @@ export default function UniversalProfile() {
       return
     }
 
-    // First load from localStorage for immediate UI update (keeping existing localStorage functionality)
     const savedData = localStorage.getItem(getUserSpecificKey("universalProfileData"))
     const savedCompletedSections = localStorage.getItem(getUserSpecificKey("universalProfileCompletedSections"))
     const savedSubmissionStatus = localStorage.getItem(getUserSpecificKey("profileSubmitted"))
+    const hasSeenWelcomePopup = localStorage.getItem(getUserSpecificKey("hasSeenWelcomePopup")) === "true"
+    const hasSeenCongratulationsPopup =
+      localStorage.getItem(getUserSpecificKey("hasSeenCongratulationsPopup")) === "true"
 
     if (savedData) setFormData(JSON.parse(savedData))
     if (savedCompletedSections) setCompletedSections(JSON.parse(savedCompletedSections))
@@ -273,8 +185,13 @@ export default function UniversalProfile() {
       setShowSummary(true)
     }
 
-    // Load from Firebase (this will override localStorage data and handle onboarding)
-    loadDataFromFirebase()
+    // Show welcome popup only for first-time users
+    if (!hasSeenWelcomePopup) {
+      setShowWelcomePopup(true)
+      localStorage.setItem(getUserSpecificKey("hasSeenWelcomePopup"), "true")
+    }
+
+    setLoading(false)
   }, [])
 
   // Save to localStorage
@@ -282,13 +199,10 @@ export default function UniversalProfile() {
     const userId = auth.currentUser?.uid
     if (!userId) return
 
-    // Only save to localStorage after initial loading is complete
-    if (!loading) {
-      localStorage.setItem(getUserSpecificKey("universalProfileData"), JSON.stringify(formData))
-      localStorage.setItem(getUserSpecificKey("universalProfileCompletedSections"), JSON.stringify(completedSections))
-      localStorage.setItem(getUserSpecificKey("profileSubmitted"), profileSubmitted.toString())
-    }
-  }, [formData, completedSections, profileSubmitted, loading])
+    localStorage.setItem(getUserSpecificKey("universalProfileData"), JSON.stringify(formData))
+    localStorage.setItem(getUserSpecificKey("universalProfileCompletedSections"), JSON.stringify(completedSections))
+    localStorage.setItem(getUserSpecificKey("profileSubmitted"), profileSubmitted.toString())
+  }, [formData, completedSections, profileSubmitted])
 
   const updateFormData = (section, data) => {
     setFormData((prev) => ({
@@ -330,31 +244,6 @@ export default function UniversalProfile() {
     window.scrollTo(0, 0)
   }
 
-  const handleNextOnboardingStep = () => {
-    if (currentOnboardingStep < onboardingSteps.length - 1) {
-      setCurrentOnboardingStep(currentOnboardingStep + 1)
-    } else {
-      setShowWelcomePopup(false)
-      // Save to Firebase that user has seen onboarding
-      saveOnboardingStatusToFirebase(true)
-    }
-  }
-
-  const handleCloseWelcomePopup = () => {
-    setShowWelcomePopup(false)
-    // Save to Firebase that user has seen onboarding
-    saveOnboardingStatusToFirebase(true)
-  }
-
-  const handleCloseCongratulationsPopup = () => {
-    setShowCongratulationsPopup(false)
-    setShowSummary(true) // Show the summary after closing the congratulations popup
-  }
-
-  const handleNavigateToFunding = () => {
-    navigate("/applications/funding")
-  }
-
   const uploadFilesAndReplaceWithURLs = async (data, section) => {
     const uploadRecursive = async (item, pathPrefix) => {
       if (item instanceof File) {
@@ -377,7 +266,7 @@ export default function UniversalProfile() {
     return await uploadRecursive(data, section)
   }
 
-  const saveDataToFirebase = async (section = null, includingSubmissionStatus = false) => {
+  const saveDataToFirebase = async (section = null) => {
     try {
       setLoading(true)
       const userId = auth.currentUser?.uid
@@ -390,69 +279,44 @@ export default function UniversalProfile() {
         ? { [section]: await uploadFilesAndReplaceWithURLs(sectionData, section) }
         : await uploadFilesAndReplaceWithURLs(formData, "full")
 
-      const dataToSave = { ...uploaded }
-
-      // Only include submission status if specifically requested
-      if (includingSubmissionStatus) {
-        dataToSave.profileSubmitted = profileSubmitted
-      }
-
-      await setDoc(docRef, dataToSave, { merge: true })
+      await setDoc(docRef, uploaded, { merge: true })
     } catch (err) {
       console.error("Error saving to Firebase:", err)
-      throw err
+      alert("Failed to save to Firebase.")
     } finally {
       setLoading(false)
     }
   }
 
   const handleSaveSection = async () => {
-    try {
-      await saveDataToFirebase(activeSection)
-      alert("Section saved to Firebase!")
-    } catch (err) {
-      alert("Failed to save to Firebase.")
-    }
+    await saveDataToFirebase(activeSection)
+    alert("Section saved to Firebase!")
   }
 
   const handleSaveAndContinue = async () => {
-    try {
-      markSectionAsCompleted(activeSection)
-      await saveDataToFirebase(activeSection)
-      navigateToNextSection()
-    } catch (err) {
-      alert("Failed to save. Please try again.")
-    }
+    markSectionAsCompleted(activeSection)
+    await saveDataToFirebase(activeSection)
+    navigateToNextSection()
   }
 
   const handleSubmitProfile = async () => {
-    try {
-      markSectionAsCompleted("declarationConsent")
-      setProfileSubmitted(true)
+    await saveDataToFirebase()
+    markSectionAsCompleted("declarationConsent") // save full form
+    setProfileSubmitted(true)
 
-      // Save all data to Firebase including submission status
-      await saveDataToFirebase(null, true)
-
-      // Show congratulations popup only if user hasn't seen it before
-      const hasSeenCongratulationsPopup =
-        localStorage.getItem(getUserSpecificKey("hasSeenCongratulationsPopup")) === "true"
-      if (!hasSeenCongratulationsPopup) {
-        setShowCongratulationsPopup(true)
-        localStorage.setItem(getUserSpecificKey("hasSeenCongratulationsPopup"), "true")
-      } else {
-        setShowSummary(true) // Show the summary immediately if they've seen the popup before
-      }
-
-      setIsEditing(false) // Reset editing state
-      window.scrollTo(0, 0)
-      console.log("Submitted:", formData)
-    } catch (err) {
-      console.error("Failed to submit profile:", err)
-      alert("Failed to submit profile. Please try again.")
-
-      // Revert the submission status if Firebase save failed
-      setProfileSubmitted(false)
+    // Show congratulations popup only if user hasn't seen it before
+    const hasSeenCongratulationsPopup =
+      localStorage.getItem(getUserSpecificKey("hasSeenCongratulationsPopup")) === "true"
+    if (!hasSeenCongratulationsPopup) {
+      setShowCongratulationsPopup(true)
+      localStorage.setItem(getUserSpecificKey("hasSeenCongratulationsPopup"), "true")
+    } else {
+      setShowSummary(true) // Show the summary immediately if they've seen the popup before
     }
+
+    setIsEditing(false) // Reset editing state
+    window.scrollTo(0, 0)
+    console.log("Submitted:", formData)
   }
 
   // Function to handle completion of the registration process
@@ -464,6 +328,27 @@ export default function UniversalProfile() {
 
     // Redirect to dashboard
     navigate("/dashboard")
+  }
+
+  const handleNextOnboardingStep = () => {
+    if (currentOnboardingStep < onboardingSteps.length - 1) {
+      setCurrentOnboardingStep(currentOnboardingStep + 1)
+    } else {
+      setShowWelcomePopup(false)
+    }
+  }
+
+  const handleCloseWelcomePopup = () => {
+    setShowWelcomePopup(false)
+  }
+
+  const handleCloseCongratulationsPopup = () => {
+    setShowCongratulationsPopup(false)
+    setShowSummary(true) // Show the summary after closing the congratulations popup
+  }
+
+  const handleNavigateToFunding = () => {
+    navigate("/applications/funding")
   }
 
   const renderActiveSection = () => {
@@ -494,6 +379,46 @@ export default function UniversalProfile() {
         return <Instructions />
     }
   }
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true)
+        const userId = auth.currentUser?.uid
+
+        if (!userId) {
+          throw new Error("User not logged in")
+        }
+
+        const docRef = doc(db, "universalProfiles", userId)
+        const docSnap = await getDoc(docRef)
+
+        if (docSnap.exists()) {
+          setProfileData(docSnap.data())
+
+          // Check if profile is complete and show summary only on first load (not editing)
+          const isProfileComplete =
+            docSnap.data()?.declarationCommitment?.commitReporting &&
+            docSnap.data()?.declarationCommitment?.confirmIntent &&
+            docSnap.data()?.declarationCommitment?.consentShare
+
+          if (isProfileComplete && !isEditing) {
+            setProfileSubmitted(true)
+            setShowSummary(true)
+          }
+        } else {
+          setError("No profile found. Please complete your Universal Profile first.")
+        }
+      } catch (err) {
+        console.error("Error fetching profile data:", err)
+        setError("Failed to load profile data. Please try again later.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProfileData()
+  }, [isEditing])
 
   if (loading) {
     return (

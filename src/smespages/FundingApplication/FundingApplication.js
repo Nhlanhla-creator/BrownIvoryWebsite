@@ -16,6 +16,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore"
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { auth, db, storage } from "../../firebaseConfig"
 import { useNavigate } from "react-router-dom"
+import { onAuthStateChanged } from "firebase/auth"
 
 // Onboarding steps for the welcome popup
 const onboardingSteps = [
@@ -47,6 +48,8 @@ export default function FundingApplication() {
   const [showSummary, setShowSummary] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
+const [authChecked, setAuthChecked] = useState(false)
+const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   // New state for popups
   const [showWelcomePopup, setShowWelcomePopup] = useState(false)
@@ -90,6 +93,20 @@ export default function FundingApplication() {
       consentShare: false,
     },
   })
+  useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (user) {
+      setIsAuthenticated(true)
+      loadDataFromFirebase() // load Firebase data only if authenticated
+    } else {
+      navigate("/login") // or wherever your login page is
+    }
+    setAuthChecked(true)
+  })
+
+  return () => unsubscribe()
+}, [])
+
 
   // Helper function to get user-specific localStorage key
   const getUserSpecificKey = (baseKey) => {
@@ -456,6 +473,14 @@ export default function FundingApplication() {
       alert("Failed to save. Please try again.")
     }
   }
+  if (!authChecked || isLoading) {
+  return <div className="loading-screen">Loading...</div>
+}
+
+if (!isAuthenticated) {
+  return null // Prevent flashing page before redirect
+}
+
 
   // Show loading state while fetching data
   if (isLoading) {
@@ -477,6 +502,13 @@ export default function FundingApplication() {
       </div>
     )
   }
+if (isLoading) {
+  return (
+    <div className="loading-container">
+      <p>Loading application...</p>
+    </div>
+  )
+}
 
   // If application is submitted and we're showing the summary
   if (showSummary) {

@@ -11,6 +11,7 @@ import { doc, getDoc } from "firebase/firestore"
 import { auth, db } from "../../firebaseConfig"
 import { X, ChevronRight } from "lucide-react"
 import "./Dashboard.css"
+import { onAuthStateChanged } from "firebase/auth"
 
 export function Dashboard() {
   const [profileData, setProfileData] = useState(null)
@@ -19,6 +20,8 @@ export function Dashboard() {
   const [showDashboardPopup, setShowDashboardPopup] = useState(false)
   const [applicationRefreshKey, setApplicationRefreshKey] = useState(0)
   const [currentDashboardStep, setCurrentDashboardStep] = useState(0)
+const [authChecked, setAuthChecked] = useState(false)
+const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   const user = auth.currentUser
   const userName = user ? user.email : "User"
@@ -67,42 +70,53 @@ export function Dashboard() {
     const userId = auth.currentUser?.uid
     return userId ? `${baseKey}_${userId}` : baseKey
   }
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (user) {
+      setIsAuthenticated(true)
+    } 
+    setAuthChecked(true)
+  })
 
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const userId = auth.currentUser?.uid
-        if (!userId) {
-          console.error("User not logged in")
-          setLoading(false)
-          return
-        }
+  return () => unsubscribe()
+}, [])
 
-        const docRef = doc(db, "universalProfiles", userId)
-        const docSnap = await getDoc(docRef)
+useEffect(() => {
+  if (!isAuthenticated) return
 
-        if (docSnap.exists()) {
-          setProfileData(docSnap.data())
-        } else {
-          console.error("No profile found")
-        }
+  const fetchProfileData = async () => {
+    try {
+      const userId = auth.currentUser?.uid
+      if (!userId) {
+        console.error("User not logged in")
         setLoading(false)
-      } catch (err) {
-        console.error("Error fetching profile data:", err)
-        setLoading(false)
+        return
       }
-    }
 
-    fetchProfileData()
+      const docRef = doc(db, "universalProfiles", userId)
+      const docSnap = await getDoc(docRef)
 
-    const userId = auth.currentUser?.uid
-    if (userId) {
+      if (docSnap.exists()) {
+        setProfileData(docSnap.data())
+      } else {
+        console.error("No profile found")
+      }
+
       const hasSeenDashboardPopup = localStorage.getItem(getUserSpecificKey("hasSeenDashboardPopup")) === "true"
       if (!hasSeenDashboardPopup) {
         setShowDashboardPopup(true)
       }
+
+      setLoading(false)
+    } catch (err) {
+      console.error("Error fetching profile data:", err)
+      setLoading(false)
     }
-  }, [])
+  }
+
+  fetchProfileData()
+}, [isAuthenticated])
+
 
   useEffect(() => {
     const resizableContainers = document.querySelectorAll(".resizable-card-container")
@@ -202,16 +216,16 @@ export function Dashboard() {
 
           <section className="stats-cards-row">
             <div className="resizable-card-container">
-              < ComplianceScoreCard styles={styles} profileData={profileData} />
+              <LegitimacyScoreCard styles={styles} profileData={profileData} />
             </div>
             <div className="resizable-card-container">
-              < LegitimacyScoreCard styles={styles}  profileData={profileData} />
+              <CustomerReviewsCard styles={styles} />
             </div>
             <div className="resizable-card-container">
               <FundabilityScoreCard profileData={profileData} />
             </div>
             <div className="resizable-card-container">
-              <CustomerReviewsCard styles={styles} /> 
+              <ComplianceScoreCard styles={styles} profileData={profileData} /> {/* ✅ Correct usage */}
             </div>
           </section>
         </main>

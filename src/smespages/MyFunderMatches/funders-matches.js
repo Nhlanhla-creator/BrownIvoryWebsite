@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { onAuthStateChanged } from "firebase/auth"
+import { auth } from "../../firebaseConfig" // adjust path if different
 import FundingFlowPipeline from "./funding-flow-pipeline"
 import { FundingInsights } from "./funding-insights"
 import { FilterFunding } from "./filter-funding"
 import { FundingTable } from "./funding-table"
 import styles from "./funding.module.css"
 import { X, ArrowRight } from 'lucide-react'
-
 
 // Onboarding steps for the welcome popup
 const onboardingSteps = [
@@ -32,92 +33,69 @@ const onboardingSteps = [
     icon: "🔍",
   },
 ]
-
 export default function FundingMatchesPage() {
-  const [filters, setFilters] = useState({
-    location: "",
-    matchScore: 50,
-    minValue: "",
-    maxValue: "",
-    instruments: [],
-    stages: [],
-    sectors: [],
-    supportTypes: [],
-    funderType: "",
-    sortBy: "",
-  })
-
-  // New state for popups
+  const [user, setUser] = useState(null)
+  const [authChecked, setAuthChecked] = useState(false)
+  const [filters, setFilters] = useState({ /* ... */ })
   const [showWelcomePopup, setShowWelcomePopup] = useState(false)
   const [currentOnboardingStep, setCurrentOnboardingStep] = useState(0)
 
-  const handleFilterChange = (newFilters) => {
-    setFilters({ ...filters, ...newFilters })
-  }
-
-  // Helper function to get user-specific localStorage key
-  const getUserSpecificKey = (baseKey) => {
-    // In a real app, you would use the actual user ID
-    const userId = "current-user-id" // Replace with auth.currentUser?.uid or similar
-    return userId ? `${baseKey}_${userId}` : baseKey
-  }
-
-  // Check if this is the first time visiting the funding matches page
+  // Wait for Firebase auth
   useEffect(() => {
-    const hasSeenFundingMatchesPopup =
-      localStorage.getItem(getUserSpecificKey("hasSeenFundingMatchesPopup")) === "true"
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser)
+      setAuthChecked(true)
+    })
+    return () => unsubscribe()
+  }, [])
 
-    if (!hasSeenFundingMatchesPopup) {
+  const handleFilterChange = (newFilters) => {
+    setFilters(prev => ({ ...prev, ...newFilters }))
+  }
+
+  const getUserSpecificKey = (baseKey) => {
+    const userId = user?.uid || "guest"
+    return `${baseKey}_${userId}`
+  }
+
+  useEffect(() => {
+    if (!authChecked || !user) return
+    const seenPopup = localStorage.getItem(getUserSpecificKey("hasSeenFundingMatchesPopup")) === "true"
+    if (!seenPopup) {
       setShowWelcomePopup(true)
       localStorage.setItem(getUserSpecificKey("hasSeenFundingMatchesPopup"), "true")
     }
-  }, [])
+  }, [authChecked, user])
 
-  // Popup handlers
-  const handleNextOnboardingStep = () => {
-    if (currentOnboardingStep < onboardingSteps.length - 1) {
-      setCurrentOnboardingStep(currentOnboardingStep + 1)
-    } else {
-      handleCloseWelcomePopup()
-    }
-  }
-
-  const handleCloseWelcomePopup = () => {
-    setShowWelcomePopup(false)
-  }
-
-  // For testing - add a button to manually trigger the popup
-  const handleTestWelcomePopup = () => {
-    setShowWelcomePopup(true)
-  }
+  if (!authChecked) return <div>Loading...</div> // or custom spinner
 
   return (
     <div className={styles.mainContent}>
-      {/* Welcome Popup for first-time users */}
       {showWelcomePopup && (
         <div className="popup-overlay">
           <div className="welcome-popup funding-popup">
-            <button className="close-popup" onClick={handleCloseWelcomePopup}>
+            <button className="close-popup" onClick={() => setShowWelcomePopup(false)}>
               <X size={24} />
             </button>
             <div className="popup-content">
               <div className="popup-icon">{onboardingSteps[currentOnboardingStep].icon}</div>
               <h2>{onboardingSteps[currentOnboardingStep].title}</h2>
               <p>{onboardingSteps[currentOnboardingStep].content}</p>
-
               <div className="popup-progress">
                 {onboardingSteps.map((_, index) => (
                   <div key={index} className={`progress-dot ${index === currentOnboardingStep ? "active" : ""}`} />
                 ))}
               </div>
-
               <div className="popup-buttons">
-                <button className="btn btn-secondary" onClick={handleCloseWelcomePopup}>
-                  Skip
-                </button>
-                <button className="btn btn-primary" onClick={handleNextOnboardingStep}>
-                  {currentOnboardingStep < onboardingSteps.length - 1 ? "Next" : "Get Started"}
-                  <ArrowRight size={16} />
+                <button className="btn btn-secondary" onClick={() => setShowWelcomePopup(false)}>Skip</button>
+                <button className="btn btn-primary" onClick={() => {
+                  if (currentOnboardingStep < onboardingSteps.length - 1) {
+                    setCurrentOnboardingStep(currentOnboardingStep + 1)
+                  } else {
+                    setShowWelcomePopup(false)
+                  }
+                }}>
+                  {currentOnboardingStep < onboardingSteps.length - 1 ? "Next" : "Get Started"} <ArrowRight size={16} />
                 </button>
               </div>
             </div>
@@ -125,28 +103,17 @@ export default function FundingMatchesPage() {
         </div>
       )}
 
-   
-
       <div className={styles.pageContainer}>
-
-
-        <div className={styles.sectionCard}>
-          <FundingFlowPipeline />
-        </div>
-
+        <div className={styles.sectionCard}><FundingFlowPipeline /></div>
         <div className={styles.sectionCard}>
           <h2 className={styles.sectionTitle}>Funding Insights</h2>
           <FundingInsights />
         </div>
-
         <div className={styles.sectionCard}>
           <h2 className={styles.sectionTitle}>Filter Matches</h2>
           <FilterFunding onFilterChange={handleFilterChange} filters={filters} />
         </div>
-
-        <div className={styles.sectionCard}>
-          <FundingTable filters={filters} />
-        </div>
+        <div className={styles.sectionCard}><FundingTable filters={filters} /></div>
       </div>
     </div>
   )

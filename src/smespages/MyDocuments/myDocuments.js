@@ -8,7 +8,7 @@ import { db } from "../../firebaseConfig";
 import { FileText, ExternalLink } from "lucide-react";
 import get from "lodash.get";
 import { DOCUMENT_PATHS, checkSubmittedDocs, getDocumentURL } from "../../utils/documentUtils";
-
+import { onAuthStateChanged } from "firebase/auth";
 const DOCUMENTS = Object.keys(DOCUMENT_PATHS);
 
 const MyDocuments = () => {
@@ -18,13 +18,11 @@ const MyDocuments = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUserDocuments = async () => {
+ useEffect(() => {
+  const auth = getAuth();
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if (user) {
       try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-        if (!user) return;
-
         const profileRef = doc(db, "universalProfiles", user.uid);
         const profileSnap = await getDoc(profileRef);
         if (!profileSnap.exists()) return;
@@ -38,10 +36,14 @@ const MyDocuments = () => {
       } finally {
         setLoading(false);
       }
-    };
+    } else {
+      setLoading(false); // If not signed in, stop loading too
+    }
+  });
 
-    fetchUserDocuments();
-  }, []);
+  return () => unsubscribe(); // Cleanup listener on unmount
+}, []);
+
 
   const handleFileUpload = async (docLabel, file) => {
     const auth = getAuth();
@@ -106,6 +108,9 @@ const MyDocuments = () => {
       </a>
     );
   };
+if (!getAuth().currentUser && !loading) {
+  return <div className="empty-state">Please sign in to view documents.</div>;
+}
 
   return (
     <div className="my-documents-wrapper">
