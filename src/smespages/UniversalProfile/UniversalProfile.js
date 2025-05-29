@@ -80,7 +80,7 @@ export default function UniversalProfile() {
     declarationConsent: false,
   })
 
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     entityOverview: {},
     ownershipManagement: {
       shareholders: [

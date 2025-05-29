@@ -5,7 +5,400 @@
     font-family: "Inter", sans-serif;
     background-color: #fdfaf6; /* Soft beige background */
   }
+  /* Base Styles */
+.profile-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  color: #333;
+}
+
+/* Profile Header Card */
+.profile-header-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.profile-banner {
+  height: 160px;
+  background: linear-gradient(135deg, #bfbfbf, #7a5633);
+  position: relative;
+}
+
+.banner-placeholder {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar {
+  position: absolute;
+  bottom: -40px;
+  left: 24px;
+  width: 200px;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.avatar-placeholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4a6cf7, #9a77f0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.match-badge {
+  background: #4CAF50;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info {
+  padding: 60px 24px 24px;
+}
+
+.profile-info h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #222;
+}
+
+.profile-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #666;
+}
+
+.profile-meta span {
+  display: flex;
+  align-items: center;
+}
+
+.profile-bio {
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px 24px;
+  border-top: 1px solid #eee;
+}
+
+.action-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-btn.dislike {
+  background: #fff;
+  border: 2px solid #ff6b6b;
+  color: #ff6b6b;
+}
+
+.action-btn.save {
+  background: #fff;
+  border: 2px solid #4CAF50;
+  color: #4CAF50;
+}
+
+.action-btn.message {
+  background: #fff;
+  border: 2px solid #2196F3;
+  color: #2196F3;
+}
+
+.action-btn.share {
+  background: #fff;
+  border: 2px solid #9C27B0;
+  color: #9C27B0;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Profile Content Sections */
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.section-header {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.section-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.section-content {
+  padding: 16px 24px;
+}
+
+/* Funds Grid */
+.funds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.fund-card {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s;
+}
+
+.fund-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.fund-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.fund-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.fund-size {
+  font-size: 14px;
+  color: #666;
+  background: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.fund-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.detail-item {
+  display: flex;
+  gap: 8px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #666;
+  min-width: 100px;
+}
+
+.sectors-tags, .support-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sector-tag, .support-tag {
+  background: #f0f7ff;
+  color: #1a73e8;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.support-tag {
+  background: #f0fff4;
+  color: #34a853;
+}
+
+.fund-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.fund-action-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.fund-action-btn.primary {
+  background: #3e2c1a;
+  color: white;
+  border-color: #3e2c1a;
+}
+
+.fund-action-btn:hover {
+  background: #f5f5f5;
+}
+
+.fund-action-btn.primary:hover {
+  background: #1557b0;
+}
+
+/* Documents Grid */
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.document-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+.document-item h4 {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+/* Footer Actions */
+.profile-footer-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+}
+
+.footer-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.footer-btn.secondary {
+  background: white;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+.footer-btn.primary {
+  background: #1a73e8;
+  border: 1px solid #1a73e8;
+  color: white;
+}
+
+.footer-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Empty State */
+.empty-state {
+  padding: 24px;
+  text-align: center;
+  color: #999;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+  .profile-stats {
+    gap: 12px;
+  }
   
+  .funds-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-footer-actions {
+    flex-direction: column;
+  }
+}
   .summary-header {
     display: flex;
     justify-content: space-between;
