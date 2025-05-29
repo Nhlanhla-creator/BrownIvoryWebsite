@@ -24,39 +24,29 @@ const FUNDING_STAGES = ["Pre-Seed", "Seed", "Series A", "Series B", "Growth"];
 
 // Pipeline stage definitions with colors and next stages
 const PIPELINE_STAGES = {
-MATCH: {
-  label: "Match",
-  color: "#F5EBE0", // Light cream/beige brown
-  next: "send application"
-},
-APPLICATION_SENT: {
-  label: "Application Sent", 
-  color: "#E8D5C4", // Warm light brown
-  next: "Investor Feedback"
-},
+  MATCH: {
+    label: "Match",
+    color: "#F5EBE0", // Light cream/beige brown
+    next: "send application"
+  },
+  APPLICATION_SENT: {
+    label: "Application Sent",
+    color: "#E8D5C4",
+    next: "Pending"
+  },
   UNDER_REVIEW: {
     label: "Under Review",
-    color: "#FFE0B2", // Light orange
-    next: "Investor Feedback"
-  },
-  INVESTOR_FEEDBACK: {
-    label: "Investor Feedback",
-    color: "#DCE775", // Light lime
-    next: "Term Sheet"
+    color: "#FFE0B2",
+    next: "Pending"
   },
   TERM_SHEET: {
-    label: "Term Sheet",
-    color: "#C8E6C9", // Light green
+    label: "Termsheet",
+    color: "#C8E6C9",
     next: "Deal Closed"
   },
   DEAL_CLOSED: {
     label: "Deal Closed",
     color: "#A5D6A7", // Green
-    next: "N/A"
-  },
-  WITHDRAWN: {
-    label: "Withdrawn",
-    color: "#EEEEEE", // Gray
     next: "N/A"
   },
   DECLINED: {
@@ -116,21 +106,21 @@ const formatDocumentLabel = (label) => {
 const capitalize = (str) => str?.charAt(0).toUpperCase() + str?.slice(1).toLowerCase();
 
 const getStatusColor = (status) => {
-  const statusKey = Object.keys(APPLICATION_STATUSES).find(key => 
+  const statusKey = Object.keys(APPLICATION_STATUSES).find(key =>
     APPLICATION_STATUSES[key].label.toLowerCase() === status?.toLowerCase()
   );
   return statusKey ? APPLICATION_STATUSES[statusKey].color : "#E0E0E0";
 };
 
 const getStageColor = (stage) => {
-  const stageKey = Object.keys(PIPELINE_STAGES).find(key => 
+  const stageKey = Object.keys(PIPELINE_STAGES).find(key =>
     PIPELINE_STAGES[key].label.toLowerCase() === stage?.toLowerCase()
   );
   return stageKey ? PIPELINE_STAGES[stageKey].color : "#E0E0E0";
 };
 
 const getNextStage = (currentStage) => {
-  const stageEntry = Object.values(PIPELINE_STAGES).find(stage => 
+  const stageEntry = Object.values(PIPELINE_STAGES).find(stage =>
     stage.label.toLowerCase() === currentStage?.toLowerCase()
   );
   return stageEntry ? stageEntry.next : "N/A";
@@ -236,7 +226,7 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
 
       const requiredDocs = getRequiredDocs(funder);
       const applicationDate = new Date().toISOString().split("T")[0];
-      
+
       const applicationData = {
         smeId: user.uid,
         funderId: funder.funderId,
@@ -268,7 +258,7 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
       setPipelineStages((prev) => ({ ...prev, [funder.id]: "Application Sent" }));
       setApplicationDates((prev) => ({ ...prev, [funder.id]: applicationDate }));
       setWaitingTimes((prev) => ({ ...prev, [funder.id]: "3-5 days" }));
-      
+
       onApplicationSubmitted?.();
       setApplyingFunder(null);
       setNotification({ type: "success", message: "Application submitted!" });
@@ -305,6 +295,7 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
           funds.forEach((fund) => {
             const score = calculateHybridScore(businessData, fund);
             if (score >= 10) {
+              const entityOverview = investor.formData?.entityOverview || {};
               matchedFunds.push({
                 id: `${docSnap.id}_${fund.name}`,
                 funderId: docSnap.id,
@@ -319,6 +310,8 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
                 website: investor.formData?.contactDetails?.website || "#",
                 minInvestment: Number(fund.ticketMin) || 0,
                 maxInvestment: Number(fund.ticketMax) || 0,
+                deadline: entityOverview.deadline || "-",
+                responseTime: entityOverview.responseTime || "-"
               });
             }
           });
@@ -333,7 +326,7 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
         const pipelineStageMap = {};
         const applicationDateMap = {};
         const waitingTimeMap = {};
-        
+
         appSnapshot.forEach(doc => {
           const data = doc.data();
           const key = `${data.funderId}_${data.fundName}`;
@@ -342,7 +335,7 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
           applicationDateMap[key] = data.applicationDate || new Date().toISOString().split("T")[0];
           waitingTimeMap[key] = data.waitingTime || "3-5 days";
         });
-        
+
         setStatuses(appStatusMap);
         setPipelineStages(pipelineStageMap);
         setApplicationDates(applicationDateMap);
@@ -427,8 +420,8 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
                 <th>Funding Type</th>
                 <th>Ticket Size</th>
                 <th>Match</th>
-                <th>Application Date</th>
-                <th>Pipeline Stage</th>
+                <th>Application Deadline</th>
+                <th>Current Stage</th>
                 <th>Next Stage</th>
                 <th>Waiting Time</th>
                 <th>Action</th>
@@ -439,12 +432,12 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
                 const status = statuses[funder.id] || "Application not sent";
                 const pipelineStage = pipelineStages[funder.id] || "Match";
                 const nextStage = getNextStage(pipelineStage);
-                
+
                 return (
                   <tr key={funder.id}>
                     <td>
-                      <span 
-                        onClick={() => handleViewClick(funder)} 
+                      <span
+                        onClick={() => handleViewClick(funder)}
                         style={{
                           color: '#a67c52',
                           textDecoration: 'underline',
@@ -462,15 +455,15 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
                     <td>{formatLabel(funder.investmentType)}</td>
                     <td>{funder.ticketSize}</td>
                     <td>{funder.matchPercentage}%</td>
-                    <td>{applicationDates[funder.id] || "N/A"}</td>
+                    <td>{funder.deadline || "-"}</td>
                     <td>
                       <span className={styles.stageBadge} style={{ backgroundColor: getStageColor(pipelineStage) }}>
                         {capitalize(pipelineStage)}
                       </span>
                     </td>
-                  
+
                     <td>{nextStage}</td>
-                    <td>{waitingTimes[funder.id] || "N/A"}</td>
+                    <td>{funder.responseTime || "-"}</td>
                     <td>
                       <div className={styles.actionButtons}>
                         {statuses[funder.id] ? (
