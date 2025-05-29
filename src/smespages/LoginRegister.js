@@ -8,8 +8,10 @@ import { db } from '../firebaseConfig';
 import { getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import NDASignupPopup from '../NDAsign';
+import TermsConditionsCheckbox from './Ts&cs';
 
 export default function LoginRegister() {
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
   const navigate = useNavigate();
   const [isRegistering, setIsRegistering] = useState(true);
   const [email, setEmail] = useState('');
@@ -30,52 +32,69 @@ export default function LoginRegister() {
 
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
-  const handleRegister = async () => {
-    setIsLoading(true); // Start loading
-    const newErrors = {};
-    if (!validateEmail(email)) newErrors.email = 'Oops! Wrong email';
-    if (password.length < 6) newErrors.password = 'Make it longer (at least 6 characters)';
-    if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords don\'t match!';
-    if (!role) newErrors.role = 'What\'s your role?';
-    if (!company) newErrors.company = 'Please enter your company name'; // Validate company
+   const handleRegister = async () => {
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      setIsLoading(false); // Stop loading if validation fails
-      return;
-    }
+  setIsLoading(true); // Start loading
+  const newErrors = {};
+  
+  // Validate email
+  if (!validateEmail(email)) newErrors.email = 'Oops! Wrong email';
+  
+  // Validate password
+  if (password.length < 6) newErrors.password = 'Make it longer (at least 6 characters)';
+  
+  // Validate password confirmation
+  if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords don\'t match!';
+  
+  // Validate role selection
+  if (!role) newErrors.role = 'What\'s your role?';
+  
+  // Validate company name
+  if (!company) newErrors.company = 'Please enter your company name';
+  
+  // Validate terms and conditions agreement
+  if (!agreeToTerms) newErrors.terms = 'Please agree to the Terms & Conditions';
 
-    setErrors({});
-    setAuthError('');
+  // If there are validation errors, stop and display them
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    setIsLoading(false); // Stop loading if validation fails
+    return;
+  }
 
-    try {
-      // Create user in Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      
-      // Prepare complete data for NDA
-      const ndaData = {
-        email: email,
-        role: role,
-        company: company,
-        password: password, // Include password for the NDA component
-        uid: user.uid
-      };
-      
-      // Set registration data and show NDA
-      setRegistrationData(ndaData);
-      setShowNDA(true);
-      
-    } catch (error) {
-      console.error('Registration error:', error);
-      setAuthError(error.message);
-    } finally {
-      setIsLoading(false); // Stop loading in any case
-    }
-  };
- 
+  // Clear any previous errors
+  setErrors({});
+  setAuthError('');
+
+  try {
+    // Create user in Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    
+    // Prepare complete data for NDA
+    const ndaData = {
+      email: email,
+      role: role,
+      company: company,
+      password: password, // Include password for the NDA component
+      uid: user.uid,
+      termsAccepted: true, // Include terms acceptance status
+      termsAcceptedDate: new Date().toISOString() // Include timestamp of acceptance
+    };
+    
+    // Set registration data and show NDA
+    setRegistrationData(ndaData);
+    setShowNDA(true);
+    
+  } catch (error) {
+    console.error('Registration error:', error);
+    setAuthError(error.message);
+  } finally {
+    setIsLoading(false); // Stop loading in any case
+  }
+};
   // Handle NDA completion
-  const handleRegistrationComplete = async (ndaData) => {
+   const handleRegistrationComplete = async (ndaData) => {
     // Check if the process was cancelled
     if (ndaData.cancelled) {
       setShowNDA(false);
@@ -100,19 +119,27 @@ export default function LoginRegister() {
 
       // Create user document in Firestore with NDA status and all returned data
       await setDoc(doc(db, 'users', auth.currentUser.uid), {
-        email: email,
-        role: role,
-        company: company,
-        ndaSigned: true,
-        ndaSignedDate: new Date().toISOString(),
-        createdAt: new Date(),
-        // Include data from NDA signing
-        ndaInfo: {
-          pdfUrl: ndaData.pdfUrl || null,
-          signatureUrl: ndaData.signatureUrl || null,
-          userId: ndaData.userId || auth.currentUser.uid
-        }
-      });
+      email: email,
+      role: role,
+      company: company,
+      ndaSigned: true,
+      ndaSignedDate: new Date().toISOString(),
+      termsAccepted: agreeToTerms,
+      termsAcceptedDate: new Date().toISOString(), // Timestamp of acceptance
+      createdAt: new Date(),
+      // Include data from NDA signing
+      ndaInfo: {
+        pdfUrl: ndaData.pdfUrl || null,
+        signatureUrl: ndaData.signatureUrl || null,
+        userId: ndaData.userId || auth.currentUser.uid
+      },
+      // Include terms version or identifier if needed
+      termsVersion: "1.0", // Update this when terms change
+      termsContent: "BIG Marketplace Platform Terms & Conditions" // Optional
+    });
+
+    // ... rest of the existing code ...
+
 
       setNdaComplete(true);
       setShowNDA(false);
@@ -129,11 +156,12 @@ export default function LoginRegister() {
       }
       
     } catch (error) {
+      
       console.error('Error saving user data:', error);
       setAuthError('Failed to complete registration. Please try again.');
     }
   };
-
+  
   const handleVerify = () => {
     if (verificationCode.trim() === '') {
       setErrors({ verificationCode: 'We sent you a magic code - enter it here!' });
@@ -159,11 +187,14 @@ export default function LoginRegister() {
     if (!validateEmail(email)) newErrors.email = 'Enter your email!';
     if (password === '') newErrors.password = 'Enter your password!';
 
+
+   
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       setIsLoading(false); // Stop loading if validation fails
       return;
     }
+    
 
     setErrors({});
     setAuthError('');
@@ -176,6 +207,16 @@ export default function LoginRegister() {
       if (userDocSnap.exists()) {
         const userRole = userDocSnap.data().role || 'No role set';
         setRole(userRole);
+
+         const userData = userDocSnap.data();
+   
+      
+      // Check if terms were accepted (optional)
+      // if (!userData.termsAccepted) {
+      //   setAuthError('Please accept the latest Terms & Conditions');
+      //   // You could force them to accept terms here
+      //   return;
+      // }
         
         // Redirect based on role - NDA check removed
         if (userRole === 'Investor') {
@@ -198,6 +239,7 @@ export default function LoginRegister() {
       setIsLoading(false); // Stop loading in any case
     }
   };
+
 
   const getRoleIcon = (roleValue) => {
     switch(roleValue) {
@@ -518,7 +560,11 @@ export default function LoginRegister() {
     marginBottom: '-0.5rem'
   }}>{errors.role}</p>}
 
-
+<TermsConditionsCheckbox
+                    agreeToTerms={agreeToTerms}
+                    setAgreeToTerms={setAgreeToTerms}
+                    error={errors.terms}
+                    />
                   <button 
                     className="primary-btn" 
                     onClick={handleRegister}
