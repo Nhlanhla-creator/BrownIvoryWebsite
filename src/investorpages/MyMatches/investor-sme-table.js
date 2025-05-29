@@ -7,8 +7,16 @@ import { db } from "../../firebaseConfig";
 import { collection, query, where, onSnapshot, updateDoc, doc, getDoc, getDocs, addDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
+import {auth} from "../../firebaseConfig";
 
 export function InvestorSMETable() {
+  const [availabilities, setAvailabilities] = useState([]);
+const [showCalendarModal, setShowCalendarModal] = useState(false);
+const [tempDates, setTempDates] = useState([]);
+const [timeSlot, setTimeSlot] = useState({ start: '09:00', end: '17:00' });
+const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [smes, setSmes] = useState([]);
   const [selectedSME, setSelectedSME] = useState(null);
   const [modalType, setModalType] = useState(null);
@@ -27,46 +35,189 @@ export function InvestorSMETable() {
   const [updatedStages, setUpdatedStages] = useState({});
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const auth = getAuth();
-    const user = auth.currentUser;
+const loadApplicationAvailability = (application) => {
+  if (application.availableDates) {
+    const appAvailabilities = application.availableDates.map(avail => ({
+      ...avail,
+      date: new Date(avail.date) // Convert ISO string back to Date
+    }));
+    setAvailabilities(appAvailabilities);
+  } else {
+    setAvailabilities([]); // Start fresh for new applications
+  }
+};
 
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+ useEffect(() => {
+  const auth = getAuth();
+  const user = auth.currentUser;
 
-    setLoading(true);
+  if (!user) {
+    setLoading(false);
+    return;
+  }
 
-    const q = query(
-      collection(db, "investorApplications"),
-      where("funderId", "==", user.uid)
-    );
+  setLoading(true);
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const applications = [];
-      querySnapshot.forEach((doc) => {
-        applications.push({
-          id: doc.id,
-          ...doc.data()
-        });
+  const q = query(
+    collection(db, "investorApplications"),
+    where("funderId", "==", user.uid)
+  );
+
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const applications = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      
+      // Convert availableDates back to Date objects if they exist
+      if (data.availableDates) {
+        data.availableDates = data.availableDates.map(avail => ({
+          ...avail,
+          date: new Date(avail.date) // Convert ISO string back to Date
+        }));
+      }
+      
+      applications.push({
+        id: doc.id,
+        ...data
       });
-
-      applications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setSmes(applications);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching applications:", error);
-      setNotification({
-        type: "error",
-        message: "Failed to load applications"
-      });
-      setLoading(false);
     });
 
-    return () => unsubscribe();
-  }, []);
+    applications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    setSmes(applications);
+    setLoading(false);
+  }, (error) => {
+    console.error("Error fetching applications:", error);
+    setNotification({
+      type: "error",
+      message: "Failed to load applications"
+    });
+    setLoading(false);
+  });
 
+  return () => unsubscribe();
+}, []);
+
+  const handleDateSelect = (dates) => {
+  setTempDates(dates || []);
+};
+
+const handleTimeChange = (field, value) => {
+  setTimeSlot(prev => ({ ...prev, [field]: value }));
+};// In the saveSelectedDates function:
+const saveSelectedDates = async () => {
+  const newAvailabilities = [
+    ...availabilities,
+    ...tempDates
+      .filter(date => !availabilities.some(a => a.date.getTime() === date.getTime()))
+      .map(date => ({
+        date,
+        timeSlots: [{ ...timeSlot }],
+        timeZone,
+        status: 'available' // Add status field
+      }))
+  ];
+  
+  setAvailabilities(newAvailabilities);
+  
+  // Save to Firebase
+  if (selectedSME) {
+    try {
+      const availabilityData = newAvailabilities.map(avail => ({
+        date: avail.date.toISOString(),
+        timeSlots: avail.timeSlots,
+        timeZone: avail.timeZone,
+        status: avail.status // Include status in saved data
+      }));
+      
+      await updateDoc(doc(db, "investorApplications", selectedSME.id), {
+        availableDates: availabilityData,
+        updatedAt: new Date().toISOString()
+      });
+      
+      // Also update the SME side
+      const investorAppSnap = await getDoc(doc(db, "investorApplications", selectedSME.id));
+      const { smeId, funderId } = investorAppSnap.data();
+      
+      const smeQuery = query(
+        collection(db, "smeApplications"),
+        where("smeId", "==", smeId),
+        where("funderId", "==", funderId)
+      );
+      
+      const smeSnapshot = await getDocs(smeQuery);
+      if (!smeSnapshot.empty) {
+        const smeDocRef = smeSnapshot.docs[0].ref;
+        await updateDoc(smeDocRef, {
+          availableDates: availabilityData,
+          updatedAt: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error("Error updating availabilities:", error);
+      setNotification({
+        type: "error",
+        message: "Failed to update availability dates"
+      });
+    }
+  }
+  
+  setTempDates([]);
+  setShowCalendarModal(false);
+};
+
+const removeAvailability = async (dateToRemove) => {
+  const updatedAvailabilities = availabilities.filter(item => 
+    item.date.getTime() !== dateToRemove.getTime()
+  );
+  
+  setAvailabilities(updatedAvailabilities);
+  
+  // Save to Firebase immediately for the current application
+  if (selectedSME) {
+    try {
+      const availabilityData = updatedAvailabilities.map(avail => ({
+        date: avail.date.toISOString(),
+        timeSlots: avail.timeSlots,
+        timeZone: avail.timeZone
+      }));
+      
+      await updateDoc(doc(db, "investorApplications", selectedSME.id), {
+        availableDates: availabilityData,
+        updatedAt: new Date().toISOString()
+      });
+      
+      // Also update the SME side
+      const investorAppSnap = await getDoc(doc(db, "investorApplications", selectedSME.id));
+      const { smeId, funderId } = investorAppSnap.data();
+      
+      const smeQuery = query(
+        collection(db, "smeApplications"),
+        where("smeId", "==", smeId),
+        where("funderId", "==", funderId)
+      );
+      
+      const smeSnapshot = await getDocs(smeQuery);
+      if (!smeSnapshot.empty) {
+        const smeDocRef = smeSnapshot.docs[0].ref;
+        await updateDoc(smeDocRef, {
+          availableDates: availabilityData,
+          updatedAt: new Date().toISOString()
+        });
+      }
+      
+    } catch (error) {
+      console.error("Error updating availabilities:", error);
+      setNotification({
+        type: "error",
+        message: "Failed to update availability dates"
+      });
+    }
+  }
+};
+
+const hasAvailability = (sme) => {
+  return sme.availableDates && sme.availableDates.length > 0;
+};
   const handleUpdateStatus = async (id, status) => {
     if (status === "Declined") {
       const confirmDecline = window.confirm("Are you sure you want to decline this application? This action cannot be undone.");
@@ -82,9 +233,11 @@ export function InvestorSMETable() {
         errors.message = "Please provide a message to the SME";
       }
 
-      if (modalType === "approve" && !meetingTime) {
-        errors.meetingTime = "Please select a meeting time";
-      }
+      // Replace the meetingTime validation with:
+if (modalType === "approve" && availabilities.length === 0) {
+  errors.availabilities = "Please select at least one available meeting date";
+  
+}
 
       if (modalType === "approve" && !meetingLocation.trim()) {
         errors.meetingLocation = "Please provide a meeting location";
@@ -108,59 +261,81 @@ export function InvestorSMETable() {
         responseMessage: message,
         updatedAt: new Date().toISOString(),
       };
-
-      if (status === "Approved") {
-        updateData.meetingTime = meetingTime;
-        updateData.meetingLocation = meetingLocation;
-        updateData.meetingPurpose = meetingPurpose;
-      }
+if (status === "Approved") {
+  // Convert dates to ISO strings for Firestore storage and save with this specific application
+  const availabilityData = availabilities.map(avail => ({
+    date: avail.date.toISOString(),
+    timeSlots: avail.timeSlots,
+    timeZone: avail.timeZone
+  }));
+  
+  updateData.availableDates = availabilityData;
+  updateData.meetingLocation = meetingLocation;
+  updateData.meetingPurpose = meetingPurpose;
+}
 
       await updateDoc(doc(db, "investorApplications", id), updateData);
 
       const investorAppSnap = await getDoc(doc(db, "investorApplications", id));
       const { smeId, funderId } = investorAppSnap.data();
 
-      const smeQuery = query(
-        collection(db, "smeApplications"),
-        where("smeId", "==", smeId),
-        where("funderId", "==", funderId)
-      );
+  const smeQuery = query(
+  collection(db, "smeApplications"),
+  where("smeId", "==", smeId),
+  where("funderId", "==", funderId)
+);
 
-      const smeSnapshot = await getDocs(smeQuery);
-      if (!smeSnapshot.empty) {
-        const smeDocRef = smeSnapshot.docs[0].ref;
-        await updateDoc(smeDocRef, { 
-          status: status === "Approved" ? "Accepted" : status,
-          updatedAt: new Date().toISOString() 
-        });
-      }
+const smeSnapshot = await getDocs(smeQuery);
+if (!smeSnapshot.empty) {
+  const smeDocRef = smeSnapshot.docs[0].ref;
+  const smeUpdateData = { 
+    status: status === "Approved" ? "Accepted" : status,
+    updatedAt: new Date().toISOString() 
+  };
+  
+  // Add availability data to SME application as well
+  if (status === "Approved") {
+    smeUpdateData.availableDates = updateData.availableDates;
+    smeUpdateData.meetingLocation = meetingLocation;
+    smeUpdateData.meetingPurpose = meetingPurpose;
+  }
+  
+  await updateDoc(smeDocRef, smeUpdateData);
+}
+    
 
-      if (status === "Approved" || status === "Declined") {
-        let subject = status === "Approved" ? meetingPurpose : "Declined Application";
-        let content = status === "Approved"
-          ? `${message}\n\nMeeting Details:\nTime: ${meetingTime}\nLocation: ${meetingLocation}`
-          : message;
+  if (status === "Approved" || status === "Declined") {
+  let subject = status === "Approved" ? meetingPurpose : "Declined Application";
+  let content = status === "Approved"
+    ? `${message}\n\nMeeting Details:\nLocation: ${meetingLocation}\n\nAvailable Meeting Dates for this application:\n${availabilities.map(avail => 
+        `${avail.date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} (${avail.timeSlots[0].start} - ${avail.timeSlots[0].end} ${avail.timeZone})`
+      ).join('\n')}\n\nPlease reply with your preferred meeting time from the above options.`
+    : message;
 
-        await addDoc(collection(db, "messages"), {
-          to: smeId,
-          from: funderId,
-          subject,
-          content,
-          date: new Date().toISOString(),
-          read: false,
-          type: "inbox"
-        });
+  await addDoc(collection(db, "messages"), {
+    to: smeId,
+    from: funderId,
+    subject,
+    content,
+    date: new Date().toISOString(),
+    read: false,
+    type: "inbox",
+    applicationId: selectedSME.id, // Link message to specific application
+    availableDates: status === "Approved" ? updateData.availableDates : null
+  });
 
-        await addDoc(collection(db, "messages"), {
-          to: smeId,
-          from: funderId,
-          subject,
-          content,
-          date: new Date().toISOString(),
-          read: true,
-          type: "sent"
-        });
-      }
+  await addDoc(collection(db, "messages"), {
+    to: smeId,
+    from: funderId,
+    subject,
+    content,
+    date: new Date().toISOString(),
+    read: true,
+    type: "sent",
+    applicationId: selectedSME.id, // Link message to specific application
+    availableDates: status === "Approved" ? updateData.availableDates : null
+  });
+}
 
       if (status === "Approved") {
         await addDoc(collection(db, "smeCalendarEvents"), {
@@ -203,20 +378,45 @@ export function InvestorSMETable() {
     setDocumentFile(null);
   };
 
-  const getStatusBadgeClass = (status) => {
-    let baseClass = styles.statusBadge;
+ // In the InvestorSMETable component, update the getStatusBadgeClass function:
+const getStatusBadgeClass = (status) => {
+  let baseClass = styles.statusBadge;
 
-    switch (status) {
-      case "Accepted":
-        return `${baseClass} ${styles.statusAccepted}`;
-      case "Declined":
-        return `${baseClass} ${styles.statusDeclined}`;
-      case "Application Received":
-        return `${baseClass} ${styles.statusPending}`;
-      default:
-        return baseClass;
-    }
-  };
+  switch (status) {
+    case "Accepted":
+    case "scheduled":
+      return `${baseClass} ${styles.statusAccepted}`;
+    case "Declined":
+      return `${baseClass} ${styles.statusDeclined}`;
+    case "Application Received":
+      return `${baseClass} ${styles.statusPending}`;
+    default:
+      return baseClass;
+  }
+};
+
+// And in the table rendering:
+
+
+  // Add this function after your other handler functions (around line 300-400)
+
+const openModal = (sme, type) => {
+  setSelectedSME(sme);
+  setModalType(type);
+  
+  // Load availability data for this specific application
+  if (type === "approve") {
+    loadApplicationAvailability(sme);
+  }
+  
+  // Reset form fields
+  setMessage("");
+  setMeetingTime("");
+  setMeetingLocation("");
+  setMeetingPurpose("");
+  setFormErrors({});
+  setDocumentFile(null);
+};
 
   const handleSendMessage = async () => {
     if (!message.trim()) {
@@ -469,34 +669,35 @@ export function InvestorSMETable() {
                   <td>R{Number(sme.fundingNeeded).toLocaleString()}</td>
                   <td>{sme.applicationDate}</td>
                   <td>
-                    <span className={getStatusBadgeClass(sme.status)}>
-                      {sme.status === "Approved" ? "Accepted" : sme.status}
-                    </span>
+<span className={getStatusBadgeClass(sme.status)}>
+  {sme.status === "Approved" ? "Accepted" : sme.status === "scheduled" ? "Meeting Scheduled" : sme.status}
+</span>
                   </td>
+                  
                   <td style={{ whiteSpace: "nowrap" }}>
                     <button
-                      className={styles.actionBtn}
-                      title="View details"
-                      onClick={() => { setSelectedSME(sme); setModalType("view") }}
-                    >
-                      <Eye size={16} />
-                    </button>
-                    <button
-                      className={styles.actionBtn}
-                      title="Accept application"
-                      onClick={() => { setSelectedSME(sme); setModalType("approve") }}
-                      enabled={sme.status !== "Application Received"}
-                    >
-                      <Check size={16} />
-                    </button>
-                    <button
-                      className={styles.actionBtn}
-                      title="Decline application"
-                      onClick={() => { setSelectedSME(sme); setModalType("decline") }}
-                      enabled={sme.status !== "Application Received"}
-                    >
-                      <X size={16} />
-                    </button>
+  className={styles.actionBtn}
+  title="View details"
+  onClick={() => openModal(sme, "view")}
+>
+  <Eye size={16} />
+</button>
+<button
+  className={styles.actionBtn}
+  title="Accept application"
+  onClick={() => openModal(sme, "approve")}
+  disabled={sme.status === "Declined"}
+>
+  <Check size={16} />
+</button>
+<button
+  className={styles.actionBtn}
+  title="Decline application"
+  onClick={() => openModal(sme, "decline")}
+  disabled={sme.status === "Declined"}
+>
+  <X size={16} />
+</button>
                   </td>
                   <td>
                     {updatedStages[sme.id] ? (
@@ -514,6 +715,7 @@ export function InvestorSMETable() {
                       </div>
                     )}
                   </td>
+
                 </tr>
               ))
             )}
@@ -604,70 +806,144 @@ export function InvestorSMETable() {
                 </div>
 
                 {modalType === "approve" && (
-                  <div className={styles.meetingFields}>
-                    <div>
-                      <label>Meeting Time:</label>
-                      <input
-                        type="datetime-local"
-                        className={`${styles.meetingInput} ${formErrors.meetingTime ? styles.inputError : ''}`}
-                        value={meetingTime}
-                        onChange={(e) => {
-                          setMeetingTime(e.target.value);
-                          if (e.target.value) {
-                            setFormErrors({ ...formErrors, meetingTime: null });
-                          }
-                        }}
-                      />
-                      {formErrors.meetingTime && (
-                        <p className={styles.errorText}>
-                          <AlertTriangle size={14} /> {formErrors.meetingTime}
-                        </p>
-                      )}
-                    </div>
+  <div className={styles.meetingFields}>
+    <div>
+      <label>Purpose of Meeting:</label>
+      <input
+        type="text"
+        className={`${styles.meetingInput} ${formErrors.meetingPurpose ? styles.inputError : ''}`}
+        value={meetingPurpose}
+        onChange={(e) => {
+          setMeetingPurpose(e.target.value);
+          if (e.target.value.trim()) {
+            setFormErrors({ ...formErrors, meetingPurpose: null });
+          }
+        }}
+        placeholder="e.g., Initial Discussion, Due Diligence, etc."
+      />
+      {formErrors.meetingPurpose && (
+        <p className={styles.errorText}>
+          <AlertTriangle size={14} /> {formErrors.meetingPurpose}
+        </p>
+      )}
+    </div>
 
-                    <div>
-                      <label>Meeting Location:</label>
-                      <input
-                        type="text"
-                        className={`${styles.meetingInput} ${formErrors.meetingLocation ? styles.inputError : ''}`}
-                        value={meetingLocation}
-                        onChange={(e) => {
-                          setMeetingLocation(e.target.value);
-                          if (e.target.value.trim()) {
-                            setFormErrors({ ...formErrors, meetingLocation: null });
-                          }
-                        }}
-                        placeholder="e.g., Office, Virtual Meeting, etc."
-                      />
-                      {formErrors.meetingLocation && (
-                        <p className={styles.errorText}>
-                          <AlertTriangle size={14} /> {formErrors.meetingLocation}
-                        </p>
-                      )}
-                    </div>
+    <div>
+      <label>Meeting Location:</label>
+      <input
+        type="text"
+        className={`${styles.meetingInput} ${formErrors.meetingLocation ? styles.inputError : ''}`}
+        value={meetingLocation}
+        onChange={(e) => {
+          setMeetingLocation(e.target.value);
+          if (e.target.value.trim()) {
+            setFormErrors({ ...formErrors, meetingLocation: null });
+          }
+        }}
+        placeholder="e.g., Office, Virtual Meeting, etc."
+      />
+      {formErrors.meetingLocation && (
+        <p className={styles.errorText}>
+          <AlertTriangle size={14} /> {formErrors.meetingLocation}
+        </p>
+      )}
+      
+      {showCalendarModal && (
+  <div className={styles.calendarModalOverlay} onClick={() => setShowCalendarModal(false)}>
+    <div className={styles.calendarModal} onClick={(e) => e.stopPropagation()}>
+      <h3>Select Available Meeting Dates</h3>
+      <div className={styles.timeSelection}>
+        <label>Available Time:</label>
+        <div className={styles.timeInputs}>
+          <input
+            type="time"
+            value={timeSlot.start}
+            onChange={(e) => handleTimeChange('start', e.target.value)}
+          />
+          <span>to</span>
+          <input
+            type="time"
+            value={timeSlot.end}
+            onChange={(e) => handleTimeChange('end', e.target.value)}
+          />
+        </div>
+      </div>
+      <DayPicker
+        mode="multiple"
+        selected={tempDates}
+        onSelect={handleDateSelect}
+        className="brown-calendar"
+      />
+      <div className={styles.modalActions}>
+        <button 
+          type="button"
+          onClick={() => setShowCalendarModal(false)}
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          className={styles.acceptBtn}
+          onClick={saveSelectedDates}
+          disabled={!tempDates.length}
+        >
+          Save Dates
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+    </div>
 
-                    <div>
-                      <label>Purpose of Meeting:</label>
-                      <input
-                        type="text"
-                        className={`${styles.meetingInput} ${formErrors.meetingPurpose ? styles.inputError : ''}`}
-                        value={meetingPurpose}
-                        onChange={(e) => {
-                          setMeetingPurpose(e.target.value);
-                          if (e.target.value.trim()) {
-                            setFormErrors({ ...formErrors, meetingPurpose: null });
-                          }
-                        }}
-                        placeholder="e.g., Initial Discussion, Due Diligence, etc."
-                      />
-                      {formErrors.meetingPurpose && (
-                        <p className={styles.errorText}>
-                          <AlertTriangle size={14} /> {formErrors.meetingPurpose}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
+    <div className={styles.availabilitySection}>
+      <label>Available Meeting Dates:</label>
+      <button 
+        type="button"
+        className={styles.selectDatesBtn} 
+        onClick={() => {
+          setTempDates([]);
+          setShowCalendarModal(true);
+        }}
+      >
+        + Select Available Dates
+      </button>
+      
+      {availabilities.length > 0 && (
+        <div className={styles.availabilityList}>
+          {availabilities
+            .sort((a, b) => a.date - b.date)
+            .map((availability, index) => (
+              <div key={index} className={styles.availabilityItem}>
+                <span className={styles.availabilityDate}>
+                  {availability.date.toLocaleDateString('en-US', { 
+                    weekday: 'short', 
+                    month: 'short', 
+                    day: 'numeric' 
+                  })}
+                </span>
+                <span className={styles.availabilityTime}>
+                  {availability.timeSlots[0].start} - {availability.timeSlots[0].end}
+                </span>
+                <button
+                  type="button"
+                  className={styles.removeBtn}
+                  onClick={() => removeAvailability(availability.date)}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+        </div>
+      )}
+      
+      {formErrors.availabilities && (
+        <p className={styles.errorText}>
+          <AlertTriangle size={14} /> {formErrors.availabilities}
+        </p>
+      )}
+    </div>
+  </div>
+)}
               </>
             )}
 

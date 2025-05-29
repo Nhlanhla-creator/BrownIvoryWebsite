@@ -109,6 +109,21 @@ export default function FundingApplication() {
     )
   }
 
+  // Function to save onboarding status to Firebase
+  const saveOnboardingStatusToFirebase = async (status) => {
+    try {
+      const userId = auth.currentUser?.uid
+      if (!userId) return
+
+      const docRef = doc(db, "universalProfiles", userId)
+      await setDoc(docRef, { 
+        fundingApplicationOnboardingSeen: status 
+      }, { merge: true })
+    } catch (error) {
+      console.error("Error saving onboarding status to Firebase:", error)
+    }
+  }
+
   // Function to load data from Firebase
   const loadDataFromFirebase = async () => {
     try {
@@ -125,6 +140,14 @@ export default function FundingApplication() {
       if (docSnap.exists()) {
         const firebaseData = docSnap.data()
         console.log("Retrieved data from Firebase:", firebaseData)
+
+        // Check onboarding status from Firebase
+        const hasSeenOnboarding = firebaseData.fundingApplicationOnboardingSeen === true
+        
+        // Show welcome popup only if user hasn't seen it (based on Firebase data)
+        if (!hasSeenOnboarding) {
+          setShowWelcomePopup(true)
+        }
 
         // Check if declaration commitment is complete in Firebase
         const declarationCommitmentComplete = checkDeclarationCommitment(firebaseData)
@@ -195,6 +218,8 @@ export default function FundingApplication() {
         }
       } else {
         console.log("No previous data found in Firebase")
+        // If no Firebase data exists, show onboarding for new users
+        setShowWelcomePopup(true)
       }
     } catch (error) {
       console.error("Error loading data from Firebase:", error)
@@ -210,11 +235,10 @@ export default function FundingApplication() {
       return
     }
 
-    // First load from localStorage for immediate UI update
+    // First load from localStorage for immediate UI update (keeping existing localStorage functionality)
     const savedData = localStorage.getItem(getUserSpecificKey("fundingApplicationData"))
     const savedCompletedSections = localStorage.getItem(getUserSpecificKey("fundingApplicationCompletedSections"))
     const savedSubmissionStatus = localStorage.getItem(getUserSpecificKey("applicationSubmitted"))
-    const hasSeenFundingWelcomePopup = localStorage.getItem(getUserSpecificKey("hasSeenFundingWelcomePopup")) === "true"
 
     if (savedData) {
       setFormData(JSON.parse(savedData))
@@ -229,13 +253,7 @@ export default function FundingApplication() {
       setShowSummary(true)
     }
 
-    // Show welcome popup only for first-time users
-    if (!hasSeenFundingWelcomePopup) {
-      setShowWelcomePopup(true)
-      localStorage.setItem(getUserSpecificKey("hasSeenFundingWelcomePopup"), "true")
-    }
-
-    // Then load from Firebase (this will override localStorage data)
+    // Load from Firebase (this will override localStorage data and handle onboarding)
     loadDataFromFirebase()
   }, [])
 
@@ -296,11 +314,15 @@ export default function FundingApplication() {
       setCurrentOnboardingStep(currentOnboardingStep + 1)
     } else {
       setShowWelcomePopup(false)
+      // Save to Firebase that user has seen onboarding
+      saveOnboardingStatusToFirebase(true)
     }
   }
 
   const handleCloseWelcomePopup = () => {
     setShowWelcomePopup(false)
+    // Save to Firebase that user has seen onboarding
+    saveOnboardingStatusToFirebase(true)
   }
 
   const handleCloseCongratulationsPopup = () => {
