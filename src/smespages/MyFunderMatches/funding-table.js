@@ -10,7 +10,7 @@ import {
 import { getAuth } from "firebase/auth";
 import { DOCUMENT_PATHS, getDocumentURL } from "../../utils/documentUtils";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import InvestorProfileSummary from "../../investorpages/InvestorUniversalProfile/investor-profile-summary";
+import InvestorProfileSummary from "../../investorpages/InvestorUniversalProfile/summaryformatch";
 import get from "lodash.get";
 
 const ADJACENT_INDUSTRIES = {
