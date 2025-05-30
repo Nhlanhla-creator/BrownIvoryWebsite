@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Quicksand:wght@400;600;700&display=swap');
 
 .auth-page {
-  --primary-dark:#372C27;
+  --primary-dark: #372C27;
   --primary: #9E6E3C;
   --secondary: #BCAE9C;
   --background-light: #F2F0E6;
@@ -12,19 +12,19 @@
   --error: #C44536;
   --success: #4A7C59;
 
-  background-color: #F2F0E6; 
-
   min-height: 100vh;
-  background: linear-gradient(135deg, var(background-light) 0%, #372C27 50%, #372C27 100%);
+  background-image: url('/public/brown.jpg'); /* Replace with your actual image path */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
   font-family: 'Quicksand', sans-serif;
-  animation: gradientShift 15s ease infinite;
-  background-size: 200% 200%;
-  
 }
+
 
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }

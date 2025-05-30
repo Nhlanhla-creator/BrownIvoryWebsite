@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Plus, Trash2 } from 'lucide-react'
 import FormField from "./form-field"
 import FileUpload from "./file-upload"
@@ -8,25 +8,38 @@ import { db, auth, storage } from '../../firebaseConfig';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
+// Constants
 const raceOptions = [
   { value: "black", label: "Black African" },
   { value: "coloured", label: "Coloured" },
   { value: "indian", label: "Indian/Asian" },
   { value: "white", label: "White" },
   { value: "other", label: "Other" },
-]
+];
+
+const positionOptions = [
+  "Chairman",
+  "Vice-President",
+  "Board of Directors",
+  "Chief Executive Officer",
+  "General Manager",
+  "Regional Manager",
+  "Supervisor",
+  "Office Manager",
+  "Team Leader",
+];
 
 const genderOptions = [
   { value: "male", label: "Male" },
   { value: "female", label: "Female" },
   { value: "other", label: "Other" },
   { value: "prefer_not", label: "Prefer not to say" },
-]
+];
 
 const execOptions = [
   { value: "executive", label: "Executive" },
   { value: "non-executive", label: "Non-Executive" },
-]
+];
 
 const africanCountries = [
   { value: "algeria", label: "Algeria" },
@@ -85,226 +98,183 @@ const africanCountries = [
   { value: "zimbabwe", label: "Zimbabwe" },
 ]
 
-export default function OwnershipManagement({ data = { shareholders: [], directors: [] }, updateData }) {
-  const [formData, setFormData] = useState({ shareholders: [], directors: [] })
-  const [isLoading, setIsLoading] = useState(true)
+const DEFAULT_SHAREHOLDER = {
+  name: "",
+  idRegNo: "",
+  country: "",
+  linkedin: "",
+  shareholding: "",
+  race: "",
+  gender: "",
+  isYouth: false,
+  isDisabled: false,
+  idDocument: null,
+};
 
-  // Load data from Firebase when component mounts
+const DEFAULT_DIRECTOR = {
+  name: "",
+  id: "",
+  position: "",
+  nationality: "",
+  linkedin: "",
+  execType: "",
+  race: "",
+  gender: "",
+  isYouth: false,
+  isDisabled: false,
+  doc: null,
+};
+
+export default function OwnershipManagement({ data = { shareholders: [], directors: [] }, updateData }) {
+  const [formData, setFormData] = useState({ shareholders: [], directors: [] });
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Helper functions
+  const updateFormData = (newData) => {
+    setFormData(newData);
+    updateData(newData);
+  };
+
+  // Data loading
   useEffect(() => {
     const loadOwnershipManagement = async () => {
       try {
-        setIsLoading(true)
-        const userId = auth.currentUser?.uid
+        setIsLoading(true);
+        const userId = auth.currentUser?.uid;
         
         if (!userId) {
-          setIsLoading(false)
-          return
+          setIsLoading(false);
+          return;
         }
 
-        // Load from the universalProfiles collection (matching your main structure)
-        const docRef = doc(db, "universalProfiles", userId)
-        const docSnap = await getDoc(docRef)
+        const docRef = doc(db, "universalProfiles", userId);
+        const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          const profileData = docSnap.data()
+          const profileData = docSnap.data();
           
-          // Check if ownershipManagement data exists
           if (profileData.ownershipManagement) {
-            const ownershipData = profileData.ownershipManagement
-            setFormData(ownershipData)
-            updateData(ownershipData)
+            updateFormData(profileData.ownershipManagement);
           } else {
-            // If no data exists, initialize with passed data or default structure
-            const initData = data.shareholders?.length > 0 || data.directors?.length > 0 ? data : {
-              shareholders: [
-                {
-                  name: "",
-                  idRegNo: "",
-                  country: "",
-                  linkedin:"",
-                  shareholding: "",
-                  race: "",
-                  gender: "",
-                  isYouth: false,
-                  isDisabled: false,
-                  idDocument: null,
-                }
-              ],
-              directors: [
-                {
-                  name: "",
-                  id: "",
-                  position: "",
-                  nationality: "",
-                  linkedin:"",
-                  isExec: false,
-                  doc: null,
-                }
-              ],
-            }
-            setFormData(initData)
-            updateData(initData)
+            const initData = data.shareholders?.length > 0 || data.directors?.length > 0 
+              ? data 
+              : {
+                  shareholders: [DEFAULT_SHAREHOLDER],
+                  directors: [DEFAULT_DIRECTOR],
+                };
+            updateFormData(initData);
           }
         } else {
-          // No profile exists yet, use passed data or default structure
-          const initData = data.shareholders?.length > 0 || data.directors?.length > 0 ? data : {
-            shareholders: [
-              {
-                name: "",
-                idRegNo: "",
-                country: "",
-                linkedin:"",
-                shareholding: "",
-                race: "",
-                gender: "",
-                isYouth: false,
-                isDisabled: false,
-                idDocument: null,
-              }
-            ],
-            directors: [
-              {
-                name: "",
-                id: "",
-                position: "",
-                nationality: "",
-                linkedin:"",
-                isExec: false,
-                doc: null,
-              }
-            ],
-          }
-          setFormData(initData)
-          updateData(initData)
+          const initData = data.shareholders?.length > 0 || data.directors?.length > 0 
+            ? data 
+            : {
+                shareholders: [DEFAULT_SHAREHOLDER],
+                directors: [DEFAULT_DIRECTOR],
+              };
+          updateFormData(initData);
         }
       } catch (error) {
-        console.error("Error loading ownership management:", error)
-        // Fallback to passed data on error
-        const fallbackData = data.shareholders?.length > 0 || data.directors?.length > 0 ? data : {
-          shareholders: [
-            {
-              name: "",
-              idRegNo: "",
-              country: "",
-              linkedin:"",
-              shareholding: "",
-              race: "",
-              gender: "",
-              isYouth: false,
-              isDisabled: false,
-              idDocument: null,
-            }
-          ],
-          directors: [
-            {
-              name: "",
-              id: "",
-              position: "",
-              nationality: "",
-              linkedin:"",
-              isExec: false,
-              doc: null,
-            }
-          ],
-        }
-        setFormData(fallbackData)
-        updateData(fallbackData)
+        console.error("Error loading ownership management:", error);
+        const fallbackData = data.shareholders?.length > 0 || data.directors?.length > 0 
+          ? data 
+          : {
+              shareholders: [DEFAULT_SHAREHOLDER],
+              directors: [DEFAULT_DIRECTOR],
+            };
+        updateFormData(fallbackData);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    loadOwnershipManagement()
-  }, []) // Remove data dependency to prevent infinite loops
+    loadOwnershipManagement();
+  }, []);
 
-  // Update form data when data prop changes (but only if not loading from Firebase)
   useEffect(() => {
     if (!isLoading && (!formData.shareholders?.length && !formData.directors?.length)) {
-      setFormData(data)
+      setFormData(data);
     }
-  }, [data, isLoading])
+  }, [data, isLoading]);
 
+  // Shareholder functions
   const addShareholder = () => {
-    const newShareholders = [
-      ...formData.shareholders,
-      { name: "", idRegNo: "", country: "", linkedin:"",shareholding: "", race: "", gender: "", isYouth: false, isDisabled: false },
-    ]
-    const updatedData = { ...formData, shareholders: newShareholders }
-    setFormData(updatedData)
-    updateData(updatedData)
-  }
+    const newShareholders = [...formData.shareholders, DEFAULT_SHAREHOLDER];
+    updateFormData({ ...formData, shareholders: newShareholders });
+  };
 
   const updateShareholder = (index, field, value) => {
-    const newShareholders = [...formData.shareholders]
-    newShareholders[index] = { ...newShareholders[index], [field]: value }
-    const updatedData = { ...formData, shareholders: newShareholders }
-    setFormData(updatedData)
-    updateData(updatedData)
-  }
+    const newShareholders = [...formData.shareholders];
+    newShareholders[index] = { ...newShareholders[index], [field]: value };
+    updateFormData({ ...formData, shareholders: newShareholders });
+  };
 
   const removeShareholder = (index) => {
-    const newShareholders = [...formData.shareholders]
-    newShareholders.splice(index, 1)
-    const updatedData = { ...formData, shareholders: newShareholders }
-    setFormData(updatedData)
-    updateData(updatedData)
-  }
+    const newShareholders = formData.shareholders.filter((_, i) => i !== index);
+    updateFormData({ ...formData, shareholders: newShareholders });
+  };
 
+  // Director functions
   const addDirector = () => {
-    const newDirectors = [...formData.directors, { 
-      name: "", 
-      id: "", 
-      position: "", 
-      nationality: "", 
-      linkedin:"",
-      execType: "", 
-      race: "", 
-      gender: "", 
-      isYouth: false, 
-      isDisabled: false 
-    }]
-    const updatedData = { ...formData, directors: newDirectors }
-    setFormData(updatedData)
-    updateData(updatedData)
-  }
+    const newDirectors = [...formData.directors, DEFAULT_DIRECTOR];
+    updateFormData({ ...formData, directors: newDirectors });
+  };
 
   const updateDirector = (index, field, value) => {
-    const newDirectors = [...formData.directors]
-    newDirectors[index] = { ...newDirectors[index], [field]: value }
-    const updatedData = { ...formData, directors: newDirectors }
-    setFormData(updatedData)
-    updateData(updatedData)
-  }
+    const newDirectors = [...formData.directors];
+    newDirectors[index] = { ...newDirectors[index], [field]: value };
+    updateFormData({ ...formData, directors: newDirectors });
+  };
 
   const removeDirector = (index) => {
-    const newDirectors = [...formData.directors]
-    newDirectors.splice(index, 1)
-    const updatedData = { ...formData, directors: newDirectors }
-    setFormData(updatedData)
-    updateData(updatedData)
-  }
+    const newDirectors = formData.directors.filter((_, i) => i !== index);
+    updateFormData({ ...formData, directors: newDirectors });
+  };
 
+  // Handlers
   const handleChange = (e) => {
-    const { name, value } = e.target
-    const updatedData = { ...formData, [name]: value }
-    setFormData(updatedData)
-    updateData(updatedData)
-  }
+    const { name, value } = e.target;
+    updateFormData({ ...formData, [name]: value });
+  };
 
   const handleFileChange = (name, files) => {
-    const updatedData = { ...formData, [name]: files }
-    setFormData(updatedData)
-    updateData(updatedData)
-  }
+    updateFormData({ ...formData, [name]: files });
+  };
 
-  // Show loading state while fetching data
+  // Table column configurations
+  const shareholderColumns = [
+    { label: "Name", style: { width: "25%", minWidth: "200px" } },
+    { label: "ID", style: { width: "20%", minWidth: "180px" } },
+    { label: "Country", style: { width: "18%", minWidth: "150px" } },
+    { label: "LinkedIn", style: { width: "35%", minWidth: "200px" } },
+    { label: "%Shareholding", style: { width: "11%" } },
+    { label: "Race", style: { width: "80px" } },
+    { label: "Gender", style: { width: "10%" } },
+    { label: "Is Youth?", style: { width: "60px" } },
+    { label: "Is Disabled?", style: { width: "60px" } },
+    { label: "Actions", style: { width: "60px" } },
+  ];
+
+  const directorColumns = [
+    { label: "Name", style: { width: "25%", minWidth: "200px" } },
+    { label: "ID", style: { width: "20%", minWidth: "180px" } },
+    { label: "Position", style: { width: "18%", minWidth: "150px" } },
+    { label: "Nationality", style: { width: "12%" } },
+    { label: "linkedin", style: { width: "35%", minWidth: "200px" } },
+    { label: "Exec/Non-Exec", style: { width: "80px" } },
+    { label: "Race", style: { width: "10%" } },
+    { label: "Gender", style: { width: "80px" } },
+    { label: "Is Youth?", style: { width: "60px" } },
+    { label: "Is Disabled?", style: { width: "60px" } },
+    { label: "Actions", style: { width: "60px" } },
+  ];
+
   if (isLoading) {
     return (
       <div className="ownership-management-loading">
         <h2 className="text-2xl font-bold text-brown-800 mb-6">Ownership & Management</h2>
         <p>Loading your information...</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -324,6 +294,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
         </FormField>
       </div>
 
+      {/* Shareholder Table */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-brown-700">Shareholder Table</h3>
@@ -340,36 +311,15 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
           <table className="min-w-full bg-white border border-brown-200 rounded-lg">
             <thead>
               <tr className="bg-brown-50">
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Name
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  ID
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Country
-                </th>
-                   <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  LinkedIn
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  % Shareholding
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Race
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Gender
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Is Youth?
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Is Disabled?
-                </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b">
-                  Actions
-                </th>
+                {shareholderColumns.map((header, i) => (
+                  <th
+                    key={i}
+                    className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b"
+                    style={header.style}
+                  >
+                    {header.label}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -405,10 +355,10 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                       ))}
                     </select>
                   </td>
-                    <td className="px-4 py-2 border-b">
+                  <td className="px-4 py-2 border-b">
                     <input
                       type="text"
-                      value={shareholder.linkedin|| ""}
+                      value={shareholder.linkedin || ""}
                       onChange={(e) => updateShareholder(index, "linkedin", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
                     />
@@ -484,6 +434,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
         </div>
       </div>
 
+      {/* Directors Table */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-brown-700">Directors Table</h3>
@@ -499,29 +450,17 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-brown-200 rounded-lg">
             <thead>
-           <tr className="bg-brown-50">
-  {[
-    { label: "Name", style: { width: "25%", minWidth: "200px" } },
-    { label: "ID", style: { width: "20%", minWidth: "180px" } },
-    { label: "Position", style: { width: "18%", minWidth: "150px" } },
-    { label: "Nationality", style: { width: "12%" } },
-    { label: "linkedin", style: { width: "35%", minWidth: "200px" } },
-    { label: "Exec/Non-Exec", style: { width: "80px" } },
-    { label: "Race", style: { width: "10%" } },
-    { label: "Gender", style: { width: "80px" } },
-    { label: "Is Youth?", style: { width: "60px" } },
-    { label: "Is Disabled?", style: { width: "60px" } },
-    { label: "Actions", style: { width: "60px" } },
-  ].map((header, i) => (
-    <th
-      key={i}
-      className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b"
-      style={header.style}
-    >
-      {header.label}
-    </th>
-  ))}
-</tr>
+              <tr className="bg-brown-50">
+                {directorColumns.map((header, i) => (
+                  <th
+                    key={i}
+                    className="px-4 py-2 text-left text-xs font-medium text-brown-700 uppercase tracking-wider border-b"
+                    style={header.style}
+                  >
+                    {header.label}
+                  </th>
+                ))}
+              </tr>
             </thead>
             <tbody>
               {formData.directors?.map((director, index) => (
@@ -543,12 +482,18 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                     />
                   </td>
                   <td className="px-4 py-2 border-b">
-                    <input
-                      type="text"
+                    <select
                       value={director.position || ""}
                       onChange={(e) => updateDirector(index, "position", e.target.value)}
                       className="w-full px-2 py-1 border border-brown-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brown-500"
-                    />
+                    >
+                      <option value="">Select Position</option>
+                      {positionOptions.map((pos) => (
+                        <option key={pos} value={pos}>
+                          {pos}
+                        </option>
+                      ))}
+                    </select>
                   </td>
                   <td className="px-4 py-2 border-b">
                     <select
@@ -564,7 +509,7 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
                       ))}
                     </select>
                   </td>
-                    <td className="px-4 py-2 border-b">
+                  <td className="px-4 py-2 border-b">
                     <input
                       type="text"
                       value={director.linkedin || ""}
@@ -646,10 +591,10 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
         </div>
       </div>
 
+      {/* Documents Section */}
       <div className="mt-8 border-t border-brown-200 pt-6">
         <h3 className="text-lg font-semibold text-brown-700 mb-4">Required Documents</h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2">
           <FileUpload
             label="Certified IDs of Directors & Shareholders"
             accept=".pdf,.jpg,.jpeg,.png"
@@ -658,7 +603,6 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
             onChange={(files) => handleFileChange("certifiedIds", files)}
             value={formData.certifiedIds || []}
           />
-
           <FileUpload
             label="Share Register"
             accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls"
@@ -669,5 +613,5 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
         </div>
       </div>
     </div>
-  )
+  );
 }

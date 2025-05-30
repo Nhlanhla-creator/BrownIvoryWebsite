@@ -423,7 +423,9 @@ export function FundabilityScoreCard({ profileData }) {
         </div>
 
         <button className={styles.viewMoreBtn} onClick={() => setShowScoreSummaryModal(true)}>
-          View More
+      Score Breakdown
+
+
           <ChevronDown className={styles.chevronIcon} size={16} />
         </button>
       </div>

@@ -269,16 +269,9 @@ export default function LegalCompliance({ data = {}, updateData }) {
             value={data.bbbeeCert || []}
           />
 
+     
           <FileUpload
-            label="VAT/UIF/PAYE/COIDA Certificates (if applicable)"
-            accept=".pdf,.jpg,.jpeg,.png"
-            multiple
-            onChange={(files) => handleFileChange("otherCerts", files)}
-            value={data.otherCerts || []}
-          />
-
-          <FileUpload
-            label="Industry Accreditations (if available)"
+            label="Industry Accreditations (optional)"
             accept=".pdf,.jpg,.jpeg,.png"
             multiple
             onChange={(files) => handleFileChange("industryAccreditationDocs", files)}

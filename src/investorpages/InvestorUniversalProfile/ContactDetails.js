@@ -173,17 +173,7 @@ export default function ContactDetails({ data = {}, updateData }) {
         </div>
       </div>
 
-      <div className="mt-8 border-t pt-6">
-        <h3 className={`${styles.subtitle} text-lg font-semibold mb-4`}>Required Documents</h3>
-
-        <FileUpload
-          label="Proof of Address (Utility Bill, Lease Agreement)"
-          accept=".pdf,.jpg,.jpeg,.png"
-          required
-          onChange={(files) => handleFileChange("proofOfAddress", files)}
-          value={data.proofOfAddress || []}
-        />
-      </div>
+   
     </div>
   )
 }

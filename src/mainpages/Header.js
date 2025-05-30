@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom';
 const Header = () => {
   const navigate = useNavigate();
 
-  const handleLoginClick = () => {
-    navigate('/LoginRegister');
-  };
+const handleLoginClick = (mode = 'login') => {
+  navigate(`/LoginRegister?mode=${mode}`);
+};
+
 
   const handleNavigation = (path) => {
     if (path.startsWith('#')) {
@@ -241,12 +242,22 @@ const Header = () => {
           </button>
         </nav>
         <div style={styles.buttonGroup} className="button-group">
-          <button className="login-button" onClick={handleLoginClick}>Login</button>
+   <button className="login-button" onClick={() => handleLoginClick('login')}>
+  Login
+</button>
+
           <div className="register-container">
-            <button className="get-started-button" onClick={handleLoginClick}>Register</button>
-            <div style={styles.registerText} className="register-text" onClick={handleLoginClick}>
-              Have not registered yet?
-            </div>
+          <button className="get-started-button" onClick={() => handleLoginClick('register')}>
+  Register
+</button>
+            <div
+  style={styles.registerText}
+  className="register-text"
+  onClick={() => handleLoginClick('register')}
+>
+  Have not registered yet?
+</div>
+
           </div>
         </div>
       </header>

@@ -5,13 +5,31 @@ import { DashboardHeader } from "./dashboard-header"
 import { ApplicationTracker } from "./application-tracker"
 import { LegitimacyScoreCard } from "./legitimacy-score-card"
 import { FundabilityScoreCard } from "./fundability-score-card"
-import { ComplianceScoreCard } from "./compliance-score" // ✅ Updated import
+import { ComplianceScoreCard } from "./compliance-score"
 import { CustomerReviewsCard } from "./customer-reviews-card"
 import { doc, getDoc } from "firebase/firestore"
 import { auth, db } from "../../firebaseConfig"
-import { X, ChevronRight } from "lucide-react"
+import { X, ChevronRight, Info, Smile, Star, ShieldCheck } from "lucide-react"
 import "./Dashboard.css"
 import { onAuthStateChanged } from "firebase/auth"
+
+// New explanatory card component
+const ExplanationCard = ({ title, description, icon, color }) => {
+  const iconComponents = {
+    info: <Info size={24} />,
+    smile: <Smile size={24} />,
+    star: <Star size={24} />,
+    shield: <ShieldCheck size={24} />,
+  }
+
+  return (
+    <div className={`explanation-card ${color}`}>
+      <div className="explanation-icon">{iconComponents[icon]}</div>
+      <h3 className="explanation-title">{title}</h3>
+      <p className="explanation-text">{description}</p>
+    </div>
+  )
+}
 
 export function Dashboard() {
   const [profileData, setProfileData] = useState(null)
@@ -20,8 +38,8 @@ export function Dashboard() {
   const [showDashboardPopup, setShowDashboardPopup] = useState(false)
   const [applicationRefreshKey, setApplicationRefreshKey] = useState(0)
   const [currentDashboardStep, setCurrentDashboardStep] = useState(0)
-const [authChecked, setAuthChecked] = useState(false)
-const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   const user = auth.currentUser
   const userName = user ? user.email : "User"
@@ -70,53 +88,53 @@ const [isAuthenticated, setIsAuthenticated] = useState(false)
     const userId = auth.currentUser?.uid
     return userId ? `${baseKey}_${userId}` : baseKey
   }
-useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, (user) => {
-    if (user) {
-      setIsAuthenticated(true)
-    } 
-    setAuthChecked(true)
-  })
 
-  return () => unsubscribe()
-}, [])
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsAuthenticated(true)
+      } 
+      setAuthChecked(true)
+    })
 
-useEffect(() => {
-  if (!isAuthenticated) return
+    return () => unsubscribe()
+  }, [])
 
-  const fetchProfileData = async () => {
-    try {
-      const userId = auth.currentUser?.uid
-      if (!userId) {
-        console.error("User not logged in")
+  useEffect(() => {
+    if (!isAuthenticated) return
+
+    const fetchProfileData = async () => {
+      try {
+        const userId = auth.currentUser?.uid
+        if (!userId) {
+          console.error("User not logged in")
+          setLoading(false)
+          return
+        }
+
+        const docRef = doc(db, "universalProfiles", userId)
+        const docSnap = await getDoc(docRef)
+
+        if (docSnap.exists()) {
+          setProfileData(docSnap.data())
+        } else {
+          console.error("No profile found")
+        }
+
+        const hasSeenDashboardPopup = localStorage.getItem(getUserSpecificKey("hasSeenDashboardPopup")) === "true"
+        if (!hasSeenDashboardPopup) {
+          setShowDashboardPopup(true)
+        }
+
         setLoading(false)
-        return
+      } catch (err) {
+        console.error("Error fetching profile data:", err)
+        setLoading(false)
       }
-
-      const docRef = doc(db, "universalProfiles", userId)
-      const docSnap = await getDoc(docRef)
-
-      if (docSnap.exists()) {
-        setProfileData(docSnap.data())
-      } else {
-        console.error("No profile found")
-      }
-
-      const hasSeenDashboardPopup = localStorage.getItem(getUserSpecificKey("hasSeenDashboardPopup")) === "true"
-      if (!hasSeenDashboardPopup) {
-        setShowDashboardPopup(true)
-      }
-
-      setLoading(false)
-    } catch (err) {
-      console.error("Error fetching profile data:", err)
-      setLoading(false)
     }
-  }
 
-  fetchProfileData()
-}, [isAuthenticated])
-
+    fetchProfileData()
+  }, [isAuthenticated])
 
   useEffect(() => {
     const resizableContainers = document.querySelectorAll(".resizable-card-container")
@@ -225,8 +243,36 @@ useEffect(() => {
               <FundabilityScoreCard profileData={profileData} />
             </div>
             <div className="resizable-card-container">
-              <ComplianceScoreCard styles={styles} profileData={profileData} /> {/* ✅ Correct usage */}
+              <ComplianceScoreCard styles={styles} profileData={profileData} />
             </div>
+          </section>
+
+          {/* New explanatory cards row */}
+          <section className="explanation-cards-row">
+            <ExplanationCard
+              title="About Legitimacy Score"
+              description="This score shows how trustworthy your business appears to partners. It's based on your business history, online presence, and verification status."
+              icon="shield"
+              color="blue"
+            />
+            <ExplanationCard
+              title="About Customer Reviews"
+              description="These are real ratings from your customers. Positive reviews boost your credibility and help attract more business opportunities."
+              icon="smile"
+              color="green"
+            />
+            <ExplanationCard
+              title="About Fundability Score"
+              description="This measures how likely your business is to get funding. It considers your financial health, credit history, and business stability."
+              icon="star"
+              color="purple"
+            />
+            <ExplanationCard
+              title="About Compliance Score"
+              description="Shows how well your business follows industry regulations. Good compliance reduces risks and makes you more attractive to partners."
+              icon="info"
+              color="orange"
+            />
           </section>
         </main>
       </div>

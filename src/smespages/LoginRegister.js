@@ -7,14 +7,22 @@ import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import { useLocation } from 'react-router-dom';
 import NDASignupPopup from '../NDAsign';
 import TermsConditionsCheckbox from './Ts&cs';
+import { Eye, EyeOff } from 'lucide-react';
+
 
 export default function LoginRegister() {
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const navigate = useNavigate();
-  const [isRegistering, setIsRegistering] = useState(true);
+  const location = useLocation();
+const initialMode = new URLSearchParams(location.search).get('mode');
+const [isRegistering, setIsRegistering] = useState(initialMode !== 'login'); // default to register if not login
+
   const [email, setEmail] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [codeSent, setCodeSent] = useState(false);
@@ -38,13 +46,13 @@ export default function LoginRegister() {
   const newErrors = {};
   
   // Validate email
-  if (!validateEmail(email)) newErrors.email = 'Oops! Wrong email';
+  if (!validateEmail(email)) newErrors.email = 'Enter your email';
   
   // Validate password
-  if (password.length < 6) newErrors.password = 'Make it longer (at least 6 characters)';
+  if (password.length < 6) newErrors.password = 'Password should be (at least 6 characters)';
   
   // Validate password confirmation
-  if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords don\'t match!';
+  if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match!';
   
   // Validate role selection
   if (!role) newErrors.role = 'What\'s your role?';
@@ -306,259 +314,235 @@ export default function LoginRegister() {
   gap: '1.25rem',
   width: '100%'
 }}>
-  {/* Email Input */}
+ <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+  {/* Email */}
   <div style={{
     display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    border: errors.email ? '1px solid #ff4d4f' : '1px solid #d9d9d9',
-    borderRadius: '8px',
-    transition: 'all 0.3s',
-    backgroundColor: '#fff',
-    ':hover': {
-      borderColor: errors.email ? '#ff4d4f' : '#6e8efb'
-    }
+    alignItems: 'center',
+    backgroundColor: 'var(--background)',
+    border: `2px solid ${errors.email ? 'var(--error)' : 'var(--secondary)'}`,
+    borderRadius: '12px',
+    padding: '0 15px',
+    height: '50px',
+    transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
   }}>
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0.75rem 1rem'
-    }}>
-      <div style={{
-        marginRight: '0.75rem',
-        color: errors.email ? '#ff4d4f' : '#372C27',
-        display: 'flex',
-        alignItems: 'center'
-      }}>
-        <Mail size={18} />
-      </div>
-      <input
-        type="email"
-        placeholder="Your email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        style={{
-          flex: 1,
-          border: 'none',
-          outline: 'none',
-          fontSize: '0.9375rem',
-          '::placeholder': {
-            color: '#bfbfbf'
-          }
-        }}
-      />
+    <div style={{ marginRight: '12px', color: 'var(--primary-dark)', display: 'flex', alignItems: 'center' }}>
+      <Mail size={18} />
     </div>
+    <input
+      type="email"
+      placeholder="Your email"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+      style={{
+        flex: 1,
+        border: 'none',
+        background: 'transparent',
+        outline: 'none',
+        fontSize: '15px',
+        color: 'var(--text)',
+        height: '100%',
+        fontFamily: 'Quicksand, sans-serif',
+      }}
+    />
   </div>
-  {errors.email && <p style={{
-    color: '#ff4d4f',
-    fontSize: '0.8125rem',
-    marginTop: '-0.75rem',
-    marginBottom: '-0.5rem'
-  }}>{errors.email}</p>}
+  {errors.email && <p className="error-text">{errors.email}</p>}
 
-  {/* Password Input */}
+  {/* Password */}
+<div style={{
+  display: 'flex',
+  alignItems: 'center',
+  backgroundColor: 'var(--background)',
+  border: `2px solid ${errors.password ? 'var(--error)' : 'var(--secondary)'}`,
+  borderRadius: '12px',
+  padding: '0 15px',
+  height: '50px',
+  transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'
+}}>
   <div style={{
+    marginRight: '12px',
+    color: 'var(--primary-dark)',
     display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    border: errors.password ? '1px solid #ff4d4f' : '1px solid #d9d9d9',
-    borderRadius: '8px',
-    transition: 'all 0.3s',
-    backgroundColor: '#fff',
-    ':hover': {
-      borderColor: errors.password ? '#ff4d4f' : '#6e8efb'
-    }
+    alignItems: 'center'
   }}>
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0.75rem 1rem'
-    }}>
-      <div style={{
-        marginRight: '0.75rem',
-        color: errors.password ? '#ff4d4f' : '#372C27',
-        display: 'flex',
-        alignItems: 'center'
-      }}>
-        <Lock size={18} />
-      </div>
-      <input
-        type="password"
-        placeholder="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        style={{
-          flex: 1,
-          border: 'none',
-          outline: 'none',
-          fontSize: '0.9375rem',
-          '::placeholder': {
-            color: '#bfbfbf'
-          }
-        }}
-      />
-    </div>
+    <Lock size={18} />
   </div>
-  {errors.password && <p style={{
-    color: '#ff4d4f',
+  <input
+    type={showPassword ? 'text' : 'password'}
+    placeholder="Password"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    style={{
+      flex: 1,
+      border: 'none',
+      background: 'transparent',
+      outline: 'none',
+      fontSize: '15px',
+      color: 'var(--text)',
+      height: '100%',
+      fontFamily: 'Quicksand, sans-serif'
+    }}
+  />
+  <div
+    onClick={() => setShowPassword(!showPassword)}
+    style={{
+      cursor: 'pointer',
+      marginLeft: '12px',
+      color: 'var(--primary-dark)',
+      display: 'flex',
+      alignItems: 'center'
+    }}
+  >
+    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+  </div>
+</div>
+{errors.password && (
+  <p style={{
+    color: 'var(--error)',
     fontSize: '0.8125rem',
-    marginTop: '-0.75rem',
-    marginBottom: '-0.5rem'
-  }}>{errors.password}</p>}
+    marginTop: '4px',
+    marginBottom: '0'
+  }}>
+    {errors.password}
+  </p>
+)}
 
-  {/* Confirm Password Input */}
-  <div style={{
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    border: errors.confirmPassword ? '1px solid #ff4d4f' : '1px solid #d9d9d9',
-    borderRadius: '8px',
-    transition: 'all 0.3s',
-    backgroundColor: '#fff',
-    ':hover': {
-      borderColor: errors.confirmPassword ? '#ff4d4f' : '#6e8efb'
-    }
-  }}>
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0.75rem 1rem'
-    }}>
-      <div style={{
-        marginRight: '0.75rem',
-        color: errors.confirmPassword ? '#ff4d4f' : '#372C27',
-        display: 'flex',
-        alignItems: 'center'
-      }}>
-        <Lock size={18} />
-      </div>
-      <input
-        type="password"
-        placeholder="confirm password"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-        style={{
-          flex: 1,
-          border: 'none',
-          outline: 'none',
-          fontSize: '0.9375rem',
-          '::placeholder': {
-            color: '#bfbfbf'
-          }
-        }}
-      />
-    </div>
-  </div>
-  {errors.confirmPassword && <p style={{
-    color: '#ff4d4f',
-    fontSize: '0.8125rem',
-    marginTop: '-0.75rem',
-    marginBottom: '-0.5rem'
-  }}>{errors.confirmPassword}</p>}
 
-  {/* Company Input */}
+  {/* Confirm Password */}
+ <div style={{
+  display: 'flex',
+  alignItems: 'center',
+  backgroundColor: 'var(--background)',
+  border: `2px solid ${errors.confirmPassword ? 'var(--error)' : 'var(--secondary)'}`,
+  borderRadius: '12px',
+  padding: '0 15px',
+  height: '50px',
+  transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'
+}}>
+  <div style={{
+    marginRight: '12px',
+    color: 'var(--primary-dark)',
+    display: 'flex',
+    alignItems: 'center'
+  }}>
+    <Lock size={18} />
+  </div>
+  <input
+    type={showConfirmPassword ? 'text' : 'password'}
+    placeholder="Confirm Password"
+    value={confirmPassword}
+    onChange={(e) => setConfirmPassword(e.target.value)}
+    style={{
+      flex: 1,
+      border: 'none',
+      background: 'transparent',
+      outline: 'none',
+      fontSize: '15px',
+      color: 'var(--text)',
+      height: '100%',
+      fontFamily: 'Quicksand, sans-serif'
+    }}
+  />
+  <div
+    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+    style={{
+      cursor: 'pointer',
+      marginLeft: '12px',
+      color: 'var(--primary-dark)',
+      display: 'flex',
+      alignItems: 'center'
+    }}
+  >
+    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+  </div>
+</div>
+{errors.confirmPassword && (
+  <p style={{
+    color: 'var(--error)',
+    fontSize: '0.8125rem',
+    marginTop: '4px',
+    marginBottom: '0'
+  }}>
+    {errors.confirmPassword}
+  </p>
+)}
+
+  {/* Company Name */}
   <div style={{
     display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    border: errors.company ? '1px solid #ff4d4f' : '1px solid #d9d9d9',
-    borderRadius: '8px',
-    transition: 'all 0.3s',
-    backgroundColor: '#fff',
-    ':hover': {
-      borderColor: errors.company ? '#ff4d4f' : '#6e8efb'
-    }
+    alignItems: 'center',
+    backgroundColor: 'var(--background)',
+    border: `2px solid ${errors.company ? 'var(--error)' : 'var(--secondary)'}`,
+    borderRadius: '12px',
+    padding: '0 15px',
+    height: '50px',
+    transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
   }}>
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0.75rem 1rem'
-    }}>
-      <div style={{
-        marginRight: '0.75rem',
-        color: errors.company ? '#ff4d4f' : '#372C27',
-        display: 'flex',
-        alignItems: 'center'
-      }}>
-        <Briefcase size={18} />
-      </div>
-      <input
-        type="text"
-        placeholder="Your company name"
-        value={company}
-        onChange={(e) => setCompany(e.target.value)}
-        style={{
-          flex: 1,
-          border: 'none',
-          outline: 'none',
-          fontSize: '0.9375rem',
-          '::placeholder': {
-            color: '#bfbfbf'
-          }
-        }}
-      />
+    <div style={{ marginRight: '12px', color: 'var(--primary-dark)', display: 'flex', alignItems: 'center' }}>
+      <Briefcase size={18} />
     </div>
+    <input
+      type="text"
+      placeholder="Your company name"
+      value={company}
+      onChange={(e) => setCompany(e.target.value)}
+      style={{
+        flex: 1,
+        border: 'none',
+        background: 'transparent',
+        outline: 'none',
+        fontSize: '15px',
+        color: 'var(--text)',
+        height: '100%',
+        fontFamily: 'Quicksand, sans-serif',
+      }}
+    />
   </div>
-  {errors.company && <p style={{
-    color: '#ff4d4f',
-    fontSize: '0.8125rem',
-    marginTop: '-0.75rem',
-    marginBottom: '-0.5rem'
-  }}>{errors.company}</p>}
+  {errors.company && <p className="error-text">{errors.company}</p>}
 
   {/* Role Select */}
   <div style={{
     display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    border: errors.role ? '1px solid #ff4d4f' : '1px solid #d9d9d9',
-    borderRadius: '8px',
-    transition: 'all 0.3s',
-    backgroundColor: '#fff',
-    ':hover': {
-      borderColor: errors.role ? '#ff4d4f' : '#6e8efb'
-    }
+    alignItems: 'center',
+    backgroundColor: 'var(--background)',
+    border: `2px solid ${errors.role ? 'var(--error)' : 'var(--secondary)'}`,
+    borderRadius: '12px',
+    padding: '0 0 0 15px',
+    height: '50px',
+    transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
   }}>
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0.75rem 1rem'
-    }}>
-      <div style={{
-        marginRight: '0.75rem',
-        color: errors.role ? '#ff4d4f' : '#372C27',
-        display: 'flex',
-        alignItems: 'center'
-      }}>
-        {getRoleIcon(role)}
-      </div>
-      <select 
-        value={role} 
-        onChange={(e) => setRole(e.target.value)}
-        style={{
-          flex: 1,
-          border: 'none',
-          outline: 'none',
-          fontSize: '0.9375rem',
-          backgroundColor: 'transparent',
-          color: role ? '#333' : '#bfbfbf',
-          appearance: 'none',
-          cursor: 'pointer'
-        }}
-      >
-        <option value="">I am a </option>
-        <option value="SME/BUSINESS"> Small and Medium Social Enterprise</option>
-        <option value="Investor">Investor</option>
-        <option value="Support Program">Support Program</option>
-      </select>
+    <div style={{ marginRight: '12px', color: 'var(--primary-dark)', display: 'flex', alignItems: 'center' }}>
+      {getRoleIcon(role)}
     </div>
+    <select
+      value={role}
+      onChange={(e) => setRole(e.target.value)}
+      style={{
+        flex: 1,
+        border: 'none',
+        background: 'transparent',
+        outline: 'none',
+        fontSize: '15px',
+        color: 'var(--text)',
+        height: '100%',
+        fontFamily: 'Quicksand, sans-serif',
+        appearance: 'none',
+        padding: '0 15px',
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'right 15px center',
+        backgroundSize: '16px',
+      }}
+    >
+      <option value="">I am a</option>
+      <option value="SME/BUSINESS">SME</option>
+      <option value="Investor">Investor</option>
+      <option value="Support Program">Support Program</option>
+    </select>
   </div>
-  {errors.role && <p style={{
-    color: '#ff4d4f',
-    fontSize: '0.8125rem',
-    marginTop: '-0.75rem',
-    marginBottom: '-0.5rem'
-  }}>{errors.role}</p>}
+  {errors.role && <p className="error-text">{errors.role}</p>}
+</div>
+
 
 <TermsConditionsCheckbox
                     agreeToTerms={agreeToTerms}
@@ -594,104 +578,114 @@ export default function LoginRegister() {
   width: '100%'
 }}>
   {/* Email Input */}
+<div style={{
+  display: 'flex',
+  alignItems: 'center',
+  backgroundColor: 'var(--background)',
+  border: `2px solid ${errors.email ? 'var(--error)' : 'var(--secondary)'}`,
+  borderRadius: '12px',
+  padding: '0 15px',
+  height: '50px',
+  transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+}}>
   <div style={{
+    marginRight: '12px',
+    color: 'var(--primary-dark)',
     display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    border: errors.email ? '1px solid #ff4d4f' : '1px solid #d9d9d9',
-    borderRadius: '8px',
-    transition: 'all 0.3s',
-    backgroundColor: '#fff',
-    ':hover': {
-      borderColor: errors.email ? '#ff4d4f' : '#6e8efb'
-    }
+    alignItems: 'center'
   }}>
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0.75rem 1rem'
-    }}>
-      <div style={{
-        marginRight: '0.75rem',
-        color: errors.email ? '#ff4d4f' : '#372C27',
-        display: 'flex',
-        alignItems: 'center'
-      }}>
-        <Mail size={18} />
-      </div>
-      <input
-        type="email"
-        placeholder="enter your email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        style={{
-          flex: 1,
-          border: 'none',
-          outline: 'none',
-          fontSize: '0.9375rem',
-          '::placeholder': {
-            color: '#bfbfbf'
-          }
-        }}
-      />
-    </div>
+    <Mail size={18} />
   </div>
-  {errors.email && <p style={{
-    color: '#ff4d4f',
+  <input
+    type="email"
+    placeholder="Enter your email"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    style={{
+      flex: 1,
+      border: 'none',
+      background: 'transparent',
+      outline: 'none',
+      fontSize: '15px',
+      color: 'var(--text)',
+      height: '100%',
+      fontFamily: 'Quicksand, sans-serif'
+    }}
+  />
+</div>
+{errors.email && (
+  <p style={{
+    color: 'var(--error)',
     fontSize: '0.8125rem',
-    marginTop: '-0.75rem',
-    marginBottom: '-0.5rem'
-  }}>{errors.email}</p>}
+    marginTop: '4px',
+    marginBottom: '0'
+  }}>
+    {errors.email}
+  </p>
+)}
 
-  {/* Password Input */}
+{/* Password Input */}
+{/* Password Input */}
+<div style={{
+  display: 'flex',
+  alignItems: 'center',
+  backgroundColor: 'var(--background)',
+  border: `2px solid ${errors.password ? 'var(--error)' : 'var(--secondary)'}`,
+  borderRadius: '12px',
+  padding: '0 15px',
+  height: '50px',
+  transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+  position: 'relative'
+}}>
   <div style={{
+    marginRight: '12px',
+    color: 'var(--primary-dark)',
     display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    border: errors.password ? '1px solid #ff4d4f' : '1px solid #d9d9d9',
-    borderRadius: '8px',
-    transition: 'all 0.3s',
-    backgroundColor: '#fff',
-    ':hover': {
-      borderColor: errors.password ? '#ff4d4f' : '#6e8efb'
-    }
+    alignItems: 'center'
   }}>
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0.75rem 1rem'
-    }}>
-      <div style={{
-        marginRight: '0.75rem',
-        color: errors.password ? '#ff4d4f' : '#372C27',
-        display: 'flex',
-        alignItems: 'center'
-      }}>
-        <Lock size={18} />
-      </div>
-      <input
-        type="password"
-        placeholder="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        style={{
-          flex: 1,
-          border: 'none',
-          outline: 'none',
-          fontSize: '0.9375rem',
-          '::placeholder': {
-            color: '#bfbfbf'
-          }
-        }}
-      />
-    </div>
+    <Lock size={18} />
   </div>
-  {errors.password && <p style={{
-    color: '#ff4d4f',
+  <input
+    type={showPassword ? 'text' : 'password'}
+    placeholder="Password"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    style={{
+      flex: 1,
+      border: 'none',
+      background: 'transparent',
+      outline: 'none',
+      fontSize: '15px',
+      color: 'var(--text)',
+      height: '100%',
+      fontFamily: 'Quicksand, sans-serif'
+    }}
+  />
+  <div
+    style={{
+      cursor: 'pointer',
+      color: 'var(--primary-dark)',
+      marginLeft: '12px',
+      display: 'flex',
+      alignItems: 'center'
+    }}
+    onClick={() => setShowPassword(!showPassword)}
+  >
+    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+  </div>
+</div>
+
+{errors.password && (
+  <p style={{
+    color: 'var(--error)',
     fontSize: '0.8125rem',
-    marginTop: '-0.75rem',
-    marginBottom: '-0.5rem'
-  }}>{errors.password}</p>}
+    marginTop: '4px',
+    marginBottom: '0'
+  }}>
+    {errors.password}
+  </p>
+)}
+
 
                 {isVerifying && <a>make sure email is verified</a>}
                 {errors.password && <p className="error-text">{errors.password}</p>}

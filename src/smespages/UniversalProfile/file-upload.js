@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Upload, X, FileText } from "lucide-react"
-import './UniversalProfile.css';
 
 export default function FileUpload({
   label,
@@ -47,43 +46,165 @@ export default function FileUpload({
     if (onChange) onChange(newFiles)
   }
 
+  const styles = {
+    container: {
+      marginBottom: '1rem',
+      maxWidth: '500px',
+      width: '100%'
+    },
+    label: {
+      display: 'block',
+      fontSize: '0.875rem',
+      fontWeight: '500',
+      color: '#8B4513',
+      marginBottom: '0.5rem'
+    },
+    required: {
+      color: '#EF4444'
+    },
+    dropZone: {
+      border: `2px dashed ${isDragging ? '#8B4513' : '#D2B48C'}`,
+      borderRadius: '8px',
+      padding: '0.75rem',
+      textAlign: 'center',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      backgroundColor: isDragging ? '#F5F5DC' : 'transparent',
+      minHeight: '70px',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%'
+    },
+    dropZoneHover: {
+      borderColor: '#8B4513'
+    },
+    hiddenInput: {
+      display: 'none'
+    },
+    uploadIcon: {
+      width: '1.5rem',
+      height: '1.5rem',
+      color: '#A0522D',
+      marginBottom: '0.25rem'
+    },
+    dragText: {
+      marginTop: '0.25rem',
+      fontSize: '0.75rem',
+      color: '#8B4513',
+      lineHeight: '1.2'
+    },
+    formatText: {
+      fontSize: '0.625rem',
+      color: '#A0522D',
+      marginTop: '0.25rem'
+    },
+    filesContainer: {
+      marginTop: '0.75rem'
+    },
+    filesLabel: {
+      fontSize: '0.75rem',
+      fontWeight: '500',
+      color: '#8B4513',
+      marginBottom: '0.5rem'
+    },
+    filesList: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '0.25rem'
+    },
+    fileItem: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: '#F5F5DC',
+      padding: '0.5rem',
+      borderRadius: '4px',
+      fontSize: '0.75rem'
+    },
+    fileInfo: {
+      display: 'flex',
+      alignItems: 'center',
+      minWidth: 0
+    },
+    fileIcon: {
+      width: '1rem',
+      height: '1rem',
+      color: '#A0522D',
+      marginRight: '0.5rem',
+      flexShrink: 0
+    },
+    fileName: {
+      color: '#8B4513',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+      maxWidth: '8rem'
+    },
+    removeButton: {
+      color: '#A0522D',
+      cursor: 'pointer',
+      padding: '0.125rem',
+      borderRadius: '2px',
+      transition: 'color 0.2s ease',
+      flexShrink: 0
+    },
+    removeIcon: {
+      width: '1rem',
+      height: '1rem'
+    }
+  }
+
   return (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-brown-700 mb-1">
-        {label} {required && <span className="text-red-500">*</span>}
+    <div style={styles.container}>
+      <label style={styles.label}>
+        {label} {required && <span style={styles.required}>*</span>}
       </label>
 
       <div
-        className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
-          isDragging ? "border-brown-500 bg-brown-50" : "border-brown-300 hover:border-brown-500"
-        }`}
+        style={{
+          ...styles.dropZone,
+          ...(isDragging ? {} : {}),
+          ':hover': styles.dropZoneHover
+        }}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => document.getElementById(`file-upload-${label}`).click()}
+        onMouseEnter={(e) => {
+          if (!isDragging) {
+            e.target.style.borderColor = '#8B4513'
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isDragging) {
+            e.target.style.borderColor = '#D2B48C'
+          }
+        }}
       >
         <input
           id={`file-upload-${label}`}
           type="file"
-          className="hidden"
+          style={styles.hiddenInput}
           accept={accept}
           multiple={multiple}
           onChange={handleFileChange}
         />
-        <Upload className="mx-auto h-8 w-8 text-brown-400" />
-        <p className="mt-1 text-sm text-brown-600">Drag and drop files here, or click to select files</p>
-        <p className="text-xs text-brown-500 mt-1">Accepted formats: {accept.replace(/\./g, "").replace(/,/g, ", ")}</p>
+        <Upload style={styles.uploadIcon} />
+        <p style={styles.dragText}>Drag files or click to select</p>
+        <p style={styles.formatText}>{accept.replace(/\./g, "").replace(/,/g, ", ")}</p>
       </div>
 
       {files.length > 0 && (
-        <div className="mt-2">
-          <p className="text-sm font-medium text-brown-700 mb-1">Uploaded files:</p>
-          <ul className="space-y-1">
+        <div style={styles.filesContainer}>
+          <p style={styles.filesLabel}>Files ({files.length}):</p>
+          <div style={styles.filesList}>
             {files.map((file, index) => (
-              <li key={index} className="flex items-center justify-between bg-brown-50 p-2 rounded">
-                <div className="flex items-center">
-                  <FileText className="h-4 w-4 text-brown-500 mr-2" />
-                  <span className="text-sm text-brown-700 truncate max-w-xs">{file.name || `File ${index + 1}`}</span>
+              <div key={index} style={styles.fileItem}>
+                <div style={styles.fileInfo}>
+                  <FileText style={styles.fileIcon} />
+                  <span style={styles.fileName}>{file.name || `File ${index + 1}`}</span>
                 </div>
                 <button
                   type="button"
@@ -91,13 +212,19 @@ export default function FileUpload({
                     e.stopPropagation()
                     removeFile(index)
                   }}
-                  className="text-brown-500 hover:text-brown-700"
+                  style={styles.removeButton}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = '#8B4513'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = '#A0522D'
+                  }}
                 >
-                  <X className="h-4 w-4" />
+                  <X style={styles.removeIcon} />
                 </button>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </div>

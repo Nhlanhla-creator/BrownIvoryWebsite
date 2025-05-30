@@ -200,16 +200,10 @@ export default function OwnershipManagement({ data = { shareholders: [], directo
       <div className={styles.documentSection}>
         <h3 className={styles.sectionHeading}>Required Documents</h3>
         <div className={styles.documentGrid}>
-          <FileUpload
-            label="Certified IDs"
-            accept=".pdf,.jpg,.jpeg,.png"
-            multiple
-            onChange={(files) => handleFileChange("certifiedIDs", files)}
-            value={data.certifiedIDs || []}
-          />
+       
 
           <FileUpload
-            label="Share Register"
+            label="ownership declaration(optional)"
             accept=".pdf,.doc,.docx"
             onChange={(files) => handleFileChange("shareRegister", files)}
             value={data.shareRegister || []}

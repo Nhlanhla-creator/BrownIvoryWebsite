@@ -27,22 +27,22 @@ export function FundingInsights() {
     // Clean up any existing charts
     charts.current.forEach((chart) => chart.destroy())
     charts.current = []
+// Elegant Brown Color Palette
+const brownPalette = {
+  primary: "#7B3F00",       // Rich Coffee
+  secondary: "#A0522D",     // Sienna
+  tertiary: "#C68642",      // Light Caramel
+  light: "#D8B384",         // Toasted Almond
+  lighter: "#EBD3B0",       // Champagne
+  lightest: "#F9E9D0",      // Soft Beige
 
-    // Brown color palette
-    const brownPalette = {
-      primary: "#8B5A2B",
-      secondary: "#A67C52",
-      tertiary: "#C19A6B",
-      light: "#D4B996",
-      lighter: "#E6CCAB",
-      lightest: "#F5E6CB",
- accent1: "#CD853F", // Peru brown (keeping one of yours)
-accent2: "#DEB887", // Burlywood
-accent3: "#8B4513", // Saddle brown
-accent4: "#6B4226", // Umber brown
-accent5: "#4A3728", // Dark walnut
-  
-    }
+  accent1: "#8B5E3C",       // Chestnut
+  accent2: "#A67B5B",       // Cocoa Brown
+  accent3: "#5C3A21",       // Dark Mocha
+  accent4: "#3E2C20",       // Espresso
+  accent5: "#2B1B0E",       // Deep Bark
+}
+
 
     const createChart = (ref, config) => {
       if (ref.current) {

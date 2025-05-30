@@ -119,7 +119,9 @@ export function ComplianceScoreCard({ styles, profileData }) {
             onClick={() => setShowModal(true)}
             style={{ backgroundColor: '#8d6e63', color: 'white' }}
           >
-            View More
+         Score Breakdown
+
+
             <ChevronDown className="ml-1 inline-block" size={16} />
           </button>
         </div>
