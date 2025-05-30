@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { auth } from "../../firebaseConfig";
+import { onAuthStateChanged } from "firebase/auth";
 
 export function InvestorSMETable() {
   const [availabilities, setAvailabilities] = useState([]);
@@ -34,6 +35,8 @@ export function InvestorSMETable() {
   const [selectedSMEForStage, setSelectedSMEForStage] = useState(null);
   const [updatedStages, setUpdatedStages] = useState({});
   const navigate = useNavigate();
+const [authLoading, setAuthLoading] = useState(true);
+const [user, setUser] = useState(null);
 
   const loadApplicationAvailability = (application) => {
     if (application.availableDates) {
@@ -47,23 +50,28 @@ export function InvestorSMETable() {
     }
   };
 
-  useEffect(() => {
-    const auth = getAuth();
-    const user = auth.currentUser;
+useEffect(() => {
+  setLoading(true);
+  setAuthLoading(true);
 
-    if (!user) {
+  // Listen for authentication state changes
+  const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser);
+    setAuthLoading(false);
+
+    if (!currentUser) {
       setLoading(false);
+      setSmes([]);
       return;
     }
 
-    setLoading(true);
-
+    // Only proceed with data fetching if user is authenticated
     const q = query(
       collection(db, "investorApplications"),
-      where("funderId", "==", user.uid)
+      where("funderId", "==", currentUser.uid)
     );
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const unsubscribeData = onSnapshot(q, (querySnapshot) => {
       const applications = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
@@ -93,8 +101,13 @@ export function InvestorSMETable() {
       setLoading(false);
     });
 
-    return () => unsubscribe();
-  }, []);
+    // Return cleanup function for data subscription
+    return () => unsubscribeData();
+  });
+
+  // Return cleanup function for auth subscription
+  return () => unsubscribeAuth();
+}, []);
 
   const handleDateSelect = (dates) => {
     setTempDates(dates || []);
@@ -704,7 +717,18 @@ export function InvestorSMETable() {
   if (loading) {
     return <div className={styles.loadingContainer}>Loading applications...</div>;
   }
+if (authLoading || loading) {
+  return <div className={styles.loadingContainer}>Loading applications...</div>;
+}
 
+// Add this condition right after the loading check
+if (!user) {
+  return (
+    <div className={styles.loadingContainer}>
+      Please log in to view applications.
+    </div>
+  );
+}
   return (
     <div className={styles.tableSection}>
       <h2 className={styles.sectionTitle}>SMSE Applications</h2>
