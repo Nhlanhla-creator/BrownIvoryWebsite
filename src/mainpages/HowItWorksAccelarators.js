@@ -7,7 +7,8 @@ const HowItWorksAccelerators = () => {
   return (
     <div style={styles.appContainer}>
       <Header />
-      
+
+      {/* Main Content Container */}
       <div style={styles.container}>
         {/* Hero Section */}
         <section style={styles.heroSection}>
@@ -17,11 +18,12 @@ const HowItWorksAccelerators = () => {
           </div>
         </section>
 
-        {/* Steps Section */}
+        {/* Content & Steps */}
         <div style={styles.contentContainer}>
           <h2 style={styles.contentTitle}>Supercharge Your Cohort in 3 Steps</h2>
           <p style={styles.videoTitle}>Explainer Video: "Building Stronger SMEs"</p>
-          
+
+          {/* Steps */}
           <div style={styles.stepsContainer}>
             {/* Step 1 */}
             <div style={styles.stepCard}>
@@ -66,6 +68,7 @@ const HowItWorksAccelerators = () => {
             </div>
           </div>
 
+          {/* CTA Button */}
           <button style={styles.ctaButton}>Join as Partner</button>
         </div>
       </div>
@@ -89,55 +92,57 @@ const styles = {
   appContainer: {
     display: 'flex',
     flexDirection: 'column',
-    minHeight: '100vh'
+    minHeight: '100vh',
+    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+    backgroundImage: 'linear-gradient(rgba(55, 44, 39, 0.21), rgba(55, 44, 39, 0.36)), url(/brown.jpg)',
+    backgroundSize: 'cover',
   },
   container: {
-    fontFamily: "'Arial', sans-serif",
     maxWidth: '1200px',
     margin: '0 auto',
-    padding: '20px',
+    padding: '30px 20px',
     backgroundColor: colors.cream,
     color: colors.darkBrown,
-    flex: '1'
+    flex: 1
   },
   heroSection: {
-    height: '300px',
-    marginBottom: '40px',
+    height: '350px',
+    marginBottom: '50px',
     borderRadius: '10px',
     overflow: 'hidden',
-    backgroundImage: 'linear-gradient(rgba(55, 44, 39, 0.8), rgba(55, 44, 39, 0.8)), url(https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80)',
+    backgroundImage: `linear-gradient(rgba(55, 44, 39, 0.8), rgba(55, 44, 39, 0.8)), url(https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80)`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     textAlign: 'center',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+    boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
   },
   heroContent: {
     padding: '20px',
     maxWidth: '800px'
   },
   mainTitle: {
-    fontSize: '2.5rem',
-    fontWeight: 'bold',
+    fontSize: '3rem',
+    fontWeight: '700',
     color: colors.white,
     marginBottom: '20px',
-    textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+    textShadow: '2px 2px 4px rgba(0,0,0,0.4)'
   },
   subTitle: {
-    fontSize: '1.3rem',
+    fontSize: '1.5rem',
     color: colors.lightGray,
-    marginBottom: '30px',
+    marginBottom: '40px',
     textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
   },
   contentContainer: {
-    marginBottom: '60px',
-    textAlign: 'center'
+    textAlign: 'center',
+    marginBottom: '60px'
   },
   contentTitle: {
     fontSize: '2rem',
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: colors.mediumBrown,
     marginBottom: '20px',
     position: 'relative',
@@ -153,23 +158,24 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     flexWrap: 'wrap',
-    gap: '40px',
+    gap: '30px',
     marginBottom: '50px'
   },
   stepCard: {
     flex: '1',
     minWidth: '280px',
-    maxWidth: '320px',
+    maxWidth: '340px',
     backgroundColor: colors.white,
     padding: '30px 20px',
     borderRadius: '15px',
-    boxShadow: '0 5px 20px rgba(0,0,0,0.08)',
+    boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
     textAlign: 'center',
-    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-    ':hover': {
-      transform: 'translateY(-10px)',
-      boxShadow: '0 15px 30px rgba(0,0,0,0.15)'
-    }
+    transition: 'transform 0.3s, box-shadow 0.3s',
+    cursor: 'pointer',
+  },
+  stepCardHover: {
+    transform: 'translateY(-8px)',
+    boxShadow: '0 10px 20px rgba(0,0,0,0.2)'
   },
   stepCircle: {
     width: '100px',
@@ -182,20 +188,19 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     color: colors.white,
-    position: 'relative',
-    boxShadow: '0 5px 15px rgba(117, 74, 45, 0.3)',
-    transition: 'all 0.3s ease'
+    boxShadow: '0 4px 10px rgba(117, 74, 45, 0.3)',
+    transition: 'all 0.3s',
   },
   stepNumber: {
-    fontSize: '1.2rem',
-    fontWeight: 'bold',
+    fontSize: '1.4rem',
+    fontWeight: '700',
     marginBottom: '5px'
   },
   stepIcon: {
     color: colors.white
   },
   stepTitle: {
-    fontSize: '1.4rem',
+    fontSize: '1.3rem',
     color: colors.mediumBrown,
     marginBottom: '20px',
     fontWeight: '600'
@@ -203,23 +208,23 @@ const styles = {
   stepDetails: {
     textAlign: 'left',
     paddingLeft: '20px',
-    listStyleType: 'none',
-    marginBottom: '20px',
-    li: {
-      marginBottom: '12px',
-      position: 'relative',
-      paddingLeft: '25px',
-      lineHeight: '1.5',
-      ':before': {
-        content: '"•"',
-        position: 'absolute',
-        left: '0',
-        color: colors.lightBrown,
-        fontSize: '1.8rem',
-        lineHeight: '1rem',
-        top: '3px'
-      }
-    }
+    listStyle: 'none',
+    marginBottom: '20px'
+  },
+  stepDetailsLi: {
+    marginBottom: '12px',
+    position: 'relative',
+    paddingLeft: '25px',
+    lineHeight: '1.5',
+  },
+  stepDetailsLiBefore: {
+    content: '"•"',
+    position: 'absolute',
+    left: '0',
+    top: '0',
+    color: colors.lightBrown,
+    fontSize: '1.8rem',
+    lineHeight: '1',
   },
   ctaButton: {
     padding: '15px 40px',
@@ -227,19 +232,16 @@ const styles = {
     color: colors.white,
     border: 'none',
     borderRadius: '50px',
-    fontSize: '1.1rem',
-    fontWeight: 'bold',
+    fontSize: '1.2rem',
+    fontWeight: '700',
     cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    boxShadow: '0 4px 8px rgba(158, 110, 60, 0.3)',
-    ':hover': {
-      backgroundColor: colors.mediumBrown,
-      transform: 'translateY(-3px)',
-      boxShadow: '0 6px 12px rgba(117, 74, 45, 0.4)'
-    },
-    ':active': {
-      transform: 'translateY(1px)'
-    }
+    boxShadow: '0 4px 10px rgba(158, 110, 60, 0.3)',
+    transition: 'all 0.3s',
+  },
+  ctaButtonHover: {
+    backgroundColor: colors.mediumBrown,
+    transform: 'translateY(-3px)',
+    boxShadow: '0 8px 16px rgba(117, 74, 45, 0.4)'
   }
 };
 

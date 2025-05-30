@@ -89,7 +89,9 @@ const styles = {
   appContainer: {
     display: 'flex',
     flexDirection: 'column',
-    minHeight: '100vh'
+    minHeight: '100vh',
+    backgroundImage: 'linear-gradient(rgba(55, 44, 39, 0.21), rgba(55, 44, 39, 0.36)), url(/background10.jpg)',
+    backgroundSize: 'cover',
   },
   container: {
     fontFamily: "'Arial', sans-serif",
@@ -98,7 +100,8 @@ const styles = {
     padding: '20px',
     backgroundColor: colors.cream,
     color: colors.darkBrown,
-    flex: '1'
+    flex: '1',
+    
   },
   heroSection: {
     height: '300px',

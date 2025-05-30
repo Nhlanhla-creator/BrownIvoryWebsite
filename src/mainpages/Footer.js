@@ -40,7 +40,7 @@ const Footer = () => {
       </div>
 
       <div style={styles.footerBottom}>
-        <p>&copy; {new Date().getFullYear()} Brown Ivory Group. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} BIG Marketplace. All rights reserved.</p>
       </div>
     </footer>
   );

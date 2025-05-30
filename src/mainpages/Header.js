@@ -4,10 +4,9 @@ import { useNavigate } from 'react-router-dom';
 const Header = () => {
   const navigate = useNavigate();
 
-const handleLoginClick = (mode = 'login') => {
-  navigate(`/LoginRegister?mode=${mode}`);
-};
-
+  const handleLoginClick = (mode = 'login') => {
+    navigate(`/LoginRegister?mode=${mode}`);
+  };
 
   const handleNavigation = (path) => {
     if (path.startsWith('#')) {
@@ -38,13 +37,12 @@ const handleLoginClick = (mode = 'login') => {
     },
     logoContainer: {
       display: 'flex',
-      alignItems: 'center',
-      cursor: 'pointer'
+      alignItems: 'center'
     },
     logo: {
       height: 'auto',
-      width: '220px',
-      maxHeight: '80px',
+      width: '330px',
+      maxHeight: '370px',
       objectFit: 'contain',
     },
     nav: {
@@ -70,12 +68,7 @@ const handleLoginClick = (mode = 'login') => {
     <>
       {/* CSS for pseudo-classes */}
       <style>
-        {`
-          .logo-container:hover {
-            transform: scale(1.03);
-            transition: transform 0.3s ease;
-          }
-          
+        {`          
           .nav-button {
             text-decoration: none;
             color: #FFFFFF;
@@ -191,12 +184,11 @@ const handleLoginClick = (mode = 'login') => {
       </style>
 
       <header style={styles.header}>
-        <div style={styles.logoContainer} className="logo-container">
+        <div style={styles.logoContainer}>
           <img 
-            src='/PrimaryLogo.jpg' 
+            src='/LogoWhite.png' 
             alt="Brown Ivory Group Logo" 
-            style={styles.logo} 
-            onClick={() => handleNavigation('/')} 
+            style={styles.logo}
           />
         </div>
         <nav style={styles.nav} className="nav">
@@ -230,7 +222,7 @@ const handleLoginClick = (mode = 'login') => {
           
           <button 
             className="nav-button"
-            onClick={() => handleNavigation('#footer-contact')}
+            onClick={() => handleNavigation('/ContactPage')}
           >
             Contact Us
           </button>
@@ -242,22 +234,21 @@ const handleLoginClick = (mode = 'login') => {
           </button>
         </nav>
         <div style={styles.buttonGroup} className="button-group">
-   <button className="login-button" onClick={() => handleLoginClick('login')}>
-  Login
-</button>
+          <button className="login-button" onClick={() => handleLoginClick('login')}>
+            Login
+          </button>
 
           <div className="register-container">
-          <button className="get-started-button" onClick={() => handleLoginClick('register')}>
-  Register
-</button>
+            <button className="get-started-button" onClick={() => handleLoginClick('register')}>
+              Register
+            </button>
             <div
-  style={styles.registerText}
-  className="register-text"
-  onClick={() => handleLoginClick('register')}
->
-  Have not registered yet?
-</div>
-
+              style={styles.registerText}
+              className="register-text"
+              onClick={() => handleLoginClick('register')}
+            >
+              Have not registered yet?
+            </div>
           </div>
         </div>
       </header>

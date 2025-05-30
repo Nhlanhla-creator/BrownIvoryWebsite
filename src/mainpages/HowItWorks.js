@@ -1,86 +1,183 @@
 import React, { useState } from 'react';
-import { FaUserEdit, FaChartLine, FaHandshake, FaFilter, FaFileAlt, FaMoneyBillWave, FaBullseye, FaUsers, FaHandHoldingUsd, FaClipboardList, FaUserFriends, FaChartBar } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  FaUserEdit, FaChartLine, FaHandshake, FaFilter, FaFileAlt, 
+  FaMoneyBillWave, FaBullseye, FaUsers, FaHandHoldingUsd, 
+  FaClipboardList, FaUserFriends, FaChartBar 
+} from 'react-icons/fa';
 import Header from './Header';
 import Footer from './Footer';
 
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      when: "beforeChildren"
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 10
+    }
+  }
+};
+
+const tabContentVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.3, ease: "easeOut" }
+  },
+  exit: { opacity: 0, y: -20 }
+};
+
 const HowItWorks = () => {
   const [activeTab, setActiveTab] = useState('smes');
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+
+  const handleTabChange = (tab) => {
+    setIsVideoLoaded(false);
+    setActiveTab(tab);
+  };
 
   const renderContent = () => {
     switch (activeTab) {
       case 'investors':
-        return <InvestorsContent />;
+        return <InvestorsContent isVideoLoaded={isVideoLoaded} setIsVideoLoaded={setIsVideoLoaded} />;
       case 'corporates':
-        return <CorporatesContent />;
+        return <CorporatesContent isVideoLoaded={isVideoLoaded} setIsVideoLoaded={setIsVideoLoaded} />;
       case 'accelerators':
-        return <AcceleratorsContent />;
+        return <AcceleratorsContent isVideoLoaded={isVideoLoaded} setIsVideoLoaded={setIsVideoLoaded} />;
       default:
-        return <SMESContent />;
+        return <SMESContent isVideoLoaded={isVideoLoaded} setIsVideoLoaded={setIsVideoLoaded} />;
     }
   };
 
   return (
     <div style={styles.appContainer}>
-      {/* Full page background */}
-      <div style={styles.fullPageBackground}></div>
+      {/* Animated background */}
+      <motion.div 
+        style={styles.fullPageBackground}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.5 }}
+        transition={{ duration: 1 }}
+      />
       
       <Header />
       
       <div style={styles.contentContainer}>
         {/* Hero Section */}
-        <section style={styles.heroSection}>
+        <motion.section 
+          style={styles.heroSection}
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
           <div style={styles.heroContent}>
-            <h1 style={styles.mainTitle}>How BIG Marketplace Works</h1>
-            <p style={styles.subTitle}>For Every Stakeholder in the SMSE Ecosystem</p>
+            <motion.h1 
+              style={styles.mainTitle}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              How BIG Marketplace Works
+            </motion.h1>
+            <motion.p 
+              style={styles.subTitle}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              For Every Stakeholder in the SMSE Ecosystem
+            </motion.p>
           </div>
-        </section>
+        </motion.section>
 
         {/* Main Content Area */}
-        <div style={styles.mainContentArea}>
+        <motion.div 
+          style={styles.mainContentArea}
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
           {/* Tab Navigation */}
-          <div style={styles.tabContainer}>
-            <button 
-              style={activeTab === 'smes' ? styles.activeTab : styles.tab}
-              onClick={() => setActiveTab('smes')}
-            >
-              <FaUserEdit style={styles.tabIcon} /> For SMSEs
-            </button>
-            <button 
-              style={activeTab === 'investors' ? styles.activeTab : styles.tab}
-              onClick={() => setActiveTab('investors')}
-            >
-              <FaMoneyBillWave style={styles.tabIcon} /> For Investors
-            </button>
-            <button 
-              style={activeTab === 'corporates' ? styles.activeTab : styles.tab}
-              onClick={() => setActiveTab('corporates')}
-            >
-              <FaBullseye style={styles.tabIcon} /> For Corporates
-            </button>
-            <button 
-              style={activeTab === 'accelerators' ? styles.activeTab : styles.tab}
-              onClick={() => setActiveTab('accelerators')}
-            >
-              <FaUsers style={styles.tabIcon} /> For Accelerators
-            </button>
-          </div>
+          <motion.div 
+            style={styles.tabContainer}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {[
+              { id: 'smes', label: 'For SMSEs', icon: <FaUserEdit style={styles.tabIcon} /> },
+              { id: 'investors', label: 'For Investors', icon: <FaMoneyBillWave style={styles.tabIcon} /> },
+              { id: 'corporates', label: 'For Corporates', icon: <FaBullseye style={styles.tabIcon} /> },
+              { id: 'accelerators', label: 'For Accelerators', icon: <FaUsers style={styles.tabIcon} /> }
+            ].map((tab) => (
+              <motion.button
+                key={tab.id}
+                style={activeTab === tab.id ? styles.activeTab : styles.tab}
+                onClick={() => handleTabChange(tab.id)}
+                variants={itemVariants}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {tab.icon} {tab.label}
+              </motion.button>
+            ))}
+          </motion.div>
 
           {/* Dynamic Content */}
-          {renderContent()}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              variants={tabContentVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              {renderContent()}
+            </motion.div>
+          </AnimatePresence>
 
           {/* Trust Section */}
-          <div style={styles.trustSection}>
+          <motion.div 
+            style={styles.trustSection}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ delay: 0.4 }}
+          >
             <p style={styles.trustText}>Trusted by 50+ funders and 500+ SMEs</p>
             <div style={styles.logoGrid}>
               {[...Array(6)].map((_, i) => (
-                <div key={i} style={styles.logoPlaceholder}>
+                <motion.div 
+                  key={i} 
+                  style={styles.logoPlaceholder}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ y: -5 }}
+                >
                   <div style={styles.logoIcon}>🏢</div>
                   <span>Partner {i+1}</span>
-                </div>
+                </motion.div>
               ))}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
 
       <Footer />
@@ -89,14 +186,36 @@ const HowItWorks = () => {
 };
 
 // SMSEs Content Component
-const SMESContent = () => {
+const SMESContent = ({ isVideoLoaded, setIsVideoLoaded }) => {
   return (
     <div style={styles.contentSection}>
-      <h2 style={styles.contentTitle}>Get Scored. Get Matched. Grow.</h2>
+      <motion.h2 
+        style={styles.contentTitle}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        Get Scored. Get Matched. Grow.
+      </motion.h2>
       
       {/* Main Explainer Video Section */}
-      <div style={styles.mainVideoContainer}>
+      <motion.div 
+        style={styles.mainVideoContainer}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
         <div style={styles.videoWrapper}>
+          {!isVideoLoaded && (
+            <motion.div
+              style={styles.videoPlaceholder}
+              initial={{ opacity: 1 }}
+              animate={{ opacity: isVideoLoaded ? 0 : 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div style={styles.loadingSpinner}></div>
+            </motion.div>
+          )}
           <iframe 
             width="100%" 
             height="100%" 
@@ -106,13 +225,23 @@ const SMESContent = () => {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowFullScreen
             style={{ position: 'absolute', top: 0, left: 0 }}
-          ></iframe>
+            onLoad={() => setIsVideoLoaded(true)}
+          />
         </div>
-      </div>
+      </motion.div>
       
-      <div style={styles.stepsContainer}>
+      <motion.div 
+        style={styles.stepsContainer}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Step 1 */}
-        <div style={styles.stepCard}>
+        <motion.div 
+          style={styles.stepCard}
+          variants={itemVariants}
+          whileHover={{ y: -5 }}
+        >
           <div style={styles.stepNumberCircle}>
             <span style={styles.stepNumber}>1</span>
           </div>
@@ -124,10 +253,14 @@ const SMESContent = () => {
             <li>Takes 5 minutes</li>
             <li>Upload basic docs (tax, registration, pitch deck)</li>
           </ul>
-        </div>
+        </motion.div>
 
         {/* Step 2 */}
-        <div style={styles.stepCard}>
+        <motion.div 
+          style={styles.stepCard}
+          variants={itemVariants}
+          whileHover={{ y: -5 }}
+        >
           <div style={styles.stepNumberCircle}>
             <span style={styles.stepNumber}>2</span>
           </div>
@@ -139,10 +272,14 @@ const SMESContent = () => {
             <li>We analyze compliance, growth potential, and pitch quality</li>
             <li>Receive a score (0-100) + actionable feedback</li>
           </ul>
-        </div>
+        </motion.div>
 
         {/* Step 3 */}
-        <div style={styles.stepCard}>
+        <motion.div 
+          style={styles.stepCard}
+          variants={itemVariants}
+          whileHover={{ y: -5 }}
+        >
           <div style={styles.stepNumberCircle}>
             <span style={styles.stepNumber}>3</span>
           </div>
@@ -155,23 +292,51 @@ const SMESContent = () => {
             <li>Mentors: Connect with advisors to improve weak areas</li>
             <li>Programs: Apply to accelerators if score is low</li>
           </ul>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      <button style={styles.ctaButton}>Get Your Score Now</button>
+      <motion.button 
+        style={styles.ctaButton}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        Get Your Score Now
+      </motion.button>
     </div>
   );
 };
 
 // Investors Content Component
-const InvestorsContent = () => {
+const InvestorsContent = ({ isVideoLoaded, setIsVideoLoaded }) => {
   return (
     <div style={styles.contentSection}>
-      <h2 style={styles.contentTitle}>Discover. Verify. Invest.</h2>
+      <motion.h2 
+        style={styles.contentTitle}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        Discover. Verify. Invest.
+      </motion.h2>
       
       {/* Main Explainer Video Section */}
-      <div style={styles.mainVideoContainer}>
+      <motion.div 
+        style={styles.mainVideoContainer}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
         <div style={styles.videoWrapper}>
+          {!isVideoLoaded && (
+            <motion.div
+              style={styles.videoPlaceholder}
+              initial={{ opacity: 1 }}
+              animate={{ opacity: isVideoLoaded ? 0 : 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div style={styles.loadingSpinner}></div>
+            </motion.div>
+          )}
           <iframe 
             width="100%" 
             height="100%" 
@@ -181,13 +346,23 @@ const InvestorsContent = () => {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowFullScreen
             style={{ position: 'absolute', top: 0, left: 0 }}
-          ></iframe>
+            onLoad={() => setIsVideoLoaded(true)}
+          />
         </div>
-      </div>
+      </motion.div>
       
-      <div style={styles.stepsContainer}>
+      <motion.div 
+        style={styles.stepsContainer}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Step 1 */}
-        <div style={styles.stepCard}>
+        <motion.div 
+          style={styles.stepCard}
+          variants={itemVariants}
+          whileHover={{ y: -5 }}
+        >
           <div style={styles.stepNumberCircle}>
             <span style={styles.stepNumber}>1</span>
           </div>
@@ -199,10 +374,14 @@ const InvestorsContent = () => {
             <li>Industry, risk level, ticket size</li>
             <li>Opt-in for auto-matched SMEs</li>
           </ul>
-        </div>
+        </motion.div>
 
         {/* Step 2 */}
-        <div style={styles.stepCard}>
+        <motion.div 
+          style={styles.stepCard}
+          variants={itemVariants}
+          whileHover={{ y: -5 }}
+        >
           <div style={styles.stepNumberCircle}>
             <span style={styles.stepNumber}>2</span>
           </div>
@@ -214,10 +393,14 @@ const InvestorsContent = () => {
             <li>Filter by BIG Score, growth metrics, or compliance</li>
             <li>View SME pitch decks + score breakdowns</li>
           </ul>
-        </div>
+        </motion.div>
 
         {/* Step 3 */}
-        <div style={styles.stepCard}>
+        <motion.div 
+          style={styles.stepCard}
+          variants={itemVariants}
+          whileHover={{ y: -5 }}
+        >
           <div style={styles.stepNumberCircle}>
             <span style={styles.stepNumber}>3</span>
           </div>
@@ -229,23 +412,51 @@ const InvestorsContent = () => {
             <li>Message SMEs via platform</li>
             <li>Track portfolio performance</li>
           </ul>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      <button style={styles.ctaButton}>Browse SMEs Now</button>
+      <motion.button 
+        style={styles.ctaButton}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        Browse SMEs Now
+      </motion.button>
     </div>
   );
 };
 
 // Corporates Content Component
-const CorporatesContent = () => {
+const CorporatesContent = ({ isVideoLoaded, setIsVideoLoaded }) => {
   return (
     <div style={styles.contentSection}>
-      <h2 style={styles.contentTitle}>Source. Partner. Amplify Impact.</h2>
+      <motion.h2 
+        style={styles.contentTitle}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        Source. Partner. Amplify Impact.
+      </motion.h2>
       
       {/* Main Explainer Video Section */}
-      <div style={styles.mainVideoContainer}>
+      <motion.div 
+        style={styles.mainVideoContainer}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
         <div style={styles.videoWrapper}>
+          {!isVideoLoaded && (
+            <motion.div
+              style={styles.videoPlaceholder}
+              initial={{ opacity: 1 }}
+              animate={{ opacity: isVideoLoaded ? 0 : 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div style={styles.loadingSpinner}></div>
+            </motion.div>
+          )}
           <iframe 
             width="100%" 
             height="100%" 
@@ -255,13 +466,23 @@ const CorporatesContent = () => {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowFullScreen
             style={{ position: 'absolute', top: 0, left: 0 }}
-          ></iframe>
+            onLoad={() => setIsVideoLoaded(true)}
+          />
         </div>
-      </div>
+      </motion.div>
       
-      <div style={styles.stepsContainer}>
+      <motion.div 
+        style={styles.stepsContainer}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Step 1 */}
-        <div style={styles.stepCard}>
+        <motion.div 
+          style={styles.stepCard}
+          variants={itemVariants}
+          whileHover={{ y: -5 }}
+        >
           <div style={styles.stepNumberCircle}>
             <span style={styles.stepNumber}>1</span>
           </div>
@@ -272,10 +493,14 @@ const CorporatesContent = () => {
           <ul style={styles.stepDetails}>
             <li>Select focus areas (e.g., women-led, green biz)</li>
           </ul>
-        </div>
+        </motion.div>
 
         {/* Step 2 */}
-        <div style={styles.stepCard}>
+        <motion.div 
+          style={styles.stepCard}
+          variants={itemVariants}
+          whileHover={{ y: -5 }}
+        >
           <div style={styles.stepNumberCircle}>
             <span style={styles.stepNumber}>2</span>
           </div>
@@ -287,10 +512,14 @@ const CorporatesContent = () => {
             <li>BIG Score ensures compliance and impact alignment</li>
             <li>Dashboard tracks SME progress over time</li>
           </ul>
-        </div>
+        </motion.div>
 
         {/* Step 3 */}
-        <div style={styles.stepCard}>
+        <motion.div 
+          style={styles.stepCard}
+          variants={itemVariants}
+          whileHover={{ y: -5 }}
+        >
           <div style={styles.stepNumberCircle}>
             <span style={styles.stepNumber}>3</span>
           </div>
@@ -302,23 +531,51 @@ const CorporatesContent = () => {
             <li>Sponsor accelerators</li>
             <li>Direct contracts with high-scoring SMEs</li>
           </ul>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      <button style={styles.ctaButton}>Explore SMEs</button>
+      <motion.button 
+        style={styles.ctaButton}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        Explore SMEs
+      </motion.button>
     </div>
   );
 };
 
 // Accelerators Content Component
-const AcceleratorsContent = () => {
+const AcceleratorsContent = ({ isVideoLoaded, setIsVideoLoaded }) => {
   return (
     <div style={styles.contentSection}>
-      <h2 style={styles.contentTitle}>Identify. Nurture. Track.</h2>
+      <motion.h2 
+        style={styles.contentTitle}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        Identify. Nurture. Track.
+      </motion.h2>
       
       {/* Main Explainer Video Section */}
-      <div style={styles.mainVideoContainer}>
+      <motion.div 
+        style={styles.mainVideoContainer}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
         <div style={styles.videoWrapper}>
+          {!isVideoLoaded && (
+            <motion.div
+              style={styles.videoPlaceholder}
+              initial={{ opacity: 1 }}
+              animate={{ opacity: isVideoLoaded ? 0 : 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div style={styles.loadingSpinner}></div>
+            </motion.div>
+          )}
           <iframe 
             width="100%" 
             height="100%" 
@@ -328,13 +585,23 @@ const AcceleratorsContent = () => {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowFullScreen
             style={{ position: 'absolute', top: 0, left: 0 }}
-          ></iframe>
+            onLoad={() => setIsVideoLoaded(true)}
+          />
         </div>
-      </div>
+      </motion.div>
       
-      <div style={styles.stepsContainer}>
+      <motion.div 
+        style={styles.stepsContainer}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Step 1 */}
-        <div style={styles.stepCard}>
+        <motion.div 
+          style={styles.stepCard}
+          variants={itemVariants}
+          whileHover={{ y: -5 }}
+        >
           <div style={styles.stepNumberCircle}>
             <span style={styles.stepNumber}>1</span>
           </div>
@@ -345,10 +612,14 @@ const AcceleratorsContent = () => {
           <ul style={styles.stepDetails}>
             <li>Add eligibility criteria (e.g., "Scores 40-60")</li>
           </ul>
-        </div>
+        </motion.div>
 
         {/* Step 2 */}
-        <div style={styles.stepCard}>
+        <motion.div 
+          style={styles.stepCard}
+          variants={itemVariants}
+          whileHover={{ y: -5 }}
+        >
           <div style={styles.stepNumberCircle}>
             <span style={styles.stepNumber}>2</span>
           </div>
@@ -360,10 +631,14 @@ const AcceleratorsContent = () => {
             <li>Auto-receive applications from aligned SMEs</li>
             <li>View SME score history</li>
           </ul>
-        </div>
+        </motion.div>
 
         {/* Step 3 */}
-        <div style={styles.stepCard}>
+        <motion.div 
+          style={styles.stepCard}
+          variants={itemVariants}
+          whileHover={{ y: -5 }}
+        >
           <div style={styles.stepNumberCircle}>
             <span style={styles.stepNumber}>3</span>
           </div>
@@ -375,10 +650,16 @@ const AcceleratorsContent = () => {
             <li>Track SME score improvements post-program</li>
             <li>Highlight success stories to attract funders</li>
           </ul>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      <button style={styles.ctaButton}>Join as a Partner</button>
+      <motion.button 
+        style={styles.ctaButton}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        Join as a Partner
+      </motion.button>
     </div>
   );
 };
@@ -403,7 +684,7 @@ const styles = {
     minHeight: '100vh',
     display: 'flex',
     flexDirection: 'column',
-     backgroundImage: 'linear-gradient(rgba(180, 168, 162, 0.85), rgba(148, 138, 133, 0.89)), url(https://wallcoveringsmart.com/cdn/shop/products/Floralivorypearloffwhitegoldmetallicappletreesbirdstexturedwallpaper.jpg?v=1674418164)',
+    backgroundImage: 'linear-gradient(rgba(180, 168, 162, 0.85), rgba(148, 138, 133, 0.89)), url(https://wallcoveringsmart.com/cdn/shop/products/Floralivorypearloffwhitegoldmetallicappletreesbirdstexturedwallpaper.jpg?v=1674418164)',
     backgroundSize: 'cover',
   },
   fullPageBackground: {
@@ -417,7 +698,6 @@ const styles = {
     backgroundPosition: 'center',
     backgroundAttachment: 'fixed',
     zIndex: -1,
-    opacity: 0.5
   },
   contentContainer: {
     flex: 1,
@@ -466,7 +746,8 @@ const styles = {
     backgroundColor: 'rgba(248, 245, 240, 0.9)',
     borderRadius: '16px',
     padding: '40px',
-    boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
+    boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
+    backdropFilter: 'blur(5px)'
   },
   tabContainer: {
     display: 'flex',
@@ -538,7 +819,8 @@ const styles = {
     maxWidth: '800px',
     borderRadius: '12px',
     overflow: 'hidden',
-    boxShadow: '0 15px 30px rgba(0,0,0,0.1)'
+    boxShadow: '0 15px 30px rgba(0,0,0,0.1)',
+    position: 'relative'
   },
   videoWrapper: {
     position: 'relative',
@@ -546,6 +828,26 @@ const styles = {
     height: 0,
     overflow: 'hidden',
     backgroundColor: '#000'
+  },
+  videoPlaceholder: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: colors.cream,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2
+  },
+  loadingSpinner: {
+    width: '50px',
+    height: '50px',
+    border: `5px solid ${colors.lightBrown}`,
+    borderTopColor: 'transparent',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
   },
   stepsContainer: {
     display: 'grid',

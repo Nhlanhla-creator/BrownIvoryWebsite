@@ -10,6 +10,7 @@ import {
 } from 'react-icons/fa';
 import { MdCorporateFare, MdTrendingUp } from 'react-icons/md';
 import './LandingPage.css';
+import { useNavigate } from 'react-router-dom';
 
 const images = {
   heroBg: "https://www.shutterstock.com/image-photo/group-business-people-outlines-lit-600nw-2145032061.jpg",
@@ -34,6 +35,8 @@ const colors = {
 };
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+  
   const [showScroll, setShowScroll] = useState(false);
   const [chatbotOpen, setChatbotOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -85,13 +88,47 @@ const LandingPage = () => {
     }
   };
 
+  const handleLoginClick = (mode = 'login') => {
+    console.log('Navigating to register'); // Debug log
+    navigate(`/LoginRegister?mode=${mode}`);
+  };
+
   return (
     <div className="landing-page" style={{ 
       backgroundColor: colors.light,
-      fontFamily: "'Poppins', sans-serif",
+      fontFamily: "'Neue Haas Grotesk Text Pro', sans-serif",
       overflowX: 'hidden',
       position: 'relative'
     }}>
+      <style>
+        {`
+          .benefit-card {
+            position: relative;
+          }
+          .benefit-card .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            width: 100%;
+            background-color: ${colors.dark};
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 100%;
+            left: 0;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+          }
+          .benefit-card:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+          }
+        `}
+      </style>
+      
       <Header />
       
       {/* Hero Section */}
@@ -114,14 +151,13 @@ const LandingPage = () => {
           width: '100%',
           position: 'relative'
         }}>
-          {/* Slogan spanning full width */}
           <div style={{
             width: '100%',
             marginBottom: '30px',
             textAlign: 'center'
           }}>
             <h1 style={{ 
-              fontSize: '2.7rem', // Reduced from 3.5rem
+              fontSize: '3.1rem',
               fontWeight: '800',
               lineHeight: '1.2',
               textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
@@ -131,7 +167,7 @@ const LandingPage = () => {
               overflow: 'hidden',
               textOverflow: 'clip'
             }}>
-              <span style={{ color: colors.secondary }}>BIG</span> ON IDEAS. <span style={{ color: colors.secondary }}>BIG</span> ON GROWTH. <span style={{ color: colors.secondary }}>BIG</span> ON IMPACT.
+              <span style={{ color: colors.secondary }}>BIG</span> on Ideas. <span style={{ color: colors.secondary }}>BIG</span> on Growth. <span style={{ color: colors.secondary }}>BIG</span> on Impact.
             </h1>
           </div>
 
@@ -143,46 +179,51 @@ const LandingPage = () => {
           }}>
             <div style={{ zIndex: 1 }}>
               <p style={{ 
-                fontSize: '1.2rem',
+                fontSize: '1.5rem',
                 margin: '0 0 20px 0',
                 opacity: 0.9
               }}>
-                HOLISTIC SOLUTIONS DESIGNED TO PROPEL HIGH-IMPACT ENTERPRISES FORWARD — BECAUSE SCALING SUCCESS REQUIRES STRATEGY, INSIGHT, AND THE RIGHT PARTNERSHIPS.
+                Holistic solutions designed to propel high-impact enterprises forward — because scaling success requires strategy, insight, and the right partnerships.
               </p>
               <p style={{ 
                 fontSize: '1rem',
                 margin: '0 0 25px 0',
                 fontWeight: '500'
               }}>
-                WE'RE CLOSING THE SMALL, MEDIUM, AND SOCIAL ENTERPRISES (SMSEs) FUNDING GAP IN AFRICA — WITH THE TOOLS, TRUST, AND PATHWAYS TO GROW YOUR BUSINESS.
+                We're closing the Small, Medium, and Social Enterprises (SMSEs) funding gap in Africa — with the tools, trust, and pathways to grow your business.
               </p>
               <p style={{
                 fontSize: '0.9rem',
                 fontStyle: 'italic',
                 marginBottom: '25px'
               }}>
-                TRUSTED BY 500+ SMSES AND 50+ FUNDERS ACROSS AFRICA
+                Trusted by 500+ SMSEs and 50+ funders across Africa
               </p>
               <div style={{ 
                 display: 'flex',
                 gap: '15px',
                 flexWrap: 'wrap'
               }}>
-                <Link to="/register" style={{
-                  backgroundColor: colors.secondary,
-                  color: colors.light,
-                  padding: '12px 30px',
-                  borderRadius: '50px',
-                  fontWeight: '700',
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  ':hover': {
-                    transform: 'translateY(-3px)',
-                    boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
-                  }
-                }}>
-                  GET STARTED
-                </Link>
+                <button
+                  onClick={() => handleLoginClick('register')}
+                  style={{
+                    backgroundColor: colors.secondary,
+                    color: colors.light,
+                    padding: '12px 30px',
+                    borderRadius: '50px',
+                    fontWeight: '700',
+                    textDecoration: 'none',
+                    transition: 'all 0.3s ease',
+                    border: 'none',
+                    cursor: 'pointer',
+                    ':hover': {
+                      transform: 'translateY(-3px)',
+                      boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
+                    }
+                  }}
+                >
+                  Get Started
+                </button>
                 <Link to="/demo" style={{
                   backgroundColor: 'transparent',
                   color: colors.light,
@@ -196,7 +237,7 @@ const LandingPage = () => {
                     backgroundColor: 'rgba(255,255,255,0.1)'
                   }
                 }}>
-                  SEE DEMO
+                  See Demo
                 </Link>
               </div>
             </div>
@@ -256,7 +297,7 @@ const LandingPage = () => {
             gap: '25px'
           }}>
             {/* SMSEs Card */}
-            <div style={{
+            <div className="benefit-card" style={{
               backgroundColor: 'white',
               borderRadius: '8px',
               padding: '25px',
@@ -268,6 +309,9 @@ const LandingPage = () => {
                 transform: 'translateY(-5px)'
               }
             }}>
+              <div className="tooltip">
+                SMSEs = Small, Medium and Social Enterprises. These are businesses with 5-250 employees and annual revenues between $50k-$15M.
+              </div>
               <div style={{
                 backgroundColor: `${colors.primary}10`,
                 width: '60px',
@@ -294,15 +338,17 @@ const LandingPage = () => {
                 color: colors.primary,
                 marginBottom: '12px',
                 textTransform: 'uppercase'
-              }}>Get Visibility. Get Scored. Get Matched.</p>
+              }}>
+                Get visibility. Get<br />Scored. Get matched.
+              </p>
               <p style={{
                 fontSize: '0.85rem',
                 color: colors.dark,
                 marginBottom: '15px'
               }}>
-                GROW YOUR BUSINESS WITH ACCESS TO FUNDING AND PARTNERSHIPS.
+                Grow your business with access to funding and partnerships.
               </p>
-              <Link to="/HowItWorksSMEs" style={{
+              <Link to="/HowItWorksSMSE" style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 color: colors.primary,
@@ -314,23 +360,28 @@ const LandingPage = () => {
               }}>
                 How It Works <FaChevronRight style={{ marginLeft: '5px' }} />
               </Link>
-              <Link to="/register" style={{
-                backgroundColor: colors.primary,
-                color: colors.light,
-                padding: '8px 20px',
-                borderRadius: '50px',
-                fontWeight: '600',
-                textDecoration: 'none',
-                display: 'inline-block',
-                transition: 'all 0.3s ease',
-                textTransform: 'uppercase'
-              }}>
+              <button
+                onClick={() => handleLoginClick('register')}
+                style={{
+                  backgroundColor: colors.primary,
+                  color: colors.light,
+                  padding: '8px 20px',
+                  borderRadius: '50px',
+                  fontWeight: '600',
+                  textDecoration: 'none',
+                  display: 'inline-block',
+                  transition: 'all 0.3s ease',
+                  textTransform: 'uppercase',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
                 Get Started
-              </Link>
+              </button>
             </div>
 
             {/* Investors Card */}
-            <div style={{
+            <div className="benefit-card" style={{
               backgroundColor: 'white',
               borderRadius: '8px',
               padding: '25px',
@@ -342,6 +393,9 @@ const LandingPage = () => {
                 transform: 'translateY(-5px)'
               }
             }}>
+              <div className="tooltip">
+                Investors include venture capitalists, angel investors, impact investors, and other funding institutions looking for investment-ready businesses.
+              </div>
               <div style={{
                 backgroundColor: `${colors.secondary}10`,
                 width: '60px',
@@ -368,13 +422,15 @@ const LandingPage = () => {
                 color: colors.secondary,
                 marginBottom: '12px',
                 textTransform: 'uppercase'
-              }}>Discover. Verify. Invest.</p>
+              }}>
+                Discover. Verify.<br />Invest.
+              </p>
               <p style={{
                 fontSize: '0.85rem',
                 color: colors.dark,
                 marginBottom: '15px'
               }}>
-                DISCOVER INVESTMENT-READY SMSES WITH VERIFIED COMPLIANCE AND GROWTH READINESS.
+                Discover investment-ready SMSEs with verified compliance and growth readiness.
               </p>
               <Link to="/HowItWorksInvestors" style={{
                 display: 'inline-flex',
@@ -388,23 +444,28 @@ const LandingPage = () => {
               }}>
                 How It Works <FaChevronRight style={{ marginLeft: '5px' }} />
               </Link>
-              <Link to="/register" style={{
-                backgroundColor: colors.secondary,
-                color: colors.light,
-                padding: '8px 20px',
-                borderRadius: '50px',
-                fontWeight: '600',
-                textDecoration: 'none',
-                display: 'inline-block',
-                transition: 'all 0.3s ease',
-                textTransform: 'uppercase'
-              }}>
+              <button
+                onClick={() => handleLoginClick('register')}
+                style={{
+                  backgroundColor: colors.secondary,
+                  color: colors.light,
+                  padding: '8px 20px',
+                  borderRadius: '50px',
+                  fontWeight: '600',
+                  textDecoration: 'none',
+                  display: 'inline-block',
+                  transition: 'all 0.3s ease',
+                  textTransform: 'uppercase',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
                 Get Started
-              </Link>
+              </button>
             </div>
 
             {/* Corporates Card */}
-            <div style={{
+            <div className="benefit-card" style={{
               backgroundColor: 'white',
               borderRadius: '8px',
               padding: '25px',
@@ -416,6 +477,9 @@ const LandingPage = () => {
                 transform: 'translateY(-5px)'
               }
             }}>
+              <div className="tooltip">
+                Corporates include large companies looking for suppliers, partners, or investment opportunities through their CSI, ESD or procurement programs.
+              </div>
               <div style={{
                 backgroundColor: `${colors.dark}10`,
                 width: '60px',
@@ -442,15 +506,15 @@ const LandingPage = () => {
                 color: colors.dark,
                 marginBottom: '12px',
                 textTransform: 'uppercase'
-              }}>Source. Partner. Amplify Impact.</p>
+              }}>Source. Partner. Amplify impact.</p>
               <p style={{
                 fontSize: '0.85rem',
                 color: colors.dark,
                 marginBottom: '15px'
               }}>
-                ACCELERATE CSI & ESD IMPACT BY SOURCING VERIFIED SMSES THAT ALIGN WITH YOUR GOALS.
+                Accelerate CSI & ESD impact by sourcing verified SMSEs that align with your goals.
               </p>
-              <Link to="/HowItWorksCorporate" style={{
+              <Link to="/HowItWorksCorporates" style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 color: colors.dark,
@@ -462,23 +526,28 @@ const LandingPage = () => {
               }}>
                 How It Works <FaChevronRight style={{ marginLeft: '5px' }} />
               </Link>
-              <Link to="/register" style={{
-                backgroundColor: colors.dark,
-                color: colors.light,
-                padding: '8px 20px',
-                borderRadius: '50px',
-                fontWeight: '600',
-                textDecoration: 'none',
-                display: 'inline-block',
-                transition: 'all 0.3s ease',
-                textTransform: 'uppercase'
-              }}>
+              <button
+                onClick={() => handleLoginClick('register')}
+                style={{
+                  backgroundColor: colors.dark,
+                  color: colors.light,
+                  padding: '8px 20px',
+                  borderRadius: '50px',
+                  fontWeight: '600',
+                  textDecoration: 'none',
+                  display: 'inline-block',
+                  transition: 'all 0.3s ease',
+                  textTransform: 'uppercase',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
                 Get Started
-              </Link>
+              </button>
             </div>
 
             {/* Support Partners Card */}
-            <div style={{
+            <div className="benefit-card" style={{
               backgroundColor: 'white',
               borderRadius: '8px',
               padding: '25px',
@@ -490,6 +559,9 @@ const LandingPage = () => {
                 transform: 'translateY(-5px)'
               }
             }}>
+              <div className="tooltip">
+                Support partners include incubators, accelerators, development agencies and other organizations that support SMSE growth.
+              </div>
               <div style={{
                 backgroundColor: `${colors.accent}10`,
                 width: '60px',
@@ -516,13 +588,15 @@ const LandingPage = () => {
                 color: colors.accent,
                 marginBottom: '12px',
                 textTransform: 'uppercase'
-              }}>Identify. Nurture. Track.</p>
+              }}>
+                Identify. Nurture.<br />Track.
+              </p>
               <p style={{
                 fontSize: '0.85rem',
                 color: colors.dark,
                 marginBottom: '15px'
               }}>
-                BOOST YOUR COHORT WITH FUNDING, MARKETPLACE ACCESS, MENTORSHIP, AND PARTNERSHIPS.
+                Boost your cohort with funding, marketplace access, mentorship, and partnerships.
               </p>
               <Link to="/HowItWorksAccelerators" style={{
                 display: 'inline-flex',
@@ -536,19 +610,24 @@ const LandingPage = () => {
               }}>
                 How It Works <FaChevronRight style={{ marginLeft: '5px' }} />
               </Link>
-              <Link to="/register" style={{
-                backgroundColor: colors.accent,
-                color: colors.dark,
-                padding: '8px 20px',
-                borderRadius: '50px',
-                fontWeight: '600',
-                textDecoration: 'none',
-                display: 'inline-block',
-                transition: 'all 0.3s ease',
-                textTransform: 'uppercase'
-              }}>
+              <button
+                onClick={() => handleLoginClick('register')}
+                style={{
+                  backgroundColor: colors.accent,
+                  color: colors.dark,
+                  padding: '8px 20px',
+                  borderRadius: '50px',
+                  fontWeight: '600',
+                  textDecoration: 'none',
+                  display: 'inline-block',
+                  transition: 'all 0.3s ease',
+                  textTransform: 'uppercase',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
                 Get Started
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -609,7 +688,7 @@ const LandingPage = () => {
                 color: colors.primary,
                 textTransform: 'uppercase'
               }}>
-                The Trust Layer For Business In Africa.
+                The trust layer for business in Africa.
               </p>
               <p style={{ 
                 fontSize: '1.1rem',
@@ -617,21 +696,21 @@ const LandingPage = () => {
                 color: colors.dark,
                 textTransform: 'uppercase'
               }}>
-                One Profile. One Score. Many Doors.
+                One profile. One score. Many doors.
               </p>
               
               <div style={{ marginBottom: '25px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
                   <FaCheck style={{ color: colors.primary, marginRight: '10px' }} />
-                  <span style={{ color: colors.dark }}>GET MATCHED TO FUNDERS, SERVICES, AND IMPACT OPPORTUNITIES.</span>
+                  <span style={{ color: colors.dark }}>Get matched to funders, services, and impact opportunities.</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
                   <FaCheck style={{ color: colors.primary, marginRight: '10px' }} />
-                  <span style={{ color: colors.dark }}>TRACK YOUR BIG SCORE AND SEE EXACTLY WHAT'S MISSING.</span>
+                  <span style={{ color: colors.dark }}>Track your BIG Score and see exactly what's missing.</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
                   <FaCheck style={{ color: colors.primary, marginRight: '10px' }} />
-                  <span style={{ color: colors.dark }}>GROW YOUR CREDIBILITY WITH VERIFIED COMPLIANCE.</span>
+                  <span style={{ color: colors.dark }}>Grow your credibility with verified compliance.</span>
                 </div>
               </div>
               
@@ -640,7 +719,7 @@ const LandingPage = () => {
                 marginBottom: '25px',
                 color: colors.dark
               }}>
-                WHETHER YOU'RE AN ENTREPRENEUR, INVESTOR, OR CORPORATE CHAMPION — BIG CONNECTS YOU TO WHO (AND WHAT) YOU NEED TO GROW.
+                Whether you're an entrepreneur, investor, or corporate champion — BIG connects you to who (and what) you need to grow.
               </p>
               
               {!expandedAbout && (
@@ -675,16 +754,16 @@ const LandingPage = () => {
                     color: colors.dark,
                     marginBottom: '12px'
                   }}>
-                    BIG MARKETPLACE WAS FOUNDED TO SOLVE ONE PROBLEM: AFRICA'S SMES LACK TRUST, NOT POTENTIAL. WE COMBINE DATA, PARTNERSHIPS, AND TECHNOLOGY TO CREATE A FAIR, TRANSPARENT ECOSYSTEM WHERE:
+                    BIG Marketplace was founded to solve one problem: Africa's SMEs lack trust, not potential. We combine data, partnerships, and technology to create a fair, transparent ecosystem where:
                   </p>
                   <ul style={{ 
                     listStyleType: 'disc',
                     paddingLeft: '20px',
                     marginBottom: '12px'
                   }}>
-                    <li style={{ marginBottom: '6px', textTransform: 'uppercase' }}>SMSEs PROVE THEIR CREDIBILITY.</li>
-                    <li style={{ marginBottom: '6px', textTransform: 'uppercase' }}>FUNDERS FIND VERIFIED OPPORTUNITIES.</li>
-                    <li style={{ textTransform: 'uppercase' }}>CORPORATES MAXIMIZE IMPACT.</li>
+                    <li style={{ marginBottom: '6px', textTransform: 'uppercase' }}>SMSEs prove their credibility.</li>
+                    <li style={{ marginBottom: '6px', textTransform: 'uppercase' }}>Funders find verified opportunities.</li>
+                    <li style={{ textTransform: 'uppercase' }}>Corporates maximize impact.</li>
                   </ul>
                 </div>
               )}
@@ -713,7 +792,7 @@ const LandingPage = () => {
                 fontStyle: 'italic',
                 textTransform: 'uppercase'
               }}>
-                The BIG Marketplace Ecosystem Connects SMSEs With Funders, Support Partners, And Customers.
+                The BIG Marketplace ecosystem connects SMSEs with funders, support partners, and customers.
               </p>
             </div>
           </div>
@@ -764,7 +843,7 @@ const LandingPage = () => {
               color: colors.dark,
               textTransform: 'uppercase'
             }}>
-              Introducing The <span style={{ color: colors.primary }}>BIG</span> Score
+              Introducing the <span style={{ color: colors.primary }}>BIG</span> Score
             </h2>
             <p style={{ 
               fontSize: '1rem',
@@ -773,7 +852,7 @@ const LandingPage = () => {
               margin: '0 auto',
               textTransform: 'uppercase'
             }}>
-              A COMPREHENSIVE ASSESSMENT THAT EVALUATES YOUR BUSINESS ACROSS MULTIPLE DIMENSIONS
+              A comprehensive assessment that evaluates your business across multiple dimensions
             </p>
           </div>
           
@@ -816,7 +895,7 @@ const LandingPage = () => {
                 color: colors.dark,
                 marginBottom: '15px'
               }}>
-                OUR PROPRIETARY BIG SCORE EVALUATES YOUR FINANCIAL HEALTH, OPERATIONAL MATURITY, COMPLIANCE STATUS, AND GROWTH POTENTIAL.
+                Our proprietary BIG Score evaluates your financial health, operational maturity, compliance status, and growth potential.
               </p>
               <ul style={{ 
                 listStyleType: 'none',
@@ -826,19 +905,19 @@ const LandingPage = () => {
               }}>
                 <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'flex-start' }}>
                   <FaCheck style={{ color: colors.primary, marginRight: '8px', flexShrink: 0, marginTop: '3px' }} />
-                  <span style={{ fontSize: '0.85rem' }}>FINANCIAL HEALTH: REVENUE TRENDS, PROFITABILITY</span>
+                  <span style={{ fontSize: '0.85rem' }}>Financial health: Revenue trends, profitability</span>
                 </li>
                 <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'flex-start' }}>
                   <FaCheck style={{ color: colors.primary, marginRight: '8px', flexShrink: 0, marginTop: '3px' }} />
-                  <span style={{ fontSize: '0.85rem' }}>OPERATIONAL MATURITY: SYSTEMS, PROCESSES</span>
+                  <span style={{ fontSize: '0.85rem' }}>Operational maturity: Systems, processes</span>
                 </li>
                 <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'flex-start' }}>
                   <FaCheck style={{ color: colors.primary, marginRight: '8px', flexShrink: 0, marginTop: '3px' }} />
-                  <span style={{ fontSize: '0.85rem' }}>COMPLIANCE STATUS: LEGAL, REGULATORY</span>
+                  <span style={{ fontSize: '0.85rem' }}>Compliance status: Legal, regulatory</span>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'flex-start' }}>
                   <FaCheck style={{ color: colors.primary, marginRight: '8px', flexShrink: 0, marginTop: '3px' }} />
-                  <span style={{ fontSize: '0.85rem' }}>GROWTH POTENTIAL: MARKET OPPORTUNITY</span>
+                  <span style={{ fontSize: '0.85rem' }}>Growth potential: Market opportunity</span>
                 </li>
               </ul>
             </div>
@@ -876,7 +955,7 @@ const LandingPage = () => {
                 color: colors.dark,
                 marginBottom: '15px'
               }}>
-                YOUR BIG SCORE OPENS DOORS TO OPPORTUNITIES MATCHED TO YOUR BUSINESS'S CURRENT STAGE AND POTENTIAL.
+                Your BIG Score opens doors to opportunities matched to your business's current stage and potential.
               </p>
               <div style={{
                 display: 'grid',
@@ -896,7 +975,7 @@ const LandingPage = () => {
                     fontWeight: '600',
                     textTransform: 'uppercase'
                   }}>
-                    FUNDING
+                    Funding
                   </div>
                 </div>
                 <div style={{
@@ -911,7 +990,7 @@ const LandingPage = () => {
                     fontWeight: '600',
                     textTransform: 'uppercase'
                   }}>
-                    PARTNERSHIPS
+                    Partnerships
                   </div>
                 </div>
                 <div style={{
@@ -926,7 +1005,7 @@ const LandingPage = () => {
                     fontWeight: '600',
                     textTransform: 'uppercase'
                   }}>
-                    COMPLIANCE
+                    Compliance
                   </div>
                 </div>
                 <div style={{
@@ -941,7 +1020,7 @@ const LandingPage = () => {
                     fontWeight: '600',
                     textTransform: 'uppercase'
                   }}>
-                    GUIDANCE
+                    Guidance
                   </div>
                 </div>
               </div>
@@ -952,7 +1031,7 @@ const LandingPage = () => {
             textAlign: 'center',
             marginTop: '20px'
           }}>
-            <Link to="/bigscore" style={{
+            <Link to="/BigScorePage" style={{
               backgroundColor: colors.primary,
               color: colors.light,
               padding: '12px 30px',
@@ -1048,16 +1127,16 @@ const LandingPage = () => {
                 marginBottom: '15px',
                 color: colors.dark
               }}>
-                IF YOUR SCORE IS LOW, WE'LL GUIDE YOU TO:
+                If your score is low, we'll guide you to:
               </p>
               <ul style={{ 
                 listStyleType: 'disc',
                 paddingLeft: '20px',
                 marginBottom: '15px'
               }}>
-                <li style={{ marginBottom: '6px', textTransform: 'uppercase' }}>ACCELERATORS TO REFINE YOUR MODEL.</li>
-                <li style={{ marginBottom: '6px', textTransform: 'uppercase' }}>MENTORS TO FIX COMPLIANCE GAPS.</li>
-                <li style={{ textTransform: 'uppercase' }}>INCUBATORS TO PREP FOR FUNDING.</li>
+                <li style={{ marginBottom: '6px', textTransform: 'uppercase' }}>Accelerators to refine your model.</li>
+                <li style={{ marginBottom: '6px', textTransform: 'uppercase' }}>Mentors to fix compliance gaps.</li>
+                <li style={{ textTransform: 'uppercase' }}>Incubators to prep for funding.</li>
               </ul>
               <p style={{ 
                 fontSize: '1.1rem',
@@ -1158,7 +1237,7 @@ const LandingPage = () => {
                 lineHeight: '1.6',
                 color: colors.dark
               }}>
-                WE BELIEVE SMES ARE THE BACKBONE OF AFRICA'S ECONOMY — AND DESERVE ACCESS, TOOLS, AND A SEAT AT THE TABLE. BIG MARKETPLACE IS HOW WE MAKE THAT REAL.
+                We believe SMEs are the backbone of Africa's economy — and deserve access, tools, and a seat at the table. BIG Marketplace is how we make that real.
               </p>
             </div>
             
@@ -1196,7 +1275,7 @@ const LandingPage = () => {
                 lineHeight: '1.6',
                 color: colors.dark
               }}>
-                TO CLOSE THE $330B SME FUNDING GAP IN AFRICA BY MAKING GROWTH ACCESSIBLE, NOT ACCIDENTAL.
+                To close the $330B SME funding gap in Africa by making growth accessible, not accidental.
               </p>
             </div>
             
@@ -1234,7 +1313,7 @@ const LandingPage = () => {
                 lineHeight: '1.6',
                 color: colors.dark
               }}>
-                TO BUILD A CONTINENT-WIDE TRUST ECONOMY WHERE EVERY SME HAS A FAIR CHANCE TO GROW AND EVERY INVESTOR FINDS QUALITY OPPORTUNITIES.
+                To build a continent-wide trust economy where every SME has a fair chance to grow and every investor finds quality opportunities.
               </p>
             </div>
           </div>
@@ -1247,22 +1326,27 @@ const LandingPage = () => {
               color: colors.secondary,
               textTransform: 'uppercase'
             }}>
-              We're Building A Continent-Wide Trust Economy. Join Us.
+              We're building a continent-wide trust economy. Join us.
             </p>
             
-            <Link to="/register" style={{
-              backgroundColor: colors.primary,
-              color: colors.light,
-              padding: '12px 30px',
-              borderRadius: '50px',
-              fontWeight: '700',
-              textDecoration: 'none',
-              display: 'inline-block',
-              transition: 'all 0.3s ease',
-              textTransform: 'uppercase'
-            }}>
+            <button
+              onClick={() => handleLoginClick('register')}
+              style={{
+                backgroundColor: colors.primary,
+                color: colors.light,
+                padding: '12px 30px',
+                borderRadius: '50px',
+                fontWeight: '700',
+                textDecoration: 'none',
+                display: 'inline-block',
+                transition: 'all 0.3s ease',
+                textTransform: 'uppercase',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
               Get Started
-            </Link>
+            </button>
           </div>
         </div>
 

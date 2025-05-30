@@ -89,7 +89,9 @@ const styles = {
   appContainer: {
     display: 'flex',
     flexDirection: 'column',
-    minHeight: '100vh'
+    minHeight: '100vh',
+    backgroundImage: 'linear-gradient(rgba(55, 44, 39, 0.21), rgba(55, 44, 39, 0.36)), url(/brown.jpg)',
+    backgroundSize: 'cover',
   },
   container: {
     fontFamily: "'Arial', sans-serif",
