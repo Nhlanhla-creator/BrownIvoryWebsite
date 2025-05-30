@@ -35,22 +35,22 @@ const onboardingSteps = [
   {
     title: "Welcome to Universal Profile",
     content: "This profile will help us understand your business better and provide you with tailored services.",
-    icon: "👋",
+    
   },
   {
     title: "Step 1: Read Instructions",
     content: "Start by reading the instructions carefully to understand what information you'll need to provide.",
-    icon: "📝",
+
   },
   {
     title: "Step 2: Fill in Your Details",
     content: "Complete each section with accurate information about your business entity, ownership, and operations.",
-    icon: "📋",
+  
   },
   {
     title: "Step 3: Review & Submit",
     content: "Review your information in the summary page and submit when you're ready. You can always edit later.",
-    icon: "✅",
+    
   },
 ]
 
@@ -476,7 +476,7 @@ useEffect(() => {
               <X size={24} />
             </button>
             <div className="popup-content">
-              <div className="confetti-animation">🎉</div>
+              <div className="confetti-animation"></div>
               <h2>Congratulations!</h2>
               <p>You've successfully completed your Universal Profile!</p>
               <p>

@@ -56,14 +56,14 @@ export default function DealFlowPipeline() {
   const stages = [
     {
       id: "initial",
-      name: "Initial Matches",
+      name: "Primary Matches",
       description: "SMSEs that match your profile with a score of 80% or higher",
       colorClass: styles.stageInitial,
       iconColor: "#8d6e63"
     },
     {
       id: "application",
-      name: "Received Applications",
+      name: "Applications",
       description: "Applications received from SMSEs",
       colorClass: styles.stageApplication,
       iconColor: "#795548"
@@ -77,23 +77,16 @@ export default function DealFlowPipeline() {
     },
     {
       id: "feedback",
-      name: "Feedback Sent",
+      name: "Deals Initiated",
       description: "Feedback sent to SMSEs",
       hasMessages: true,
       colorClass: styles.stageFeedback,
       iconColor: "#5d4037"
     },
-    {
-      id: "termSheet",
-      name: "Term Sheet Sent",
-      description: "Term sheets sent to SMSEs for consideration",
-      hasTermSheet: true,
-      colorClass: styles.stageTermSheet,
-      iconColor: "#4e342e"
-    },
+
     {
       id: "deals",
-      name: "Deals",
+      name: "Deals Closed",
       description: "Successfully closed funding deals",
       colorClass: styles.stageDeals,
       iconColor: "#3e2723"
@@ -140,9 +133,7 @@ export default function DealFlowPipeline() {
     <div className={styles.dealflowPipelineContainer}>
       <div className={styles.pipelineHeader}>
         <h2 className={styles.pipelineTitle}>Deal Flow Pipeline</h2>
-        <p className={styles.pipelineDescription}>
-          Track your funding applications through each stage of the process
-        </p>
+     
       </div>
 
       <div className={styles.pipelineStagesContainer}>

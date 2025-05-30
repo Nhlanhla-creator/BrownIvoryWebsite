@@ -737,11 +737,7 @@ const [isRegistering, setIsRegistering] = useState(initialMode !== 'login'); // 
               </div>
             </div>
             
-            <div className="floating-icons">
-              <Rocket className="floating-icon rocket" />
-              <Briefcase className="floating-icon briefcase" />
-              <HeartHandshake className="floating-icon heart" />
-            </div>
+         
           </div>
         </div>
       </div>

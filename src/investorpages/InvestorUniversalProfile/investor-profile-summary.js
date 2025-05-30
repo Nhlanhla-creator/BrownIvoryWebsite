@@ -1,24 +1,24 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown, ChevronUp, Edit, Printer,ExternalLink,FileText } from "lucide-react"
-import "./investor-profile-summary.css"  
-import { useNavigate } from "react-router-dom"  
+import { ChevronDown, ChevronUp, Edit, Printer, ExternalLink, FileText } from "lucide-react"
+import "./investor-profile-summary.css"
+import { useNavigate } from "react-router-dom"
 
 const InvestorProfileSummary = ({ data, onEdit }) => {
-      const navigate = useNavigate()
+  const navigate = useNavigate()
 
   const renderDocumentLink = (url, label = "View Document") => {
-      if (!url) return "No document uploaded";
-      
-      return (
-        <a href={url} target="_blank" rel="noopener noreferrer" className="document-link">
-          <FileText size={16} />
-          <span>{label}</span>
-          <ExternalLink size={14} />
-        </a>
-      );
-    };
+    if (!url) return "No document uploaded"
+    
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer" className="document-link">
+        <FileText size={16} />
+        <span>{label}</span>
+        <ExternalLink size={14} />
+      </a>
+    )
+  }
 
   const [expandedSections, setExpandedSections] = useState({
     entityOverview: true,
@@ -37,22 +37,18 @@ const InvestorProfileSummary = ({ data, onEdit }) => {
     }))
   }
 
-  // Helper function to format file names from arrays
   const formatFiles = (files) => {
     if (!files || !files.length) return "None"
     return files.map((file) => (typeof file === "string" ? file : file.name)).join(", ")
   }
 
-  // Helper function to format arrays
   const formatArray = (arr) => {
     if (!arr || !arr.length) return "None"
     return arr.join(", ")
   }
 
-  // Helper function to format boolean values
   const formatBoolean = (value) => (value ? "Yes" : "No")
 
-  // Helper function to get label from value using options array
   const getLabelFromValue = (value, options) => {
     if (!value) return "Not specified"
     const option = options.find((opt) => opt.value === value)
@@ -60,7 +56,31 @@ const InvestorProfileSummary = ({ data, onEdit }) => {
   }
 
   const handlePrint = () => {
-    window.print()
+    // Force all sections open before printing
+    setExpandedSections({
+      entityOverview: true,
+      ownershipManagement: true,
+      contactDetails: true,
+      legalCompliance: true,
+      productsServices: true,
+      howDidYouHear: true,
+      declarationConsent: true,
+    })
+    
+    // Wait a moment for state to update before printing
+    setTimeout(() => {
+      const printContent = document.querySelector('.investor-profile-summary').innerHTML
+      const originalContent = document.body.innerHTML
+      
+      document.body.innerHTML = `
+        <div class="print-container">
+          ${printContent}
+        </div>
+      `
+      window.print()
+      document.body.innerHTML = originalContent
+      window.location.reload()
+    }, 100)
   }
 
   return (
@@ -402,7 +422,6 @@ const InvestorProfileSummary = ({ data, onEdit }) => {
             <div className="summary-item mt-6">
               <span className="summary-label">Documents:</span>
               <span className="summary-value">
-                
                 <div>Tax Clearance Certificate: {renderDocumentLink(data.legalCompliance?.taxClearanceCert, "Document")}</div>
                 <div>B-BBEE Certificate: {renderDocumentLink(data.legalCompliance?.bbbeeCert, "Document")}</div>
                 <div>Other Certificates:  {renderDocumentLink(data.legalCompliance?.otherCerts, "Document")}</div>
@@ -673,7 +692,8 @@ const InvestorProfileSummary = ({ data, onEdit }) => {
           </div>
         )}
       </div>
-            <div className="mt-6 text-center">
+
+      <div className="mt-6 text-center">
         <button 
           className="btn btn-primary"
           onClick={() => navigate('/investor-dashboard')}

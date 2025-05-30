@@ -30,7 +30,7 @@
     box-sizing: border-box;
     width: calc(100% - 270px); /* Adjust based on your left sidebar width */
     max-width: 90%; /* Limit the maximum width */
-    margin-left: 240px; /* Push content to the right */
+    margin-left: 230px; /* Push content to the right */
     margin-right: 0;
     background-color: var(--brown-50);
     margin-top: 90px;

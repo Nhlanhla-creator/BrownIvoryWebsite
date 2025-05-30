@@ -2,18 +2,19 @@
 .header {
   position: fixed;
   top: 0;
-  left: var(--sidebar-width, 240px);
-  width: calc(100% - var(--sidebar-width, 240px));
+  margin-left: 259px; /* Match this to your sidebar width */
+  width: calc(100% - 259px); /* Subtract the same sidebar width */
   height: 72px;
   background-color: #fff;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
+  padding: 16px 1px;
   z-index: 100;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   transition: left 0.3s ease, width 0.3s ease;
 }
+
 
 /* Left section with logo and welcome message */
 .header-left {

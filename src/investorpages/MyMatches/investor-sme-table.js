@@ -39,11 +39,11 @@ export function InvestorSMETable() {
     if (application.availableDates) {
       const appAvailabilities = application.availableDates.map(avail => ({
         ...avail,
-        date: new Date(avail.date) // Convert ISO string back to Date
+        date: new Date(avail.date)
       }));
       setAvailabilities(appAvailabilities);
     } else {
-      setAvailabilities([]); // Start fresh for new applications
+      setAvailabilities([]);
     }
   };
 
@@ -68,11 +68,10 @@ export function InvestorSMETable() {
       querySnapshot.forEach((doc) => {
         const data = doc.data();
 
-        // Convert availableDates back to Date objects if they exist
         if (data.availableDates) {
           data.availableDates = data.availableDates.map(avail => ({
             ...avail,
-            date: new Date(avail.date) // Convert ISO string back to Date
+            date: new Date(avail.date)
           }));
         }
 
@@ -103,8 +102,7 @@ export function InvestorSMETable() {
 
   const handleTimeChange = (field, value) => {
     setTimeSlot(prev => ({ ...prev, [field]: value }));
-  };// In the saveSelectedDates function:
-
+  };
 
   const saveSelectedDates = async () => {
     const newAvailabilities = [
@@ -115,20 +113,19 @@ export function InvestorSMETable() {
           date,
           timeSlots: [{ ...timeSlot }],
           timeZone,
-          status: 'available' // Add status field
+          status: 'available'
         }))
     ];
 
     setAvailabilities(newAvailabilities);
 
-    // Save to Firebase
     if (selectedSME) {
       try {
         const availabilityData = newAvailabilities.map(avail => ({
           date: avail.date.toISOString(),
           timeSlots: avail.timeSlots,
           timeZone: avail.timeZone,
-          status: avail.status // Include status in saved data
+          status: avail.status
         }));
 
         await updateDoc(doc(db, "investorApplications", selectedSME.id), {
@@ -136,7 +133,6 @@ export function InvestorSMETable() {
           updatedAt: new Date().toISOString()
         });
 
-        // Also update the SME side
         const investorAppSnap = await getDoc(doc(db, "investorApplications", selectedSME.id));
         const { smeId, funderId } = investorAppSnap.data();
 
@@ -174,7 +170,6 @@ export function InvestorSMETable() {
 
     setAvailabilities(updatedAvailabilities);
 
-    // Save to Firebase immediately for the current application
     if (selectedSME) {
       try {
         const availabilityData = updatedAvailabilities.map(avail => ({
@@ -188,7 +183,6 @@ export function InvestorSMETable() {
           updatedAt: new Date().toISOString()
         });
 
-        // Also update the SME side
         const investorAppSnap = await getDoc(doc(db, "investorApplications", selectedSME.id));
         const { smeId, funderId } = investorAppSnap.data();
 
@@ -263,7 +257,6 @@ export function InvestorSMETable() {
         updatedAt: new Date().toISOString(),
       };
       if (status === "Approved") {
-        // Convert dates to ISO strings for Firestore storage and save with this specific application
         const availabilityData = availabilities.map(avail => ({
           date: avail.date.toISOString(),
           timeSlots: avail.timeSlots,
@@ -294,7 +287,6 @@ export function InvestorSMETable() {
           updatedAt: new Date().toISOString()
         };
 
-        // Add availability data to SME application as well
         if (status === "Approved") {
           smeUpdateData.availableDates = updateData.availableDates;
           smeUpdateData.meetingLocation = meetingLocation;
@@ -303,7 +295,6 @@ export function InvestorSMETable() {
 
         await updateDoc(smeDocRef, smeUpdateData);
       }
-
 
       if (status === "Approved" || status === "Declined") {
         let subject = status === "Approved" ? meetingPurpose : "Declined Application";
@@ -355,7 +346,7 @@ export function InvestorSMETable() {
           date: new Date().toISOString(),
           read: false,
           type: "inbox",
-          applicationId: selectedSME.id, // Link message to specific application
+          applicationId: selectedSME.id,
           availableDates: status === "Approved" ? updateData.availableDates : null
         });
 
@@ -367,7 +358,7 @@ export function InvestorSMETable() {
           date: new Date().toISOString(),
           read: true,
           type: "sent",
-          applicationId: selectedSME.id, // Link message to specific application
+          applicationId: selectedSME.id,
           availableDates: status === "Approved" ? updateData.availableDates : null
         });
       }
@@ -413,7 +404,6 @@ export function InvestorSMETable() {
     setDocumentFile(null);
   };
 
-  // In the InvestorSMETable component, update the getStatusBadgeClass function:
   const getStatusBadgeClass = (status) => {
     let baseClass = styles.statusBadge;
 
@@ -430,27 +420,25 @@ export function InvestorSMETable() {
     }
   };
 
-  // And in the table rendering:
-
-
-  // Add this function after your other handler functions (around line 300-400)
-
   const openModal = (sme, type) => {
     setSelectedSME(sme);
     setModalType(type);
 
-    // Load availability data for this specific application
     if (type === "approve") {
       loadApplicationAvailability(sme);
     }
 
-    // Reset form fields
     setMessage("");
     setMeetingTime("");
     setMeetingLocation("");
     setMeetingPurpose("");
     setFormErrors({});
     setDocumentFile(null);
+  };
+
+  const handleSMENameClick = (sme) => {
+    setSelectedSME(sme);
+    setModalType("view");
   };
 
   const handleSendMessage = async () => {
@@ -604,7 +592,6 @@ export function InvestorSMETable() {
       const user = auth.currentUser;
       const { smeId, funderId } = (await getDoc(appRef)).data();
 
-      // Sync to SME side
       const smeQuery = query(
         collection(db, "smeApplications"),
         where("smeId", "==", smeId),
@@ -642,7 +629,6 @@ export function InvestorSMETable() {
             meetingPurpose
           });
 
-          // Add to calendar
           await addDoc(collection(db, "smeCalendarEvents"), {
             smeId,
             funderId: user.uid,
@@ -657,7 +643,6 @@ export function InvestorSMETable() {
 
       setUpdatedStages(prev => ({ ...prev, [selectedSMEForStage.id]: nextStage }));
 
-      // Prepare message
       let subject = nextStage === "Termsheet" ? "Termsheet Shared" : `Application ${nextStage}`;
       let content = message;
 
@@ -684,7 +669,6 @@ export function InvestorSMETable() {
             .join("\n")}`;
       }
 
-      // Send messages
       await Promise.all([
         addDoc(collection(db, "messages"), {
           to: smeId,
@@ -757,7 +741,14 @@ export function InvestorSMETable() {
             ) : (
               smes.map((sme) => (
                 <tr key={sme.id}>
-                  <td>{sme.smeName}</td>
+                  <td>
+                    <button 
+                      className={styles.smeNameLink}
+                      onClick={() => handleSMENameClick(sme)}
+                    >
+                      {sme.smeName}
+                    </button>
+                  </td>
                   <td>{sme.investmentType}</td>
                   <td>
                     <div className={styles.matchPercentage}>
@@ -806,7 +797,6 @@ export function InvestorSMETable() {
                       <X size={16} />
                     </button>
                   </td>
-
                 </tr>
               ))
             )}
@@ -1041,9 +1031,6 @@ export function InvestorSMETable() {
             <div className={styles.modalActions}>
               {modalType !== "view" && (
                 <>
-
-
-
                   <button
                     className={modalType === "approve" ? styles.acceptBtn : styles.declineBtn}
                     onClick={() => handleUpdateStatus(
