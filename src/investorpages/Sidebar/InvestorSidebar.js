@@ -73,12 +73,6 @@ function InvestorSidebar({ companyName }) {
   const menuItems = [
     { id: "home", label: "Home", icon: <Home size={18} />, route: "/" },
     { 
-      id: "dashboard", 
-      label: "My Big Score", 
-      icon: <LayoutDashboard size={18} />, 
-      route: "/investor-dashboard" 
-    },
-    { 
       id: "profile", 
       label: "My Profile", 
       icon: <User size={18} />, 

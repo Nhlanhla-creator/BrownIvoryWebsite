@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
+import { Info } from "lucide-react"
 import FormField from "./form-field"
 import FileUpload from "./file-upload"
 import "./UniversalProfile.css"
@@ -392,22 +393,39 @@ export default function EntityOverview({ data = {}, updateData, onSave }) {
         </div>
 
         <div>
-          <FormField label="Operation Stage" required>
-            <select
-              name="operationStage"
-              value={formData.operationStage || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
-              required
-            >
-              <option value="">Select Operation Stage</option>
-              {operationStages.map((stage) => (
-                <option key={stage.value} value={stage.value}>
-                  {stage.label}
-                </option>
-              ))}
-            </select>
-          </FormField>
+        <FormField 
+  label="Operation Stage " 
+  tooltip={
+    <div className="tooltip-content">
+      <p>Select the current stage of your business operation:</p>
+      <ul className="list-disc pl-4 mt-1">
+        <li><strong>Idea:</strong> Conceptual phase, not yet operational</li>
+        <li><strong>Prototype:</strong> Developing product/service prototype</li>
+        <li><strong>Startup:</strong> Recently launched, establishing operations</li>
+        <li><strong>Early-Growth:</strong> Initial expansion phase</li>
+        <li><strong>Growth:</strong> Established and growing steadily</li>
+        <li><strong>Scale-up:</strong> Rapid expansion phase</li>
+        <li><strong>Mature:</strong> Well-established, stable operations</li>
+      </ul>
+    </div>
+  }
+  required
+>
+  <select
+    name="operationStage"
+    value={formData.operationStage || ""}
+    onChange={handleChange}
+    className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
+    required
+  >
+    <option value="">Select Operation Stage</option>
+    {operationStages.map((stage) => (
+      <option key={stage.value} value={stage.value}>
+        {stage.label}
+      </option>
+    ))}
+  </select>
+</FormField>
 
           <FormField label="Economic Sector" required>
             <MultiSelect
@@ -469,16 +487,30 @@ export default function EntityOverview({ data = {}, updateData, onSave }) {
             </FormField>
           )}
 
-          <FormField label="Brief Business Description" required>
-            <textarea
-              name="businessDescription"
-              value={formData.businessDescription || ""}
-              onChange={handleChange}
-              rows={4}
-              className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
-              required
-            ></textarea>
-          </FormField>
+     <FormField 
+  label="Brief Business Description " 
+  tooltip={
+    <div className="tooltip-content">
+      <p>Provide a concise overview of your business (100-200 words). Include:</p>
+      <ul className="list-disc pl-4 mt-1">
+        <li>What products/services you offer</li>
+        <li>What makes your business unique</li>
+        <li>Key value propositions</li>
+        <li>Any notable achievements or milestones</li>
+      </ul>
+    </div>
+  }
+  required
+>
+  <textarea
+    name="businessDescription"
+    value={formData.businessDescription || ""}
+    onChange={handleChange}
+    rows={4}
+    className="w-full px-3 py-2 border border-brown-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
+    required
+  ></textarea>
+</FormField>
 
           <FormField label="Company Logo" tooltip="Recommended size: 300x300px, Max size: 2MB">
             <FileUpload

@@ -58,22 +58,38 @@ export const renderApplicationOverview = (data, updateFormData) => {
             />
           </FormField>
 
-          <FormField label="Business Funding Stage" required>
-            <select
-              name="fundingStage"
-              value={data.fundingStage || ""}
-              onChange={handleChange}
-              className="form-select"
-              required
-            >
-              <option value="">Select Funding Stage</option>
-              {businessFundingStage.map((stage) => (
-                <option key={stage.value} value={stage.value}>
-                  {stage.label}
-                </option>
-              ))}
-            </select>
-          </FormField>
+         <FormField 
+  label="Business Funding Stage *" 
+  tooltip={
+    <div className="tooltip-content">
+    
+      <ul>
+        <li><strong>Pre-Seed:</strong> Idea/concept stage, validating market need</li>
+        <li><strong>Seed:</strong> Building MVP, initial market testing</li>
+        <li><strong>Series A:</strong> Scaling product and initial customer base</li>
+        <li><strong>Series B:</strong> Expanding market reach and operations</li>
+        <li><strong>Maturity:</strong> Stable revenue, optimizing operations</li>
+        <li><strong>Exit:</strong> Preparing for acquisition or IPO</li>
+      </ul>
+    </div>
+  }
+  required
+>
+  <select
+    name="fundingStage"
+    value={data.fundingStage || ""}
+    onChange={handleChange}
+    className="form-select"
+    required
+  >
+    <option value="">Select Funding Stage</option>
+    {businessFundingStage.map((stage) => (
+      <option key={stage.value} value={stage.value}>
+        {stage.label}
+      </option>
+    ))}
+  </select>
+</FormField>
         </div>
 
         <div>

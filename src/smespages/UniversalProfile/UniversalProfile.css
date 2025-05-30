@@ -1823,3 +1823,29 @@
   pointer-events: none;
   border-radius: 20px;
 }
+/* Tooltip styles */
+.tooltip-content {
+  max-width: 300px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.FormField .tooltip-trigger {
+  display: inline-flex;
+  margin-left: 4px;
+  color: #6b7280;
+  cursor: help;
+}
+
+.FormField .tooltip-trigger:hover {
+  color: #4b5563;
+}
+
+.tooltip-content ul {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.tooltip-content li {
+  margin-bottom: 2px;
+}
