@@ -816,31 +816,131 @@ export function InvestorSMETable() {
             </h3>
             <p className={styles.modalSMEName}><strong>{selectedSME.smeName}</strong></p>
 
-            <div className={styles.profileDetails}>
-              <div className={styles.profileGrid}>
-                <div>
-                  <p><strong>Sector:</strong> {selectedSME.sector}</p>
-                  <p><strong>Stage:</strong> {selectedSME.stage}</p>
-                  <p><strong>Focus Area:</strong> {selectedSME.focusArea}</p>
-                </div>
-                <div>
-                  <p><strong>Location:</strong> {selectedSME.location}</p>
-                  <p><strong>Revenue:</strong> {selectedSME.revenue}</p>
-                  <p><strong>Team Size:</strong> {selectedSME.teamSize}</p>
-                </div>
-              </div>
-              <p><strong>Funding Needed:</strong> R{Number(selectedSME.fundingNeeded).toLocaleString()}</p>
-              <p><strong>Match Percentage:</strong> {selectedSME.matchPercentage}%</p>
-              <p><strong>Documents:</strong></p>
-              <ul className={styles.documentList}>
-                {selectedSME.documents?.map((doc, idx) => (
-                  <li key={idx}>
-                    <FileText size={14} className={styles.docIcon} />
-                    <span>{doc}</span>
-                  </li>
-                ))}
-              </ul>
+           {selectedSME && modalType === "view" && (
+  <div className={styles.modalOverlay} onClick={resetModal}>
+    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+      {/* Profile Header */}
+      <div className={styles.profileHeader}>
+        <div className={styles.matchBadge}>{selectedSME.matchPercentage}% Match</div>
+        <div className={styles.profileAvatar}>
+          {selectedSME.smeName.charAt(0).toUpperCase()}
+        </div>
+        <h1 className={styles.profileName}>{selectedSME.smeName}</h1>
+        <p className={styles.profileSubtitle}>
+          {selectedSME.sector} • {selectedSME.stage} • {selectedSME.location}
+        </p>
+      </div>
+
+      {/* Profile Body */}
+      <div className={styles.profileBody}>
+        <div className={styles.infoCards}>
+          {/* Business Info Card */}
+          <div className={styles.infoCard}>
+            <div className={styles.cardTitle}>
+              <span className={styles.cardIcon}>💼</span>
+              Business Details
             </div>
+            <div className={styles.cardGrid}>
+              <div className={styles.cardItem}>
+                <div className={styles.cardLabel}>Sector</div>
+                <div className={styles.cardValue}>{selectedSME.sector}</div>
+              </div>
+              <div className={styles.cardItem}>
+                <div className={styles.cardLabel}>Stage</div>
+                <div className={styles.cardValue}>{selectedSME.stage}</div>
+              </div>
+              <div className={styles.cardItem}>
+                <div className={styles.cardLabel}>Focus Area</div>
+                <div className={styles.cardValue}>{selectedSME.focusArea}</div>
+              </div>
+              <div className={styles.cardItem}>
+                <div className={styles.cardLabel}>Location</div>
+                <div className={styles.cardValue}>{selectedSME.location}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Company Metrics Card */}
+          <div className={styles.infoCard}>
+            <div className={styles.cardTitle}>
+              <span className={styles.cardIcon}>🎯</span>
+              Company Metrics
+            </div>
+            <div className={styles.cardGrid}>
+              <div className={styles.cardItem}>
+                <div className={styles.cardLabel}>Revenue</div>
+                <div className={styles.cardValue}>{selectedSME.revenue}</div>
+              </div>
+              <div className={styles.cardItem}>
+                <div className={styles.cardLabel}>Team Size</div>
+                <div className={styles.cardValue}>{selectedSME.teamSize}</div>
+              </div>
+              <div className={styles.cardItem}>
+                <div className={styles.cardLabel}>Investment Type</div>
+                <div className={styles.cardValue}>{selectedSME.investmentType}</div>
+              </div>
+              <div className={styles.cardItem}>
+                <div className={styles.cardLabel}>Application Date</div>
+                <div className={styles.cardValue}>{selectedSME.applicationDate}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Funding Card */}
+          <div className={`${styles.infoCard} ${styles.fundingCard}`}>
+            <div className={styles.cardTitle}>
+              <span className={styles.cardIcon}>💰</span>
+              Funding Required
+            </div>
+            <div className={styles.fundingAmount}>
+              R{Number(selectedSME.fundingNeeded).toLocaleString()}
+            </div>
+            <div style={{ opacity: 0.9 }}>{selectedSME.stage} Round</div>
+          </div>
+
+          {/* Documents Card */}
+          <div className={`${styles.infoCard} ${styles.documentsCard}`}>
+            <div className={styles.cardTitle}>
+              <span className={styles.cardIcon}>📄</span>
+              Documents
+            </div>
+            <ul className={styles.documentsList}>
+              {selectedSME.documents?.map((doc, idx) => (
+                <li key={idx} className={styles.documentItem}>
+                  <span className={styles.docIcon}>📄</span>
+                  <span>{doc}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Status Card */}
+          <div className={styles.infoCard}>
+            <div className={styles.cardTitle}>
+              <span className={styles.cardIcon}>🏗️</span>
+              Application Status
+            </div>
+            <div style={{ textAlign: 'center', padding: '10px 0' }}>
+              <span className={`${styles.statusBadge} ${getStatusBadgeClass(selectedSME.status)}`}>
+                {selectedSME.status === "Approved" ? "Accepted" : selectedSME.status}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal Actions */}
+      <div className={styles.modalActions}>
+        <button
+          className={styles.closeBtn}
+          onClick={resetModal}
+        >
+          Close Profile
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
             {modalType !== "view" && (
               <>
