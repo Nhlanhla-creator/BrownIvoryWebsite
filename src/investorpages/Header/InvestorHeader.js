@@ -227,7 +227,11 @@ function InvestorHeader({ companyName, profileImage, setProfileImage }) {
                 />
               ) : (
                 <div className={styles["profile-placeholder"]}>
-                  {userName.charAt(0).toUpperCase()}
+                  <img 
+                    src="/default-profile.png" 
+                    alt="Default Profile" 
+                    className={styles["default-profile-image"]}
+                  />
                 </div>
               )}
             </div>
@@ -242,7 +246,11 @@ function InvestorHeader({ companyName, profileImage, setProfileImage }) {
                       <img src={profileImage} alt="Profile" />
                     ) : (
                       <div className={styles["profile-placeholder-large"]}>
-                        {userName.charAt(0).toUpperCase()}
+                        <img 
+                          src="/default-profile.png" 
+                          alt="Default Profile" 
+                          className={styles["default-profile-image-large"]}
+                        />
                       </div>
                     )}
                     <label htmlFor="profile-upload" className={styles["change-avatar-button"]}>
