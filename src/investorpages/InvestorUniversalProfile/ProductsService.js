@@ -935,9 +935,15 @@ export default function ProductsServices({ data = {}, updateData }) {
               value={data.fundMandate || []}
             />
             <FileUpload
-              label="Prospectus (optional)"
+              label="⁠Portolio"
               accept=".pdf,.doc,.docx"
               onChange={(files) => handleFileChange("fundProspectus", files)}
+              value={data.fundProspectus || []}
+            />
+             <FileUpload
+              label="⁠⁠Bank Letter"
+              accept=".pdf,.doc,.docx"
+              onChange={(files) => handleFileChange("BankLetter", files)}
               value={data.fundProspectus || []}
             />
           </div>

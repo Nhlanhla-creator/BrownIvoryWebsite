@@ -77,7 +77,7 @@ export function CustomerReviewsCard({ styles }) {
           <button
             style={{
              marginTop: "40px",
-              padding: '12px 68px',
+              padding: '12px 48px',
               marginBottom: '40px',
               marginLeft: "10px",
               borderRadius: '8px',
@@ -96,7 +96,9 @@ export function CustomerReviewsCard({ styles }) {
             }}
             onClick={() => setShowReviewsModal(true)}
           >
-            View More
+        View Breakdown
+
+
             <ChevronDown className="ml-1 inline-block" size={16} />
           </button>
         </div>

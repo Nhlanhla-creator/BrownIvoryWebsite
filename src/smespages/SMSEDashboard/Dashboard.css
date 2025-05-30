@@ -673,3 +673,116 @@ body.modal-open {
     width: 100%;
   }
 }
+/* Explanation Cards */
+
+.explanation-cards-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: -70px;
+  padding: 0 20px;
+}
+
+.explanation-card {
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(93, 64, 55, 0.1);
+  transition: all 0.3s ease;
+  background: #EFEBE9; /* Your background brown */
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #D7CCC8; /* Your pale brown */
+}
+
+.explanation-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(93, 64, 55, 0.15);
+  background: #FFFFFF;
+}
+
+.explanation-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+}
+
+/* Brown shades for each card type */
+.explanation-card.blue::before {
+  background: #8D6E63; /* Your light brown */
+}
+.explanation-card.green::before {
+  background: #A67C52; /* Your accent brown */
+}
+.explanation-card.purple::before {
+  background: #5D4037; /* Your primary brown */
+}
+.explanation-card.orange::before {
+  background: #3E2723; /* Your dark brown */
+}
+
+.explanation-icon {
+  margin-bottom: 15px;
+  color: #5D4037; /* Primary brown */
+  background: rgba(142, 110, 99, 0.1); /* Light brown with opacity */
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.explanation-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #3E2723; /* Dark brown */
+}
+
+.explanation-text {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #5D4037; /* Primary brown */
+}
+
+/* Card-specific icon colors */
+.explanation-card.blue .explanation-icon {
+  color: #8D6E63; /* Light brown */
+}
+.explanation-card.green .explanation-icon {
+  color: #A67C52; /* Accent brown */
+}
+.explanation-card.purple .explanation-icon {
+  color: #5D4037; /* Primary brown */
+}
+.explanation-card.orange .explanation-icon {
+  color: #3E2723; /* Dark brown */
+}
+
+/* Make it responsive */
+@media (max-width: 1200px) {
+  .explanation-cards-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .explanation-cards-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .explanation-card {
+    padding: 16px;
+  }
+  
+  .explanation-title {
+    font-size: 1rem;
+  }
+  
+  .explanation-text {
+    font-size: 0.85rem;
+  }
+}
