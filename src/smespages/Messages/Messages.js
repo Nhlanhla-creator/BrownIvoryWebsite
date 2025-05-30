@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Messages.css';
-import { collection, query, where, onSnapshot, doc, getDoc, addDoc } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, getDoc, addDoc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { db } from "../../firebaseConfig";
 
@@ -32,11 +32,12 @@ const Messages = () => {
     });
   };
 
-  const filteredMessages = messages.filter(msg => {
-    const matchesSearch = msg.subject?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      msg.sender?.toLowerCase().includes(searchQuery.toLowerCase());
-    return msg.type === activeTab && (searchQuery === '' || matchesSearch);
-  });
+  const filteredMessages = messages.filter(msg =>
+    msg.type === activeTab &&
+    (searchQuery === '' ||
+      msg.subject?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      msg.sender?.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   useEffect(() => {
     const auth = getAuth();
@@ -81,27 +82,25 @@ const Messages = () => {
     return () => unsubscribe();
   }, []);
 
-  const handleMessageSelect = async (message) => {
-    setSelectedMessage(message);
-    setMessages((prev) =>
-      prev.map((msg) =>
-        msg.id === message.id ? { ...msg, read: true } : msg
-      )
-    );
+  const handleMessageSelect = async (msg) => {
+    setSelectedMessage(msg);
+    if (!msg.read) {
+      await updateDoc(doc(db, "messages", msg.id), { read: true });
+      setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, read: true } : m));
+    }
 
-    if (message.from) {
+    if (msg.from) {
       try {
-        const senderDoc = await getDoc(doc(db, "MyuniversalProfiles", message.from));
+        const senderDoc = await getDoc(doc(db, "MyuniversalProfiles", msg.from));
         if (senderDoc.exists()) {
           const data = senderDoc.data();
-          const fundName = data?.formData?.productsServices?.funds?.[0]?.name;
-          setSenderName(fundName || "Unnamed Funder");
+          const name = data?.formData?.productsServices?.funds?.[0]?.name;
+          setSenderName(name || "Unnamed Funder");
         } else {
-          setSenderName("Unknown Funder");
+          setSenderName("Unknown");
         }
-      } catch (error) {
-        console.error("Error fetching sender profile:", error);
-        setSenderName("Unknown Funder");
+      } catch {
+        setSenderName("Unknown");
       }
     }
   };
@@ -109,35 +108,34 @@ const Messages = () => {
   const handleReply = async () => {
     if (!selectedMessage) return;
 
-    let name = "";
+    let name = "Unknown";
     try {
-      const senderDoc = await getDoc(doc(db, "MyuniversalProfiles", selectedMessage.from));
-      if (senderDoc.exists()) {
-        const data = senderDoc.data();
-        name = data?.formData?.entityOverview?.tradingName || data?.formData?.productsServices?.funds?.[0]?.name || "Unnamed User";
+      const docRef = await getDoc(doc(db, "MyuniversalProfiles", selectedMessage.from));
+      if (docRef.exists()) {
+        const data = docRef.data();
+        name = data?.formData?.entityOverview?.tradingName ||
+          data?.formData?.productsServices?.funds?.[0]?.name || "Unnamed User";
       }
-    } catch (error) {
-      console.error("Error fetching sender profile for reply:", error);
-      name = "Unknown";
-    }
+    } catch { }
 
-    setIsComposing(true);
     setNewMessage({
       to: selectedMessage.from,
       toName: name,
       subject: `Re: ${selectedMessage.subject}`,
       content: ''
     });
+    setIsComposing(true);
   };
 
   const handleForward = () => {
     if (!selectedMessage) return;
-    setIsComposing(true);
     setNewMessage({
       to: '',
+      toName: '',
       subject: `Fwd: ${selectedMessage.subject}`,
-      content: `\n\n---- Forwarded Message ----\nFrom: ${selectedMessage.sender}\nDate: ${selectedMessage.date}\n\n${selectedMessage.content}`
+      content: `\n\n---- Forwarded Message ----\nFrom: ${selectedMessage.sender}\nDate: ${formatDate(selectedMessage.date)}\n\n${selectedMessage.content}`
     });
+    setIsComposing(true);
   };
 
   const handleSend = async () => {
@@ -145,62 +143,43 @@ const Messages = () => {
     const user = auth.currentUser;
     if (!user) return;
 
-    try {
-      const messageToSend = {
-        from: user.uid,
-        to: newMessage.to,
-        toName: newMessage.toName,
-        subject: newMessage.subject,
-        content: newMessage.content,
-        date: new Date().toISOString(),
-        read: false,
-        type: 'inbox',
-      };
+    const base = {
+      from: user.uid,
+      to: newMessage.to,
+      toName: newMessage.toName,
+      subject: newMessage.subject,
+      content: newMessage.content,
+      date: new Date().toISOString(),
+      read: false
+    };
 
-      await addDoc(collection(db, "messages"), messageToSend);
+    await addDoc(collection(db, "messages"), { ...base, type: "inbox" });
+    await addDoc(collection(db, "messages"), { ...base, read: true, type: "sent" });
 
-      const sentMessage = {
-        ...messageToSend,
-        sender: 'You',
-        recipient: newMessage.to,
-        type: 'sent'
-      };
-
-      setMessages([sentMessage, ...messages]);
-      setIsComposing(false);
-      setSelectedMessage(sentMessage);
-      setActiveTab('sent');
-      setNewMessage({ to: '', toName: '', subject: '', content: '' });
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
+    setIsComposing(false);
+    setNewMessage({ to: '', toName: '', subject: '', content: '' });
+    setActiveTab("sent");
   };
 
   const handleDelete = (id) => {
     setMessages(messages.filter(msg => msg.id !== id));
-    if (selectedMessage && selectedMessage.id === id) {
-      setSelectedMessage(filteredMessages.length > 1 ? filteredMessages[0] : null);
-    }
+    if (selectedMessage?.id === id) setSelectedMessage(null);
   };
 
   const handleSaveDraft = () => {
-    const newId = `draft-${Date.now()}`;
-    const draftMessage = {
-      id: newId,
-      sender: 'You',
+    const draft = {
+      id: `draft-${Date.now()}`,
       subject: newMessage.subject,
       content: newMessage.content,
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString(),
       read: true,
-      type: 'drafts'
+      type: "drafts"
     };
-
-    setMessages([draftMessage, ...messages]);
+    setMessages([draft, ...messages]);
     setIsComposing(false);
-    setSelectedMessage(draftMessage);
-    setActiveTab('drafts');
-    setNewMessage({ to: '', subject: '', content: '' });
+    setActiveTab("drafts");
   };
+
 
   return (
     <div className="messages-page">
@@ -317,12 +296,22 @@ const Messages = () => {
                   const details = selectedMessage.content.split("\n\nMeeting Details:")[1];
                   const timeMatch = details.match(/Time:\s*(.+)/);
                   const locationMatch = details.match(/Location:\s*(.+)/);
-                  const formattedTime = timeMatch ? formatDate(timeMatch[1].trim()) : "Not specified";
+                  const timeText = timeMatch ? timeMatch[1].trim() : "Not specified";
+                  const rsvpLink = timeText.includes("http") ? timeText.match(/\((.*?)\)/)?.[1] : null;
 
                   return (
                     <div className="meeting-details-box">
                       <h4>Meeting Details</h4>
-                      <p><strong>Time:</strong> {formattedTime}</p>
+                      <p>
+                        <strong>Time:</strong>{" "}
+                        {rsvpLink ? (
+                          <a href={rsvpLink} target="_blank" rel="noopener noreferrer">
+                            click to RSVP
+                          </a>
+                        ) : (
+                          timeText
+                        )}
+                      </p>
                       <p><strong>Location:</strong> {locationMatch ? locationMatch[1].trim() : "Not specified"}</p>
                     </div>
                   );

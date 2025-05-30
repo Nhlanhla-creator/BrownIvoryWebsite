@@ -307,11 +307,45 @@ export function InvestorSMETable() {
 
       if (status === "Approved" || status === "Declined") {
         let subject = status === "Approved" ? meetingPurpose : "Declined Application";
-        let content = status === "Approved"
-          ? `${message}\n\nMeeting Details:\nLocation: ${meetingLocation}\n\nAvailable Meeting Dates for this application:\n${availabilities.map(avail =>
-            `${avail.date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} (${avail.timeSlots[0].start} - ${avail.timeSlots[0].end} ${avail.timeZone})`
-          ).join('\n')}\n\nPlease reply with your preferred meeting time from the above options.`
-          : message;
+        let content;
+
+        if (status === "Approved") {
+          const rsvpLink = `${window.location.origin}/calendar`;
+
+          content = `${message}
+
+          Meeting Details:
+          Time: click to RSVP (${rsvpLink})
+          Location: ${meetingLocation}
+
+          Available Meeting Dates for this application:
+          ${availabilities
+              .map((avail) => {
+                try {
+                  const dateStr = avail.date instanceof Date
+                    ? avail.date.toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })
+                    : "Invalid Date";
+
+                  const timeStr = avail.timeSlots?.[0]
+                    ? `${avail.timeSlots[0].start} - ${avail.timeSlots[0].end} ${avail.timeZone}`
+                    : "Time not specified";
+
+                  return `${dateStr} (${timeStr})`;
+                } catch (e) {
+                  return "Invalid availability entry";
+                }
+              })
+              .join('\n')}
+
+        Please reply with your preferred meeting time from the above options.`;
+        } else {
+          content = message;
+        }
 
         await addDoc(collection(db, "messages"), {
           to: smeId,
@@ -629,9 +663,25 @@ export function InvestorSMETable() {
 
       if (nextStage === "Under Review") {
         subject = meetingPurpose;
-        content += `\n\nMeeting Details:\nLocation: ${meetingLocation}\nAvailable Dates: ${availabilities
-          .map(a => new Date(a.date).toLocaleDateString())
-          .join(", ")}`;
+        const rsvpLink = `${window.location.origin}/calendar`;
+
+        content += `
+
+        Meeting Details:
+        Time: [click to RSVP](${rsvpLink})
+        Location: ${meetingLocation}
+
+        Available Dates:
+        ${availabilities
+            .map(a =>
+              new Date(a.date).toLocaleDateString('en-ZA', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+              }) + ` (${a.timeSlots?.[0]?.start} - ${a.timeSlots?.[0]?.end})`
+            )
+            .join("\n")}`;
       }
 
       // Send messages
@@ -666,7 +716,7 @@ export function InvestorSMETable() {
       setIsSubmitting(false);
     }
   };
-  
+
   if (loading) {
     return <div className={styles.loadingContainer}>Loading applications...</div>;
   }
