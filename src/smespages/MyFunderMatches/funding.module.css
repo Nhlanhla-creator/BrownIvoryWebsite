@@ -1342,13 +1342,13 @@
 
 .fundingTable th:nth-child(8), /* Match */
 .fundingTable td:nth-child(8) {
-  width: 6%;
+  width: 7%;
   max-width: 70px;
 }
 
 .fundingTable th:nth-child(9), /* Deadline */
 .fundingTable td:nth-child(9) {
-  width: 9%;
+  width: 10%;
   max-width: 90px;
 }
 
@@ -1366,13 +1366,13 @@
 
 .fundingTable th:nth-child(12), /* Waiting Time */
 .fundingTable td:nth-child(12) {
-  width: 7%;
+  width: 8%;
   max-width: 80px;
 }
 
 .fundingTable th:nth-child(13), /* Action */
 .fundingTable td:nth-child(13) {
-  width: 8%;
+  width: 7%;
   max-width: 90px;
 }
 
