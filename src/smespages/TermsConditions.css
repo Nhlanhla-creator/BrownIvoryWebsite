@@ -53,13 +53,13 @@
 
 .checkbox-container:hover input ~ .checkmark {
   background-color: #F0DCC9;
-  border-color: #A0522D;
+  border-color: #37190b;
   transform: scale(1.05);
 }
 
 .checkbox-container input:checked ~ .checkmark {
-  background-color: #8B4513;
-  border-color: #8B4513;
+  background-color: #3c1f0a;
+  border-color: #3d1c05;
   box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
 }
 
@@ -91,7 +91,7 @@
 .terms-link {
   background: none;
   border: none;
-  color: #8B4513;
+  color: #6a350e;
   cursor: pointer;
   text-decoration: underline;
   font-weight: 600;
@@ -189,7 +189,7 @@
 
 /* Modal Header - Fixed layout and positioning */
 .terms-header {
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  background: linear-gradient(135deg, #6b3c1a 0%, #290f02 100%);
   color: #FAF7F2;
   padding: 20px 24px;
   display: flex;
@@ -399,7 +399,7 @@
 }
 
 .terms-content::-webkit-scrollbar-thumb:hover {
-  background: #A0522D;
+  background: #3d1908;
 }
 
 /* Responsive Design */
@@ -519,7 +519,7 @@
 
 /* Focus states for accessibility */
 .checkbox-container:focus-within .checkmark {
-  outline: 2px solid #8B4513;
+  outline: 2px solid #2d1607;
   outline-offset: 2px;
 }
 
