@@ -1134,7 +1134,7 @@ const LandingPage = () => {
                 paddingLeft: '20px',
                 marginBottom: '15px'
               }}>
-                <li style={{ marginBottom: '6px', textTransform: 'uppercase' }}>Accelerators to refine your model.</li>
+                <li style={{ marginBottom: '6px' }}>Accelerators to refine your model.</li>
                 <li style={{ marginBottom: '6px', textTransform: 'uppercase' }}>Mentors to fix compliance gaps.</li>
                 <li style={{ textTransform: 'uppercase' }}>Incubators to prep for funding.</li>
               </ul>

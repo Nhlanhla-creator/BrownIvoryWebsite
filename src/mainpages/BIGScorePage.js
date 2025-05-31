@@ -4,6 +4,20 @@ import Footer from './Footer';
 
 const BIGScorePage = () => {
   const [activeTab, setActiveTab] = useState('funding');
+  const [expandedTables, setExpandedTables] = useState({
+    fundability: false,
+    scoringRubric1: false,
+    scoringRubric2: false,
+    serviceTraditional: false,
+    serviceSocial: false
+  });
+
+  const toggleTable = (tableName) => {
+    setExpandedTables(prev => ({
+      ...prev,
+      [tableName]: !prev[tableName]
+    }));
+  };
 
   return (
     <div style={{ 
@@ -679,7 +693,7 @@ const BIGScorePage = () => {
                     marginBottom: '30px',
                     paddingLeft: '45px'
                   }}>
-                    For: SMSEs seeking capital or social enterprises proving impact. The BIG Score for funding evaluates organizations based on their investment readiness, operational reliability, and ESG/impact alignment.
+                    The Fundability Score is a comprehensive measure of how ready an enterprise is to attract and secure funding. It evaluates key dimensions such as business strategy, financial strength, market clarity, traction, and governance. The score adapts to the SME's stage of growth — whether early, scaling, or mature — to ensure fair, relevant evaluation.
                   </p>
                   
                   <h4 style={{ 
@@ -699,20 +713,12 @@ const BIGScorePage = () => {
                       height: '2px',
                       backgroundColor: '#9E6E3C'
                     }}></span>
-                    A. Traditional SMEs (Profit-Driven)
+                    Fundability Score Components
                   </h4>
-                  <p style={{ 
-                    fontStyle: 'italic',
-                    color: '#754A2D',
-                    marginBottom: '20px',
-                    paddingLeft: '45px'
-                  }}>
-                    Weightings Focus: Financial viability, market traction, and scalability. Weightings Shift as You Grow.
-                  </p>
                   
                   <div style={{ 
                     overflowX: 'auto',
-                    marginBottom: '40px',
+                    marginBottom: '20px',
                     boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
                     borderRadius: '12px'
                   }}>
@@ -728,50 +734,159 @@ const BIGScorePage = () => {
                           color: 'white'
                         }}>
                           <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Category</th>
-                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Pre-Revenue</th>
+                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Description</th>
+                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Early Stage</th>
                           <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Scaling</th>
                           <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Mature</th>
-                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Data Sources</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr style={{ backgroundColor: '#F2F0E6' }}>
-                          <td style={{ padding: '15px', fontWeight: '500' }}>Compliance</td>
-                          <td style={{ padding: '15px' }}>15%</td>
-                          <td style={{ padding: '15px' }}>20%</td>
-                          <td style={{ padding: '15px' }}>25%</td>
-                          <td style={{ padding: '15px' }}>Uploaded docs + govt APIs</td>
+                          <td style={{ padding: '15px', fontWeight: '500' }}>1. Leadership Strength</td>
+                          <td style={{ padding: '15px' }}>AI evaluation of uploaded leadership profiles</td>
+                          <td style={{ padding: '15px' }}>14%</td>
+                          <td style={{ padding: '15px' }}>8%</td>
+                          <td style={{ padding: '15px' }}>4%</td>
                         </tr>
                         <tr style={{ backgroundColor: '#D3D2CE' }}>
-                          <td style={{ padding: '15px', fontWeight: '500' }}>Financial Health</td>
-                          <td style={{ padding: '15px' }}>20%</td>
-                          <td style={{ padding: '15px' }}>30%</td>
-                          <td style={{ padding: '15px' }}>35%</td>
-                          <td style={{ padding: '15px' }}>Xero/QuickBooks + projections</td>
+                          <td style={{ padding: '15px', fontWeight: '500' }}>2. Financial Readiness</td>
+                          <td style={{ padding: '15px' }}>Existence of accounting/ERP system, books up-to-date and clean, Tax and VAT compliance results</td>
+                          <td style={{ padding: '15px' }}>11%</td>
+                          <td style={{ padding: '15px' }}>13%</td>
+                          <td style={{ padding: '15px' }}>11%</td>
                         </tr>
-                        <tr style={{ backgroundColor: '#F2F0E6' }}>
-                          <td style={{ padding: '15px', fontWeight: '500' }}>Operational Strength</td>
-                          <td style={{ padding: '15px' }}>20%</td>
-                          <td style={{ padding: '15px' }}>20%</td>
-                          <td style={{ padding: '15px' }}>15%</td>
-                          <td style={{ padding: '15px' }}>Team profiles + LinkedIn</td>
-                        </tr>
-                        <tr style={{ backgroundColor: '#D3D2CE' }}>
-                          <td style={{ padding: '15px', fontWeight: '500' }}>Pitch Quality</td>
-                          <td style={{ padding: '15px' }}>25%</td>
-                          <td style={{ padding: '15px' }}>15%</td>
-                          <td style={{ padding: '15px' }}>10%</td>
-                          <td style={{ padding: '15px' }}>ChatGPT deck analysis</td>
-                        </tr>
-                        <tr style={{ backgroundColor: '#F2F0E6' }}>
-                          <td style={{ padding: '15px', fontWeight: '500' }}>Impact Proof</td>
-                          <td style={{ padding: '15px' }}>20%</td>
-                          <td style={{ padding: '15px' }}>15%</td>
-                          <td style={{ padding: '15px' }}>15%</td>
-                          <td style={{ padding: '15px' }}>Sector benchmarks (Briter/AfDB)</td>
-                        </tr>
+                        {expandedTables.fundability && (
+                          <>
+                            <tr style={{ backgroundColor: '#F2F0E6' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>3. Financial Strength</td>
+                              <td style={{ padding: '15px' }}>Profitability and revenue growth</td>
+                              <td style={{ padding: '15px' }}>5%</td>
+                              <td style={{ padding: '15px' }}>8%</td>
+                              <td style={{ padding: '15px' }}>14%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#D3D2CE' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>4. Operational Strength & Operating Model Clarity</td>
+                              <td style={{ padding: '15px' }}>Upload Operating Model (eg business model canvas) + Pitch Deck + Business Plan, + AI evaluation of operating Model</td>
+                              <td style={{ padding: '15px' }}>10%</td>
+                              <td style={{ padding: '15px' }}>8%</td>
+                              <td style={{ padding: '15px' }}>8%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#F2F0E6' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>5. Pitch and Business Plan Evaluation - Problem Clarity</td>
+                              <td style={{ padding: '15px' }}>AI evaluation of uploaded Pitch Deck &/ Business Plan</td>
+                              <td style={{ padding: '15px' }}>7%</td>
+                              <td style={{ padding: '15px' }}>5%</td>
+                              <td style={{ padding: '15px' }}>3%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#D3D2CE' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>5. Pitch and Business Plan Evaluation - Solution Fit</td>
+                              <td style={{ padding: '15px' }}>AI evaluation of uploaded Pitch Deck &/ Business Plan</td>
+                              <td style={{ padding: '15px' }}>7%</td>
+                              <td style={{ padding: '15px' }}>5%</td>
+                              <td style={{ padding: '15px' }}>3%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#F2F0E6' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>5. Pitch and Business Plan Evaluation - Market Analysis</td>
+                              <td style={{ padding: '15px' }}>AI evaluation of uploaded Pitch Deck &/ Business Plan</td>
+                              <td style={{ padding: '15px' }}>4%</td>
+                              <td style={{ padding: '15px' }}>6%</td>
+                              <td style={{ padding: '15px' }}>7%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#D3D2CE' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>5. Pitch and Business Plan Evaluation - Competitive Landscape</td>
+                              <td style={{ padding: '15px' }}>AI evaluation of uploaded Pitch Deck &/ Business Plan</td>
+                              <td style={{ padding: '15px' }}>4%</td>
+                              <td style={{ padding: '15px' }}>6%</td>
+                              <td style={{ padding: '15px' }}>7%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#F2F0E6' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>5. Pitch and Business Plan Evaluation - Revenue Streams</td>
+                              <td style={{ padding: '15px' }}>AI evaluation of uploaded Pitch Deck &/ Business Plan</td>
+                              <td style={{ padding: '15px' }}>5%</td>
+                              <td style={{ padding: '15px' }}>6%</td>
+                              <td style={{ padding: '15px' }}>6%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#D3D2CE' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>5. Pitch and Business Plan Evaluation - Financial Projections</td>
+                              <td style={{ padding: '15px' }}>AI evaluation of uploaded Pitch Deck &/ Business Plan</td>
+                              <td style={{ padding: '15px' }}>4%</td>
+                              <td style={{ padding: '15px' }}>6%</td>
+                              <td style={{ padding: '15px' }}>7%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#F2F0E6' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>5. Pitch and Business Plan Evaluation - Traction</td>
+                              <td style={{ padding: '15px' }}>AI evaluation of uploaded Pitch Deck &/ Business Plan</td>
+                              <td style={{ padding: '15px' }}>6%</td>
+                              <td style={{ padding: '15px' }}>9%</td>
+                              <td style={{ padding: '15px' }}>5%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#D3D2CE' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>5. Pitch and Business Plan Evaluation - MVP Maturity</td>
+                              <td style={{ padding: '15px' }}>AI evaluation of uploaded Pitch Deck &/ Business Plan</td>
+                              <td style={{ padding: '15px' }}>6%</td>
+                              <td style={{ padding: '15px' }}>6%</td>
+                              <td style={{ padding: '15px' }}>6%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#F2F0E6' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>5. Pitch and Business Plan Evaluation - Investor IRR</td>
+                              <td style={{ padding: '15px' }}>AI evaluation of uploaded Pitch Deck &/ Business Plan</td>
+                              <td style={{ padding: '15px' }}>3%</td>
+                              <td style={{ padding: '15px' }}>5%</td>
+                              <td style={{ padding: '15px' }}>6%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#D3D2CE' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>6. Contract Evaluation</td>
+                              <td style={{ padding: '15px' }}>Scope Clarity, Risk Allocation, Payment Terms, Growth Opportunity, Profitability</td>
+                              <td style={{ padding: '15px' }}>3%</td>
+                              <td style={{ padding: '15px' }}>5%</td>
+                              <td style={{ padding: '15px' }}>6%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#F2F0E6' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>7. Governance</td>
+                              <td style={{ padding: '15px' }}>Decision-Making Clarity, Policies & Controls, Board or Advisory Oversight, External Accountability, Conflict Resolution / Ethics, Separation of Duties</td>
+                              <td style={{ padding: '15px' }}>3%</td>
+                              <td style={{ padding: '15px' }}>4%</td>
+                              <td style={{ padding: '15px' }}>6%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#D3D2CE' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>8. Impact Proof</td>
+                              <td style={{ padding: '15px' }}>Are roles and responsibilities clearly assigned? Is leadership accountable? Existence of documented internal controls (e.g., procurement, finance, HR) Is there external input or advisory support for oversight? Are financial and operational approvals clearly structured? Are there anti-fraud, tax, and regulatory guidelines or monitoring mechanisms?</td>
+                              <td style={{ padding: '15px' }}>6%</td>
+                              <td style={{ padding: '15px' }}>4%</td>
+                              <td style={{ padding: '15px' }}>3%</td>
+                            </tr>
+                          </>
+                        )}
                       </tbody>
                     </table>
+                  </div>
+                  
+                  <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                    <button 
+                      onClick={() => toggleTable('fundability')}
+                      style={{
+                        backgroundColor: 'transparent',
+                        color: '#9E6E3C',
+                        border: '1px solid #9E6E3C',
+                        padding: '8px 20px',
+                        borderRadius: '20px',
+                        fontSize: '0.9rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        display: 'inline-flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      {expandedTables.fundability ? 'Show Less' : 'Show More'}
+                      <span style={{ 
+                        marginLeft: '8px',
+                        transform: expandedTables.fundability ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.3s ease'
+                      }}>
+                        ▼
+                      </span>
+                    </button>
                   </div>
                   
                   <h4 style={{ 
@@ -791,20 +906,12 @@ const BIGScorePage = () => {
                       height: '2px',
                       backgroundColor: '#9E6E3C'
                     }}></span>
-                    B. Social Enterprises (Impact-Driven)
+                    Scoring Rubric
                   </h4>
-                  <p style={{ 
-                    fontStyle: 'italic',
-                    color: '#754A2D',
-                    marginBottom: '20px',
-                    paddingLeft: '45px'
-                  }}>
-                    Weightings Focus: Impact metrics, sustainability, and community alignment. Weightings Favor Real-World Change:
-                  </p>
                   
                   <div style={{ 
                     overflowX: 'auto',
-                    marginBottom: '40px',
+                    marginBottom: '20px',
                     boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
                     borderRadius: '12px'
                   }}>
@@ -819,44 +926,155 @@ const BIGScorePage = () => {
                           backgroundColor: '#9E6E3C',
                           color: 'white'
                         }}>
-                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Category</th>
-                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Early-Stage</th>
-                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Growing</th>
-                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Mature</th>
-                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>What We Measure</th>
+                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Score</th>
+                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Leadership Strength</th>
+                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Financial Readiness</th>
+                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Financial Strength</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr style={{ backgroundColor: '#F2F0E6' }}>
-                          <td style={{ padding: '15px', fontWeight: '500' }}>Impact Proof</td>
-                          <td style={{ padding: '15px' }}>40%</td>
-                          <td style={{ padding: '15px' }}>35%</td>
-                          <td style={{ padding: '15px' }}>30%</td>
-                          <td style={{ padding: '15px' }}>SDG alignment, beneficiary stories</td>
+                          <td style={{ padding: '15px', fontWeight: '500' }}>0</td>
+                          <td style={{ padding: '15px' }}>No relevant experience; no diversity</td>
+                          <td style={{ padding: '15px' }}>No financial documents uploaded; unclear or missing accounting system</td>
+                          <td style={{ padding: '15px' }}>No cash flow data or financial ratios provided; business operating at a consistent loss</td>
                         </tr>
                         <tr style={{ backgroundColor: '#D3D2CE' }}>
-                          <td style={{ padding: '15px', fontWeight: '500' }}>Financial Sustainability</td>
-                          <td style={{ padding: '15px' }}>15%</td>
-                          <td style={{ padding: '15px' }}>25%</td>
-                          <td style={{ padding: '15px' }}>30%</td>
-                          <td style={{ padding: '15px' }}>Grant diversity, earned income %</td>
+                          <td style={{ padding: '15px', fontWeight: '500' }}>1-2</td>
+                          <td style={{ padding: '15px' }}>Limited experience; minimal diversity</td>
+                          <td style={{ padding: '15px' }}>Uploaded outdated financials; ad hoc or spreadsheet-based systems; basic tax info only</td>
+                          <td style={{ padding: '15px' }}>Irregular cash flow; minimal margins; signs of financial instability or high cost structure</td>
                         </tr>
-                        <tr style={{ backgroundColor: '#F2F0E6' }}>
-                          <td style={{ padding: '15px', fontWeight: '500' }}>Governance</td>
-                          <td style={{ padding: '15px' }}>20%</td>
-                          <td style={{ padding: '15px' }}>20%</td>
-                          <td style={{ padding: '15px' }}>25%</td>
-                          <td style={{ padding: '15px' }}>Board diversity, transparency</td>
-                        </tr>
-                        <tr style={{ backgroundColor: '#D3D2CE' }}>
-                          <td style={{ padding: '15px', fontWeight: '500' }}>Community Roots</td>
-                          <td style={{ padding: '15px' }}>25%</td>
-                          <td style={{ padding: '15px' }}>20%</td>
-                          <td style={{ padding: '15px' }}>15%</td>
-                          <td style={{ padding: '15px' }}>Local partnerships, participatory design</td>
-                        </tr>
+                        {expandedTables.scoringRubric1 && (
+                          <>
+                            <tr style={{ backgroundColor: '#F2F0E6' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>3-4</td>
+                              <td style={{ padding: '15px' }}>Strong core team with track record; some diversity/coachability</td>
+                              <td style={{ padding: '15px' }}>Recent financials uploaded; basic accounting system (e.g., Wave, Zoho); fair tax record</td>
+                              <td style={{ padding: '15px' }}>Positive cash flow or acceptable burn rate; decent margins; cost base partially optimized</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#D3D2CE' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>5</td>
+                              <td style={{ padding: '15px' }}>Exceptional team (scaled startups before); diverse + mentorship sought</td>
+                              <td style={{ padding: '15px' }}>Strong financial management (e.g., Xero, Sage); clean financial statements; tax & VAT fully compliant</td>
+                              <td style={{ padding: '15px' }}>Strong, stable cash flow; healthy profit margins; lean cost structure; reserves to sustain operations</td>
+                            </tr>
+                          </>
+                        )}
                       </tbody>
                     </table>
+                  </div>
+                  
+                  <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                    <button 
+                      onClick={() => toggleTable('scoringRubric1')}
+                      style={{
+                        backgroundColor: 'transparent',
+                        color: '#9E6E3C',
+                        border: '1px solid #9E6E3C',
+                        padding: '8px 20px',
+                        borderRadius: '20px',
+                        fontSize: '0.9rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        display: 'inline-flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      {expandedTables.scoringRubric1 ? 'Show Less' : 'Show More'}
+                      <span style={{ 
+                        marginLeft: '8px',
+                        transform: expandedTables.scoringRubric1 ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.3s ease'
+                      }}>
+                        ▼
+                      </span>
+                    </button>
+                  </div>
+                  
+                  <div style={{ 
+                    overflowX: 'auto',
+                    marginBottom: '20px',
+                    boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
+                    borderRadius: '12px'
+                  }}>
+                    <table style={{ 
+                      width: '100%',
+                      borderCollapse: 'collapse',
+                      borderRadius: '12px',
+                      overflow: 'hidden'
+                    }}>
+                      <thead>
+                        <tr style={{ 
+                          backgroundColor: '#9E6E3C',
+                          color: 'white'
+                        }}>
+                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Score</th>
+                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Operational Strength</th>
+                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Problem Clarity</th>
+                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Solution Fit</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr style={{ backgroundColor: '#F2F0E6' }}>
+                          <td style={{ padding: '15px', fontWeight: '500' }}>0</td>
+                          <td style={{ padding: '15px' }}>No operating model uploaded; unclear how the business works</td>
+                          <td style={{ padding: '15px' }}>No clear articulation of the problem being solved</td>
+                          <td style={{ padding: '15px' }}>No clear solution defined or not aligned to the problem</td>
+                        </tr>
+                        <tr style={{ backgroundColor: '#D3D2CE' }}>
+                          <td style={{ padding: '15px', fontWeight: '500' }}>1-2</td>
+                          <td style={{ padding: '15px' }}>Vague or overly technical explanation of operations; low relevance to business type</td>
+                          <td style={{ padding: '15px' }}>Vague problem statement; lacks urgency or real-world framing</td>
+                          <td style={{ padding: '15px' }}>Basic idea shared; limited differentiation or depth</td>
+                        </tr>
+                        {expandedTables.scoringRubric2 && (
+                          <>
+                            <tr style={{ backgroundColor: '#F2F0E6' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>3-4</td>
+                              <td style={{ padding: '15px' }}>Clear business model canvas or SOPs; some gaps in detail or delivery readiness</td>
+                              <td style={{ padding: '15px' }}>Reasonable clarity, but may lack specificity or data</td>
+                              <td style={{ padding: '15px' }}>Good product/service fit; addresses problem with workable model</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#D3D2CE' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>5</td>
+                              <td style={{ padding: '15px' }}>Strong, well-structured operations document; lean, scalable, and tailored to the growth strategy</td>
+                              <td style={{ padding: '15px' }}>Sharp, compelling articulation with clear urgency and supporting context</td>
+                              <td style={{ padding: '15px' }}>Clear, validated solution with strong market fit and clear value proposition</td>
+                            </tr>
+                          </>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                    <button 
+                      onClick={() => toggleTable('scoringRubric2')}
+                      style={{
+                        backgroundColor: 'transparent',
+                        color: '#9E6E3C',
+                        border: '1px solid #9E6E3C',
+                        padding: '8px 20px',
+                        borderRadius: '20px',
+                        fontSize: '0.9rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        display: 'inline-flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      {expandedTables.scoringRubric2 ? 'Show Less' : 'Show More'}
+                      <span style={{ 
+                        marginLeft: '8px',
+                        transform: expandedTables.scoringRubric2 ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.3s ease'
+                      }}>
+                        ▼
+                      </span>
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -923,7 +1141,7 @@ const BIGScorePage = () => {
                   
                   <div style={{ 
                     overflowX: 'auto',
-                    marginBottom: '40px',
+                    marginBottom: '20px',
                     boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
                     borderRadius: '12px'
                   }}>
@@ -941,7 +1159,6 @@ const BIGScorePage = () => {
                           <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Category</th>
                           <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Description</th>
                           <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Weighting</th>
-                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Data Sources</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -949,22 +1166,51 @@ const BIGScorePage = () => {
                           <td style={{ padding: '15px', fontWeight: '500' }}>Compliance</td>
                           <td style={{ padding: '15px' }}>SME legitimacy, legal compliance, licensing</td>
                           <td style={{ padding: '15px' }}>20%</td>
-                          <td style={{ padding: '15px' }}>Vendor management docs, Tax docs, certifications</td>
                         </tr>
-                        <tr style={{ backgroundColor: '#D3D2CE' }}>
-                          <td style={{ padding: '15px', fontWeight: '500' }}>Reliability</td>
-                          <td style={{ padding: '15px' }}>Financial and operational strength/health</td>
-                          <td style={{ padding: '15px' }}>50%</td>
-                          <td style={{ padding: '15px' }}>SLAs, Team capacity</td>
-                        </tr>
-                        <tr style={{ backgroundColor: '#F2F0E6' }}>
-                          <td style={{ padding: '15px', fontWeight: '500' }}>Customer Love</td>
-                          <td style={{ padding: '15px' }}>Real-time ratings and reviews from actual customers</td>
-                          <td style={{ padding: '15px' }}>30%</td>
-                          <td style={{ padding: '15px' }}>Net Promoter Score, repeat business</td>
-                        </tr>
+                        {expandedTables.serviceTraditional && (
+                          <>
+                            <tr style={{ backgroundColor: '#D3D2CE' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>Reliability</td>
+                              <td style={{ padding: '15px' }}>Financial and operational strength/health</td>
+                              <td style={{ padding: '15px' }}>50%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#F2F0E6' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>Customer Love</td>
+                              <td style={{ padding: '15px' }}>Real-time ratings and reviews from actual customers</td>
+                              <td style={{ padding: '15px' }}>30%</td>
+                            </tr>
+                          </>
+                        )}
                       </tbody>
                     </table>
+                  </div>
+                  
+                  <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                    <button 
+                      onClick={() => toggleTable('serviceTraditional')}
+                      style={{
+                        backgroundColor: 'transparent',
+                        color: '#9E6E3C',
+                        border: '1px solid #9E6E3C',
+                        padding: '8px 20px',
+                        borderRadius: '20px',
+                        fontSize: '0.9rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        display: 'inline-flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      {expandedTables.serviceTraditional ? 'Show Less' : 'Show More'}
+                      <span style={{ 
+                        marginLeft: '8px',
+                        transform: expandedTables.serviceTraditional ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.3s ease'
+                      }}>
+                        ▼
+                      </span>
+                    </button>
                   </div>
                   
                   <h4 style={{ 
@@ -997,7 +1243,7 @@ const BIGScorePage = () => {
                   
                   <div style={{ 
                     overflowX: 'auto',
-                    marginBottom: '40px',
+                    marginBottom: '20px',
                     boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
                     borderRadius: '12px'
                   }}>
@@ -1015,7 +1261,6 @@ const BIGScorePage = () => {
                           <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Category</th>
                           <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Description</th>
                           <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Weighting</th>
-                          <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600' }}>Data Sources</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1023,22 +1268,51 @@ const BIGScorePage = () => {
                           <td style={{ padding: '15px', fontWeight: '500' }}>Compliance</td>
                           <td style={{ padding: '15px' }}>NGO legitimacy, legal compliance, licensing</td>
                           <td style={{ padding: '15px' }}>25%</td>
-                          <td style={{ padding: '15px' }}>NGO registration, audits</td>
                         </tr>
-                        <tr style={{ backgroundColor: '#D3D2CE' }}>
-                          <td style={{ padding: '15px', fontWeight: '500' }}>Impact Proof</td>
-                          <td style={{ padding: '15px' }}>Environmental and social responsibility practices, ESG compliance</td>
-                          <td style={{ padding: '15px' }}>40%</td>
-                          <td style={{ padding: '15px' }}>Beneficiary testimonials, SDG reports</td>
-                        </tr>
-                        <tr style={{ backgroundColor: '#F2F0E6' }}>
-                          <td style={{ padding: '15px', fontWeight: '500' }}>Service Quality</td>
-                          <td style={{ padding: '15px' }}>Reliability, consistency in service delivery, operational efficiency - Real-time ratings and reviews from actual customers</td>
-                          <td style={{ padding: '15px' }}>35%</td>
-                          <td style={{ padding: '15px' }}>Partner/corporate ratings</td>
-                        </tr>
+                        {expandedTables.serviceSocial && (
+                          <>
+                            <tr style={{ backgroundColor: '#D3D2CE' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>Impact Proof</td>
+                              <td style={{ padding: '15px' }}>Environmental and social responsibility practices, ESG compliance</td>
+                              <td style={{ padding: '15px' }}>40%</td>
+                            </tr>
+                            <tr style={{ backgroundColor: '#F2F0E6' }}>
+                              <td style={{ padding: '15px', fontWeight: '500' }}>Service Quality</td>
+                              <td style={{ padding: '15px' }}>Reliability, consistency in service delivery, operational efficiency - Real-time ratings and reviews from actual customers</td>
+                              <td style={{ padding: '15px' }}>35%</td>
+                            </tr>
+                          </>
+                        )}
                       </tbody>
                     </table>
+                  </div>
+                  
+                  <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                    <button 
+                      onClick={() => toggleTable('serviceSocial')}
+                      style={{
+                        backgroundColor: 'transparent',
+                        color: '#9E6E3C',
+                        border: '1px solid #9E6E3C',
+                        padding: '8px 20px',
+                        borderRadius: '20px',
+                        fontSize: '0.9rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        display: 'inline-flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      {expandedTables.serviceSocial ? 'Show Less' : 'Show More'}
+                      <span style={{ 
+                        marginLeft: '8px',
+                        transform: expandedTables.serviceSocial ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.3s ease'
+                      }}>
+                        ▼
+                      </span>
+                    </button>
                   </div>
                 </div>
               )}

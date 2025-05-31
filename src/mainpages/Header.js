@@ -10,191 +10,108 @@ const Header = () => {
 
   const handleNavigation = (path) => {
     if (path.startsWith('#')) {
-      // Handle internal page anchor links
       const element = document.getElementById(path.substring(1));
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
+      if (element) element.scrollIntoView({ behavior: 'smooth' });
     } else {
       navigate(path);
     }
   };
 
-  // Inline styles for the main elements
+  // Styles
   const styles = {
     header: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: '1.5rem 3rem',
+      padding: '1rem 1.5rem', // Reduced side padding
       backgroundColor: '#FFFFFF',
-      boxShadow: '0 2px 20px rgba(0, 0, 0, 0.08)',
+      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
       position: 'sticky',
       top: 0,
       zIndex: 100,
       width: '100%',
-      boxSizing: 'border-box'
     },
     logoContainer: {
-      display: 'flex',
-      alignItems: 'center'
+      flex: '0 0 auto',
+      marginRight: '0.5rem' // Reduced from 1.5rem to move logo left
     },
     logo: {
+      width: '250px',
       height: 'auto',
-      width: '330px',
-      maxHeight: '370px',
-      objectFit: 'contain',
+      maxHeight: '80px',
+      cursor: 'pointer'
+    },
+    navContainer: {
+      display: 'flex',
+      flex: '1 1 auto',
+      justifyContent: 'center',
+      margin: '0 1rem' // Adjusted margin
     },
     nav: {
       display: 'flex',
-      gap: '0.5rem',
-      position: 'relative',
+      gap: '0.6rem'
     },
-    buttonGroup: {
+    navButton: {
+      minWidth: '100px',
+      padding: '0.5rem 0',
+      textAlign: 'center',
+      fontSize: '0.95rem'
+    },
+    authContainer: {
       display: 'flex',
-      gap: '1.5rem',
+      flexDirection: 'column',
       alignItems: 'center',
+      gap: '0.2rem',
+      flex: '0 0 auto',
+      marginLeft: '0.5rem' // Adjusted margin
+    },
+    loginButton: {
+      minWidth: '100px',
+      padding: '0.5rem 0',
+      textAlign: 'center',
+      fontSize: '0.95rem',
+      backgroundColor: '#A78B71',
+      color: 'white',
+      border: 'none',
+      borderRadius: '5px',
+      fontWeight: '600',
+      cursor: 'pointer',
+      transition: 'all 0.3s'
     },
     registerText: {
       color: '#808080',
-      fontSize: '0.8rem',
-      textAlign: 'center',
-      marginTop: '0.3rem',
-      cursor: 'pointer'
+      fontSize: '0.75rem',
+      cursor: 'pointer',
+      transition: 'color 0.2s',
+      whiteSpace: 'nowrap'
     }
   };
 
   return (
-    <>
-      {/* CSS for pseudo-classes */}
-      <style>
-        {`          
-          .nav-button {
-            text-decoration: none;
-            color: #FFFFFF;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            position: relative;
-            padding: 0.6rem 1.5rem;
-            border-radius: 6px;
-            background-color: #5D432C;
-            border: none;
-            cursor: pointer;
-            overflow: hidden;
-          }
-          
-          .nav-button:hover {
-            background-color: #372C27;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-          }
-          
-          .nav-button:active {
-            transform: translateY(0);
-          }
-          
-          .nav-button::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: #F2F0E6;
-            transform: scaleX(0);
-            transform-origin: right;
-            transition: transform 0.3s ease;
-          }
-          
-          .nav-button:hover::after {
-            transform: scaleX(1);
-            transform-origin: left;
-          }
-          
-          .login-button {
-            background: none;
-            color: #372C27;
-            border: none;
-            padding: 0.7rem 1.4rem;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1rem;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-          }
-          
-          .login-button:hover {
-            color: #9E6E3C;
-            background-color: rgba(158, 110, 60, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-          }
-          
-          .login-button:active {
-            transform: translateY(0);
-          }
-          
-          .get-started-button {
-            background-color: #754A2D;
-            color: #FFFFFF;
-            border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 1rem;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(117, 74, 45, 0.2);
-          }
-          
-          .get-started-button:hover {
-            background-color: #9E6E3C;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(117, 74, 45, 0.3);
-          }
-          
-          .get-started-button:active {
-            transform: translateY(0);
-          }
-          
-          .register-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-          }
-          
-          .register-text:hover {
-            color: #9E6E3C;
-          }
-          
-          @media (max-width: 1024px) {
-            .nav {
-              gap: 0.5rem;
-            }
-          }
-          
-          @media (max-width: 768px) {
-            .button-group {
-              display: none;
-            }
-          }
-        `}
-      </style>
-
-      <header style={styles.header}>
-        <div style={styles.logoContainer}>
-          <img 
-            src='/LogoWhite.png' 
-            alt="Brown Ivory Group Logo" 
+    <header style={styles.header}>
+      {/* Logo on left - now positioned slightly more to the left */}
+      <div style={styles.logoContainer}>
+        <picture onClick={() => handleNavigation('/')}>
+          <source srcSet="/MainLogo.webp" type="image/webp" />
+          <source srcSet="/MainLogo.png" type="image/png" />
+          <img
+            src="/logo.png"
+            alt="Brown Ivory Group Logo"
             style={styles.logo}
+            width="250"
+            height="80"
+            loading="lazy"
           />
-        </div>
-        <nav style={styles.nav} className="nav">
+        </picture>
+      </div>
+
+      {/* Centered Navigation */}
+      <div style={styles.navContainer}>
+        <nav style={styles.nav}>
           <button 
             className="nav-button"
             onClick={() => handleNavigation('/')}
+            style={styles.navButton}
           >
             Home
           </button>
@@ -202,6 +119,7 @@ const Header = () => {
           <button 
             className="nav-button"
             onClick={() => handleNavigation('/HowItWorks')}
+            style={styles.navButton}
           >
             How it works
           </button>
@@ -209,6 +127,7 @@ const Header = () => {
           <button 
             className="nav-button"
             onClick={() => handleNavigation('/BigScorePage')}
+            style={styles.navButton}
           >
             BIG score
           </button>
@@ -216,6 +135,7 @@ const Header = () => {
           <button 
             className="nav-button"
             onClick={() => handleNavigation('/resources')}
+            style={styles.navButton}
           >
             Resources
           </button>
@@ -223,36 +143,102 @@ const Header = () => {
           <button 
             className="nav-button"
             onClick={() => handleNavigation('/ContactPage')}
+            style={styles.navButton}
           >
             Contact Us
           </button>
+          
           <button 
             className="nav-button"
             onClick={() => handleNavigation('/FAQPage')}
+            style={styles.navButton}
           >
             FAQs
           </button>
         </nav>
-        <div style={styles.buttonGroup} className="button-group">
-          <button className="login-button" onClick={() => handleLoginClick('login')}>
-            Login
-          </button>
+      </div>
 
-          <div className="register-container">
-            <button className="get-started-button" onClick={() => handleLoginClick('register')}>
-              Register
-            </button>
-            <div
-              style={styles.registerText}
-              className="register-text"
-              onClick={() => handleLoginClick('register')}
-            >
-              Have not registered yet?
-            </div>
-          </div>
-        </div>
-      </header>
-    </>
+      {/* Auth section on right */}
+      <div style={styles.authContainer}>
+        <button 
+          className="login-button"
+          onClick={() => handleLoginClick('login')}
+          style={styles.loginButton}
+        >
+          Login
+        </button>
+        <span 
+          style={styles.registerText}
+          onClick={() => handleLoginClick('register')}
+        >
+          Not registered yet?
+        </span>
+      </div>
+
+      {/* CSS Styles */}
+      <style jsx>{`
+        .nav-button {
+          background-color: #5D432C;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+        
+        .nav-button:hover {
+          background-color: #372C27;
+          transform: translateY(-1px);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .login-button:hover {
+          background-color: #8a6d52;
+          transform: translateY(-1px);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 1200px) {
+          ${styles.navButton}, ${styles.loginButton} {
+            min-width: 90px;
+            font-size: 0.9rem;
+          }
+        }
+        
+        @media (max-width: 1024px) {
+          ${styles.navButton}, ${styles.loginButton} {
+            min-width: 85px;
+            font-size: 0.85rem;
+            padding: 0.4rem 0;
+          }
+          
+          ${styles.logo} {
+            width: 220px;
+          }
+        }
+        
+        @media (max-width: 768px) {
+          ${styles.navContainer}, ${styles.authContainer} {
+            display: none;
+          }
+          
+          header {
+            padding: 0.8rem;
+            justify-content: center;
+          }
+          
+          ${styles.logoContainer} {
+            margin-right: 0;
+          }
+          
+          ${styles.logo} {
+            width: 200px;
+            max-height: 70px;
+          }
+        }
+      `}</style>
+    </header>
   );
 };
 
