@@ -651,3 +651,23 @@
 .table-container::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, #A07B52, #6B4428);
 }
+
+/* Add these styles */
+.group-header {
+  background-color: #f8f8f8;
+  font-weight: bold;
+}
+
+.group-slot {
+  background-color: #fafafa;
+}
+
+.group-slot td {
+  padding-left: 2rem;
+}
+
+.group-slot .event-title::before {
+  content: "→";
+  margin-right: 0.5rem;
+  color: #888;
+}

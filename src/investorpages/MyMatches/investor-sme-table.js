@@ -35,8 +35,8 @@ export function InvestorSMETable() {
   const [selectedSMEForStage, setSelectedSMEForStage] = useState(null);
   const [updatedStages, setUpdatedStages] = useState({});
   const navigate = useNavigate();
-const [authLoading, setAuthLoading] = useState(true);
-const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   const loadApplicationAvailability = (application) => {
     if (application.availableDates) {
@@ -50,64 +50,64 @@ const [user, setUser] = useState(null);
     }
   };
 
-useEffect(() => {
-  setLoading(true);
-  setAuthLoading(true);
+  useEffect(() => {
+    setLoading(true);
+    setAuthLoading(true);
 
-  // Listen for authentication state changes
-  const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
-    setUser(currentUser);
-    setAuthLoading(false);
+    // Listen for authentication state changes
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setAuthLoading(false);
 
-    if (!currentUser) {
-      setLoading(false);
-      setSmes([]);
-      return;
-    }
+      if (!currentUser) {
+        setLoading(false);
+        setSmes([]);
+        return;
+      }
 
-    // Only proceed with data fetching if user is authenticated
-    const q = query(
-      collection(db, "investorApplications"),
-      where("funderId", "==", currentUser.uid)
-    );
+      // Only proceed with data fetching if user is authenticated
+      const q = query(
+        collection(db, "investorApplications"),
+        where("funderId", "==", currentUser.uid)
+      );
 
-    const unsubscribeData = onSnapshot(q, (querySnapshot) => {
-      const applications = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
+      const unsubscribeData = onSnapshot(q, (querySnapshot) => {
+        const applications = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
 
-        if (data.availableDates) {
-          data.availableDates = data.availableDates.map(avail => ({
-            ...avail,
-            date: new Date(avail.date)
-          }));
-        }
+          if (data.availableDates) {
+            data.availableDates = data.availableDates.map(avail => ({
+              ...avail,
+              date: new Date(avail.date)
+            }));
+          }
 
-        applications.push({
-          id: doc.id,
-          ...data
+          applications.push({
+            id: doc.id,
+            ...data
+          });
         });
+
+        applications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setSmes(applications);
+        setLoading(false);
+      }, (error) => {
+        console.error("Error fetching applications:", error);
+        setNotification({
+          type: "error",
+          message: "Failed to load applications"
+        });
+        setLoading(false);
       });
 
-      applications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setSmes(applications);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching applications:", error);
-      setNotification({
-        type: "error",
-        message: "Failed to load applications"
-      });
-      setLoading(false);
+      // Return cleanup function for data subscription
+      return () => unsubscribeData();
     });
 
-    // Return cleanup function for data subscription
-    return () => unsubscribeData();
-  });
-
-  // Return cleanup function for auth subscription
-  return () => unsubscribeAuth();
-}, []);
+    // Return cleanup function for auth subscription
+    return () => unsubscribeAuth();
+  }, []);
 
   const handleDateSelect = (dates) => {
     setTempDates(dates || []);
@@ -649,7 +649,8 @@ useEffect(() => {
             date: availabilityData[0].date,
             location: meetingLocation,
             type: "meeting",
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            availableDates: availabilityData // ✅ include all available dates
           });
         }
       }
@@ -717,18 +718,18 @@ useEffect(() => {
   if (loading) {
     return <div className={styles.loadingContainer}>Loading applications...</div>;
   }
-if (authLoading || loading) {
-  return <div className={styles.loadingContainer}>Loading applications...</div>;
-}
+  if (authLoading || loading) {
+    return <div className={styles.loadingContainer}>Loading applications...</div>;
+  }
 
-// Add this condition right after the loading check
-if (!user) {
-  return (
-    <div className={styles.loadingContainer}>
-      Please log in to view applications.
-    </div>
-  );
-}
+  // Add this condition right after the loading check
+  if (!user) {
+    return (
+      <div className={styles.loadingContainer}>
+        Please log in to view applications.
+      </div>
+    );
+  }
   return (
     <div className={styles.tableSection}>
       <h2 className={styles.sectionTitle}>SMSE Applications</h2>
@@ -766,7 +767,7 @@ if (!user) {
               smes.map((sme) => (
                 <tr key={sme.id}>
                   <td>
-                    <button 
+                    <button
                       className={styles.smeNameLink}
                       onClick={() => handleSMENameClick(sme)}
                     >
@@ -840,131 +841,131 @@ if (!user) {
             </h3>
             <p className={styles.modalSMEName}><strong>{selectedSME.smeName}</strong></p>
 
-           {selectedSME && modalType === "view" && (
-  <div className={styles.modalOverlay} onClick={resetModal}>
-    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-      {/* Profile Header */}
-      <div className={styles.profileHeader}>
-        <div className={styles.matchBadge}>{selectedSME.matchPercentage}% Match</div>
-        <div className={styles.profileAvatar}>
-          {selectedSME.smeName.charAt(0).toUpperCase()}
-        </div>
-        <h1 className={styles.profileName}>{selectedSME.smeName}</h1>
-        <p className={styles.profileSubtitle}>
-          {selectedSME.sector} • {selectedSME.stage} • {selectedSME.location}
-        </p>
-      </div>
+            {selectedSME && modalType === "view" && (
+              <div className={styles.modalOverlay} onClick={resetModal}>
+                <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                  {/* Profile Header */}
+                  <div className={styles.profileHeader}>
+                    <div className={styles.matchBadge}>{selectedSME.matchPercentage}% Match</div>
+                    <div className={styles.profileAvatar}>
+                      {selectedSME.smeName.charAt(0).toUpperCase()}
+                    </div>
+                    <h1 className={styles.profileName}>{selectedSME.smeName}</h1>
+                    <p className={styles.profileSubtitle}>
+                      {selectedSME.sector} • {selectedSME.stage} • {selectedSME.location}
+                    </p>
+                  </div>
 
-      {/* Profile Body */}
-      <div className={styles.profileBody}>
-        <div className={styles.infoCards}>
-          {/* Business Info Card */}
-          <div className={styles.infoCard}>
-            <div className={styles.cardTitle}>
-              <span className={styles.cardIcon}>💼</span>
-              Business Details
-            </div>
-            <div className={styles.cardGrid}>
-              <div className={styles.cardItem}>
-                <div className={styles.cardLabel}>Sector</div>
-                <div className={styles.cardValue}>{selectedSME.sector}</div>
-              </div>
-              <div className={styles.cardItem}>
-                <div className={styles.cardLabel}>Stage</div>
-                <div className={styles.cardValue}>{selectedSME.stage}</div>
-              </div>
-              <div className={styles.cardItem}>
-                <div className={styles.cardLabel}>Focus Area</div>
-                <div className={styles.cardValue}>{selectedSME.focusArea}</div>
-              </div>
-              <div className={styles.cardItem}>
-                <div className={styles.cardLabel}>Location</div>
-                <div className={styles.cardValue}>{selectedSME.location}</div>
-              </div>
-            </div>
-          </div>
+                  {/* Profile Body */}
+                  <div className={styles.profileBody}>
+                    <div className={styles.infoCards}>
+                      {/* Business Info Card */}
+                      <div className={styles.infoCard}>
+                        <div className={styles.cardTitle}>
+                          <span className={styles.cardIcon}>💼</span>
+                          Business Details
+                        </div>
+                        <div className={styles.cardGrid}>
+                          <div className={styles.cardItem}>
+                            <div className={styles.cardLabel}>Sector</div>
+                            <div className={styles.cardValue}>{selectedSME.sector}</div>
+                          </div>
+                          <div className={styles.cardItem}>
+                            <div className={styles.cardLabel}>Stage</div>
+                            <div className={styles.cardValue}>{selectedSME.stage}</div>
+                          </div>
+                          <div className={styles.cardItem}>
+                            <div className={styles.cardLabel}>Focus Area</div>
+                            <div className={styles.cardValue}>{selectedSME.focusArea}</div>
+                          </div>
+                          <div className={styles.cardItem}>
+                            <div className={styles.cardLabel}>Location</div>
+                            <div className={styles.cardValue}>{selectedSME.location}</div>
+                          </div>
+                        </div>
+                      </div>
 
-          {/* Company Metrics Card */}
-          <div className={styles.infoCard}>
-            <div className={styles.cardTitle}>
-              <span className={styles.cardIcon}>🎯</span>
-              Company Metrics
-            </div>
-            <div className={styles.cardGrid}>
-              <div className={styles.cardItem}>
-                <div className={styles.cardLabel}>Revenue</div>
-                <div className={styles.cardValue}>{selectedSME.revenue}</div>
-              </div>
-              <div className={styles.cardItem}>
-                <div className={styles.cardLabel}>Team Size</div>
-                <div className={styles.cardValue}>{selectedSME.teamSize}</div>
-              </div>
-              <div className={styles.cardItem}>
-                <div className={styles.cardLabel}>Investment Type</div>
-                <div className={styles.cardValue}>{selectedSME.investmentType}</div>
-              </div>
-              <div className={styles.cardItem}>
-                <div className={styles.cardLabel}>Application Date</div>
-                <div className={styles.cardValue}>{selectedSME.applicationDate}</div>
-              </div>
-            </div>
-          </div>
+                      {/* Company Metrics Card */}
+                      <div className={styles.infoCard}>
+                        <div className={styles.cardTitle}>
+                          <span className={styles.cardIcon}>🎯</span>
+                          Company Metrics
+                        </div>
+                        <div className={styles.cardGrid}>
+                          <div className={styles.cardItem}>
+                            <div className={styles.cardLabel}>Revenue</div>
+                            <div className={styles.cardValue}>{selectedSME.revenue}</div>
+                          </div>
+                          <div className={styles.cardItem}>
+                            <div className={styles.cardLabel}>Team Size</div>
+                            <div className={styles.cardValue}>{selectedSME.teamSize}</div>
+                          </div>
+                          <div className={styles.cardItem}>
+                            <div className={styles.cardLabel}>Investment Type</div>
+                            <div className={styles.cardValue}>{selectedSME.investmentType}</div>
+                          </div>
+                          <div className={styles.cardItem}>
+                            <div className={styles.cardLabel}>Application Date</div>
+                            <div className={styles.cardValue}>{selectedSME.applicationDate}</div>
+                          </div>
+                        </div>
+                      </div>
 
-          {/* Funding Card */}
-          <div className={`${styles.infoCard} ${styles.fundingCard}`}>
-            <div className={styles.cardTitle}>
-              <span className={styles.cardIcon}>💰</span>
-              Funding Required
-            </div>
-            <div className={styles.fundingAmount}>
-              R{Number(selectedSME.fundingNeeded).toLocaleString()}
-            </div>
-            <div style={{ opacity: 0.9 }}>{selectedSME.stage} Round</div>
-          </div>
+                      {/* Funding Card */}
+                      <div className={`${styles.infoCard} ${styles.fundingCard}`}>
+                        <div className={styles.cardTitle}>
+                          <span className={styles.cardIcon}>💰</span>
+                          Funding Required
+                        </div>
+                        <div className={styles.fundingAmount}>
+                          R{Number(selectedSME.fundingNeeded).toLocaleString()}
+                        </div>
+                        <div style={{ opacity: 0.9 }}>{selectedSME.stage} Round</div>
+                      </div>
 
-          {/* Documents Card */}
-          <div className={`${styles.infoCard} ${styles.documentsCard}`}>
-            <div className={styles.cardTitle}>
-              <span className={styles.cardIcon}>📄</span>
-              Documents
-            </div>
-            <ul className={styles.documentsList}>
-              {selectedSME.documents?.map((doc, idx) => (
-                <li key={idx} className={styles.documentItem}>
-                  <span className={styles.docIcon}>📄</span>
-                  <span>{doc}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+                      {/* Documents Card */}
+                      <div className={`${styles.infoCard} ${styles.documentsCard}`}>
+                        <div className={styles.cardTitle}>
+                          <span className={styles.cardIcon}>📄</span>
+                          Documents
+                        </div>
+                        <ul className={styles.documentsList}>
+                          {selectedSME.documents?.map((doc, idx) => (
+                            <li key={idx} className={styles.documentItem}>
+                              <span className={styles.docIcon}>📄</span>
+                              <span>{doc}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
 
-          {/* Status Card */}
-          <div className={styles.infoCard}>
-            <div className={styles.cardTitle}>
-              <span className={styles.cardIcon}>🏗️</span>
-              Application Status
-            </div>
-            <div style={{ textAlign: 'center', padding: '10px 0' }}>
-              <span className={`${styles.statusBadge} ${getStatusBadgeClass(selectedSME.status)}`}>
-                {selectedSME.status === "Approved" ? "Accepted" : selectedSME.status}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+                      {/* Status Card */}
+                      <div className={styles.infoCard}>
+                        <div className={styles.cardTitle}>
+                          <span className={styles.cardIcon}>🏗️</span>
+                          Application Status
+                        </div>
+                        <div style={{ textAlign: 'center', padding: '10px 0' }}>
+                          <span className={`${styles.statusBadge} ${getStatusBadgeClass(selectedSME.status)}`}>
+                            {selectedSME.status === "Approved" ? "Accepted" : selectedSME.status}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-      {/* Modal Actions */}
-      <div className={styles.modalActions}>
-        <button
-          className={styles.closeBtn}
-          onClick={resetModal}
-        >
-          Close Profile
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+                  {/* Modal Actions */}
+                  <div className={styles.modalActions}>
+                    <button
+                      className={styles.closeBtn}
+                      onClick={resetModal}
+                    >
+                      Close Profile
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {modalType !== "view" && (
               <>

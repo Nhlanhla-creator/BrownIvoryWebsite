@@ -293,7 +293,10 @@ const Messages = () => {
                 )}
 
                 {selectedMessage.content.includes("Meeting Details:") && (() => {
-                  const details = selectedMessage.content.split("\n\nMeeting Details:")[1];
+                  const parts = selectedMessage.content.split("\n\nMeeting Details:");
+                  const details = parts[1];
+                  if (!details) return null; // guard clause to prevent error
+
                   const timeMatch = details.match(/Time:\s*(.+)/);
                   const locationMatch = details.match(/Location:\s*(.+)/);
                   const timeText = timeMatch ? timeMatch[1].trim() : "Not specified";

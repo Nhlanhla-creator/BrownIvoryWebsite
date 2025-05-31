@@ -344,3 +344,54 @@
   font-size: 13px;
   color: #8C6842;
 }
+
+.slots-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.time-slot {
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.time-slot:hover {
+  background-color: #f9f9f9;
+}
+
+.time-slot.selected {
+  background-color: #e1f5fe;
+  border-color: #4fc3f7;
+}
+
+.time-slot.scheduled {
+  background-color: #e8f5e9;
+  border-color: #81c784;
+  cursor: not-allowed;
+}
+
+.slot-date {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.slot-time {
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.slot-status {
+  margin-top: 0.25rem;
+  color: #2e7d32;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.info-value {
+  width: 70%;
+}
