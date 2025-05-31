@@ -6,14 +6,15 @@ import MeetingDetails from './MeetingDetails';
 import './Meetings.css';
 import { db } from '../../firebaseConfig.js'; // Adjust the import path as necessary
 import { getAuth } from 'firebase/auth';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, getDoc } from 'firebase/firestore';
+
 
 
 const CalendarPopup = ({ events, availabilities, onClose, onDateSelect }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
 
-  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
   const getDaysInMonth = (date) => {
     const year = date.getFullYear();
@@ -72,13 +73,13 @@ const CalendarPopup = ({ events, availabilities, onClose, onDateSelect }) => {
         <h3>{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</h3>
         <button onClick={goToNextMonth}><ChevronRight size={20} /></button>
       </div>
-      
+
       <div className="calendar-weekdays">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
           <div key={day} className="weekday">{day}</div>
         ))}
       </div>
-      
+
       <div className="calendar-grid">
         {days.map((day, index) => {
           const dayEvents = getEventsForDate(day);
@@ -89,7 +90,7 @@ const CalendarPopup = ({ events, availabilities, onClose, onDateSelect }) => {
             selectedDate.getDate() === day &&
             selectedDate.getMonth() === currentDate.getMonth() &&
             selectedDate.getFullYear() === currentDate.getFullYear();
-          
+
           return (
             <div
               key={index}
@@ -118,7 +119,7 @@ const CalendarPopup = ({ events, availabilities, onClose, onDateSelect }) => {
           );
         })}
       </div>
-      
+
       {selectedDate && (
         <div className="selected-date-events">
           <h4>Events on {selectedDate.toDateString()}:</h4>
@@ -144,7 +145,7 @@ const CalendarPopup = ({ events, availabilities, onClose, onDateSelect }) => {
           })()}
         </div>
       )}
-      
+
       <button className="close-calendar" onClick={onClose}>Close</button>
     </div>
   );
@@ -162,44 +163,77 @@ const Meetings = ({ stats, setStats }) => {
   });
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [smeNames, setSmeNames] = useState({}); // Store SME names by ID
+
+  // Function to fetch SME name
+  const fetchSmeName = async (smeId) => {
+    try {
+      if (!smeId) return 'SME';
+
+      // Check if we already have this name cached
+      if (smeNames[smeId]) return smeNames[smeId];
+
+      const smeRef = doc(db, "universalProfiles", smeId);
+      const smeSnap = await getDoc(smeRef);
+
+      if (smeSnap.exists()) {
+        const data = smeSnap.data();
+        const name = data?.entityOverview?.registeredName ||
+          data?.entityOverview?.tradingName ||
+          data?.contactDetails?.contactName ||
+          'SME';
+
+        // Cache the name
+        setSmeNames(prev => ({ ...prev, [smeId]: name }));
+        return name;
+      }
+      return 'SME';
+    } catch (err) {
+      console.error('Error fetching SME name:', err);
+      return 'SME';
+    }
+  };
 
   useEffect(() => {
     const auth = getAuth();
     const user = auth.currentUser;
-
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+    if (!user) return;
 
     const q = query(
-      collection(db, "investorApplications"),
-      where("funderId", "==", user.uid),
-      where("status", "==", "Accepted")
+      collection(db, "smeCalendarEvents"),
+      where("funderId", "==", user.uid)
     );
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const meetingsData = [];
-      querySnapshot.forEach((doc) => {
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      const meetingsData = await Promise.all(snapshot.docs.map(async (doc) => {
         const data = doc.data();
-        if (data.availableDates && data.availableDates.length > 0) {
-          data.availableDates.forEach((availability) => {
-            meetingsData.push({
-              id: `${doc.id}-${availability.date}`,
-              applicationId: doc.id,
-              title: data.meetingPurpose || "Meeting with SME",
-              date: new Date(availability.date),
-              timeSlots: availability.timeSlots,
-              location: data.meetingLocation || "Virtual Meeting",
-              status: "upcoming",
-              smeName: data.smeName,
-              smeId: data.smeId,
-              timeZone: availability.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone
-            });
-          });
-        }
-      });
-      setMeetings(meetingsData);
+        const scheduledDate = data.scheduledDate ? new Date(data.scheduledDate) : null;
+        const createdAt = data.createdAt ? new Date(data.createdAt) : new Date();
+        const updatedAt = data.updatedAt ? new Date(data.updatedAt) : new Date();
+
+        // Fetch SME name
+        const smeName = await fetchSmeName(data.smeId);
+
+        return {
+          id: doc.id,
+          title: data.title || "Meeting",
+          smeName: smeName, // Use fetched name instead of data.smeName
+          date: scheduledDate,
+          timeSlots: data.scheduledTimeSlot ? [data.scheduledTimeSlot] : [],
+          timeZone: data.scheduledTimeSlot?.timeZone || "Africa/Johannesburg",
+          location: data.location || "Virtual",
+          status: data.status || "scheduled",
+          smeId: data.smeId,
+          funderId: data.funderId,
+          createdAt,
+          updatedAt
+        };
+      }));
+
+      // Filter out meetings without a scheduled date
+      const validMeetings = meetingsData.filter(meeting => meeting.date !== null);
+
+      setMeetings(validMeetings);
       setLoading(false);
     });
 
@@ -207,39 +241,38 @@ const Meetings = ({ stats, setStats }) => {
   }, []);
 
   const handleCreateEvent = (newEvent) => {
-    // This would need to be updated to save to Firebase
     setMeetings([...meetings, newEvent]);
-    setStats(prev => ({...prev, created: prev.created + 1}));
+    setStats(prev => ({ ...prev, created: prev.created + 1 }));
     setShowCreateModal(false);
   };
 
   const handleMeetingAction = (id, action) => {
     const updatedMeetings = meetings.map(meeting => {
       if (meeting.id === id) {
-        return {...meeting, status: action};
+        return { ...meeting, status: action };
       }
       return meeting;
     });
-    
+
     setMeetings(updatedMeetings);
-    
+
     if (action === 'completed') {
-      setStats(prev => ({...prev, completed: prev.completed + 1}));
+      setStats(prev => ({ ...prev, completed: prev.completed + 1 }));
     } else if (action === 'cancelled') {
-      setStats(prev => ({...prev, cancelled: prev.cancelled + 1}));
+      setStats(prev => ({ ...prev, cancelled: prev.cancelled + 1 }));
     } else if (action === 'rescheduled') {
-      setStats(prev => ({...prev, rescheduled: prev.rescheduled + 1}));
+      setStats(prev => ({ ...prev, rescheduled: prev.rescheduled + 1 }));
     }
-    
+
     setSelectedMeeting(null);
   };
 
   const filteredMeetings = meetings.filter(meeting => {
     const meetingDate = meeting.date;
     const now = new Date();
-    
+
     if (activeTab === 'upcoming') {
-      return meetingDate > now && meeting.status !== 'cancelled';
+      return meetingDate > now && meeting.status === 'scheduled';
     } else if (activeTab === 'past') {
       return meetingDate < now;
     } else if (activeTab === 'pending') {
@@ -251,6 +284,8 @@ const Meetings = ({ stats, setStats }) => {
   });
 
   const formatMeetingTime = (meeting) => {
+    if (!meeting.date) return "No date scheduled";
+
     return meeting.date.toLocaleString('en-US', {
       weekday: 'short',
       month: 'short',
@@ -269,7 +304,7 @@ const Meetings = ({ stats, setStats }) => {
       <div className="meetings-header">
         <h2>Meetings</h2>
         <div className="header-buttons">
-          <button 
+          <button
             className="calendar-btn"
             onClick={() => setShowCalendar(true)}
           >
@@ -311,13 +346,13 @@ const Meetings = ({ stats, setStats }) => {
           <input
             type="date"
             value={dateRange.start.toISOString().split('T')[0]}
-            onChange={(e) => setDateRange({...dateRange, start: new Date(e.target.value)})}
+            onChange={(e) => setDateRange({ ...dateRange, start: new Date(e.target.value) })}
           />
           <span>to</span>
           <input
             type="date"
             value={dateRange.end.toISOString().split('T')[0]}
-            onChange={(e) => setDateRange({...dateRange, end: new Date(e.target.value)})}
+            onChange={(e) => setDateRange({ ...dateRange, end: new Date(e.target.value) })}
           />
         </div>
       )}
@@ -356,7 +391,7 @@ const Meetings = ({ stats, setStats }) => {
                     </span>
                   </td>
                   <td data-label="Action">
-                    <button 
+                    <button
                       className="view-meeting-btn"
                       onClick={() => setSelectedMeeting(meeting)}
                     >
@@ -372,8 +407,8 @@ const Meetings = ({ stats, setStats }) => {
 
       {showCreateModal && (
         <Modal onClose={() => setShowCreateModal(false)}>
-          <CreateEventForm 
-            onSubmit={handleCreateEvent} 
+          <CreateEventForm
+            onSubmit={handleCreateEvent}
             onCancel={() => setShowCreateModal(false)}
           />
         </Modal>
@@ -381,7 +416,7 @@ const Meetings = ({ stats, setStats }) => {
 
       {showCalendar && (
         <Modal onClose={() => setShowCalendar(false)}>
-          <CalendarPopup 
+          <CalendarPopup
             events={meetings}
             onClose={() => setShowCalendar(false)}
           />
@@ -390,7 +425,7 @@ const Meetings = ({ stats, setStats }) => {
 
       {selectedMeeting && (
         <Modal onClose={() => setSelectedMeeting(null)}>
-          <MeetingDetails 
+          <MeetingDetails
             meeting={selectedMeeting}
             onAction={handleMeetingAction}
             onClose={() => setSelectedMeeting(null)}
