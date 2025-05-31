@@ -141,17 +141,6 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
   const [notification, setNotification] = useState(null);
   const [submittedDocuments, setSubmittedDocuments] = useState([]);
   const [profileData, setProfileData] = useState({});
-  const [insightsData, setInsightsData] = useState({
-    fundingUseBreakdown: {},
-    fundingTypeBreakdown: {},
-    topMatchedSectors: {},
-    sectorDistribution: {},
-    timelineProgress: [],
-    monthlyActivity: [],
-    averageFundingAmount: 0,
-    matchRate: 0,
-    activeFundersCount: 0,
-  });
 
   const getRequiredDocs = (funder) => {
     const funds = funder.fullProfile?.productsServices?.funds || [];
@@ -478,17 +467,21 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
     return `R${Number(min).toLocaleString()} - R${Number(max).toLocaleString()}`;
   };
 
-  const handleViewClick = async (funder) => {
-    try {
-      const docSnap = await getDoc(doc(db, "MyuniversalProfiles", funder.funderId));
-      if (!docSnap.exists()) return;
-      const data = docSnap.data();
-      setModalFunder({ name: funder.name, data: data.formData });
-      funder.fullProfile = data.formData;
-    } catch (err) {
-      console.error("Error loading funder profile", err);
-    }
-  };
+const handleViewClick = async (funder) => {
+  try {
+    const docSnap = await getDoc(doc(db, "MyuniversalProfiles", funder.funderId));
+    if (!docSnap.exists()) return;
+    const data = docSnap.data();
+    setModalFunder({ 
+      name: funder.name, 
+      data: data.formData,
+      matchPercentage: funder.matchPercentage // Add this line
+    });
+    funder.fullProfile = data.formData;
+  } catch (err) {
+    console.error("Error loading funder profile", err);
+  }
+};
 
   if (loading) return <div className={styles.loadingContainer}><p>Loading matches...</p></div>;
 
@@ -526,7 +519,7 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
                 const status = statuses[funder.id] || "Application not sent";
                 const pipelineStage = pipelineStages[funder.id] || "Match";
                 const nextStage = getNextStage(pipelineStage);
-
+              
                 return (
                   <tr key={funder.id}>
                     <td>
@@ -583,7 +576,7 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
               <button onClick={() => setModalFunder(null)}>✖</button>
             </div>
             <div className={styles.modalBody}>
-              <InvestorProfileSummary data={modalFunder.data} onEdit={() => { }} />
+              <InvestorProfileSummary data={modalFunder.data }  match={modalFunder.matchPercentage}  onEdit={() => { }} />
             </div>
             <div className={styles.modalActions}>
               <button className={styles.cancelButton} onClick={() => setModalFunder(null)}>Close</button>
