@@ -141,6 +141,7 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
   const [notification, setNotification] = useState(null);
   const [submittedDocuments, setSubmittedDocuments] = useState([]);
   const [profileData, setProfileData] = useState({});
+  const [insightsData, setInsightsData] = useState({});
 
   const getRequiredDocs = (funder) => {
     const funds = funder.fullProfile?.productsServices?.funds || [];
