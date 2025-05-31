@@ -1,35 +1,40 @@
 /* LoginRegister.css */
-@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Quicksand:wght@400;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Quicksand:wght@400;600;700&display=swap");
 
 .auth-page {
-  --primary-dark: #372C27;
-  --primary: #9E6E3C;
-  --secondary: #BCAE9C;
-  --background-light: #F2F0E6;
-  --background: #D3D2CE;
-  --text: #372C27;
-  --text-light: #5C534D;
-  --error: #C44536;
-  --success: #4A7C59;
+  --primary-dark: #372c27;
+  --primary: #9e6e3c;
+  --secondary: #bcae9c;
+  --background-light: #f2f0e6;
+  --background: #d3d2ce;
+  --text: #372c27;
+  --text-light: #5c534d;
+  --error: #c44536;
+  --success: #4a7c59;
 
   min-height: 100vh;
-  background-image: url('/public/brown.jpg'); /* Replace with your actual image path */
+  background-image: url("/public/brown.jpg"); /* Replace with your actual image path */
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  
+
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
 }
 
-
 @keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .auth-box {
@@ -47,20 +52,24 @@
 }
 
 .auth-box::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(117, 74, 45, 0.1) 0%, rgba(255,255,255,0) 70%);
+  background: radial-gradient(circle, rgba(117, 74, 45, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
   animation: rotate 20s linear infinite;
   z-index: 0;
 }
 
 @keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .form-side {
@@ -71,7 +80,7 @@
   flex-direction: column;
   justify-content: center;
   position: relative;
-  z-index: 1;
+  /* z-index: 1; */
 }
 
 .form-header {
@@ -86,7 +95,7 @@
   font-size: 28px;
   font-weight: 700;
   margin: 0;
-  font-family: 'Comic Neue', cursive;
+  font-family: "Comic Neue", cursive;
 }
 
 .icon-container {
@@ -97,7 +106,7 @@
   align-items: center;
   justify-content: center;
   background: var(--primary);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   color: var(--background-light);
 }
 
@@ -155,7 +164,7 @@
   font-size: 15px;
   color: var(--text);
   height: 100%;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
 }
 
 .input-group select {
@@ -180,14 +189,27 @@
 
 .input-error {
   border-color: var(--error) !important;
-  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
 @keyframes shake {
-  10%, 90% { transform: translateX(-1px); }
-  20%, 80% { transform: translateX(2px); }
-  30%, 50%, 70% { transform: translateX(-4px); }
-  40%, 60% { transform: translateX(4px); }
+  10%,
+  90% {
+    transform: translateX(-1px);
+  }
+  20%,
+  80% {
+    transform: translateX(2px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translateX(-4px);
+  }
+  40%,
+  60% {
+    transform: translateX(4px);
+  }
 }
 
 .error-text {
@@ -214,7 +236,7 @@
   gap: 8px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  font-family: 'Comic Neue', cursive;
+  font-family: "Comic Neue", cursive;
   position: relative;
   overflow: hidden;
   z-index: 1;
@@ -231,13 +253,13 @@
 }
 
 .primary-btn::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.2) 50%);
+  background: linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.2) 50%);
   background-size: 400% 400%;
   transition: background-position 0.6s ease;
   z-index: -1;
@@ -262,12 +284,22 @@
 }
 
 @keyframes sparkle {
-  0% { opacity: 0; transform: scale(0.5); }
-  50% { opacity: 1; transform: scale(1.2); }
-  100% { opacity: 0; transform: scale(0.5); }
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
 }
 
-.switch-link, .forgot-password {
+.switch-link,
+.forgot-password {
   text-align: center;
   font-size: 14px;
   color: var(--text-light);
@@ -304,12 +336,12 @@
 
 .welcome-side {
   flex: 1;
-  background: linear-gradient(135deg, var(--primary-dark) 0%,#592d18 100%);
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #592d18 100%);
   color: var(--background-light);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 40px;
   text-align: center;
   position: relative;
@@ -317,7 +349,7 @@
 }
 
 .welcome-side::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -40px;
@@ -339,8 +371,8 @@
   font-weight: 700;
   margin-bottom: 20px;
   line-height: 1.3;
-  font-family: 'Comic Neue', cursive;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  font-family: "Comic Neue", cursive;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .welcome-side p {
@@ -376,11 +408,16 @@
   color: var(--secondary);
 }
 
-
 @keyframes float {
-  0% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(5deg); }
-  100% { transform: translateY(0) rotate(0deg); }
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
 }
 
 @media (max-width: 768px) {
@@ -388,12 +425,12 @@
     flex-direction: column;
     min-height: auto;
   }
-  
+
   .welcome-side {
     padding: 30px 20px;
     order: -1;
   }
-  
+
   .welcome-side::before {
     left: 0;
     top: -40px;
@@ -401,11 +438,11 @@
     height: 80px;
     clip-path: polygon(0 0, 100% 0, 50% 100%, 0% 100%);
   }
-  
+
   .form-side {
     padding: 30px 20px;
   }
-  
+
   .floating-icons {
     display: none;
   }
@@ -415,19 +452,19 @@
   .auth-page {
     padding: 10px;
   }
-  
+
   .auth-box {
     border-radius: 16px;
   }
-  
+
   .form-header h2 {
     font-size: 24px;
   }
-  
+
   .welcome-side h1 {
     font-size: 1.8rem;
   }
-  
+
   .welcome-side p {
     font-size: 1rem;
   }

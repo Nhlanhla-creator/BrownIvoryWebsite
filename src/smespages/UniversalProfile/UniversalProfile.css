@@ -45,7 +45,7 @@
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  max-width: 1900px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
   margin-top:52px;
@@ -533,8 +533,8 @@
 
 .universal-profile-container .profile-tracker-button .check-icon {
   position: absolute;
-  top: 1px;
-  right: 1px;
+  top: -8px;
+  right: -8px;
   width: 20px;
   height: 20px;
   color: var(--up-green);
@@ -548,8 +548,6 @@
   justify-content: center;
   animation: checkPulse 2s infinite;
 }
-
-
 
 @keyframes checkPulse {
   0%, 100% { transform: scale(1); }
@@ -767,7 +765,7 @@
 /* Tables - improved styling with better column sizing */
 .universal-profile-container .overflow-x-auto {
   overflow-x: auto;
-  max-width: 75%;
+  max-width: 100%;
   margin-bottom: 1rem;
   border-radius: var(--up-border-radius);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);

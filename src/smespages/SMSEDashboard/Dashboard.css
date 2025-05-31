@@ -20,10 +20,13 @@
 
   /* Layout with Sidebar */
   display: flex;
-  min-height: 100vh;
-  width: 100%;
-  background-color: #f8f5f2;
- 
+ min-height: 100vh;
+  background-image: url('/public/image.png'); /* Replace with your actual image path */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  max-width: 1900px;
+  margin-left: 20px;
 }
 
 /* Main Content Area - Adjusted for sidebar */
@@ -255,7 +258,7 @@
   margin-top: -191px;
 }
 
-/* Modal Styles (Shared) */
+/* Modal Styles (Shared) - MADE NARROWER */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -277,7 +280,7 @@
   background: white;
   border-radius: 1rem;
   width: 90%;
-  max-width: 600px;
+  max-width: 350px; /* REDUCED FROM 600px */
   max-height: 85vh;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   display: flex;
@@ -303,7 +306,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.25rem;
+  padding: 1rem 1rem; /* REDUCED PADDING */
   border-bottom: 1px solid var(--medium-brown);
   background-color: var(--background-brown);
 }
@@ -312,7 +315,7 @@
   margin: 0;
   color: var(--dark-brown);
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1rem; /* SMALLER FONT */
 }
 
 .close-btn {
@@ -333,13 +336,13 @@
 }
 
 .modal-body {
-  padding: 1.25rem;
+  padding: 1rem; /* REDUCED PADDING */
   overflow-y: auto;
   max-height: calc(85vh - 120px);
 }
 
 .modal-footer {
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem 1rem; /* REDUCED PADDING */
   border-top: 1px solid var(--medium-brown);
   display: flex;
   justify-content: flex-end;
@@ -399,6 +402,12 @@ body.modal-open {
   .header-actions {
     width: 100%;
     justify-content: space-between;
+  }
+  
+  /* MOBILE MODAL ADJUSTMENTS */
+  .modal-container {
+    max-width: 320px;
+    width: 95%;
   }
 }
 
@@ -490,9 +499,8 @@ body.modal-open {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px var(--shadow-color);
 }
-/* Add these styles to your existing Dashboard.css file */
 
-/* Popup Overlay */
+/* Popup Overlay - MADE NARROWER */
 .popup-overlay {
   position: fixed;
   top: 0;
@@ -516,13 +524,13 @@ body.modal-open {
   }
 }
 
-/* Base Popup Styles */
+/* Base Popup Styles - MADE NARROWER */
 .welcome-popup {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   width: 90%;
-  max-width: 500px;
+  max-width: 350px; /* REDUCED FROM 500px */
   position: relative;
   overflow: hidden;
   animation: slideUp 0.4s ease-out;
@@ -556,7 +564,7 @@ body.modal-open {
 }
 
 .popup-content {
-  padding: 40px 30px;
+  padding: 30px 20px; /* REDUCED PADDING */
   text-align: center;
 }
 
@@ -566,8 +574,8 @@ body.modal-open {
 }
 
 .popup-icon {
-  font-size: 48px;
-  margin-bottom: 20px;
+  font-size: 40px; /* REDUCED FROM 48px */
+  margin-bottom: 15px; /* REDUCED MARGIN */
   animation: bounce 1s ease infinite alternate;
 }
 
@@ -583,13 +591,13 @@ body.modal-open {
 .popup-progress {
   display: flex;
   justify-content: center;
-  margin: 30px 0;
-  gap: 8px;
+  margin: 20px 0; /* REDUCED MARGIN */
+  gap: 6px; /* REDUCED GAP */
 }
 
 .progress-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px; /* SMALLER DOTS */
+  height: 8px;
   border-radius: 50%;
   background-color: #e0e0e0;
   transition: background-color 0.3s, transform 0.3s;
@@ -603,31 +611,34 @@ body.modal-open {
 .popup-buttons {
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
+  margin-top: 15px; /* REDUCED MARGIN */
+  gap: 10px;
 }
 
 .dashboard-popup h2 {
   color: #5d4037;
-  font-size: 24px;
-  margin-bottom: 15px;
+  font-size: 20px; /* REDUCED FROM 24px */
+  margin-bottom: 12px; /* REDUCED MARGIN */
 }
 
 .dashboard-popup p {
-  margin-bottom: 15px;
+  margin-bottom: 12px; /* REDUCED MARGIN */
   color: #3e2723;
-  line-height: 1.6;
+  line-height: 1.5; /* TIGHTER LINE HEIGHT */
+  font-size: 14px; /* SMALLER FONT */
 }
 
 .btn {
-  padding: 10px 20px;
+  padding: 8px 16px; /* REDUCED PADDING */
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px; /* REDUCED GAP */
   transition: all 0.2s ease;
+  font-size: 14px; /* SMALLER FONT */
 }
 
 .btn-primary {
@@ -652,29 +663,38 @@ body.modal-open {
   background-color: rgba(93, 64, 55, 0.1);
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments - ENHANCED */
 @media (max-width: 600px) {
   .welcome-popup {
     width: 95%;
+    max-width: 300px; /* EVEN NARROWER ON MOBILE */
     max-height: 90vh;
     overflow-y: auto;
   }
 
   .popup-content {
-    padding: 30px 20px;
+    padding: 20px 15px; /* FURTHER REDUCED PADDING */
   }
 
   .popup-buttons {
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
   }
 
   .popup-buttons button {
     width: 100%;
   }
+  
+  .dashboard-popup h2 {
+    font-size: 18px;
+  }
+  
+  .dashboard-popup p {
+    font-size: 13px;
+  }
 }
-/* Explanation Cards */
 
+/* Explanation Cards */
 .explanation-cards-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -688,10 +708,10 @@ body.modal-open {
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(93, 64, 55, 0.1);
   transition: all 0.3s ease;
-  background: #EFEBE9; /* Your background brown */
+  background: #EFEBE9;
   position: relative;
   overflow: hidden;
-  border: 1px solid #D7CCC8; /* Your pale brown */
+  border: 1px solid #D7CCC8;
 }
 
 .explanation-card:hover {
@@ -711,22 +731,22 @@ body.modal-open {
 
 /* Brown shades for each card type */
 .explanation-card.blue::before {
-  background: #8D6E63; /* Your light brown */
+  background: #8D6E63;
 }
 .explanation-card.green::before {
-  background: #A67C52; /* Your accent brown */
+  background: #A67C52;
 }
 .explanation-card.purple::before {
-  background: #5D4037; /* Your primary brown */
+  background: #5D4037;
 }
 .explanation-card.orange::before {
-  background: #3E2723; /* Your dark brown */
+  background: #3E2723;
 }
 
 .explanation-icon {
   margin-bottom: 15px;
-  color: #5D4037; /* Primary brown */
-  background: rgba(142, 110, 99, 0.1); /* Light brown with opacity */
+  color: #5D4037;
+  background: rgba(142, 110, 99, 0.1);
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -739,27 +759,27 @@ body.modal-open {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 12px;
-  color: #3E2723; /* Dark brown */
+  color: #3E2723;
 }
 
 .explanation-text {
   font-size: 0.9rem;
   line-height: 1.6;
-  color: #5D4037; /* Primary brown */
+  color: #5D4037;
 }
 
 /* Card-specific icon colors */
 .explanation-card.blue .explanation-icon {
-  color: #8D6E63; /* Light brown */
+  color: #8D6E63;
 }
 .explanation-card.green .explanation-icon {
-  color: #A67C52; /* Accent brown */
+  color: #A67C52;
 }
 .explanation-card.purple .explanation-icon {
-  color: #5D4037; /* Primary brown */
+  color: #5D4037;
 }
 .explanation-card.orange .explanation-icon {
-  color: #3E2723; /* Dark brown */
+  color: #3E2723;
 }
 
 /* Make it responsive */

@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { Eye, Check } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Eye, Check, ChevronDown } from "lucide-react";
 import styles from "./funding.module.css";
 import { db, storage } from "../../firebaseConfig";
 import {
@@ -75,6 +75,68 @@ const APPLICATION_STATUSES = {
     label: "Declined",
     color: "#E57373" // Red
   }
+};
+
+// Text truncation component
+const TruncatedText = ({ text, maxLines = 2 }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showSeeMore, setShowSeeMore] = useState(false);
+  const textRef = useRef(null);
+  
+  useEffect(() => {
+    if (!text || !textRef.current) {
+      setShowSeeMore(false);
+      return;
+    }
+
+    // More aggressive detection - show "See more" for longer text
+    const charLimit = maxLines * 35; // Chars per line for sensitivity
+    const hasLongText = text.length > charLimit;
+    
+    // Also check for multiple commas (indicating multiple items)
+    const hasMultipleItems = (text.match(/,/g) || []).length >= 2;
+    
+    setShowSeeMore(hasLongText || hasMultipleItems);
+  }, [text, maxLines]);
+
+  if (!text || text === '-' || text === 'Not specified' || text === 'Various') {
+    return <span>{text || '-'}</span>;
+  }
+
+  const toggleExpanded = (e) => {
+    e.stopPropagation();
+    setIsExpanded(!isExpanded);
+  };
+
+  return (
+    <div className={styles.truncatedTextContainer}>
+      <div 
+        ref={textRef}
+        className={`${styles.truncatedText} ${isExpanded ? styles.expanded : ''}`}
+        style={{
+          '--max-lines': maxLines,
+          WebkitLineClamp: isExpanded ? 'none' : maxLines,
+        }}
+      >
+        {text}
+      </div>
+      {showSeeMore && (
+        <button 
+          className={styles.seeMoreButton}
+          onClick={toggleExpanded}
+        >
+          {isExpanded ? 'See less' : 'See more'}
+          <ChevronDown 
+            size={12} 
+            style={{ 
+              transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.2s ease'
+            }} 
+          />
+        </button>
+      )}
+    </div>
+  );
 };
 
 const formatLabel = (value) => {
@@ -536,11 +598,21 @@ const handleViewClick = async (funder) => {
                         {funder.name}
                       </span>
                     </td>
-                    <td>{formatLabel(funder.geographicFocus)}</td>
-                    <td>{formatLabel(funder.sectorFocus)}</td>
-                    <td>{formatLabel(funder.targetStage)}</td>
-                    <td>{formatLabel(funder.supportOffered)}</td>
-                    <td>{formatLabel(funder.investmentType)}</td>
+                    <td>
+                      <TruncatedText text={formatLabel(funder.geographicFocus)} maxLines={2} />
+                    </td>
+                    <td>
+                      <TruncatedText text={formatLabel(funder.sectorFocus)} maxLines={2} />
+                    </td>
+                    <td>
+                      <TruncatedText text={formatLabel(funder.targetStage)} maxLines={2} />
+                    </td>
+                    <td>
+                      <TruncatedText text={formatLabel(funder.supportOffered)} maxLines={2} />
+                    </td>
+                    <td>
+                      <TruncatedText text={formatLabel(funder.investmentType)} maxLines={2} />
+                    </td>
                     <td>{funder.ticketSize}</td>
                     <td>{funder.matchPercentage}%</td>
                     <td>{funder.deadline || "-"}</td>
@@ -549,8 +621,9 @@ const handleViewClick = async (funder) => {
                         {capitalize(pipelineStage)}
                       </span>
                     </td>
-
-                    <td>{nextStage}</td>
+                    <td>
+                      <TruncatedText text={nextStage} maxLines={2} />
+                    </td>
                     <td>{funder.responseTime || "-"}</td>
                     <td>
                       <div className={styles.actionButtons}>

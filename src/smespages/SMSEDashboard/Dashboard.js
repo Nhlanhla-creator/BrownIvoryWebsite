@@ -236,15 +236,17 @@ export function Dashboard() {
             <div className="resizable-card-container">
               <LegitimacyScoreCard styles={styles} profileData={profileData.formData} />
             </div>
-            <div className="resizable-card-container">
-              <CustomerReviewsCard styles={styles} />
+              <div className="resizable-card-container">
+              <ComplianceScoreCard styles={styles} profileData={profileData.formData} />
             </div>
-            <div className="resizable-card-container">
+              <div className="resizable-card-container">
               <FundabilityScoreCard profileData={profileData.formData} userId={profileData.id} />
             </div>
             <div className="resizable-card-container">
-              <ComplianceScoreCard styles={styles} profileData={profileData.formData} />
+              <CustomerReviewsCard styles={styles} />
             </div>
+          
+          
           </section>
 
           {/* New explanatory cards row */}
@@ -255,24 +257,26 @@ export function Dashboard() {
               icon="shield"
               color="blue"
             />
-            <ExplanationCard
-              title="About Customer Reviews"
-              description="These are real ratings from your customers. Positive reviews boost your credibility and help attract more business opportunities."
-              icon="smile"
-              color="green"
+              <ExplanationCard
+              title="About Compliance Score"
+              description="Shows how well your business follows industry regulations. Good compliance reduces risks and makes you more attractive to partners."
+              icon="info"
+              color="orange"
             />
-            <ExplanationCard
+              <ExplanationCard
               title="About Fundability Score"
               description="This measures how likely your business is to get funding. It considers your financial health, credit history, and business stability."
               icon="star"
               color="purple"
             />
             <ExplanationCard
-              title="About Compliance Score"
-              description="Shows how well your business follows industry regulations. Good compliance reduces risks and makes you more attractive to partners."
-              icon="info"
-              color="orange"
+              title="About Customer Reviews"
+              description="These are real ratings from your customers. Positive reviews boost your credibility and help attract more business opportunities."
+              icon="smile"
+              color="green"
             />
+          
+          
           </section>
         </main>
       </div>

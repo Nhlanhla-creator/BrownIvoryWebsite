@@ -13,7 +13,7 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
   const initialUserInfo = {
     email: registrationData?.email || '',
     role: registrationData?.role || '',
-    company: registrationData?.company || '',
+    username: registrationData?.username || '',
     password: registrationData?.password || '', 
     uid: registrationData?.uid || '' 
   };
@@ -55,13 +55,13 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
       setUserInfo({
         email: registrationData.email || '',
         role: registrationData.role || '',
-        company: registrationData.company || '',
+        username: registrationData.username || '',
         password: registrationData.password || '',
         uid: registrationData.uid || ''
       });
       
       // Only show NDA if we have the required data
-      if (registrationData.email && registrationData.role && registrationData.company) {
+      if (registrationData.email && registrationData.role && registrationData.username) {
         setShowNDA(true);
       }
     }
@@ -160,7 +160,7 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
     }
 
     // Validate required fields before proceeding
-    if (!userInfo.email || !userInfo.company || !userInfo.role) {
+    if (!userInfo.email || !userInfo.username || !userInfo.role) {
       setErrorMessage('Required information is missing. Please ensure all fields are filled.');
       return;
     }
@@ -198,7 +198,7 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
       const signedDocument = {
         userInfo: {
           email: userInfo.email,
-          company: userInfo.company,
+          username: userInfo.username,
           role: userInfo.role
         },
         signature: signatureData, // Base64 data URL
@@ -217,7 +217,7 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
       const ndaDocData = {
         userInfo: {
           email: userInfo.email,
-          company: userInfo.company,
+          username: userInfo.username,
           role: userInfo.role
         },
         signatureUrl,
@@ -492,9 +492,9 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
       
       yPosition += 10;
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Company:', margin, yPosition);
+      pdf.text('Username:', margin, yPosition);
       pdf.setFont('helvetica', 'normal');
-      pdf.text(ndaData.userInfo.company, margin + 40, yPosition);
+      pdf.text(ndaData.userInfo.username, margin + 40, yPosition);
       
       yPosition += 10;
       pdf.setFont('helvetica', 'bold');
@@ -599,7 +599,7 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
           <div className="user-info-box">
             {/* Safely access user information */}
             <p><strong>Email:</strong> {savedNDA.userInfo?.email || 'N/A'}</p>
-            <p><strong>Company:</strong> {savedNDA.userInfo?.company || 'N/A'}</p>
+            <p><strong>Username:</strong> {savedNDA.userInfo?.username || 'N/A'}</p>
             <p><strong>Role:</strong> {savedNDA.userInfo?.role || 'N/A'}</p>
             <p><strong>Date Signed:</strong> {savedNDA.dateSigned ? new Date(savedNDA.dateSigned).toLocaleDateString() : 'N/A'}</p>
           </div>
@@ -711,7 +711,7 @@ const NDASignupPopup = ({ onRegistrationComplete, registrationData }) => {
                        <div className="signature-section">
               <div className="signature-info">
                 <p><strong>Date:</strong> {today}</p>
-                <p><strong>Company:</strong> {userInfo.company || 'N/A'}</p>
+                <p><strong>Username:</strong> {userInfo.username || 'N/A'}</p>
                 <p><strong>Email:</strong> {userInfo.email || 'N/A'}</p>
                 <p><strong>Role:</strong> {userInfo.role || 'N/A'}</p>
                 <p><strong>Signature:</strong></p>
