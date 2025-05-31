@@ -234,7 +234,7 @@ export function Dashboard() {
 
           <section className="stats-cards-row">
             <div className="resizable-card-container">
-              <LegitimacyScoreCard styles={styles} profileData={profileData} />
+              <LegitimacyScoreCard styles={styles} profileData={profileData.formData} />
             </div>
             <div className="resizable-card-container">
               <CustomerReviewsCard styles={styles} />
@@ -243,7 +243,7 @@ export function Dashboard() {
               <FundabilityScoreCard profileData={profileData.formData} userId={profileData.id} />
             </div>
             <div className="resizable-card-container">
-              <ComplianceScoreCard styles={styles} profileData={profileData} />
+              <ComplianceScoreCard styles={styles} profileData={profileData.formData} />
             </div>
           </section>
 
