@@ -12,6 +12,7 @@ import { DOCUMENT_PATHS, getDocumentURL } from "../../utils/documentUtils";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import InvestorProfileSummary from "../../investorpages/InvestorUniversalProfile/summaryformatch";
 import get from "lodash.get";
+import { FundingInsights } from "./funding-insights";
 
 const ADJACENT_INDUSTRIES = {
   ict: ["technology", "software", "digital services"],
@@ -140,6 +141,17 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
   const [notification, setNotification] = useState(null);
   const [submittedDocuments, setSubmittedDocuments] = useState([]);
   const [profileData, setProfileData] = useState({});
+  const [insightsData, setInsightsData] = useState({
+    fundingUseBreakdown: {},
+    fundingTypeBreakdown: {},
+    topMatchedSectors: {},
+    sectorDistribution: {},
+    timelineProgress: [],
+    monthlyActivity: [],
+    averageFundingAmount: 0,
+    matchRate: 0,
+    activeFundersCount: 0,
+  });
 
   const getRequiredDocs = (funder) => {
     const funds = funder.fullProfile?.productsServices?.funds || [];
@@ -321,7 +333,87 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
         setAllFunders(matchedFunds);
         setFunders(matchedFunds);
 
-        const appSnapshot = await getDocs(query(collection(db, "smeApplications"), where("smeId", "==", user.uid)));
+        const useBreakdown = {};
+        const typeBreakdown = {};
+        const sectorMatchCount = {};
+        const sectorDistribution = {};
+        const timelineCount = Array(12).fill(0); // Jan to Dec
+        const activityByMonth = Array(12).fill().map(() => ({ matches: 0, applications: 0, deals: 0 }));
+
+        let totalFundingRequested = 0;
+        let funderIds = new Set();
+        let totalMatches = matchedFunds.length;
+
+        matchedFunds.forEach(funder => {
+          // Funding Types
+          (funder.investmentType?.split(",") || []).forEach(type => {
+            const cleanType = type.trim();
+            if (cleanType) typeBreakdown[cleanType] = (typeBreakdown[cleanType] || 0) + 1;
+          });
+
+          // Sector Focus
+          (funder.sectorFocus?.split(",") || []).forEach(sector => {
+            const cleanSector = sector.trim();
+            if (cleanSector) {
+              sectorMatchCount[cleanSector] = (sectorMatchCount[cleanSector] || 0) + 1;
+              sectorDistribution[cleanSector] = (sectorDistribution[cleanSector] || 0) + 1;
+            }
+          });
+
+          // Growth Stages
+          if (funder.targetStage) {
+            const stage = funder.targetStage.trim();
+            useBreakdown[stage] = (useBreakdown[stage] || 0) + 1;
+          }
+
+          funderIds.add(funder.funderId);
+        });
+
+        const appSnapshot = await getDocs(query(
+          collection(db, "smeApplications"),
+          where("smeId", "==", user.uid)
+        ));
+
+        // Funding applications stats
+        let appCount = 0;
+        let totalAmount = 0;
+        appSnapshot.forEach(doc => {
+          const data = doc.data();
+          const monthIndex = new Date(data.applicationDate).getMonth();
+
+          appCount++;
+          const amount = parseFloat(data.fundingNeeded || 0);
+          if (!isNaN(amount)) totalAmount += amount;
+
+          if (data.pipelineStage === "Application Sent") activityByMonth[monthIndex].applications++;
+          if (data.pipelineStage === "Deal Closed" || data.pipelineStage === "Deal Successful") activityByMonth[monthIndex].deals++;
+          activityByMonth[monthIndex].matches++;
+        });
+
+        // Final insights state
+        setInsightsData({
+          fundingUseBreakdown: useBreakdown,
+          fundingTypeBreakdown: typeBreakdown,
+          topMatchedSectors: Object.fromEntries(
+            Object.entries(sectorMatchCount).sort((a, b) => b[1] - a[1]).slice(0, 5)
+          ),
+          sectorDistribution,
+          timelineProgress: activityByMonth.map((v, i) => ({
+            month: new Date(0, i).toLocaleString("default", { month: "short" }),
+            applications: v.applications,
+            matches: v.matches,
+          })),
+          monthlyActivity: activityByMonth.map((v, i) => ({
+            month: new Date(0, i).toLocaleString("default", { month: "short" }),
+            matches: v.matches,
+            applications: v.applications,
+            deals: v.deals,
+          })),
+          averageFundingAmount: appCount ? Math.round(totalAmount / appCount) : 0,
+          matchRate: totalMatches ? Math.round((appCount / totalMatches) * 100) : 0,
+          activeFundersCount: funderIds.size,
+        });
+
         const appStatusMap = {};
         const pipelineStageMap = {};
         const applicationDateMap = {};
@@ -404,6 +496,8 @@ export function FundingTable({ filters, onApplicationSubmitted }) {
     <div className={modalFunder || applyingFunder ? styles.blurredContainer : ""}>
       <h2 className={styles.sectionTitle}>Funding Matches</h2>
       {notification && <div className={`${styles.notification} ${styles[notification.type]}`}>{notification.message}</div>}
+
+      <FundingInsights insightsData={insightsData} />
 
       {funders.length === 0 ? (
         <div className={styles.noResults}><p>No matching funders found. Try adjusting your profile.</p></div>

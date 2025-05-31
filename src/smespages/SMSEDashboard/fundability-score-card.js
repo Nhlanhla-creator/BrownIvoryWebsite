@@ -4,8 +4,10 @@ import { useState, useEffect } from "react"
 import { ChevronDown, X } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import styles from "./fundability-score-card.module.css"
+import { doc, updateDoc } from "firebase/firestore"
+import { db } from "../../firebaseConfig"
 
-export function FundabilityScoreCard({ profileData }) {
+export function FundabilityScoreCard({ profileData, userId }) {
   const [showScoreSummaryModal, setShowScoreSummaryModal] = useState(false)
   const [complianceScore, setComplianceScore] = useState(0)
   const [categoryScores, setCategoryScores] = useState({
@@ -87,17 +89,17 @@ export function FundabilityScoreCard({ profileData }) {
   // Update the score calculation to use stage-specific weights
   useEffect(() => {
     if (profileData) {
-      const rawStage = profileData.entityOverview?.operationStage?.toLowerCase() || "ideation"
-      const operationStage = Object.keys(operationStageWeights).includes(rawStage) ? rawStage : "ideation"
-      const weights = operationStageWeights[operationStage]
+      const rawStage = profileData.entityOverview?.operationStage?.toLowerCase() || "ideation";
+      const operationStage = Object.keys(operationStageWeights).includes(rawStage) ? rawStage : "ideation";
+      const weights = operationStageWeights[operationStage];
 
-      const complianceRaw = calculateComplianceScore(profileData)
-      const financialHealth = calculateFinancialHealth(profileData)
-      const operationalStrength = calculateOperationalStrength(profileData)
-      const pitchQuality = calculatePitchQuality(profileData)
-      const impactProof = calculateImpactProof(profileData)
+      const complianceRaw = calculateComplianceScore(profileData);
+      const financialHealth = calculateFinancialHealth(profileData);
+      const operationalStrength = calculateOperationalStrength(profileData);
+      const pitchQuality = calculatePitchQuality(profileData);
+      const impactProof = calculateImpactProof(profileData);
 
-      setComplianceScore(Math.round(complianceRaw * 100))
+      setComplianceScore(Math.round(complianceRaw * 100));
 
       const weightedScores = {
         compliance: complianceRaw * weights.compliance,
@@ -105,19 +107,32 @@ export function FundabilityScoreCard({ profileData }) {
         operationalStrength: (operationalStrength / 100) * weights.operationalStrength,
         pitchQuality: (pitchQuality / 100) * weights.pitchQuality,
         impactProof: (impactProof / 100) * weights.impactProof,
-      }
+      };
 
-      setCategoryScores({
+      const newCategoryScores = {
         compliance: Math.round(weightedScores.compliance * 100),
         financialHealth: Math.round(weightedScores.financialHealth * 100),
         operationalStrength: Math.round(weightedScores.operationalStrength * 100),
         pitchQuality: Math.round(weightedScores.pitchQuality * 100),
         impactProof: Math.round(weightedScores.impactProof * 100),
-      })
+      };
 
-      setMissingDocuments(calculateMissingDocuments(profileData))
+      setCategoryScores(newCategoryScores);
+      setMissingDocuments(calculateMissingDocuments(profileData));
+
+      // Calculate total fundability score
+      const newTotalScore = Object.values(newCategoryScores).reduce((sum, val) => sum + val, 0);
+
+      // Only update Firestore if score has changed
+      if (userId && !isNaN(newTotalScore)) {
+        const profileRef = doc(db, "universalProfiles", userId);
+        updateDoc(profileRef, {
+          fundabilityScore: newTotalScore,
+          fundabilityScoreUpdatedAt: new Date().toISOString()
+        }).catch(err => console.error("Failed to update score in Firestore:", err));
+      }
     }
-  }, [profileData])
+  }, [profileData]);
 
   // Calculate total score
   const totalFundabilityScore =
@@ -423,7 +438,7 @@ export function FundabilityScoreCard({ profileData }) {
         </div>
 
         <button className={styles.viewMoreBtn} onClick={() => setShowScoreSummaryModal(true)}>
-      Score Breakdown
+          Score Breakdown
 
 
           <ChevronDown className={styles.chevronIcon} size={16} />

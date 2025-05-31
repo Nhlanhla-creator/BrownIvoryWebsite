@@ -93,7 +93,7 @@ export function Dashboard() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setIsAuthenticated(true)
-      } 
+      }
       setAuthChecked(true)
     })
 
@@ -116,7 +116,7 @@ export function Dashboard() {
         const docSnap = await getDoc(docRef)
 
         if (docSnap.exists()) {
-          setProfileData(docSnap.data())
+          setProfileData({ id: userId, formData: docSnap.data() })
         } else {
           console.error("No profile found")
         }
@@ -240,7 +240,7 @@ export function Dashboard() {
               <CustomerReviewsCard styles={styles} />
             </div>
             <div className="resizable-card-container">
-              <FundabilityScoreCard profileData={profileData} />
+              <FundabilityScoreCard profileData={profileData.formData} userId={profileData.id} />
             </div>
             <div className="resizable-card-container">
               <ComplianceScoreCard styles={styles} profileData={profileData} />

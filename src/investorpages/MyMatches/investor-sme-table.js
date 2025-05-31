@@ -54,7 +54,6 @@ export function InvestorSMETable() {
     setLoading(true);
     setAuthLoading(true);
 
-    // Listen for authentication state changes
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setAuthLoading(false);
@@ -65,47 +64,62 @@ export function InvestorSMETable() {
         return;
       }
 
-      // Only proceed with data fetching if user is authenticated
       const q = query(
         collection(db, "investorApplications"),
         where("funderId", "==", currentUser.uid)
       );
 
-      const unsubscribeData = onSnapshot(q, (querySnapshot) => {
-        const applications = [];
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
+      const unsubscribeData = onSnapshot(q, async (querySnapshot) => {
+        try {
+          const fetchWithProfiles = await Promise.all(
+            querySnapshot.docs.map(async (docSnap) => {
+              const data = docSnap.data();
 
-          if (data.availableDates) {
-            data.availableDates = data.availableDates.map(avail => ({
-              ...avail,
-              date: new Date(avail.date)
-            }));
-          }
+              // Convert date fields if needed
+              if (data.availableDates) {
+                data.availableDates = data.availableDates.map(avail => ({
+                  ...avail,
+                  date: new Date(avail.date)
+                }));
+              }
 
-          applications.push({
-            id: doc.id,
-            ...data
+              // 🔍 Fetch the SME profile to get the fundabilityScore
+              let fundabilityScore = null;
+              try {
+                const profileRef = doc(db, "universalProfiles", data.smeId);
+                const profileSnap = await getDoc(profileRef);
+                if (profileSnap.exists()) {
+                  fundabilityScore = profileSnap.data().fundabilityScore || null;
+                }
+              } catch (error) {
+                console.error("Error fetching SME profile for", data.smeId, error);
+              }
+
+              return {
+                id: docSnap.id,
+                ...data,
+                fundabilityScore,
+              };
+            })
+          );
+
+          // Sort and update state
+          fetchWithProfiles.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          setSmes(fetchWithProfiles);
+          setLoading(false);
+        } catch (error) {
+          console.error("Error processing applications:", error);
+          setNotification({
+            type: "error",
+            message: "Failed to load applications"
           });
-        });
-
-        applications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        setSmes(applications);
-        setLoading(false);
-      }, (error) => {
-        console.error("Error fetching applications:", error);
-        setNotification({
-          type: "error",
-          message: "Failed to load applications"
-        });
-        setLoading(false);
+          setLoading(false);
+        }
       });
 
-      // Return cleanup function for data subscription
       return () => unsubscribeData();
     });
 
-    // Return cleanup function for auth subscription
     return () => unsubscribeAuth();
   }, []);
 
@@ -752,7 +766,7 @@ export function InvestorSMETable() {
               <th>Sector</th>
               <th>Funding Needed</th>
               <th>Application Date</th>
-              <th>Status</th>
+              <th>Fundability Score</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -790,13 +804,7 @@ export function InvestorSMETable() {
                   <td>R{Number(sme.fundingNeeded).toLocaleString()}</td>
                   <td>{sme.applicationDate}</td>
                   <td>
-                    <span className={getStatusBadgeClass(sme.status)}>
-                      {sme.status === "Approved"
-                        ? "Accepted"
-                        : sme.status === "scheduled"
-                          ? "Meeting Scheduled"
-                          : sme.status || "Pending"}
-                    </span>
+                    {sme.fundabilityScore != null ? `${sme.fundabilityScore}%` : 'N/A'}
                   </td>
 
                   <td style={{ whiteSpace: "nowrap" }}>
