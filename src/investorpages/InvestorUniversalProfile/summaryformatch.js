@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { ChevronDown, ChevronUp, Edit, Printer, ExternalLink, FileText, Mail, MapPin, Calendar, Briefcase, User, Heart, Share2, MessageSquare, X } from "lucide-react"
 
-const InvestorProfileSummary = ({ data = {}, onEdit = () => {} }) => {
+const InvestorProfileSummary = ({ data = {}, match={},onEdit = () => {} }) => {
   const [expandedSections, setExpandedSections] = useState({
     entityOverview: false,
     productsServices: true, // Show investment offerings by default
@@ -371,7 +371,7 @@ const InvestorProfileSummary = ({ data = {}, onEdit = () => {} }) => {
               <User size={40} color="white" />
             </div>
             <div style={styles.matchBadge}>
-              {matchPercentage}% Match
+              {match}% Match
             </div>
           </div>
         </div>
